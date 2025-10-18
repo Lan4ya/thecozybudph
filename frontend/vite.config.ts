@@ -5,11 +5,19 @@ import path from "path";
 import tailwindcss from "@tailwindcss/vite";
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [react(), tailwindcss()],
   server: {
     port: 3000,
     // host: "0.0.0.0",
+    server:
+      mode === "development"
+        ? {
+            proxy: {
+              "/api": "http://localhost:3000",
+            },
+          }
+        : undefined,
   },
   build: {
     outDir: path.resolve(__dirname, "../frontend-dist"), // keeps dist outside frontend
@@ -20,4 +28,4 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-});
+}));
