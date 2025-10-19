@@ -1,0 +1,25 @@
+{
+  "extends": "./tsconfig.base.json", // use base config
+  "compilerOptions": {
+    "types": [
+      "node"
+    ],
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "rootDir": "src",
+    "outDir": "../backend-dist",
+    "baseUrl": "src",
+    "paths": {
+      "@utils/*": [
+        "utils/*"
+      ],
+      "@ts-pages/*": [
+        "pages/*"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*"
+  ]
+}
