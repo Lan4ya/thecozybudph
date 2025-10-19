@@ -26,7 +26,7 @@ npm install -g pnpm # if you have npm installed you can install pnpm using this
 git clone https://github.com/isMaya404/thecozybudph && cd thecozybudph && pnpm install
 ```
 #### 3. Run development server
-###### ⚠️ NOTE ⚠️: This cmd only runs the frontend dev server and does not included the backend dev server since that is not needed. When you're creating a feature that involves an api call to the backend (e.g. a button that pre-orders a flower 'api/v1/pre-order/...' or a submitting a form with user input details to schedule an event), just message me and I'll just provide an api endpoint that's already deployed so you won't have to touch the backend at all.
+###### ⚠️ NOTE ⚠️: This cmd only runs the frontend dev server and does not include the backend dev server since that is not needed. When you're creating a feature that involves an api call to the backend (e.g. a button that pre-orders a flower 'api/v1/pre-order/...' or a submitting a form with user input details to schedule an event), just message me and I'll just provide an api endpoint that's already deployed so you won't have to touch the backend at all.
 ```bash
 pnpm dev-frontend
 ```
