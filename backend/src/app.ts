@@ -4,7 +4,7 @@ import path from "path";
 import helmet from "helmet";
 import cors from "cors";
 import morgan from "morgan";
-import { initDB } from "./db/supabase.ts";
+import { initDB } from "./db/connectDB";
 
 const app = express();
 

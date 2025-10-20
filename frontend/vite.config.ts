@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => ({
         : undefined,
   },
   build: {
-    outDir: path.resolve(__dirname, "../frontend-dist"), // keeps dist outside frontend
+    outDir: path.resolve(__dirname, "../dist-frontend"),
     emptyOutDir: true,
   },
   resolve: {

@@ -7,17 +7,17 @@
     "backend"
   ],
   "scripts": {
-    "dev-backend": "pnpm --filter backend dev",
+    // https://supabase.com/docs/guides/functions/quickstart
+    "dev-db": "pnpm dlx supabase --workdir ./backend/src/db", // append with start, stop, restart, status, etc.
+    "dev-db-start": "pnpm run dev-db start && pnpm run dev-db functions serve --no-verify-jwt",
+    "dev-db-stop": "pnpm run dev-db stop",
     "dev-frontend": "pnpm --filter frontend dev",
-    "dev": "concurrently \"pnpm --filter backend dev\" \"pnpm --filter frontend dev\"",
+    "dev-backend": "pnpm --filter backend dev",
+    "dev": "concurrently \"pnpm run deb-dv-start\" \"pnpm --filter backend dev\" \"pnpm --filter frontend dev\"",
+    "build-frontend": "pnpm --filter frontend build",
+    "build-backend": "pnpm --filter backend build",
     "build": "pnpm -r build",
     "start": "pnpm --filter backend start",
-    // https://supabase.com/docs/guides/functions/quickstart
-    "supabase": "pnpm dlx supabase --workdir ./backend",
-    "supabase-start": "pnpm run supabase start",
-    "supabase-stop": "pnpm run supabase stop",
-    "supabase-restart": "pnpm run supabase restart",
-    "supabase-status": "pnpm run supabase status"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

@@ -1,8 +1,6 @@
 {
   "compilerOptions": {
     "strict": true,
-    "noEmit": true,
-    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "sourceMap": true,
     "removeComments": true,
@@ -10,7 +8,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "noUnusedLocals": false,
+    "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "strictNullChecks": true,
@@ -18,6 +16,7 @@
     "strictBindCallApply": true,
     "noImplicitThis": true,
     "noImplicitAny": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "incremental": true
   }
 }

@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "NODE_ENV=development nodemon --watch src --exec tsx src/app.ts",
-    "build": "tsc",
-    "start": "node ../backend-dist/app.js"
+    "build": "tsc -p .",
+    "start": "node ../dist-backend/app.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.75.1",
