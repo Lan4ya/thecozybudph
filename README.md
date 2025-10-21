@@ -20,7 +20,7 @@ Make sure you have:
 - **Node.js 18+** 
 - **pnpm** installed globally
 ```bash
-# if you have npm installed, you can install pnpm using this or just install on the internet if you don't
+# install pnpm using npm, or with other pkg managers, or manually on the internet.  
 npm install -g pnpm 
 ```
 #### 2. Clone and install this repository (Skip this step if you already did this once)
@@ -30,7 +30,7 @@ git clone https://github.com/isMaya404/thecozybudph && cd thecozybudph && pnpm i
 #### 3. Run development server
 ###### ⚠️ NOTE ⚠️: This cmd only runs the frontend dev server and does not include the backend dev server since that is not needed. When you're creating a feature that involves an api call to the backend (e.g. a button that pre-orders a flower 'api/v1/pre-order/...' or a submitting a form with user input details to schedule an event), just message me and I'll just provide an api endpoint that's already deployed so you won't have to touch the backend at all.
 ```bash
-pnpm dev-frontend
+pnpm dev:frontend
 ```
 #### 4. Open the website
 ```bash
