@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "NODE_ENV=development nodemon --watch src --exec tsx src/app.ts",
+    "db": "pnpm dlx supabase --workdir ./src/db",
     "build": "tsc -p .",
     "start": "node ../dist-backend/app.js"
   },
@@ -21,6 +22,7 @@
     "@types/node": "^24.8.1",
     "morgan": "^1.10.1",
     "nodemon": "^3.1.10",
+    "supabase": "^2.51.0",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3"
   }
