@@ -16,22 +16,28 @@ const navItems = [
 const NavBar = () => {
   const isMediumScreenAndBelow = useMediaQuery("(max-width: 1023px)");
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [isBackgroundShown, setShowBackground] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
+    if (location.pathname !== "/") {
+      setShowBackground(true);
+      return;
+    }
+
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 0);
+      setShowBackground(window.scrollY > 0);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [location.pathname]);
 
   return (
     <div
       className={cn(
         "fixed top-0 z-[999] w-screen py-3 flex-between px-4 md:px-8",
         !menuOpen &&
-          isScrolled &&
+          isBackgroundShown &&
           "border-b-primary-foreground shadow-xs bg-background backdrop-blur-sm ",
       )}
     >
@@ -57,7 +63,7 @@ const NavBar = () => {
           <Menu
             className={cn(
               "text-primary-foreground group-hover:text-primary-foreground/80",
-              isScrolled && "text-primary group-hover:text-primary/80",
+              isBackgroundShown && "text-primary group-hover:text-primary/80",
             )}
           />
         </Button>
@@ -125,12 +131,18 @@ const NavBar = () => {
         )}
       </AnimatePresence>
 
-      {!isMediumScreenAndBelow && <DesktopNavLinks isScrolled={isScrolled} />}
+      {!isMediumScreenAndBelow && (
+        <DesktopNavLinks isBackgroundShown={isBackgroundShown} />
+      )}
     </div>
   );
 };
 
-const DesktopNavLinks = ({ isScrolled }: { isScrolled: boolean }) => {
+const DesktopNavLinks = ({
+  isBackgroundShown,
+}: {
+  isBackgroundShown: boolean;
+}) => {
   const [hovered, setHovered] = useState<string | null>(null);
   const location = useLocation();
   const active = hovered ?? location.pathname;
@@ -150,7 +162,7 @@ const DesktopNavLinks = ({ isScrolled }: { isScrolled: boolean }) => {
             to={href}
             className={cn(
               "text-primary-foreground hover:text-primary-foreground/70 text-lg font-bold transition-colors",
-              isScrolled && "text-primary hover:text-primary/70",
+              isBackgroundShown && "text-primary hover:text-primary/70",
             )}
           >
             {label}
@@ -186,7 +198,7 @@ const DesktopNavLinks = ({ isScrolled }: { isScrolled: boolean }) => {
           to="/cart"
           className={cn(
             "text-primary-foreground hover:text-primary-foreground/70 transition-colors relative",
-            isScrolled && "text-primary hover:text-primary/70",
+            isBackgroundShown && "text-primary hover:text-primary/70",
           )}
         >
           <div className="absolute -right-[14px] -top-[9px] flex-center text-secondary-foreground text-[9px] font-medium bg-secondary size-5 rounded-full select-none">
