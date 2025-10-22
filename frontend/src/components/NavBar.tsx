@@ -51,9 +51,15 @@ const NavBar = () => {
         <Button
           variant="minimal"
           size="auto"
+          className="group"
           onClick={() => setMenuOpen((prev) => !prev)}
         >
-          <Menu className="hover:text-current/80" />
+          <Menu
+            className={cn(
+              "text-primary-foreground group-hover:text-primary-foreground/80",
+              isScrolled && "text-primary group-hover:text-primary/80",
+            )}
+          />
         </Button>
       )}
 
@@ -119,12 +125,12 @@ const NavBar = () => {
         )}
       </AnimatePresence>
 
-      {!isMediumScreenAndBelow && <DesktopNavLinks />}
+      {!isMediumScreenAndBelow && <DesktopNavLinks isScrolled={isScrolled} />}
     </div>
   );
 };
 
-const DesktopNavLinks = () => {
+const DesktopNavLinks = ({ isScrolled }: { isScrolled: boolean }) => {
   const [hovered, setHovered] = useState<string | null>(null);
   const location = useLocation();
   const active = hovered ?? location.pathname;
@@ -142,7 +148,10 @@ const DesktopNavLinks = () => {
         >
           <Link
             to={href}
-            className="text-primary text-lg font-bold hover:text-primary/70 transition-colors"
+            className={cn(
+              "text-primary-foreground hover:text-primary-foreground/70 text-lg font-bold transition-colors",
+              isScrolled && "text-primary hover:text-primary/70",
+            )}
           >
             {label}
           </Link>
@@ -175,7 +184,10 @@ const DesktopNavLinks = () => {
       >
         <Link
           to="/cart"
-          className="text-primary hover:text-primary/70 transition-colors relative"
+          className={cn(
+            "text-primary-foreground hover:text-primary-foreground/70 transition-colors relative",
+            isScrolled && "text-primary hover:text-primary/70",
+          )}
         >
           <div className="absolute -right-[14px] -top-[9px] flex-center text-secondary-foreground text-[9px] font-medium bg-secondary size-5 rounded-full select-none">
             0
