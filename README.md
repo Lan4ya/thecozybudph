@@ -38,6 +38,21 @@ pnpm dev:frontend
 http://localhost:5173
 ```
 ---
+### 📦 How to add a dependency
+General packages:
+```bash
+# The usual "pnpm install <package-name>" won't work. You have to use:
+ pnpm i <package-name> -F frontend # this installs the pkg inside frontend dir (folder) only
+```
+<br>
+
+ShadCN components:
+```bash
+  pnpm dlx shadcn@latest add <component-name> --cwd ./frontend
+```
+
+
+---
 ### Frontend Directory Tree
 - some guides on where you can put certain files (as the codebase grows this tree will get outdated, so think of this as a base structure)
 
