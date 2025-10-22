@@ -7,8 +7,8 @@
   const style = document.createElement("style");
   style.textContent = `
     :root {
-      --fg: oklch(0.985 0 0); 
-      --bg: rgb(25, 27, 28);
+      --fg: oklch(0.145 0 0);
+      --bg: #f0e3d9;
     }
     body {
       background-color: var(--bg) !important;
