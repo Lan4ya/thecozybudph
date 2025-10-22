@@ -1,5 +1,5 @@
 const About = () => {
-  return <div>About Page...</div>;
+  return <div className="flex-1 flex-center">About Page...</div>;
 };
 
 export default About;
