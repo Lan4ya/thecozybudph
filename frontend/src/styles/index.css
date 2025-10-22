@@ -1,5 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "./tw-utils.css";
+@import "./fonts.css";
 
 @layer base {
   * {
@@ -93,4 +95,9 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@theme {
+  --font-ivy-ora-display: "IvyOraDisplay", "sans-serif";
+  --font-back-to-black: "BackToBlack", "sans-serif";
 }

@@ -1,0 +1,14 @@
+@font-face {
+  font-family: "BackToBlack";
+  src: url("../assets/fonts/back_to_black/BackToBlack.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IvyOraDisplay";
+  src: url("../assets/fonts/ivy_ora_display/IvyOraDisplay-Regular.ttf")
+    format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}

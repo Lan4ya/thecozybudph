@@ -9,7 +9,7 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        minimal: "shadow-xs cursor-pointer hover:text-current/90",
+        minimal: "cursor-pointer hover:text-current/80",
         default:
           "cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90",
         destructive:
@@ -23,7 +23,7 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
-        auto: "h-auto w-auto",
+        auto: "h-auto w-auto [&_svg]:!size-auto",
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
         sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
         lg: "h-10 rounded-md px-6 has-[>svg]:px-4",

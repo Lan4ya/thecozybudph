@@ -1,0 +1,41 @@
+/* This is just tailwind utilities grouped together to further increase productivity */
+
+@layer utilities {
+  /* Use this on all containers so it's assured they all have the same px */
+  .container {
+    @apply !px-6;
+  }
+
+  /* flex utils */
+
+  .flex-center {
+    @apply flex justify-center items-center;
+  }
+
+  .flex-between {
+    @apply flex justify-between items-center;
+  }
+
+  /* Typography utils */
+
+  .text-30-bold {
+    @apply text-[30px] font-bold;
+  }
+
+  .text-26-bold {
+    @apply font-bold text-[26px];
+  }
+
+  .text-20-semibold {
+    @apply font-semibold text-[20px];
+  }
+
+  .text-16-medium {
+    @apply font-medium text-[16px];
+  }
+
+  .text-12-normal {
+    @apply font-normal;
+    font-size: 12px;
+  }
+}
