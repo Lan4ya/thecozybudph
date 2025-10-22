@@ -1,10 +1,11 @@
 ### Frontend Codebase Guide
 ---
-####  Project Overview
-These are the main tech stack that we'll use for frontend:
+
+#### Main tech stack:
+
 - [Typescript](https://www.typescriptlang.org/) 
 - [React 19](https://react.dev/) 
-- [TailwindCSS 4](https://tailwindcss.com/) for quick css development
+- [TailwindCSS 4](https://tailwindcss.com/) 
 - [React Router (Data Mode)](https://reactrouter.com/start/data/installation/) for routing  
 - [Lucide](https://lucide.dev/) for icons  
 - [ShadCN](https://ui.shadcn.com/) for base components
