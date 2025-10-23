@@ -105,6 +105,7 @@ const NavBar = () => {
 
               <Link
                 to="/cart"
+                onClick={() => setMenuOpen(false)}
                 className="text-primary-foreground text-lg hover:text-primary transition-colors cursor-pointer"
               >
                 <ShoppingCart />
@@ -121,6 +122,7 @@ const NavBar = () => {
               >
                 <Link
                   to={href}
+                  onClick={() => setMenuOpen(false)}
                   className="text-primary-foreground font-bold hover:text-primary transition-colors"
                 >
                   {label}
