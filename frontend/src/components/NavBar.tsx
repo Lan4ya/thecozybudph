@@ -121,7 +121,7 @@ const NavBar = () => {
                 <Link
                   to={href}
                   onClick={() => setMenuOpen(false)}
-                  className="text-primary-foreground font-bold hover:text-primary transition-colors"
+                  className="text-primary-foreground font-medium hover:text-primary transition-colors"
                 >
                   {label}
                 </Link>
@@ -161,8 +161,8 @@ const DesktopNavLinks = ({
           <Link
             to={href}
             className={cn(
-              "text-primary-foreground hover:text-primary-foreground/70 text-lg font-bold transition-colors",
-              isBackgroundShown && "text-primary hover:text-primary/70",
+              "text-primary-foreground hover:text-primary-foreground/70 text-lg font-medium transition-colors",
+              isBackgroundShown && "text-secondary hover:text-primary/70",
             )}
           >
             {label}
@@ -198,7 +198,7 @@ const DesktopNavLinks = ({
           to="/cart"
           className={cn(
             "text-primary-foreground hover:text-primary-foreground/70 transition-colors relative",
-            isBackgroundShown && "text-primary hover:text-primary/70",
+            isBackgroundShown && "text-secondary hover:text-primary/70",
           )}
         >
           <div className="absolute -right-[14px] -top-[9px] flex-center text-secondary-foreground text-[9px] font-medium bg-secondary size-5 rounded-full select-none">
