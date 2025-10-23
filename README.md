@@ -97,6 +97,9 @@ frontend
 ##### Before I give the step by step guide on how contribute code, here are the branches we're gonna use for the whole process of developing this project:
 
 ### Branch Model: 
+
+![Branch Model](branch_model.png)
+
 #### main branch: production-ready features
 - This is where the deployed website will source the code.  
 - ⚠️ **You should not push your commits in here, open a pr, or touch this branch at all. this is where I'll merge code from dev branch only if the feature is already stable (bug free). I won't give access to this branch for safety.** ⚠️ 
