@@ -80,16 +80,14 @@ const NavBar = () => {
             className="h-screen fixed inset-0 z-[998] bg-black/50 backdrop-blur-sm flex flex-col items-center justify-center pb-[20%] space-y-6"
           >
             {/* Close Button */}
-            <div className="absolute top-3 right-4 md:right-8">
-              <Button
-                variant="minimal"
-                size="auto"
-                onClick={() => setMenuOpen(false)}
-                className=""
-              >
-                <X className="text-primary-foreground" />
-              </Button>
-            </div>
+            <Button
+              variant="minimal"
+              size="auto"
+              onClick={() => setMenuOpen(false)}
+              className="p-1 border-2 rounded-md absolute top-3 right-4 md:right-8"
+            >
+              <X className="text-primary-foreground" />
+            </Button>
 
             {/* Cart */}
             <motion.div
