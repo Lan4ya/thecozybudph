@@ -46,7 +46,7 @@ const NavBar = () => {
         <Link
           to="/"
           reloadDocument
-          className="font-back-to-black text-primary hover:text-primary/80 text-xl lg:text-3xl lg:font-semibold"
+          className="font-back-to-black text-primary hover:text-primary/80 text-2xl lg:text-4xl lg:font-semibold"
         >
           TheCozyBud
         </Link>
