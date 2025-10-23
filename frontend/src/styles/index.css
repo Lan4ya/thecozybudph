@@ -7,6 +7,10 @@
   * {
     @apply border-border outline-ring/50;
   }
+
+  body {
+    font-family: "NeueHaasGrotesk", system-ui, sans-serif;
+  }
 }
 
 :root {
