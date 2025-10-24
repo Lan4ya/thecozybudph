@@ -33,7 +33,7 @@ const NavBar = () => {
   }, [location.pathname]);
 
   return (
-    <div
+    <nav
       className={cn(
         "fixed top-0 z-[999] w-screen py-3 flex-between px-4 md:px-8",
         !menuOpen &&
@@ -134,7 +134,7 @@ const NavBar = () => {
       {!isMediumScreenAndBelow && (
         <DesktopNavLinks isBackgroundShown={isBackgroundShown} />
       )}
-    </div>
+    </nav>
   );
 };
 
