@@ -36,6 +36,19 @@ const ProductGrid: React.FC<{ items: Item[] }> = ({ items }) => {
           ))}
         </div>
       </div>
+
+      <div className="mx-auto py-8 flex justify-center">
+        <button
+          className="px-6 py-2 rounded-md"
+          style={{
+            background: "transparent",
+            border: "1px dashed var(--color-border)",
+            color: "var(--color-muted-foreground)",
+          }}
+        >
+          View all
+        </button>
+      </div>
     </section>
   );
 };

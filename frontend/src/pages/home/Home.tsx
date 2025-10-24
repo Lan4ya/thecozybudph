@@ -11,7 +11,7 @@ const items = Array.from({ length: 12 }).map((_, i) => ({
 
 const Home: React.FC = () => {
   return (
-    <main className="flex-1">
+    <main className="flex-1 flex flex-col gap-15">
       <Hero />
       <ProductGrid items={items} />
       <div className="container mx-auto py-8 flex justify-center">
