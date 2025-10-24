@@ -72,7 +72,6 @@ async function uploadFile(filePath: string, bucket: string): Promise<void> {
   const { data, error } = await supabase.storage
     .from(bucket)
     .upload(relativePath, stream, {
-      upsert: true,
       contentType,
     });
 
