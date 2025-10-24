@@ -6,7 +6,7 @@ export function initDB() {
   if (supabase) return supabase;
 
   const url = process.env.SUPABASE_URL!;
-  const key = process.env.SUPABASE_KEY!;
+  const key = process.env.SUPABASE_SERVICE_KEY!;
 
   if (!url || !key) throw new Error("Missing Supabase credentials...");
 

@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "NODE_ENV=development nodemon --watch src --exec tsx src/app.ts",
-    "db": "pnpm dlx supabase --workdir ./src/db",
+    "db": "pnpm dlx supabase",
     "build": "tsc -p .",
     "start": "node ../dist-backend/app.js"
   },
@@ -14,7 +14,8 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
-    "helmet": "^8.1.0"
+    "helmet": "^8.1.0",
+    "mime": "^4.1.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
