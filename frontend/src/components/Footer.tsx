@@ -2,13 +2,10 @@ import React from "react";
 
 const Footer: React.FC = () => {
   return (
-    <footer className="mt-auto bg-[var(--color-secondary)] text-[var(--color-secondary-foreground)] py-8">
+    <footer className="mt-auto bg-secondary text-secondary-foreground py-8">
       <div className="container mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h4
-            className="font-back-to-black text-20-bold"
-            style={{ color: "var(--color-primary-foreground)" }}
-          >
+          <h4 className="font-back-to-black text-primary-foreground text-20-bold">
             The Cozy Bud
           </h4>
           <p className="text-12-normal mt-2">Handmade florals • PH</p>
