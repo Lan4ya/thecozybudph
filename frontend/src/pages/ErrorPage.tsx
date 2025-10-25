@@ -1,5 +1,6 @@
 ("use client");
 
+import { useRouteError, isRouteErrorResponse } from "react-router";
 import { motion } from "framer-motion";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Link } from "react-router";
@@ -16,7 +17,7 @@ const messages: Record<number, string> = {
   500: "Something went wrong on our servers.",
 };
 
-const ErrorPage = ({ status, title, message }: ErrorPageProps) => {
+export const ErrorPage = ({ status, title, message }: ErrorPageProps) => {
   const finalMessage = message || (status ? messages[status] : null);
 
   return (
@@ -47,4 +48,16 @@ const ErrorPage = ({ status, title, message }: ErrorPageProps) => {
   );
 };
 
-export default ErrorPage;
+export function CatchAllErrorPage() {
+  const error = useRouteError();
+
+  if (isRouteErrorResponse(error)) {
+    return <ErrorPage status={error.status} title={`${error.status}`} />;
+  }
+
+  if (error instanceof Error) {
+    return <ErrorPage title="Error" message={error.message} />;
+  }
+
+  return <ErrorPage title="Unknown Error" message="Something went wrong." />;
+}
