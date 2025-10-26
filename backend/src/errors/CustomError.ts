@@ -1,0 +1,10 @@
+// Custom err that aligns with how http response looks
+
+export class CustomError extends Error {
+  statusCode: number;
+
+  constructor(statusCode: number, message?: string) {
+    super(message);
+    this.statusCode = statusCode;
+  }
+}

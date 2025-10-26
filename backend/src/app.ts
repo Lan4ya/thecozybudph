@@ -6,6 +6,10 @@ import cors from "cors";
 import morgan from "morgan";
 import { initDB } from "./db/connectDB";
 
+// err middlewares
+import { notFound } from "./middlewares/notFound";
+import { errorHandler } from "./middlewares/errorHandler";
+
 const app = express();
 
 app.use(
@@ -53,6 +57,10 @@ if (NODE_ENV === "production") {
 app.get("/api/hello", (_req, res) => {
   res.json({ message: "Hello from Express backend!" });
 });
+
+// error handlers
+app.use(notFound);
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   initDB();
