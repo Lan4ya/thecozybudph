@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev": "NODE_ENV=development nodemon --watch src --exec tsx src/app.ts",
+    "dev": "cross-env NODE_ENV=development nodemon --watch src --exec tsx src/app.ts",
     "db": "pnpm dlx supabase",
     "build": "tsc -p .",
     "start": "node ../dist-backend/app.js"
@@ -12,6 +12,7 @@
     "@supabase/supabase-js": "^2.75.1",
     "@types/cors": "^2.8.19",
     "cors": "^2.8.5",
+    "cross-env": "^10.1.0",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "helmet": "^8.1.0",
