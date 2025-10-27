@@ -87,16 +87,9 @@ frontend
 ---
 ### How To Contribute Code (Assumes Basic Git Knowledge)
 
-- Kailangan talaga to @Alex... Magugulo yung codebase pag di ganto yung process since tatlo tayo nag-aadd/nagdedelete ng code sa iisang codebase. Practice din to, ganto workflow pag may trabaho na. Make sure marunong ka ng basics
-
-##### Git Basics Refresher:
-- [Git Basics Part 1](https://youtu.be/hrTQipWp6co?si=6Z_BzwvGACF97g1W/) - 30mins  
-- [Git Basics Part 2](https://youtu.be/1ibmWyt8hfw?si=yTd7dcvtXJFSD14e) - 50mins
-
----
 ##### Before I give the step by step guide on how contribute code, here are the branches we're gonna use for the whole process of developing this project:
 
-### Branch Model: 
+### Branch Model 
 
 ![Branch Model](branch_model.png)
 
@@ -129,7 +122,7 @@ frontend
 # It's always gonna be behind upstream from dev (outdated).
 
 # skip this step if you recently just pulled.
-git pull origin dev 
+git pull --rebase origin dev 
 ```
 
 #### 2. Create a feature branch and switch to it
@@ -152,7 +145,7 @@ git commit -m "added form for event event-scheduling"
 #### 4. Push your code to your own remote branch
 ```bash
 # Sync before pushing. If there's a merge conflict fix it.
-git pull origin dev 
+git pull --rebase origin dev 
 
 # NOTE: push only to your own branch, not in dev nor main.
 git push feature/{nameOfYourBranch} 
