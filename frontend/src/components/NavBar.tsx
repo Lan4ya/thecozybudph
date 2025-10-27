@@ -4,7 +4,7 @@ import { ShoppingCart, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { cn } from "@/lib/utils/cn";
-import { Link, useLocation } from "react-router";
+import { NavLink, useLocation } from "react-router";
 
 const navItems = [
   { label: "Shop", href: "/shop" },
@@ -38,18 +38,18 @@ const NavBar = () => {
         "fixed top-0 z-[999] w-screen py-3 flex-between px-4 md:px-8",
         !menuOpen &&
           isBackgroundShown &&
-          "border-b-primary-foreground shadow-xs bg-background backdrop-blur-sm ",
+          "border-b-foreground shadow-xs bg-background backdrop-blur-sm ",
       )}
     >
       {/* Brand */}
       <div className="flex items-center gap-1">
-        <Link
+        <NavLink
           to="/"
           reloadDocument
           className="font-back-to-black text-primary hover:text-primary/80 text-2xl lg:text-4xl lg:font-semibold"
         >
           TheCozyBud
-        </Link>
+        </NavLink>
       </div>
 
       {/* Mobile Menu Button */}
@@ -101,13 +101,18 @@ const NavBar = () => {
                 0
               </div>
 
-              <Link
+              <NavLink
                 to="/cart"
                 onClick={() => setMenuOpen(false)}
-                className="text-primary-foreground text-lg hover:text-primary transition-colors cursor-pointer"
+                className={({ isActive }) =>
+                  cn(
+                    "text-primary-foreground text-lg hover:text-primary transition-colors cursor-pointer",
+                    isActive ? "text-primary" : null,
+                  )
+                }
               >
                 <ShoppingCart />
-              </Link>
+              </NavLink>
             </motion.div>
 
             {/* Menu Items */}
@@ -118,13 +123,18 @@ const NavBar = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.25 + (idx + 1) * 0.05 }}
               >
-                <Link
+                <NavLink
                   to={href}
                   onClick={() => setMenuOpen(false)}
-                  className="text-primary-foreground font-medium hover:text-primary transition-colors"
+                  className={({ isActive }) =>
+                    cn(
+                      "text-primary-foreground font-medium hover:text-primary transition-colors",
+                      isActive ? "text-primary" : null,
+                    )
+                  }
                 >
                   {label}
-                </Link>
+                </NavLink>
               </motion.div>
             ))}
           </motion.div>
@@ -158,7 +168,7 @@ const DesktopNavLinks = ({
           className="relative flex flex-col items-center"
           onMouseEnter={() => setHovered(href)}
         >
-          <Link
+          <NavLink
             to={href}
             className={cn(
               "text-primary-foreground hover:text-primary-foreground/70 text-lg font-medium transition-colors",
@@ -166,7 +176,7 @@ const DesktopNavLinks = ({
             )}
           >
             {label}
-          </Link>
+          </NavLink>
 
           {/* Animated underline */}
           <AnimatePresence>
@@ -194,7 +204,7 @@ const DesktopNavLinks = ({
         className="relative flex flex-col items-center"
         onMouseEnter={() => setHovered("/cart")}
       >
-        <Link
+        <NavLink
           to="/cart"
           className={cn(
             "text-primary-foreground hover:text-primary-foreground/70 transition-colors relative",
@@ -205,7 +215,7 @@ const DesktopNavLinks = ({
             0
           </div>
           <ShoppingCart />
-        </Link>
+        </NavLink>
 
         <AnimatePresence>
           {active === "/cart" && (
