@@ -46,8 +46,8 @@
   --input: oklch(0.68 0.05 30);
   --ring: oklch(0.68 0.05 30);
 
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.18 0.02 70);
+  --sidebar: #e3d3c6;
+  --sidebar-foreground: oklch(0.18 0 0);
   --sidebar-primary: oklch(0.33 0.05 115);
   --sidebar-primary-foreground: oklch(0.98 0 0);
   --sidebar-accent: oklch(0.92 0.02 70);
@@ -55,7 +55,7 @@
   --sidebar-border: oklch(0.85 0.01 70);
   --sidebar-ring: oklch(0.7 0.04 40);
 
-  /* Most like we're not gonna need charts but just in case. */
+  /* Most likely we're not gonna need charts but just in case. */
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
