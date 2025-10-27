@@ -1,6 +1,7 @@
 import React from "react";
 import Hero from "./components/Hero";
 import ProductGrid from "./components/ProductGrid";
+import EventSection from "./components/EventSection";
 
 const items = Array.from({ length: 12 }).map((_, i) => ({
   id: String(i + 1),
@@ -11,21 +12,10 @@ const items = Array.from({ length: 12 }).map((_, i) => ({
 
 const Home: React.FC = () => {
   return (
-    <main className="flex-1 flex flex-col gap-15">
+    <main className="overflow-x-hidden flex-1 flex flex-col gap-15">
       <Hero />
       <ProductGrid items={items} />
-      <div className="container mx-auto py-8 flex justify-center">
-        <button
-          className="px-6 py-2 rounded-md"
-          style={{
-            background: "transparent",
-            border: "1px dashed var(--color-border)",
-            color: "var(--color-muted-foreground)",
-          }}
-        >
-          View all
-        </button>
-      </div>
+      <EventSection />
     </main>
   );
 };
