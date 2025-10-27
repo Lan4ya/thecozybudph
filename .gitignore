@@ -30,6 +30,9 @@ __ignored*
 .repomix*
 repomix*
 
+# products/
+events/
+
 # This just for me. To handle quirks neovim has --Jeremiah
 ;
 ;w
