@@ -1,9 +1,12 @@
 {
-  "extends": "./tsconfig.base.json",
+  "extends": [
+    "../tsconfig.packages.json",
+    "./tsconfig.base.json"
+  ],
   "compilerOptions": {
     "types": [
       "node",
-      "express"
+      "express",
     ],
     "lib": [
       "ES2022"
@@ -15,17 +18,11 @@
     "baseUrl": ".",
     "paths": {
       "@/*": [
-        ".src/*"
+        "./*"
       ],
-      "@ts-pages/*": [
-        "pages/*"
-      ]
     }
   },
-  "include": [
-    "src/**/*"
-  ],
   "exclude": [
-    "src/db/supabase"
+    // "supabase/**/*"
   ]
 }

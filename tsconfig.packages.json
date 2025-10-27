@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@TheCozyBud/types": [
+        "packages/index.ts"
+      ]
+    }
+  }
+}

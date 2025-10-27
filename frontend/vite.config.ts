@@ -26,6 +26,7 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "@TheCozyBud/types": path.resolve(__dirname, "../packages/index.ts"),
     },
   },
 }));
