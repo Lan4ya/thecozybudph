@@ -47,7 +47,7 @@ importers:
     devDependencies:
       '@TheCozyBud/types':
         specifier: workspace:*
-        version: link:../packages
+        version: link:../packages/types
       '@types/express':
         specifier: ^5.0.3
         version: 5.0.4
@@ -123,7 +123,7 @@ importers:
     devDependencies:
       '@TheCozyBud/types':
         specifier: workspace:*
-        version: link:../packages
+        version: link:../packages/types
       '@eslint/js':
         specifier: ^9.38.0
         version: 9.38.0
@@ -164,7 +164,7 @@ importers:
         specifier: ^7.1.10
         version: 7.1.12(@types/node@24.9.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.20.6)
 
-  packages: {}
+  packages/types: {}
 
 packages:
 
