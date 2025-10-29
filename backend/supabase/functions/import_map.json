@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "@shared/": "./shared/",
+    "file-type": "https://esm.sh/file-type@18.7.0"
+  }
+}
