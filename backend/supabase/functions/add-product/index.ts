@@ -27,9 +27,12 @@ Deno.serve(async (req) => {
   console.log("HEADERS:", Object.fromEntries(req.headers.entries()));
 
   if (req.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Method not allowed" }), {
-      status: 405,
-    });
+    return Response.json(
+      { error: "Method not allowed" },
+      {
+        status: 405,
+      },
+    );
   }
 
   try {
@@ -37,9 +40,12 @@ Deno.serve(async (req) => {
 
     const productImages = formData.getAll("product_images") as File[];
     if (!productImages || productImages.length === 0) {
-      return new Response(JSON.stringify({ error: "No images uploaded" }), {
-        status: 400,
-      });
+      return Response.json(
+        { error: "No images uploaded" },
+        {
+          status: 400,
+        },
+      );
     }
     // File size and type validation
     await validateImageFile(productImages);
@@ -134,44 +140,45 @@ Deno.serve(async (req) => {
       .single();
 
     if (insertError) {
-      return new Response(JSON.stringify({ error: insertError.message }), {
-        status: 400,
-      });
+      return Response.json(
+        { error: insertError.message },
+        {
+          status: 400,
+        },
+      );
     }
 
-    return new Response(
-      JSON.stringify({
+    return Response.json(
+      {
         product: {
           ...product_metadata_data,
           total_images: imageUrls.length,
         },
-      }),
+      },
       { status: 201 },
     );
   } catch (err) {
     // Handle CustomError with proper status codes
     if (err instanceof CustomError) {
-      return new Response(
-        JSON.stringify({
+      return Response.json(
+        {
           error: err.errors,
           success: false,
-        }),
+        },
         {
           status: err.statusCode,
-          headers: { "Content-Type": "application/json" },
         },
       );
     } else {
       // Handle unexpected errors
       console.error("Unexpected error:", err);
-      return new Response(
-        JSON.stringify({
+      return Response.json(
+        {
           error: "Internal server error",
           success: false,
-        }),
+        },
         {
           status: 500,
-          headers: { "Content-Type": "application/json" },
         },
       );
     }
