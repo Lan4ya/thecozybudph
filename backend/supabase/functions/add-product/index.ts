@@ -55,26 +55,44 @@ Deno.serve(async (req) => {
 
     const collectionName = formData.get("collection_name") as string;
     let PRODUCT_COLLECTION_ID: number | null = null;
-    if (collectionName) {
-      const { data: product_collection_data, error } = await supabase
+    if (collectionName && collectionName.trim()) {
+      // Check if collection name already exists
+      const { data: existingCollection, error: findError } = await supabase
         .from("products_collection")
-        .insert(
-          { name: collectionName },
-          {
-            onConflict: "collection_name", // column(s) to use for conflict detection
-            ignoreDuplicates: true, // if the collection already exists, do nothing
-          },
-        )
         .select("id")
-        .maybeSingle(); // use maybeSingle() instead of single() to avoid error if nothing inserted
+        .eq("name", collectionName.trim())
+        .maybeSingle();
 
-      if (error) {
-        return new Response(JSON.stringify({ error: error.message }), {
-          status: 400,
-        });
+      if (findError) {
+        console.error("Error finding collection:", findError);
+        throw new CustomError(400, `Database error: ${findError.message}`);
       }
 
-      PRODUCT_COLLECTION_ID = product_collection_data?.id;
+      if (existingCollection) {
+        PRODUCT_COLLECTION_ID = existingCollection.id;
+        console.log(
+          `Using existing collection: "${collectionName}" (ID: ${existingCollection.id})`,
+        );
+      } else {
+        const { data: newCollection, error: insertError } = await supabase
+          .from("products_collection")
+          .insert({ name: collectionName.trim() })
+          .select("id")
+          .single();
+
+        if (insertError) {
+          console.error("Error creating collection:", insertError);
+          throw new CustomError(
+            400,
+            `Failed to create collection: ${insertError.message}`,
+          );
+        }
+
+        PRODUCT_COLLECTION_ID = newCollection.id;
+        console.log(
+          `Created new collection: "${collectionName}" (ID: ${newCollection.id})`,
+        );
+      }
     }
 
     // Upload images to Supabase Storage concurrently
@@ -85,7 +103,8 @@ Deno.serve(async (req) => {
         .upload(filePath, file);
 
       if (uploadError) {
-        throw new Error(
+        throw new CustomError(
+          500,
           `Failed to upload ${file.name}: ${uploadError.message}`,
         );
       }
