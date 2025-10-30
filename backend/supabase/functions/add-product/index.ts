@@ -8,16 +8,21 @@
  */
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+// @ts-ignore
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
+// @ts-ignore
 import { CustomError, handleError } from "@shared/errors/mod.ts";
+// @ts-ignore
 import { validateImageFile } from "@shared/validateImageFile.ts";
+// @ts-ignore
 import { validateProductData } from "@shared/validateProductData.ts";
 
-import type { NewProduct } from "@TheCozyBud/types/types/index.ts";
+import type { NewProduct } from "@TheCozyBud/types/index.ts";
 
 const supabase = createClient(
+  // @ts-ignore
   Deno.env.get("SUPABASE_URL")!,
+  // @ts-ignore
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
 );
 

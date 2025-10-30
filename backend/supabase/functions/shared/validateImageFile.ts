@@ -18,7 +18,7 @@ export const validateImageFile = async (imgFiles: File[]) => {
       );
     }
 
-    // Check if file is actually an image (not just spoofed extension)
+    // Check if file is actually an image
     if (!imgFile.type.startsWith("image/")) {
       throw new CustomError(
         400,
