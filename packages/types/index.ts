@@ -1,4 +1,4 @@
-// @Product Types
+// @Product-Types
 
 // ---------------------------------------------------
 
@@ -17,23 +17,30 @@ type ProductBase = {
   collection_name?: string;
 };
 
-// use when fetching from DB
+// use when getting products from DB
 export type Product = ProductBase & {
   id: string; // generated UUID from db
   created_at: string; // timestamp from db
   image_urls: string[];
-  primary_image_url: string;
+  product_collection_id?: string;
 };
 
-// use when creating a new product
-export type NewProduct = ProductBase;
+// ---------------- ADMIN ONLY ---------------- //
+
+// use when adding a new product
+export type NewProduct = ProductBase & {
+  product_images: File[];
+  primary_image_url?: string; // default image shown for the product images
+};
 
 // use when updating a product
 export type UpdateProduct = Partial<ProductBase>;
 
+// ---------------- ADMIN ONLY ---------------- //
+
 // ---------------------------------------------------
 
-// @Order Types
+// @Order-Types
 
 export interface Order {
   // some types
