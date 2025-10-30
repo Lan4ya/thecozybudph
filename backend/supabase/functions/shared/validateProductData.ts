@@ -6,6 +6,7 @@ export function validateProductData({
   price,
   stock,
   color_variants,
+  collection_name,
 }: NewProduct): void {
   const errors: { message: string; field?: string }[] = [];
 
@@ -44,29 +45,50 @@ export function validateProductData({
     errors.push({ field: "stock", message: "Stock cannot exceed 100,000" });
   }
 
-  // Validate color variants
-  if (!Array.isArray(color_variants)) {
-    errors.push({
-      field: "color_variants",
-      message: "Color variants must be an array",
-    });
-  } else {
-    for (let i = 0; i < color_variants.length; i++) {
-      const color = color_variants[i];
-      if (typeof color !== "string" || !color.trim()) {
-        errors.push({
-          field: `color_variants[${i}]`,
-          message: "Color variant cannot be empty",
-        });
-      } else if (color.length > 50) {
-        errors.push({
-          field: `color_variants[${i}]`,
-          message: "Color variant cannot exceed 50 characters",
-        });
+  // Validate color variants only if provided since it's optional
+  if (color_variants) {
+    if (!Array.isArray(color_variants)) {
+      errors.push({
+        field: "color_variants",
+        message: "Color variants must be an array",
+      });
+    } else if (color_variants.length === 0) {
+      errors.push({
+        field: "color_variants",
+        message: "Color variants must have atleast one value",
+      });
+    } else {
+      for (let i = 0; i < color_variants.length; i++) {
+        const color = color_variants[i];
+        if (typeof color !== "string" || !color.trim()) {
+          errors.push({
+            field: `color_variants[${i}]`,
+            message: "Color variant cannot be empty",
+          });
+        } else if (color.length > 50) {
+          errors.push({
+            field: `color_variants[${i}]`,
+            message: "Color variant cannot exceed 50 characters",
+          });
+        }
       }
     }
   }
 
+  // Validate collection name only if provided since it's optional
+  if (collection_name) {
+    if (collection_name.trim().length < 2) {
+      errors.push({
+        field: "collection_name",
+        message: "Collectioin name must be at least 2 characters long",
+      });
+    } else if (collection_name.trim().length > 100) {
+      errors.push({
+        field: "collection_name",
+        message: "Collection name cannot exceed 100 characters",
+      });
+    }
+  }
   // Throw if any validation errors found
   if (errors.length > 0) {
     throw CustomError.validation(errors);
