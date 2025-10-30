@@ -163,6 +163,6 @@ Deno.serve(async (req) => {
       { status: 201 },
     );
   } catch (err) {
-    handleError(err);
+    return handleError(err);
   }
 });
