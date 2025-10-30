@@ -16,6 +16,8 @@ import { CustomError, handleError } from "@shared/errors/mod.ts";
 import { validateImageFile } from "@shared/validateImageFile.ts";
 // @ts-ignore
 import { validateProductData } from "@shared/validateProductData.ts";
+// @ts-ignore
+import { parseJSONField } from "@shared/parseJSONField.ts";
 
 import type { NewProduct } from "@TheCozyBud/types/index.ts";
 
@@ -60,11 +62,20 @@ Deno.serve(async (req) => {
       name: formData.get("name") as string,
       price: Number(formData.get("price")),
       stock: Number(formData.get("stock")),
-      color_variants: JSON.parse(formData.get("color_variants") as string),
     };
+
+    // add optional fields to product data if they exist
+    const colorVariants = formData.get("color_variants") as string;
+    if (colorVariants) {
+      productData.color_variants = parseJSONField("color_variants");
+    }
+    const collectionName = formData.get("collection_name") as string;
+    if (collectionName) {
+      productData.collection_name = collectionName;
+    }
+
     validateProductData(productData);
 
-    const collectionName = formData.get("collection_name") as string;
     let PRODUCT_COLLECTION_ID: number | null = null;
     if (collectionName && collectionName.trim()) {
       // Check if collection name already exists
@@ -132,11 +143,14 @@ Deno.serve(async (req) => {
     });
     const imageUrls = await Promise.all(imageUploads);
 
+    // exclude collection_name since it's not part of products_metadata and we just need the ref ID of it.
+    const { collection_name, ...product_data } = productData;
+
     // Insert metadata + ALL image URLs into DB
     const { data: product_metadata_data, error: insertError } = await supabase
       .from("products_metadata")
       .insert({
-        ...productData,
+        ...product_data,
         image_urls: imageUrls,
         primary_image_url: imageUrls[0],
         product_collection_id: PRODUCT_COLLECTION_ID,
