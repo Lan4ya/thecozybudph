@@ -1,5 +1,5 @@
 import type { NewProduct } from "@TheCozyBud/types";
-import { CustomError } from "./CustomError.ts";
+import { CustomError } from "./errors/CustomError.ts";
 
 export function validateProductData({
   name,

@@ -10,7 +10,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-import { CustomError } from "@shared/CustomError.ts";
+import { CustomError, handleError } from "@shared/errors/mod.ts";
 import { validateImageFile } from "@shared/validateImageFile.ts";
 import { validateProductData } from "@shared/validateProductData.ts";
 
@@ -158,29 +158,6 @@ Deno.serve(async (req) => {
       { status: 201 },
     );
   } catch (err) {
-    // Handle CustomError with proper status codes
-    if (err instanceof CustomError) {
-      return Response.json(
-        {
-          error: err.errors,
-          success: false,
-        },
-        {
-          status: err.statusCode,
-        },
-      );
-    } else {
-      // Handle unexpected errors
-      console.error("Unexpected error:", err);
-      return Response.json(
-        {
-          error: "Internal server error",
-          success: false,
-        },
-        {
-          status: 500,
-        },
-      );
-    }
+    handleError(err);
   }
 });

@@ -1,5 +1,5 @@
 import { fileTypeFromBuffer } from "file-type";
-import { CustomError } from "./CustomError.ts";
+import { CustomError } from "./errors/CustomError.ts";
 
 export const validateImageFile = async (imgFiles: File[]) => {
   console.log("img file validation called");
