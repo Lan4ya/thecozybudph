@@ -22,7 +22,7 @@ export type Product = ProductBase & {
   id: string; // generated UUID from db
   created_at: string; // timestamp from db
   image_urls: string[];
-  product_collection_id?: string;
+  product_collection_id?: string | null;
 };
 
 // ---------------- ADMIN ONLY ---------------- //
@@ -34,7 +34,11 @@ export type NewProduct = ProductBase & {
 };
 
 // use when updating a product
-export type UpdateProduct = Partial<ProductBase>;
+export type UpdateProduct = Partial<ProductBase> & {
+  product_images?: File[];
+  primary_image_url?: string;
+  product_collection_id?: number | null;
+};
 
 // ---------------- ADMIN ONLY ---------------- //
 
