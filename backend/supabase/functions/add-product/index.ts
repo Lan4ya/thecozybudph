@@ -18,6 +18,8 @@ import { validateImageFile } from "@shared/validateImageFile.ts";
 import { validateProductData } from "@shared/validateProductData.ts";
 // @ts-ignore
 import { parseJSONField } from "@shared/parseJSONField.ts";
+// @ts-ignore
+import { uploadImagesToDB } from "@shared/uploadImagesToDB.ts";
 
 import type { NewProduct } from "@TheCozyBud/types/index.ts";
 
@@ -54,11 +56,12 @@ Deno.serve(async (req) => {
         },
       );
     }
+
     // File size and type validation
     await validateImageFile(productImages);
 
     // Get all product data
-    const productData: NewProduct = {
+    const productMetaData: Omit<NewProduct, "product_images"> = {
       name: formData.get("name") as string,
       price: Number(formData.get("price")),
       stock: Number(formData.get("stock")),
@@ -67,17 +70,24 @@ Deno.serve(async (req) => {
     // add optional fields to product data if they exist
     const colorVariants = formData.get("color_variants") as string;
     if (colorVariants) {
-      productData.color_variants = parseJSONField("color_variants");
+      productMetaData.color_variants = parseJSONField<string[]>(
+        "color_variants",
+        colorVariants,
+      );
     }
     const collectionName = formData.get("collection_name") as string;
     if (collectionName) {
-      productData.collection_name = collectionName;
+      productMetaData.collection_name = collectionName;
+    }
+    const primaryImageUrl = formData.get("primary_image_url") as string;
+    if (primaryImageUrl) {
+      productMetaData.primary_image_url = primaryImageUrl;
     }
 
-    validateProductData(productData);
+    validateProductData(productMetaData);
 
     let PRODUCT_COLLECTION_ID: number | null = null;
-    if (collectionName && collectionName.trim()) {
+    if (collectionName) {
       // Check if collection name already exists
       const { data: existingCollection, error: findError } = await supabase
         .from("products_collection")
@@ -118,41 +128,18 @@ Deno.serve(async (req) => {
     }
 
     // Upload images to Supabase Storage concurrently
-    const imageUploads = productImages.map(async (file) => {
-      const filePath = `${crypto.randomUUID()}-${file.name}`;
-      const { data: _uploadData, error: uploadError } = await supabase.storage
-        .from("products")
-        .upload(filePath, file);
-
-      if (uploadError) {
-        throw new CustomError(
-          500,
-          `Failed to upload ${file.name}: ${uploadError.message}`,
-        );
-      }
-
-      // dev log
-      console.log(`Upload data: `, _uploadData);
-
-      // Get the public URL for each image
-      const { data: publicUrlData } = supabase.storage
-        .from("products")
-        .getPublicUrl(filePath);
-
-      return publicUrlData.publicUrl;
-    });
-    const imageUrls = await Promise.all(imageUploads);
+    const imageUrls = await uploadImagesToDB(supabase, productImages);
 
     // exclude collection_name since it's not part of products_metadata and we just need the ref ID of it.
-    const { collection_name, ...product_data } = productData;
+    const { collection_name, primary_image_url, ...rest } = productMetaData;
 
     // Insert metadata + ALL image URLs into DB
     const { data: product_metadata_data, error: insertError } = await supabase
       .from("products_metadata")
       .insert({
-        ...product_data,
+        ...rest,
         image_urls: imageUrls,
-        primary_image_url: imageUrls[0],
+        primary_image_url: primary_image_url ?? imageUrls[0], // default to first image if not provided
         product_collection_id: PRODUCT_COLLECTION_ID,
       })
       .select()
