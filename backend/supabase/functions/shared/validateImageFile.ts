@@ -2,14 +2,21 @@ import { fileTypeFromBuffer } from "file-type";
 import { CustomError } from "./errors/CustomError.ts";
 
 export const validateImageFile = async (imgFiles: File[]) => {
-  console.log("img file validation called");
+  const filteredImages = imgFiles.filter(
+    (file) =>
+      file instanceof File &&
+      file.size > 0 &&
+      file.name &&
+      file.name !== "undefined" &&
+      file.name !== "",
+  );
 
-  if (!imgFiles || imgFiles.length === 0) {
-    throw new CustomError(400, "No images uploaded");
+  if (!filteredImages.length) {
+    throw new CustomError(400, "No valid images uploaded");
   }
 
   // File size and type validation
-  for (const imgFile of imgFiles) {
+  for (const imgFile of filteredImages) {
     // Check file size (50MB max per img)
     if (imgFile.size > 50 * 1024 * 1024) {
       throw new CustomError(
