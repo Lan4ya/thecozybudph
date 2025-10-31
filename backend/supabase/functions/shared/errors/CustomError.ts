@@ -29,6 +29,10 @@ export class CustomError extends Error {
     return new CustomError(422, errors);
   }
 
+  static forbidden(message: string = "Forbidden") {
+    return new CustomError(403, message);
+  }
+
   static unauthorized(message: string = "Unauthorized") {
     return new CustomError(401, message);
   }
