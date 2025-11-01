@@ -38,12 +38,7 @@ Deno.serve(async (req) => {
   console.log("HEADERS:", Object.fromEntries(req.headers.entries()));
 
   if (req.method !== "POST") {
-    return Response.json(
-      { error: "Method not allowed" },
-      {
-        status: 405,
-      },
-    );
+    throw CustomError.method();
   }
 
   // check admin priveleges
@@ -54,12 +49,7 @@ Deno.serve(async (req) => {
 
     const productImages = formData.getAll("product_images") as File[];
     if (!productImages || productImages.length === 0) {
-      return Response.json(
-        { error: "No images uploaded" },
-        {
-          status: 400,
-        },
-      );
+      throw CustomError.badRequest("No images uploaded");
     }
 
     // File size and type validation
@@ -101,8 +91,7 @@ Deno.serve(async (req) => {
         .maybeSingle();
 
       if (findError) {
-        console.error("Error finding collection:", findError);
-        throw new CustomError(400, `Database error: ${findError.message}`);
+        throw CustomError.internal(findError.message);
       }
 
       if (existingCollection) {
@@ -118,11 +107,7 @@ Deno.serve(async (req) => {
           .single();
 
         if (insertError) {
-          console.error("Error creating collection:", insertError);
-          throw new CustomError(
-            400,
-            `Failed to create collection: ${insertError.message}`,
-          );
+          throw CustomError.internal(insertError.message);
         }
 
         PRODUCT_COLLECTION_ID = newCollection.id;
@@ -151,12 +136,7 @@ Deno.serve(async (req) => {
       .single();
 
     if (insertError) {
-      return Response.json(
-        { error: insertError.message },
-        {
-          status: 400,
-        },
-      );
+      throw CustomError.internal(insertError.message);
     }
 
     return Response.json(

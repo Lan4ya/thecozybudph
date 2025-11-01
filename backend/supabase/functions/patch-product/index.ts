@@ -38,10 +38,7 @@ Deno.serve(async (req) => {
   console.log("HEADERS:", Object.fromEntries(req.headers.entries()));
 
   if (req.method !== "PATCH") {
-    return Response.json(
-      { error: "Method not allowed should be patch cuh" },
-      { status: 405 },
-    );
+    throw CustomError.method("Method not allowed");
   }
 
   // check admin priveleges
@@ -52,7 +49,7 @@ Deno.serve(async (req) => {
     const productId = formData.get("product_id") as string;
 
     if (!productId) {
-      throw new CustomError(400, "Product ID is required");
+      throw CustomError.badRequest("Product ID is required");
     }
 
     // Verify product exists
@@ -63,7 +60,7 @@ Deno.serve(async (req) => {
       .single();
 
     if (fetchError || !existingProduct) {
-      throw new CustomError(404, "Product not found");
+      throw CustomError.notFound("Product not found");
     }
 
     const updates: UpdateProduct = {};
@@ -101,7 +98,7 @@ Deno.serve(async (req) => {
         .maybeSingle();
 
       if (findError) {
-        throw new CustomError(400, `Database error: ${findError.message}`);
+        throw CustomError.internal(`Database error: ${findError.message}`);
       }
 
       if (existingCollection) {
@@ -115,8 +112,7 @@ Deno.serve(async (req) => {
           .single();
 
         if (insertError) {
-          throw new CustomError(
-            400,
+          throw CustomError.internal(
             `Failed to create collection: ${insertError.message}`,
           );
         }
@@ -182,7 +178,7 @@ Deno.serve(async (req) => {
 
     // Update image URLs if they changed
     if (newProductImages.length || imagesToDelete) {
-      updates.product_images = updatedImageUrls;
+      updates.new_product_images = updatedImageUrls;
     }
 
     // Update product in database
@@ -194,8 +190,7 @@ Deno.serve(async (req) => {
       .single();
 
     if (updateError) {
-      throw new CustomError(
-        400,
+      throw CustomError.internal(
         `Failed to update product: ${updateError.message}`,
       );
     }

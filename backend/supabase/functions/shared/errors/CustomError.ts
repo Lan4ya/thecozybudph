@@ -41,6 +41,10 @@ export class CustomError extends Error {
     return new CustomError(404, message);
   }
 
+  static method(message: string = "Method no allowed") {
+    return new CustomError(405, message);
+  }
+
   static internal(message: string = "Internal server error") {
     return new CustomError(500, message);
   }

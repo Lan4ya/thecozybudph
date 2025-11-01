@@ -27,7 +27,7 @@ Deno.serve(async (req) => {
   console.log("HEADERS:", Object.fromEntries(req.headers.entries()));
 
   if (req.method !== "DELETE") {
-    return Response.json({ error: "Method not allowed" }, { status: 405 });
+    throw CustomError.method("Method not allowed");
   }
 
   // check admin priveleges
@@ -37,7 +37,7 @@ Deno.serve(async (req) => {
     const { product_id } = await req.json();
 
     if (!product_id) {
-      throw new CustomError(400, "Product ID is required");
+      throw CustomError.badRequest("Product ID is required");
     }
 
     const { data: product, error: fetchError } = await supabase
@@ -47,7 +47,7 @@ Deno.serve(async (req) => {
       .single();
 
     if (fetchError || !product) {
-      throw new CustomError(404, "Product not found");
+      throw CustomError.notFound("Product to delete not found");
     }
 
     // Delete images from storage
@@ -84,8 +84,7 @@ Deno.serve(async (req) => {
       .eq("id", product_id);
 
     if (deleteError) {
-      throw new CustomError(
-        400,
+      throw CustomError.internal(
         `Failed to delete product: ${deleteError.message}`,
       );
     }
