@@ -35,7 +35,8 @@ export type NewProduct = ProductBase & {
 
 // use when updating a product
 export type UpdateProduct = Partial<ProductBase> & {
-  product_images?: File[];
+  new_product_images?: File[];
+  image_urls_to_delete?: string[];
   primary_image_url?: string;
   product_collection_id?: number | null;
 };

@@ -13,13 +13,16 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 // @ts-ignore
 import { CustomError, handleError } from "@shared/errors/mod.ts";
 // @ts-ignore
-import { validateProductData } from "@shared/validateProductData.ts";
+import { validateProductUpdate } from "@shared/validateProductData.ts";
 // @ts-ignore
 import { validateImageFile } from "@shared/validateImageFile.ts";
 // @ts-ignore
 import { parseJSONField } from "@shared/parseJSONField.ts";
 // @ts-ignore
 import { uploadImagesToDB } from "@shared/uploadImagesToDB.ts";
+// @ts-ignore
+import { authAdmin } from "../shared/authAdmin.ts";
+
 import type { UpdateProduct } from "@TheCozyBud/types/index.ts";
 
 const supabase = createClient(
@@ -40,6 +43,9 @@ Deno.serve(async (req) => {
       { status: 405 },
     );
   }
+
+  // check admin priveleges
+  await authAdmin(supabase, req);
 
   try {
     const formData = await req.formData();
@@ -81,9 +87,9 @@ Deno.serve(async (req) => {
     }
     if (collection_name) updates.name = collection_name;
 
-    // Validate updated product data if any fields are provided
-    if (Object.keys(updates).length > 0) {
-      validateProductData({ ...existingProduct, ...updates });
+    // Validate the updates
+    if (Object.keys(updates).length) {
+      validateProductUpdate({ ...updates });
     }
 
     if (collection_name) {
@@ -122,13 +128,15 @@ Deno.serve(async (req) => {
     // Handle image uploads
 
     const productImages = formData.getAll("new_product_images") as File[];
-    const imagesToDelete = formData.get("images_to_delete") as string;
+    const imagesToDelete = formData.get("image_urls_to_delete") as string;
 
     let newProductImages: File[] = [];
     let updatedImageUrls = existingProduct.image_urls || [];
 
-    await validateImageFile(productImages);
-    newProductImages = productImages;
+    if (productImages && productImages.length) {
+      await validateImageFile(productImages);
+      newProductImages = productImages;
+    }
 
     // Upload new images if provided
     if (newProductImages && newProductImages.length) {

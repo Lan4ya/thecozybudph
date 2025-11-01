@@ -12,6 +12,8 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 // @ts-ignore
 import { CustomError, handleError } from "@shared/errors/mod.ts";
+// @ts-ignore
+import { authAdmin } from "../shared/authAdmin.ts";
 
 const supabase = createClient(
   // @ts-ignore
@@ -27,6 +29,9 @@ Deno.serve(async (req) => {
   if (req.method !== "DELETE") {
     return Response.json({ error: "Method not allowed" }, { status: 405 });
   }
+
+  // check admin priveleges
+  await authAdmin(supabase, req);
 
   try {
     const { product_id } = await req.json();

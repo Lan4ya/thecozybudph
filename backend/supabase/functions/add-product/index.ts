@@ -15,11 +15,13 @@ import { CustomError, handleError } from "@shared/errors/mod.ts";
 // @ts-ignore
 import { validateImageFile } from "@shared/validateImageFile.ts";
 // @ts-ignore
-import { validateProductData } from "@shared/validateProductData.ts";
+import { validateNewProduct } from "@shared/validateProductData.ts";
 // @ts-ignore
 import { parseJSONField } from "@shared/parseJSONField.ts";
 // @ts-ignore
 import { uploadImagesToDB } from "@shared/uploadImagesToDB.ts";
+// @ts-ignore
+import { authAdmin } from "@shared/authAdmin.ts";
 
 import type { NewProduct } from "@TheCozyBud/types/index.ts";
 
@@ -43,6 +45,9 @@ Deno.serve(async (req) => {
       },
     );
   }
+
+  // check admin priveleges
+  await authAdmin(supabase, req);
 
   try {
     const formData = await req.formData();
@@ -84,7 +89,7 @@ Deno.serve(async (req) => {
       productMetaData.primary_image_url = primaryImageUrl;
     }
 
-    validateProductData(productMetaData);
+    validateNewProduct(productMetaData);
 
     let PRODUCT_COLLECTION_ID: number | null = null;
     if (collectionName) {
