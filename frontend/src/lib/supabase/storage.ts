@@ -1,6 +1,6 @@
-import { supabase } from "./connectDB";
+import { supabase } from "./connect";
 
-export async function getFileUrl(
+export async function getFileUrlFromDB(
   bucket: string,
   path: string,
   visibility: "public" | "private" = "public",
@@ -11,6 +11,7 @@ export async function getFileUrl(
     return data.publicUrl;
   }
 
+  // private
   const { data, error } = await supabase.storage
     .from(bucket)
     .createSignedUrl(path, 60);
@@ -18,7 +19,7 @@ export async function getFileUrl(
   return data.signedUrl;
 }
 
-export async function getAllFileUrls(
+export async function getAllFileUrlsFromDB(
   bucket: string,
   dir: string = "",
   visibility: "public" | "private" = "public",
@@ -30,17 +31,23 @@ export async function getAllFileUrls(
 
   if (error) throw error;
 
-  // if dir empty
   if (!files?.length) return [];
+
+  // console.log("Files found:", files);
 
   const paths = files.map((f) => (dir ? `${dir}/${f.name}` : f.name));
 
+  console.log("File paths:", paths);
+
   if (visibility === "public") {
-    return paths.map(
-      (p) => supabase.storage.from(bucket).getPublicUrl(p).data.publicUrl,
-    );
+    return paths.map((p) => {
+      const { data } = supabase.storage.from(bucket).getPublicUrl(p);
+      // console.log("Public URL data for", p, ":", data);
+      return data.publicUrl;
+    });
   }
 
+  // private
   const { data: signed, error: signErr } = await supabase.storage
     .from(bucket)
     .createSignedUrls(paths, expiresIn);

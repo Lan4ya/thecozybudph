@@ -8,16 +8,27 @@
  */
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+// @ts-ignore
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
+// @ts-ignore
 import { CustomError, handleError } from "@shared/errors/mod.ts";
+// @ts-ignore
 import { validateImageFile } from "@shared/validateImageFile.ts";
-import { validateProductData } from "@shared/validateProductData.ts";
+// @ts-ignore
+import { validateNewProduct } from "@shared/validateProductData.ts";
+// @ts-ignore
+import { parseJSONField } from "@shared/parseJSONField.ts";
+// @ts-ignore
+import { uploadImagesToDB } from "@shared/uploadImagesToDB.ts";
+// @ts-ignore
+import { authAdmin } from "@shared/authAdmin.ts";
 
-import type { NewProduct } from "@TheCozyBud/types/types/index.ts";
+import type { NewProduct } from "@TheCozyBud/types/index.ts";
 
 const supabase = createClient(
+  // @ts-ignore
   Deno.env.get("SUPABASE_URL")!,
+  // @ts-ignore
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
 );
 
@@ -27,41 +38,51 @@ Deno.serve(async (req) => {
   console.log("HEADERS:", Object.fromEntries(req.headers.entries()));
 
   if (req.method !== "POST") {
-    return Response.json(
-      { error: "Method not allowed" },
-      {
-        status: 405,
-      },
-    );
+    throw CustomError.method();
   }
+
+  // check admin priveleges
+  await authAdmin(supabase, req);
 
   try {
     const formData = await req.formData();
 
     const productImages = formData.getAll("product_images") as File[];
     if (!productImages || productImages.length === 0) {
-      return Response.json(
-        { error: "No images uploaded" },
-        {
-          status: 400,
-        },
-      );
+      throw CustomError.badRequest("No images uploaded");
     }
+
     // File size and type validation
     await validateImageFile(productImages);
 
     // Get all product data
-    const productData: NewProduct = {
+    const productMetaData: Omit<NewProduct, "product_images"> = {
       name: formData.get("name") as string,
       price: Number(formData.get("price")),
       stock: Number(formData.get("stock")),
-      color_variants: JSON.parse(formData.get("color_variants") as string),
     };
-    validateProductData(productData);
 
+    // add optional fields to product data if they exist
+    const colorVariants = formData.get("color_variants") as string;
+    if (colorVariants) {
+      productMetaData.color_variants = parseJSONField<string[]>(
+        "color_variants",
+        colorVariants,
+      );
+    }
     const collectionName = formData.get("collection_name") as string;
+    if (collectionName) {
+      productMetaData.collection_name = collectionName;
+    }
+    const primaryImageUrl = formData.get("primary_image_url") as string;
+    if (primaryImageUrl) {
+      productMetaData.primary_image_url = primaryImageUrl;
+    }
+
+    validateNewProduct(productMetaData);
+
     let PRODUCT_COLLECTION_ID: number | null = null;
-    if (collectionName && collectionName.trim()) {
+    if (collectionName) {
       // Check if collection name already exists
       const { data: existingCollection, error: findError } = await supabase
         .from("products_collection")
@@ -70,8 +91,7 @@ Deno.serve(async (req) => {
         .maybeSingle();
 
       if (findError) {
-        console.error("Error finding collection:", findError);
-        throw new CustomError(400, `Database error: ${findError.message}`);
+        throw CustomError.internal(findError.message);
       }
 
       if (existingCollection) {
@@ -87,11 +107,7 @@ Deno.serve(async (req) => {
           .single();
 
         if (insertError) {
-          console.error("Error creating collection:", insertError);
-          throw new CustomError(
-            400,
-            `Failed to create collection: ${insertError.message}`,
-          );
+          throw CustomError.internal(insertError.message);
         }
 
         PRODUCT_COLLECTION_ID = newCollection.id;
@@ -102,50 +118,25 @@ Deno.serve(async (req) => {
     }
 
     // Upload images to Supabase Storage concurrently
-    const imageUploads = productImages.map(async (file) => {
-      const filePath = `${crypto.randomUUID()}-${file.name}`;
-      const { data: _uploadData, error: uploadError } = await supabase.storage
-        .from("products")
-        .upload(filePath, file);
+    const imageUrls = await uploadImagesToDB(supabase, productImages);
 
-      if (uploadError) {
-        throw new CustomError(
-          500,
-          `Failed to upload ${file.name}: ${uploadError.message}`,
-        );
-      }
-
-      // dev log
-      console.log(`Upload data: `, _uploadData);
-
-      // Get the public URL for each image
-      const { data: publicUrlData } = supabase.storage
-        .from("products")
-        .getPublicUrl(filePath);
-
-      return publicUrlData.publicUrl;
-    });
-    const imageUrls = await Promise.all(imageUploads);
+    // exclude collection_name since it's not part of products_metadata and we just need the ref ID of it.
+    const { collection_name, primary_image_url, ...rest } = productMetaData;
 
     // Insert metadata + ALL image URLs into DB
     const { data: product_metadata_data, error: insertError } = await supabase
       .from("products_metadata")
       .insert({
-        ...productData,
+        ...rest,
         image_urls: imageUrls,
-        primary_image_url: imageUrls[0],
+        primary_image_url: primary_image_url ?? imageUrls[0], // default to first image if not provided
         product_collection_id: PRODUCT_COLLECTION_ID,
       })
       .select()
       .single();
 
     if (insertError) {
-      return Response.json(
-        { error: insertError.message },
-        {
-          status: 400,
-        },
-      );
+      throw CustomError.internal(insertError.message);
     }
 
     return Response.json(
@@ -158,6 +149,6 @@ Deno.serve(async (req) => {
       { status: 201 },
     );
   } catch (err) {
-    handleError(err);
+    return handleError(err);
   }
 });

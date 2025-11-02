@@ -29,12 +29,20 @@ export class CustomError extends Error {
     return new CustomError(422, errors);
   }
 
+  static forbidden(message: string = "Forbidden") {
+    return new CustomError(403, message);
+  }
+
   static unauthorized(message: string = "Unauthorized") {
     return new CustomError(401, message);
   }
 
   static notFound(message: string = "Resource not found") {
     return new CustomError(404, message);
+  }
+
+  static method(message: string = "Method no allowed") {
+    return new CustomError(405, message);
   }
 
   static internal(message: string = "Internal server error") {
