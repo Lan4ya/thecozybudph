@@ -8,7 +8,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       // experimental_prefetchInRender: true,
-      staleTime: 1000 * 60 * 60 * 1, // 1h
+      staleTime: 1000 * 60 * 60 * 1, // 1haa
       gcTime: 1000 * 60 * 60 * 1, // 1h
     },
   },
