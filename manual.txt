@@ -1,0 +1,8 @@
+
+
+
+
+
+pnpm install -> install all devDependencies in package.json5
+pnpm run dev -> to start development
+
