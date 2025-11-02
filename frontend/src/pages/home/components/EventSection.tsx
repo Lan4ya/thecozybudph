@@ -1,4 +1,4 @@
-import { getAllFileUrls } from "@/lib/supabase/getFileUrls";
+import { getAllFileUrlsFromDB } from "@/lib/supabase/storage";
 import { useEffect, useState } from "react";
 
 const EventSection = () => {
@@ -7,7 +7,7 @@ const EventSection = () => {
   useEffect(() => {
     async function fetchUrls() {
       try {
-        const result = await getAllFileUrls("events");
+        const result = await getAllFileUrlsFromDB("events");
         console.log("Fetched file URLs:", result);
         setUrls(result);
       } catch (err) {

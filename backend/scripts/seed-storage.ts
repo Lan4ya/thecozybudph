@@ -1,11 +1,11 @@
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js";
 import fs from "fs/promises";
 import fsSync from "fs";
 import path from "path";
 import mime from "mime";
 import "dotenv/config";
 
-// USAGE EXAMPLE: pnpm tsx </path/to/dir> <bucket-name> (this script assumes bucket already exists)
+// Usage Example: pnpm tsx </path/to/dir> <bucket-name> (this script assumes bucket already exists)
 
 // --- CLI Arguments ---
 const [, , bucketArg, dirArg] = process.argv;
