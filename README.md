@@ -4,14 +4,14 @@
 #### Main tech stack:
 
 - [Typescript](https://www.typescriptlang.org/) 
-- [React 19](https://react.dev/) 
-- [TailwindCSS 4](https://tailwindcss.com/) 
+- [React](https://react.dev/) 
+- [TailwindCSS](https://tailwindcss.com/) 
 - [React Router (Data Mode)](https://reactrouter.com/start/data/installation/) for routing  
 - [Lucide](https://lucide.dev/) for icons  
 - [ShadCN](https://ui.shadcn.com/) for base components
 - [Motion](https://motion.dev/) for reusable & quick animations
-- [Vite 7](https://vite.dev/) build tool
-- [Tanstack Query 5](https://tanstack.com/query/latest/docs/framework/react/overview) -- for fetching, caching, synchronizing server states
+- [Vite](https://vite.dev/) build tool
+- [Tanstack Query](https://tanstack.com/query/latest/docs/framework/react/overview) for fetching, caching, & synchronizing server states
 
 ---
 
