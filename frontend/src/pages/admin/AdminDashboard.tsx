@@ -1,6 +1,6 @@
 import { Outlet, redirect, useLoaderData, useNavigate } from "react-router";
 import AdminDashboardSidebar from "./components/AdminDashboardSidebar";
-import { supabase } from "@/lib/supabase/connectDB";
+import { supabase } from "@/lib/supabase/connect";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 
 export const loader = async () => {
