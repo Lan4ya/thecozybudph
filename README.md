@@ -10,7 +10,8 @@
 - [Lucide](https://lucide.dev/) for icons  
 - [ShadCN](https://ui.shadcn.com/) for base components
 - [Motion](https://motion.dev/) for reusable & quick animations
-- [Vite 7](https://vite.dev/) -- build tool
+- [Vite 7](https://vite.dev/) build tool
+- [Tanstack Query 5](https://tanstack.com/query/latest/docs/framework/react/overview) -- for fetching, caching, synchronizing server states
 
 ---
 
