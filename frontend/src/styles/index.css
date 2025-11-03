@@ -11,6 +11,10 @@
   body {
     font-family: "NeueHaasGrotesk", system-ui, sans-serif;
   }
+
+  input {
+    font-family: "Inter", sans-serif !important;
+  }
 }
 
 :root {
