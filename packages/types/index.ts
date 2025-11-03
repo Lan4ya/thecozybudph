@@ -17,28 +17,31 @@ type ProductBase = {
   collection_name?: string;
 };
 
-// use when getting products from DB
-export type Product = ProductBase & {
-  id: string; // generated UUID from db
-  created_at: string; // timestamp from db
+export type Product = Omit<ProductBase, "collection_name"> & {
+  id: string;
+  created_at: string;
+  updated_at: string;
   image_urls: string[];
-  product_collection_id?: string | null;
+  primary_image_url: string;
+  products_collection?: {
+    name: string;
+  } | null;
 };
 
 // ---------------- ADMIN ONLY ---------------- //
 
-// use when adding a new product
 export type NewProduct = ProductBase & {
   product_images: File[];
-  primary_image_url?: string; // default image shown for the product images
+  primary_image_url?: string;
 };
 
-// use when updating a product
 export type UpdateProduct = Partial<ProductBase> & {
+  product_id: string;
+  primary_image_url?: string | null;
   new_product_images?: File[];
   image_urls_to_delete?: string[];
-  primary_image_url?: string;
   product_collection_id?: number | null;
+  products_collection?: { name: string } | null;
 };
 
 // ---------------- ADMIN ONLY ---------------- //
