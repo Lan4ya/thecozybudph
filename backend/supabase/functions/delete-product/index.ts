@@ -13,6 +13,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 // @ts-ignore
 import { CustomError, handleError } from "@shared/errors/mod.ts";
 // @ts-ignore
+import { getCorsHeaders, handleCorsOptions } from "@shared/cors.ts";
+// @ts-ignore
 import { authAdmin } from "../shared/authAdmin.ts";
 
 const supabase = createClient(
@@ -26,15 +28,21 @@ const supabase = createClient(
 Deno.serve(async (req) => {
   console.log("HEADERS:", Object.fromEntries(req.headers.entries()));
 
+  const optionsRes = handleCorsOptions(req);
+  if (optionsRes) return optionsRes;
+
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method !== "DELETE") {
     throw CustomError.method("Method not allowed");
   }
 
-  // check admin priveleges
-  await authAdmin(supabase, req);
-
   try {
-    const { product_id } = await req.json();
+    // check admin priveleges
+    await authAdmin(supabase, req);
+
+    const url = new URL(req.url);
+    const product_id = url.searchParams.get("product_id");
 
     if (!product_id) {
       throw CustomError.badRequest("Product ID is required");
@@ -95,9 +103,9 @@ Deno.serve(async (req) => {
         message: "Product deleted successfully",
         deleted_product_id: product_id,
       },
-      { status: 200 },
+      { status: 200, headers: corsHeaders },
     );
   } catch (err) {
-    return handleError(err);
+    return handleError(err, corsHeaders);
   }
 });

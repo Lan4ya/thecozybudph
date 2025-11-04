@@ -22,6 +22,8 @@ import { parseJSONField } from "@shared/parseJSONField.ts";
 import { uploadImagesToDB } from "@shared/uploadImagesToDB.ts";
 // @ts-ignore
 import { authAdmin } from "@shared/authAdmin.ts";
+// @ts-ignore
+import { getCorsHeaders, handleCorsOptions } from "@shared/cors.ts";
 
 import type { NewProduct } from "@TheCozyBud/types/index.ts";
 
@@ -37,14 +39,19 @@ Deno.serve(async (req) => {
   console.log("METHOD:", req.method);
   console.log("HEADERS:", Object.fromEntries(req.headers.entries()));
 
+  const optionsRes = handleCorsOptions(req);
+  if (optionsRes) return optionsRes;
+
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method !== "POST") {
     throw CustomError.method();
   }
 
-  // check admin priveleges
-  await authAdmin(supabase, req);
-
   try {
+    // check admin priveleges
+    await authAdmin(supabase, req);
+
     const formData = await req.formData();
 
     const productImages = formData.getAll("product_images") as File[];
@@ -59,7 +66,6 @@ Deno.serve(async (req) => {
     const productMetaData: Omit<NewProduct, "product_images"> = {
       name: formData.get("name") as string,
       price: Number(formData.get("price")),
-      stock: Number(formData.get("stock")),
     };
 
     // add optional fields to product data if they exist
@@ -78,6 +84,8 @@ Deno.serve(async (req) => {
     if (primaryImageUrl) {
       productMetaData.primary_image_url = primaryImageUrl;
     }
+    const description = formData.get("description") as string;
+    productMetaData.primary_image_url = description;
 
     validateNewProduct(productMetaData);
 
@@ -143,12 +151,11 @@ Deno.serve(async (req) => {
       {
         product: {
           ...product_metadata_data,
-          total_images: imageUrls.length,
         },
       },
-      { status: 201 },
+      { status: 201, headers: corsHeaders },
     );
   } catch (err) {
-    return handleError(err);
+    return handleError(err, corsHeaders);
   }
 });

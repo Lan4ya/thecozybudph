@@ -22,6 +22,8 @@ import { parseJSONField } from "@shared/parseJSONField.ts";
 import { uploadImagesToDB } from "@shared/uploadImagesToDB.ts";
 // @ts-ignore
 import { authAdmin } from "../shared/authAdmin.ts";
+// @ts-ignore
+import { getCorsHeaders, handleCorsOptions } from "@shared/cors.ts";
 
 import type { UpdateProduct } from "@TheCozyBud/types/index.ts";
 
@@ -37,14 +39,19 @@ Deno.serve(async (req) => {
   console.log("METHOD:", req.method);
   console.log("HEADERS:", Object.fromEntries(req.headers.entries()));
 
+  const optionsRes = handleCorsOptions(req);
+  if (optionsRes) return optionsRes;
+
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method !== "PATCH") {
     throw CustomError.method("Method not allowed");
   }
 
-  // check admin priveleges
-  await authAdmin(supabase, req);
-
   try {
+    // check admin priveleges
+    await authAdmin(supabase, req);
+
     const formData = await req.formData();
     const productId = formData.get("product_id") as string;
 
@@ -63,19 +70,18 @@ Deno.serve(async (req) => {
       throw CustomError.notFound("Product not found");
     }
 
-    const updates: UpdateProduct = {};
+    const updates: Omit<UpdateProduct, "product_id"> = {};
     let PRODUCT_COLLECTION_ID: number | null = null;
 
     const name = formData.get("name") as string;
     const price = formData.get("price");
-    const stock = formData.get("stock");
     const color_variants = formData.get("color_variants");
     const collection_name = formData.get("collection_name") as string;
+    const description = formData.get("description") as string;
 
     // Check what fields are being updated
     if (name) updates.name = name;
     if (price) updates.price = Number(price);
-    if (stock) updates.stock = Number(stock);
     if (color_variants) {
       updates.color_variants = parseJSONField(
         "color_variants",
@@ -83,6 +89,7 @@ Deno.serve(async (req) => {
       );
     }
     if (collection_name) updates.name = collection_name;
+    if (description) updates.description = description;
 
     // Validate the updates
     if (Object.keys(updates).length) {
@@ -201,9 +208,9 @@ Deno.serve(async (req) => {
         success: true,
         message: "Product updated successfully",
       },
-      { status: 200 },
+      { status: 201, headers: corsHeaders },
     );
   } catch (err) {
-    return handleError(err);
+    return handleError(err, corsHeaders);
   }
 });

@@ -1,26 +1,57 @@
 import type { NewProduct, UpdateProduct } from "@TheCozyBud/types";
 import { CustomError } from "./errors/CustomError.ts";
 
+const validateStringField = (
+  value: string | undefined,
+  fieldName: string,
+  errors: { message: string; field?: string }[],
+  maxLength: number,
+  isRequired: boolean = true,
+) => {
+  if (value === undefined || value === null) {
+    if (isRequired) {
+      errors.push({ field: fieldName, message: `${fieldName} is required.` });
+    }
+    return;
+  }
+
+  const trimmedValue = value.trim();
+  const valueLength = trimmedValue.length;
+
+  if (isRequired && !trimmedValue) {
+    errors.push({ field: fieldName, message: `${fieldName} is required.` });
+  } else if (isRequired && valueLength < 1) {
+    errors.push({
+      field: fieldName,
+      message: `${fieldName} must be at least 1 character long.`,
+    });
+  } else if (valueLength > maxLength) {
+    errors.push({
+      field: fieldName,
+      message: `${fieldName} cannot exceed ${maxLength} characters.`,
+    });
+  }
+};
+
 const validateName = (
   name: string,
   errors: { message: string; field?: string }[],
 ) => {
-  const trimmedName = name.trim();
-  const nameLength = trimmedName.length;
+  validateStringField(name, "name", errors, 100, true);
+};
 
-  if (!trimmedName) {
-    errors.push({ field: "name", message: "Name is required." });
-  } else if (nameLength < 2) {
-    errors.push({
-      field: "name",
-      message: "Name must be at least 2 characters long.",
-    });
-  } else if (nameLength > 100) {
-    errors.push({
-      field: "name",
-      message: "Name cannot exceed 100 characters.",
-    });
-  }
+const validateCollectionName = (
+  collectionName: string,
+  errors: { message: string; field?: string }[],
+) => {
+  validateStringField(collectionName, "collection_name", errors, 100, false); // not required
+};
+
+const validateDescription = (
+  description: string,
+  errors: { message: string; field?: string }[],
+) => {
+  validateStringField(description, "description", errors, 500, false); // increased max length for description
 };
 
 const validatePrice = (
@@ -35,19 +66,6 @@ const validatePrice = (
     errors.push({ field: "price", message: "Price cannot be negative." });
   } else if (price > 1000000) {
     errors.push({ field: "price", message: "Price cannot exceed 1,000,000." });
-  }
-};
-
-const validateStock = (
-  stock: number,
-  errors: { message: string; field?: string }[],
-) => {
-  if (!Number.isInteger(stock)) {
-    errors.push({ field: "stock", message: "Stock must be a whole number." });
-  } else if (stock < 0) {
-    errors.push({ field: "stock", message: "Stock cannot be negative." });
-  } else if (stock > 100000) {
-    errors.push({ field: "stock", message: "Stock cannot exceed 100,000." });
   }
 };
 
@@ -82,31 +100,6 @@ const validateColorVariants = (
   }
 };
 
-const validateCollectionName = (
-  collection_name: string,
-  errors: { message: string; field?: string }[],
-) => {
-  const trimmedCollection = collection_name.trim();
-  const collectionLength = trimmedCollection.length;
-
-  if (collectionLength === 0) {
-    errors.push({
-      field: "collection_name",
-      message: "Collection name cannot be empty.",
-    });
-  } else if (collectionLength < 2) {
-    errors.push({
-      field: "collection_name",
-      message: "Collection name must be at least 2 characters long.",
-    });
-  } else if (collectionLength > 100) {
-    errors.push({
-      field: "collection_name",
-      message: "Collection name cannot exceed 100 characters.",
-    });
-  }
-};
-
 const validateIfDefined = <T>(
   value: T | undefined,
   validator: (val: T, errors: { message: string; field?: string }[]) => void,
@@ -124,9 +117,14 @@ export function validateNewProduct(product: NewProduct): void {
 
   validateName(product.name, errors);
   validatePrice(product.price, errors);
-  validateStock(product.stock, errors);
-
-  validateIfDefined(product.collection_name, validateCollectionName, errors);
+  validateStringField(
+    product.collection_name,
+    "collection_name",
+    errors,
+    100,
+    false,
+  );
+  validateStringField(product.description, "description", errors, 500, false);
   validateIfDefined(product.color_variants, validateColorVariants, errors);
 
   if (errors.length > 0) {
@@ -139,9 +137,9 @@ export function validateProductUpdate(updates: UpdateProduct): void {
 
   validateIfDefined(updates.name, validateName, errors);
   validateIfDefined(updates.price, validatePrice, errors);
-  validateIfDefined(updates.stock, validateStock, errors);
   validateIfDefined(updates.color_variants, validateColorVariants, errors);
   validateIfDefined(updates.collection_name, validateCollectionName, errors);
+  validateIfDefined(updates.description, validateDescription, errors);
 
   if (errors.length > 0) {
     throw CustomError.validation(errors);
