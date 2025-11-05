@@ -1,7 +1,7 @@
 {
   "extends": [
     "../tsconfig.packages.json",
-    "./tsconfig.base.json"
+    "../tsconfig.base.json"
   ],
   "compilerOptions": {
     "types": [
@@ -14,6 +14,7 @@
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
+    "allowImortingTsExtensions": true,
     "outDir": "../dist-backend",
     "baseUrl": ".",
     "paths": {
@@ -23,6 +24,6 @@
     }
   },
   "exclude": [
-    "supabase/**/*"
+    // "supabase/**/*"
   ]
 }
