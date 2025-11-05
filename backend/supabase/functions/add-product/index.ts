@@ -45,7 +45,10 @@ Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
 
   if (req.method !== "POST") {
-    throw CustomError.method();
+    return Response.json(
+      { error: "Method not allowed" },
+      { status: 405, headers: corsHeaders },
+    );
   }
 
   try {
@@ -85,7 +88,7 @@ Deno.serve(async (req) => {
       productMetaData.primary_image_url = primaryImageUrl;
     }
     const description = formData.get("description") as string;
-    productMetaData.primary_image_url = description;
+    productMetaData.description = description;
 
     validateNewProduct(productMetaData);
 

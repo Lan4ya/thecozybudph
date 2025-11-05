@@ -34,7 +34,10 @@ Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
 
   if (req.method !== "DELETE") {
-    throw CustomError.method("Method not allowed");
+    return Response.json(
+      { error: "Method not allowed" },
+      { status: 405, headers: corsHeaders },
+    );
   }
 
   try {

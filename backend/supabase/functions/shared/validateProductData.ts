@@ -78,11 +78,6 @@ const validateColorVariants = (
       field: "color_variants",
       message: "Color variants must be an array.",
     });
-  } else if (color_variants.length === 0) {
-    errors.push({
-      field: "color_variants",
-      message: "Color variants must have at least one value.",
-    });
   } else {
     color_variants.forEach((color, i) => {
       if (typeof color !== "string" || !color.trim()) {
@@ -124,7 +119,7 @@ export function validateNewProduct(product: NewProduct): void {
     100,
     false,
   );
-  validateStringField(product.description, "description", errors, 500, false);
+  validateStringField(product.description, "description", errors, 600, false);
   validateIfDefined(product.color_variants, validateColorVariants, errors);
 
   if (errors.length > 0) {
