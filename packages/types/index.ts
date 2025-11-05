@@ -9,12 +9,12 @@
 
 // ---------------------------------------------------
 
-type ProductBase = {
+export type ProductBase = {
   name: string;
   price: number;
-  stock: number;
   color_variants?: string[];
   collection_name?: string;
+  description?: string;
 };
 
 export type Product = Omit<ProductBase, "collection_name"> & {
