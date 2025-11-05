@@ -25,7 +25,7 @@ import { authAdmin } from "../shared/authAdmin.ts";
 // @ts-ignore
 import { getCorsHeaders, handleCorsOptions } from "@shared/cors.ts";
 
-import type { UpdateProduct } from "@TheCozyBud/types/index.ts";
+import type { UpdateProduct } from "@TheCozyBud/schema";
 
 const supabase = createClient(
   // @ts-ignore

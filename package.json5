@@ -2,24 +2,25 @@
   name: 'TheCozyBud',
   private: true,
   version: '1.0.0',
-  workspaces: [
-    'frontend',
-    'backend',
-  ],
+  // workspaces: [
+  // ],
   scripts: {
     // https://supabase.com/docs/guides/functions/quickstart
-    'dev:db-start': 'pnpm --filter backend db start && pnpm --filter backend db functions serve --no-verify-jwt',
-    'dev:db-stop': 'pnpm --filter backend db stop',
+    'dev:db-start': 'pnpm --filter backend db start && pnpm --filter backend db functions serve --no-verify-jwt', //   'frontend', /* [comment possibly relocated by pnpm] */
+    'dev:db-stop': 'pnpm --filter backend db stop', //   'backend', /* [comment possibly relocated by pnpm] */
     'dev:db-status': 'pnpm --filter backend db status',
     'dev:frontend': 'pnpm --filter frontend dev',
     'dev:backend': 'pnpm --filter backend dev',
-    'dev': 'concurrently "pnpm run deb-dv:start" "pnpm --filter backend dev" "pnpm --filter frontend dev"',
+    dev: 'concurrently "pnpm run deb-dv:start" "pnpm --filter backend dev" "pnpm --filter frontend dev"',
     'build:frontend': 'pnpm --filter frontend build',
     'build:backend': 'pnpm --filter backend build',
-    'build': 'pnpm -r build',
-    'start': 'pnpm --filter backend start',
+    build: 'pnpm -r build',
+    start: 'pnpm --filter backend start',
   },
   devDependencies: {
     concurrently: '^9.2.1',
+  },
+  dependencies: {
+    zod: '^4.1.12',
   },
 }
