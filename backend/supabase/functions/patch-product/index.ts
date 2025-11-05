@@ -23,9 +23,9 @@ import { uploadImagesToDB } from "@shared/uploadImagesToDB.ts";
 // @ts-ignore
 import { authAdmin } from "../shared/authAdmin.ts";
 // @ts-ignore
-import { getCorsHeaders, handleCorsOptions } from "@shared/cors.ts";
-
-import type { UpdateProduct } from "@TheCozyBud/schema";
+import { getCorsHeaders, handleCorsOptions } from "@shared/corsHeaders.ts";
+// @ts-ignore
+import type { UpdateProduct } from "@TheCozyBud/dist.index.d.ts";
 
 const supabase = createClient(
   // @ts-ignore
@@ -69,17 +69,18 @@ Deno.serve(async (req) => {
       .eq("id", productId)
       .single();
 
-    if (fetchError || !existingProduct) {
-      throw CustomError.notFound("Product not found");
-    }
+    if (fetchError)
+      throw CustomError.internal("Failed to fetch existing product");
 
-    const updates: Omit<UpdateProduct, "product_id"> = {};
+    if (!existingProduct) throw CustomError.notFound("Product not found");
+
+    const updates: UpdateProduct = {};
     let PRODUCT_COLLECTION_ID: number | null = null;
 
     const name = formData.get("name") as string;
     const price = formData.get("price");
     const color_variants = formData.get("color_variants");
-    const collection_name = formData.get("collection_name") as string;
+    const collectionName = formData.get("collection_name") as string;
     const description = formData.get("description") as string;
 
     // Check what fields are being updated
@@ -91,7 +92,7 @@ Deno.serve(async (req) => {
         color_variants as string,
       );
     }
-    if (collection_name) updates.name = collection_name;
+    if (collectionName) updates.collection_name = collectionName;
     if (description) updates.description = description;
 
     // Validate the updates
@@ -99,12 +100,12 @@ Deno.serve(async (req) => {
       validateProductUpdate({ ...updates });
     }
 
-    if (collection_name) {
+    if (collectionName) {
       // Already exists use the existing collection
       const { data: existingCollection, error: findError } = await supabase
         .from("products_collection")
         .select("id")
-        .eq("name", collection_name)
+        .eq("name", collectionName)
         .maybeSingle();
 
       if (findError) {
@@ -117,7 +118,7 @@ Deno.serve(async (req) => {
         // Create a new collection and use it
         const { data: newCollection, error: insertError } = await supabase
           .from("products_collection")
-          .insert({ name: collection_name })
+          .insert({ name: collectionName })
           .select("id")
           .single();
 
@@ -134,7 +135,7 @@ Deno.serve(async (req) => {
     // Handle image uploads
 
     const productImages = formData.getAll("new_product_images") as File[];
-    const imagesToDelete = formData.get("image_urls_to_delete") as string;
+    const imagesToDelete = formData.get("image_urls_to_delete");
 
     let newProductImages: File[] = [];
     let updatedImageUrls = existingProduct.image_urls || [];
@@ -153,6 +154,12 @@ Deno.serve(async (req) => {
     // Handle image deletion
     if (imagesToDelete && imagesToDelete.trim()) {
       const deleteUrls = JSON.parse(imagesToDelete) as string[];
+
+      if (existingProduct.image_urls.length - deleteUrls.length <= 0) {
+        throw CustomError.badRequest("Product must retain at least one image");
+      }
+
+      // NOTE: check existing only??
       updatedImageUrls = updatedImageUrls.filter(
         (url: string) => !deleteUrls.includes(url),
       );
@@ -188,13 +195,15 @@ Deno.serve(async (req) => {
 
     // Update image URLs if they changed
     if (newProductImages.length || imagesToDelete) {
-      updates.new_product_images = updatedImageUrls;
+      updates.image_urls = updatedImageUrls;
     }
 
-    // Update product in database
+    // exclude collection_name since it's not part of products_metadata and we just need the ref ID of it.
+    const { collection_name, ...rest } = updates;
+
     const { data: updatedProduct, error: updateError } = await supabase
       .from("products_metadata")
-      .update(updates)
+      .update({ ...rest })
       .eq("id", productId)
       .select()
       .single();

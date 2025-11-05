@@ -12,10 +12,10 @@
       "ES2022"
     ],
     "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "allowImortingTsExtensions": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "outDir": "../dist-backend",
+    "allowImortingTsExtensions": true,
     "baseUrl": ".",
     "paths": {
       "@/*": [

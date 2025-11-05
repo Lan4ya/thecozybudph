@@ -15,14 +15,14 @@ const adminPanelItems = [
   // { label: "Contact", href: "/contact" },
 ];
 
-const AdminDashboardSidebar = () => {
+const AdminDashboardNavbar = () => {
   const isMediumScreenAndBelow = useMediaQuery("(max-width: 1023px)");
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <nav
       className={cn(
-        "fixed top-0 z-[999] bg-background border-b-foreground shadow-xs w-screen py-3 flex-between px-4 md:px-8",
+        "fixed top-0 z-999 bg-background border-b-foreground shadow-xs w-full py-3 flex-between px-4 md:px-8",
       )}
     >
       {/* Brand */}
@@ -56,7 +56,7 @@ const AdminDashboardSidebar = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="h-screen fixed inset-0 z-[998] bg-black/50 backdrop-blur-sm flex flex-col items-center justify-center pb-[20%] space-y-6"
+            className="h-screen fixed inset-0 z-998 bg-black/50 backdrop-blur-sm flex flex-col items-center justify-center pb-[20%] space-y-6"
           >
             {/* Close Button */}
             <Button
@@ -97,4 +97,4 @@ const AdminDashboardSidebar = () => {
   );
 };
 
-export default AdminDashboardSidebar;
+export default AdminDashboardNavbar;

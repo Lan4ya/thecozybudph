@@ -1,5 +1,5 @@
-import { NewProduct, UpdateProduct } from "@TheCozyBud/schema";
-import { CustomError } from "./errors/CustomError";
+import type { NewProduct, UpdateProduct } from "@TheCozyBud/dist.index.d.ts";
+import { CustomError } from "./errors/CustomError.ts";
 
 const validateStringField = (
   value: string | undefined,

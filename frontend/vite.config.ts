@@ -10,14 +10,6 @@ export default defineConfig(({ mode }) => ({
   server: {
     port: 5173,
     host: "0.0.0.0",
-    server:
-      mode === "development"
-        ? {
-            proxy: {
-              "/api": "http://localhost:3000",
-            },
-          }
-        : undefined,
   },
   build: {
     outDir: path.resolve(__dirname, "../dist-frontend"),

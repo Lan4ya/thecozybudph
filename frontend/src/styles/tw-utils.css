@@ -1,9 +1,11 @@
 /* This is just tailwind utilities grouped together to further increase productivity */
 
+/* disable padding on very small screens */
+
 @layer utilities {
   /* Use this on all containers so it's assured they all have the same px */
   .container {
-    @apply !px-6 w-full;
+    @apply !px-6 max-w-full max-[380px]:!px-3;
   }
 
   /* flex utils */
@@ -37,5 +39,9 @@
   .text-12-normal {
     @apply font-normal;
     font-size: 12px;
+  }
+
+  .b {
+    @apply border border-blue-400;
   }
 }

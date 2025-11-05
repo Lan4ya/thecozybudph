@@ -23,9 +23,9 @@ import { uploadImagesToDB } from "@shared/uploadImagesToDB.ts";
 // @ts-ignore
 import { authAdmin } from "@shared/authAdmin.ts";
 // @ts-ignore
-import { getCorsHeaders, handleCorsOptions } from "@shared/cors.ts";
-
-import type { NewProduct } from "@TheCozyBud/schema";
+import { getCorsHeaders, handleCorsOptions } from "@shared/corsHeaders.ts";
+// @ts-ignore
+import type { NewProduct } from "@TheCozyBud/dist.index.d.ts";
 
 const supabase = createClient(
   // @ts-ignore

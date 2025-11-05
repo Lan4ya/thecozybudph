@@ -4,6 +4,7 @@ import { useRouteError, isRouteErrorResponse } from "react-router";
 import { motion } from "framer-motion";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Link } from "react-router";
+import { useNavigate } from "react-router";
 
 type ErrorPageProps = {
   status?: number;
@@ -14,10 +15,11 @@ type ErrorPageProps = {
 const messages: Record<number, string> = {
   401: "You’re not authorized to view this page.",
   404: "The page you’re looking for doesn’t exist.",
-  500: "Something went wrong on our servers.",
+  500: "Oops! Something went wrong on our servers.",
 };
 
 export const ErrorPage = ({ status, title, message }: ErrorPageProps) => {
+  const navigate = useNavigate();
   const finalMessage = message || (status ? messages[status] : null);
 
   return (
@@ -39,9 +41,20 @@ export const ErrorPage = ({ status, title, message }: ErrorPageProps) => {
 
         {/* CTA button */}
         <div className="mt-8">
-          <Button asChild variant="default" size="lg" className="rounded-2xl">
-            <Link to="/">Back to Home</Link>
-          </Button>
+          {status === 500 ? (
+            <Button
+              onClick={() => navigate(0)}
+              variant="default"
+              size="lg"
+              className="rounded-2xl"
+            >
+              Try Again
+            </Button>
+          ) : (
+            <Button asChild variant="default" size="lg" className="rounded-2xl">
+              <Link to="/">Back to Home</Link>
+            </Button>
+          )}
         </div>
       </motion.div>
     </div>

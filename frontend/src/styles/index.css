@@ -13,7 +13,11 @@
   }
 
   input {
-    font-family: "Inter", sans-serif !important;
+    font-family: sans-serif !important;
+  }
+
+  input::placeholder {
+    @apply text-xs;
   }
 }
 
@@ -28,7 +32,8 @@
   --primary-foreground: oklch(0.985 0 0);
 
   /* A less-dominant color or secondary brand tone */
-  --secondary: #333617;
+  /* --secondary: #333617; */
+  --secondary: #556b2f;
   --secondary-foreground: oklch(0.985 0 0);
 
   --card: oklch(0.96 0.02 70);
@@ -40,7 +45,8 @@
   --muted: oklch(0.92 0.01 70);
   --muted-foreground: oklch(0.4 0.02 70);
 
-  --accent: oklch(0.9 0.05 30);
+  /* --accent: oklch(0.9 0.05 30); */
+  --accent: oklch(0.75 0.18 25);
   --accent-foreground: oklch(0.18 0.02 70);
 
   --destructive: oklch(0.55 0.18 25);
@@ -108,4 +114,45 @@
 @theme {
   --font-ivy-ora-display: "IvyOraDisplay", "sans-serif";
   --font-back-to-black: "BackToBlack", "sans-serif";
+
+  --animate-shimmer: shimmer 1.6s ease-in-out infinite;
+  --animate-rotate: rotate 1s linear infinite;
+  --animate-swing: swing 1s ease-in-out infinite;
+
+  @keyframes shimmer {
+    0% {
+      opacity: 0.9;
+      transform: scale(0.98);
+      background-position: 0% 0%;
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1);
+      background-position: 0% 100%;
+    }
+    100% {
+      opacity: 0.9;
+      transform: scale(0.98);
+      background-position: 0% 0%;
+    }
+  }
+
+  @keyframes rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes swing {
+    0%,
+    100% {
+      transform: rotate(-10deg);
+    }
+    50% {
+      transform: rotate(10deg);
+    }
+  }
 }

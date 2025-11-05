@@ -13,7 +13,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 // @ts-ignore
 import { CustomError, handleError } from "@shared/errors/mod.ts";
 // @ts-ignore
-import { getCorsHeaders, handleCorsOptions } from "@shared/cors.ts";
+import { getCorsHeaders, handleCorsOptions } from "@shared/corsHeaders.ts";
 // @ts-ignore
 import { authAdmin } from "../shared/authAdmin.ts";
 
@@ -57,7 +57,13 @@ Deno.serve(async (req) => {
       .eq("id", product_id)
       .single();
 
-    if (fetchError || !product) {
+    if (fetchError) {
+      throw CustomError.internal(
+        `Failed to delete product: ${fetchError.message}`,
+      );
+    }
+
+    if (!product) {
       throw CustomError.notFound("Product to delete not found");
     }
 

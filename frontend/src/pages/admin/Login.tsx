@@ -28,6 +28,7 @@ const AdminLogin = () => {
 
     try {
       const { data: sessionData, error } =
+        // this call automatically stores the session in local storage
         await supabase.auth.signInWithPassword({
           email,
           password,
@@ -38,10 +39,10 @@ const AdminLogin = () => {
       if (error || !sessionData?.user)
         throw error || new Error("Invalid credentials");
 
-      const session = sessionData.session;
       const user = sessionData.user;
-      console.log("Authenticated user id:", user.id);
-      console.log("Session data:", session);
+
+      // const session = sessionData.session;
+      // console.log("Session data token:", session.access_token);
 
       // Check if admin
       const { data: isAdmin, error: adminErr } = await supabase
@@ -52,11 +53,8 @@ const AdminLogin = () => {
 
       if (adminErr) throw adminErr;
       if (!isAdmin)
-        throw new Error(
-          "You are not authorized to access the admin dashboard.",
-        );
+        throw new Error("You are not authorized to access this page.");
 
-      console.log("Admin login access granted...");
       navigate(`/admin-${admin_route_hash}/dashboard`, { replace: true });
     } catch (err: any) {
       console.error("Login failed:", err);
