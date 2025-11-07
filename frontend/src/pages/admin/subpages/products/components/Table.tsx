@@ -21,8 +21,6 @@ export default function ProductTable({
     error,
     isFetching,
     deleteProductMutation,
-    addProductMutation,
-    updateProductMutation,
   } = useProducts();
 
   if (error && !isFetching) throw error;
@@ -131,12 +129,13 @@ function ProductTableItemInner({
             </p>
           )}
 
-          {product.color_variants && (
-            <div className="flex items-center gap-2 text-xs lg:text-sm text-muted-foreground line-clamp-2">
-              Color Variants:
-              <ProductColorVariants colorVariants={product.color_variants} />
-            </div>
-          )}
+          {product.color_variants !== undefined &&
+            product.color_variants.length && (
+              <div className="flex items-center gap-2 text-xs lg:text-sm text-muted-foreground line-clamp-2">
+                Color Variants:
+                <ProductColorVariants colorVariants={product.color_variants} />
+              </div>
+            )}
 
           <p className="text-primary text-md">
             ₱{product.price.toLocaleString()}
