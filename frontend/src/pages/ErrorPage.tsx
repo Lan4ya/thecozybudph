@@ -50,11 +50,11 @@ export const ErrorPage = ({ status, title, message }: ErrorPageProps) => {
             >
               Try Again
             </Button>
-          ) : (
+          ) : status === 404 ? (
             <Button asChild variant="default" size="lg" className="rounded-2xl">
               <Link to="/">Back to Home</Link>
             </Button>
-          )}
+          ) : null}
         </div>
       </motion.div>
     </div>
