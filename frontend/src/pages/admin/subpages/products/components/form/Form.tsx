@@ -75,7 +75,7 @@ export default function ProductForm({
     handleSubmit,
     setValue,
     watch,
-    formState: { errors, isDirty },
+    formState: { errors },
     reset,
     clearErrors,
     setError,
@@ -249,8 +249,8 @@ export default function ProductForm({
     ],
   );
 
-  const onSubmit = (data: any) => {
-    if (!updatingProduct) {
+  const onSubmit = (data: ProductFormValues) => {
+    if (data.mode === "create") {
       const files = selectedFiles.map((n) => n.file);
       const formData = buildProductFormData({
         fields: data,
@@ -258,18 +258,12 @@ export default function ProductForm({
         primaryImageUrl: data.primary_image_url,
         isUpdate: false,
       });
-
-      console.log(formData);
       addProductMutation.mutate(formData);
       onSaved();
-
       return;
     }
 
-    // Updating product
-
     if (imagePreviews.length === 0) {
-      // put the err in this optionial field just to display the err
       setError("new_product_images", {
         type: "manual",
         message: "Product must retain at least one image",
@@ -284,9 +278,9 @@ export default function ProductForm({
       imagesToDelete,
       primaryImageUrl: data.primary_image_url,
       isUpdate: true,
+      productId: updatingProduct!.id,
     });
 
-    console.log(formData);
     updateProductMutation.mutate(formData);
     onSaved();
   };
@@ -467,7 +461,7 @@ export default function ProductForm({
 
               <Button
                 type="submit"
-                disabled={!isDirty || savingProductUpdate}
+                disabled={savingProductUpdate}
                 className="bg-secondary hover:bg-secondary/90"
               >
                 {savingProductUpdate && <Spinner className="mr-2" />}
