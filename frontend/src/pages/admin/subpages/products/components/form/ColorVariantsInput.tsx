@@ -2,6 +2,7 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import { Input } from "@/lib/ui/__shadcn__/input";
 import { cn } from "@/lib/utils/cn";
+import { Button } from "@/lib/ui/__shadcn__/button";
 
 export function ColorTagsInput({
   value,
@@ -19,8 +20,7 @@ export function ColorTagsInput({
 
   const validateColor = (color: string) => {
     if (!color) return "Color cannot be empty.";
-    if (!/^[a-z\s]+$/i.test(color)) return "Only letters are allowed.";
-    if (color.length > 20) return "Color name too long.";
+    if (color.length > 30) return "Color name too long.";
     if (value.includes(color)) return "Already added.";
     if (value.length >= max) return `Max ${max} colors allowed.`;
     return null;
@@ -70,17 +70,30 @@ export function ColorTagsInput({
 
       {/* Input */}
       <div>
-        <Input
-          placeholder="Type color name and press Enter"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              addColor();
-            }
-          }}
-        />
+        <div className="flex gap-2">
+          <Input
+            placeholder="Type color name and click add color"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (
+                !/[a-z.]$/.test(e.key) &&
+                ![
+                  "Backspace",
+                  "Tab",
+                  "ArrowLeft",
+                  "ArrowRight",
+                  "Delete",
+                ].includes(e.key)
+              ) {
+                e.preventDefault();
+              }
+            }}
+          />
+          <Button type="button" onClick={addColor}>
+            Add Color
+          </Button>
+        </div>
         {error && (
           <p className="mt-1 text-xs text-destructive animate-fadeIn">
             {error}
