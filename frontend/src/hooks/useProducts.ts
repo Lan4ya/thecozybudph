@@ -34,7 +34,7 @@ export const useProducts = () => {
   const addProductMutation = useMutation({
     mutationFn: async (formData: FormData) => await addProduct(formData),
     onMutate: () => {
-      addToast("Adding new product", "info");
+      addToast("Creating new product", "info");
     },
     onError: (err: any) => {
       const message =
@@ -56,7 +56,7 @@ export const useProducts = () => {
   const updateProductMutation = useMutation({
     mutationFn: async (formData: FormData) => await updateProduct(formData),
     onMutate: () => {
-      addToast("Updating product...", "info");
+      addToast("Updating product data", "info");
     },
     onError: (err: any) => {
       const message =
