@@ -360,7 +360,7 @@ export default function ProductForm({
             )}
           >
             <div className="max-h-[70dvh] overflow-x-hidden overflow-y-auto">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6 ">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 ">
                 {/* Name */}
                 <div>
                   <label className="block text-sm mb-1 text-muted-foreground">
