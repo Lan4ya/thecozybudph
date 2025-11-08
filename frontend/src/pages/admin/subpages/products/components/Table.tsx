@@ -1,4 +1,4 @@
-import React from "react";
+import { useState, useCallback, memo, useMemo } from "react";
 import ProductColorVariants from "@/components/ProductColorVariants";
 import { useProducts } from "@/hooks/useProducts";
 import { Button } from "@/lib/ui/__shadcn__/button";
@@ -14,7 +14,7 @@ export default function ProductTable({
 }: {
   onEdit: (selectedProduct: ProductPayloadFromDB) => void;
 }) {
-  const [deletingId, setDeletingId] = React.useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const {
     data: products = [],
@@ -25,7 +25,7 @@ export default function ProductTable({
 
   if (error && !isFetching) throw error;
 
-  const handleDelete = React.useCallback(
+  const handleDelete = useCallback(
     (id: string) => {
       setDeletingId(id);
       deleteProductMutation.mutate(id, {
@@ -35,7 +35,7 @@ export default function ProductTable({
     [deleteProductMutation],
   );
 
-  const handleEdit = React.useCallback(
+  const handleEdit = useCallback(
     (p: ProductPayloadFromDB) => onEdit(p),
     [onEdit],
   );
@@ -78,7 +78,7 @@ function ProductTableItemInner({
 }: ProductTableInnerProps) {
   const isDeleting = deletingId === product.id;
 
-  const deleteTrigger = React.useMemo(
+  const deleteTrigger = useMemo(
     () => (
       <Button
         variant="destructive"
@@ -93,12 +93,9 @@ function ProductTableItemInner({
     [isDeleting, product.name],
   );
 
-  const handleEdit = React.useCallback(
-    () => onEdit(product),
-    [onEdit, product],
-  );
+  const handleEdit = useCallback(() => onEdit(product), [onEdit, product]);
 
-  const handleConfirmDelete = React.useCallback(
+  const handleConfirmDelete = useCallback(
     () => onDelete(product.id),
     [onDelete, product.id],
   );
@@ -159,4 +156,4 @@ function ProductTableItemInner({
   );
 }
 
-const ProductTableItem = React.memo(ProductTableItemInner);
+const ProductTableItem = memo(ProductTableItemInner);
