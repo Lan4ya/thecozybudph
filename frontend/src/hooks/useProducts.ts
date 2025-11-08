@@ -25,10 +25,9 @@ export const useProducts = () => {
       addToast(err?.message || "Failed to delete product", "error");
     },
     onSuccess: () => {
-      addToast("Product deleted successfully 🌸", "success");
+      addToast("Product deleted successfully", "success");
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
-    onSettled: () => {},
   });
 
   const addProductMutation = useMutation({
