@@ -8,6 +8,7 @@ import ProductForm from "./components/form/Form";
 import { Plus, Search } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import type { ProductPayloadFromDB } from "@/lib/supabase/products";
+import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 
 export default function AdminDashboardProducts() {
   const [formOpen, setFormOpen] = useState(false);
@@ -17,6 +18,8 @@ export default function AdminDashboardProducts() {
   const [isSearchOpen, setSearchOpen] = useState<boolean>(false);
   const [searchInputVal, setSearchInputVal] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useLockBodyScroll(formOpen);
 
   useEffect(() => {
     if (isSearchOpen) searchInputRef.current?.focus();
