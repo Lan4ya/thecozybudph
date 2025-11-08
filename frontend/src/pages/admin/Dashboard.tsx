@@ -1,8 +1,7 @@
-import { Outlet, redirect, useLoaderData, useNavigate } from "react-router";
+import { Outlet, redirect } from "react-router";
 import AdminDashboardNavbar from "./DashboardNavBar";
 import { supabase } from "@/lib/supabase/connect";
-import { PageSpinner, Spinner } from "@/lib/ui/__shadcn__/spinner";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { PageSpinner } from "@/lib/ui/__shadcn__/spinner";
 import SessionGuard from "@/components/SessionGuard";
 
 export const loader = async () => {
@@ -44,13 +43,10 @@ export default function AdminDashboard() {
   // if (!isAdmin) navigate("/", { replace: true });
   // console.log("isAdmin:", isAdmin);
 
-  const isMediumScreenAndBelow = useMediaQuery("(max-width: 1023px)");
-  const ptVal = isMediumScreenAndBelow ? "pt-12" : "pt-16";
-
   return (
     <>
       <SessionGuard />
-      <div className={`${ptVal} flex min-h-screen`}>
+      <div className="pt-12 lg:pt-16 flex min-h-screen">
         <AdminDashboardNavbar />
         <main className="container flex-1">
           <Outlet />

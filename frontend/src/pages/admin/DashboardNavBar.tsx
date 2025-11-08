@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/lib/ui/__shadcn__/button";
-import { Menu, ShoppingCart, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 const admin_route_hash = import.meta.env.VITE_ADMIN_ROUTE_HASH!;

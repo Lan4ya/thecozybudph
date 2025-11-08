@@ -73,9 +73,9 @@ const AdminLogin = () => {
         <Card className="shadow-lg border-border/50 backdrop-blur-sm bg-card/70">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-2">
-              <Lock className="w-8 h-8 text-[var(--primary)]" />
+              <Lock className="w-8 h-8 text-primary" />
             </div>
-            <CardTitle className="text-2xl font-semibold text-[var(--foreground)]">
+            <CardTitle className="text-2xl font-semibold text-foreground">
               Admin Login
             </CardTitle>
           </CardHeader>

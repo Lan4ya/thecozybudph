@@ -13,12 +13,11 @@ const items = Array.from({ length: 12 }).map((_, i) => ({
 const Shop: React.FC = () => {
   return (
     <main className="overflow-x-hidden flex-1 flex flex-col gap-15">
-      <ShopHero />
+      {/* <ShopHero /> */}
       <ShopProductGrid items={items} />
-      <ShopEventSection />
+      {/* <ShopEventSection /> */}
     </main>
   );
 };
 
 export default Shop;
-

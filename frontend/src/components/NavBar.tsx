@@ -35,7 +35,7 @@ const NavBar = () => {
   return (
     <nav
       className={cn(
-        "fixed top-0 z-[999] w-screen py-3 flex-between px-4 md:px-8",
+        "fixed top-0 z-999 w-screen py-3 flex-between px-4 md:px-8",
         !menuOpen &&
           isBackgroundShown &&
           "border-b-foreground shadow-xs bg-background backdrop-blur-sm ",
@@ -77,7 +77,7 @@ const NavBar = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="h-screen fixed inset-0 z-[998] bg-black/50 backdrop-blur-sm flex flex-col items-center justify-center pb-[20%] space-y-6"
+            className="h-screen fixed inset-0 z-998 bg-black/50 backdrop-blur-sm flex flex-col items-center justify-center pb-[20%] space-y-6"
           >
             {/* Close Button */}
             <Button
@@ -183,7 +183,7 @@ const DesktopNavLinks = ({
             {active === href && (
               <motion.div
                 layoutId="nav-underline"
-                className="absolute -bottom-1 h-[2px] w-full bg-primary rounded-full"
+                className="absolute -bottom-1 h-0.5 w-full bg-primary rounded-full"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -221,7 +221,7 @@ const DesktopNavLinks = ({
           {active === "/cart" && (
             <motion.div
               layoutId="nav-underline"
-              className="absolute -bottom-1 h-[2px] w-full bg-primary rounded-full"
+              className="absolute -bottom-1 h-0.5 w-full bg-primary rounded-full"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
