@@ -48,7 +48,7 @@ export function formHasChanges(
     price: updatingProduct.price,
     description: updatingProduct.description ?? "",
     color_variants: updatingProduct.color_variants ?? [],
-    collection_name: updatingProduct.collection_name ?? "",
+    collection_name: updatingProduct.products_collection?.name ?? "",
   };
 
   const current = {

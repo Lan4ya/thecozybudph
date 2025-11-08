@@ -530,6 +530,7 @@ function getMappedUpdatingProductKV(
     product_id: updatingProduct.id,
     name: updatingProduct.name,
     price: updatingProduct.price,
+    collection_name: updatingProduct.products_collection?.name ?? undefined,
     description: updatingProduct.description ?? undefined,
     color_variants: updatingProduct.color_variants ?? [],
     new_product_images: [],
