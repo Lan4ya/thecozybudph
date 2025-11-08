@@ -8,14 +8,14 @@ import {
 } from "@/lib/ui/__shadcn__/dialog";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { useState } from "react";
-import type { Product } from "@TheCozyBud/schema";
+import type { ProductPayloadFromDB } from "@/lib/supabase/products";
 
 export function DeleteProductDialog({
   product,
   onConfirm,
   trigger,
 }: {
-  product: Product;
+  product: ProductPayloadFromDB;
   onConfirm: () => void;
   trigger: React.ReactNode;
 }) {
@@ -44,6 +44,7 @@ export function DeleteProductDialog({
           <Button variant="outline" onClick={() => setOpen(false)}>
             Cancel
           </Button>
+
           <Button
             variant="destructive"
             onClick={() => {

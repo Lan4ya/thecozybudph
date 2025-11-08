@@ -37,7 +37,7 @@ const productBaseSchema = z.object({
 
 export type ProductBase = z.infer<typeof productBaseSchema>;
 
-// --- product_metadata Database Table Entity Type ---
+// --- product_metadata Database Table Entity ---
 export type ProductMetadata = Omit<ProductBase, "collection_name"> & {
   id: string;
   created_at: string;
@@ -54,20 +54,14 @@ export const createProductSchema = productBaseSchema.extend({
     .array(imageFileSchema)
     .min(1, "product image is required")
     .max(2, "You can upload up to 2 images only"),
-  primary_image_url: z
-    .url("Primary image URL must be valid")
-    .optional()
-    .nullable(),
+  primary_image_index: z.number("Primary image index must be a number"),
 });
 
 export const updateProductSchema = productBaseSchema.partial().extend({
   product_id: z.string("Product ID is required"),
   new_product_images: z.array(imageFileSchema).optional(),
   image_urls_to_delete: z.array(z.string()).optional(),
-  primary_image_url: z
-    .url("Primary image URL must be valid")
-    .optional()
-    .nullable(),
+  primary_image_index: z.number("Primary image index must be a number"),
 });
 
 // Shared Types for BE and FE

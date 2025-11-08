@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useForm, type FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -54,18 +54,18 @@ export default function ProductForm({
   updatingProduct,
   onSaved,
 }: Props) {
-  const [selectedFiles, setSelectedFiles] = useState<
+  const [newSelectedFiles, setNewSelectedFiles] = useState<
     { file: File; url: string }[]
   >([]);
+  // images to mark for deletion from existing DB URLs
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-  const [primaryImageUrl, setPrimaryImageUrl] = useState<string | null>(null);
+  const [primaryImageIndex, setPrimaryImageIndex] = useState<number>(-1);
 
   const { addProductMutation, updateProductMutation } = useProducts();
-
   const savingProductUpdate =
     addProductMutation.isPending || updateProductMutation.isPending;
 
+  const MAX_IMAGES = 2;
   const fileFieldName = updatingProduct
     ? "new_product_images"
     : "product_images";
@@ -82,140 +82,160 @@ export default function ProductForm({
   } = useForm<ProductFormValues>({
     resolver: zodResolver(productFormSchema),
     defaultValues: updatingProduct
-      ? {
-          mode: "update",
-          ...getMappedUpdatingProductKV(updatingProduct),
-        }
+      ? { mode: "update", ...getMappedUpdatingProductKV(updatingProduct) }
       : { mode: "create", ...getEmptyFormKV() },
   });
 
   const values = watch();
 
-  // reset / reinit when modal opens
+  // Derive display images: existing (minus deletions) first, then selected blob urls
+  const displayImages = useMemo(() => {
+    const existing = updatingProduct?.image_urls ?? [];
+    const filteredExisting = existing.filter(
+      (u) => !imagesToDelete.includes(u),
+    );
+    const newUrls = newSelectedFiles.map((n) => n.url);
+    return [...filteredExisting, ...newUrls];
+  }, [updatingProduct, imagesToDelete, newSelectedFiles]);
+
+  // Reset component state & form when modal opens
   useEffect(() => {
     if (!open) return;
 
-    selectedFiles.forEach((n) => URL.revokeObjectURL(n.url));
-    setSelectedFiles([]);
+    newSelectedFiles.forEach((s) => URL.revokeObjectURL(s.url)); // cleanup previous blobs
+    setNewSelectedFiles([]);
     setImagesToDelete([]);
 
+    reset(
+      updatingProduct
+        ? { mode: "update", ...getMappedUpdatingProductKV(updatingProduct) }
+        : { mode: "create", ...getEmptyFormKV() },
+    );
+
+    // set initial primary index:
     if (updatingProduct) {
-      console.log("Setting primary image URL:", {
-        primary_image_url: updatingProduct.primary_image_url,
-        first_image_url: updatingProduct.image_urls?.[0],
-        finalValue:
-          updatingProduct.primary_image_url ??
-          updatingProduct.image_urls?.[0] ??
-          null,
-      });
-
-      reset({
-        mode: "update",
-        ...getMappedUpdatingProductKV(updatingProduct),
-      });
-
-      setPrimaryImageUrl(
-        updatingProduct.primary_image_url ??
-          updatingProduct.image_urls?.[0] ??
-          null,
+      const existing = updatingProduct.image_urls ?? [];
+      const idx = existing.findIndex(
+        (u) => u === updatingProduct.primary_image_url,
       );
+      const initial = idx >= 0 ? idx : existing.length > 0 ? 0 : -1;
+      setPrimaryImageIndex(initial);
     } else {
-      // create product
-      reset({ mode: "create", ...getEmptyFormKV() });
-      setPrimaryImageUrl(null);
+      setPrimaryImageIndex(-1);
     }
   }, [open, updatingProduct, reset]);
 
-  // Derive image previews
+  // CLEANUP on unmount
   useEffect(() => {
-    if (!open) return;
-    console.log(updatingProduct);
+    return () => {
+      newSelectedFiles.forEach((s) => URL.revokeObjectURL(s.url));
+    };
+  }, [newSelectedFiles]);
 
-    const existing = updatingProduct?.image_urls ?? [];
-    const existingFiltered = existing.filter(
-      (u: string) => !imagesToDelete.includes(u),
-    );
-    const newUrls = selectedFiles.map((n) => n.url);
-    setImagePreviews([...existingFiltered, ...newUrls]);
-  }, [selectedFiles, imagesToDelete, updatingProduct]);
+  // --- Handlers ---
+
+  // helper: ensure primary index is valid given new display length
+  const normalizePrimaryIndex = useCallback((idx: number, length: number) => {
+    if (length === 0) return -1;
+    if (idx < 0) return 0;
+    if (idx >= length) return length - 1;
+    return idx;
+  }, []);
 
   const handleSelectFiles = useCallback(
-    (newFiles: File[]) => {
+    (files: File[]) => {
       clearErrors(fileFieldName);
 
-      setSelectedFiles((prev) => {
+      const existingCount = (updatingProduct?.image_urls ?? []).filter(
+        (u) => !imagesToDelete.includes(u),
+      ).length;
+      const currentSelectedCount = newSelectedFiles.length;
+      if (existingCount + currentSelectedCount + files.length > MAX_IMAGES) {
+        setError(fileFieldName, {
+          type: "manual",
+          message: `You can upload up to ${MAX_IMAGES} images only`,
+        });
+        return;
+      }
+
+      // dedupe by name+size+lastModified for newly selected files
+      setNewSelectedFiles((prev) => {
         const existingKeys = new Set(
-          prev.map((n) => n.file.name + n.file.size + n.file.lastModified),
+          prev.map(
+            (p) => `${p.file.name}-${p.file.size}-${p.file.lastModified}`,
+          ),
         );
 
-        const uniqueFiles = newFiles.filter(
-          (f) => !existingKeys.has(f.name + f.size + f.lastModified),
+        const unique = files.filter(
+          (f) => !existingKeys.has(`${f.name}-${f.size}-${f.lastModified}`),
         );
 
-        const created = uniqueFiles.map((f) => ({
+        const created = unique.map((f) => ({
           file: f,
           url: URL.createObjectURL(f),
         }));
 
-        const updated = [...prev, ...created];
+        const next = [...prev, ...created];
 
-        const existingCount =
-          updatingProduct?.image_urls?.filter(
-            (u: string) => !imagesToDelete.includes(u),
-          ).length ?? 0;
-
-        if (existingCount + prev.length + newFiles.length > 2) {
-          setError(fileFieldName, {
-            type: "manual",
-            message: "You can upload up to 2 images only",
-          });
-          return prev;
-        }
-
-        // Auto-set primary
-        if (!primaryImageUrl && updated.length > 0) {
-          const firstUrl =
-            updatingProduct?.image_urls?.find(
-              (u: string) => !imagesToDelete.includes(u),
-            ) ?? updated[0].url;
-
-          setPrimaryImageUrl(firstUrl);
-          setValue("primary_image_url", firstUrl, { shouldValidate: true });
-        }
-
-        // Sync RHF
+        // sync RHF file field so validation can see selected files
         setValue(
           fileFieldName,
-          updated.map((n) => n.file),
+          next.map((n) => n.file),
           { shouldValidate: true },
         );
 
-        return updated;
+        // if primary not set yet, set it to first newly added image
+        if (primaryImageIndex === -1 && created.length > 0) {
+          const existingLen = (updatingProduct?.image_urls ?? []).filter(
+            (u) => !imagesToDelete.includes(u),
+          ).length;
+          const newPrimary = existingLen; // first new file index
+          setPrimaryImageIndex(newPrimary);
+        }
+
+        return next;
       });
     },
     [
       fileFieldName,
-      primaryImageUrl,
-      updatingProduct,
-      setValue,
-      clearErrors,
+      imagesToDelete,
+      MAX_IMAGES,
+      primaryImageIndex,
+      newSelectedFiles.length,
       setError,
+      setValue,
+      updatingProduct,
+      clearErrors,
     ],
   );
 
-  const handleRemovePreview = useCallback(
-    (url: string) => {
-      const existingUrls = updatingProduct?.image_urls ?? [];
+  const handleRemoveImage = useCallback(
+    (url: string, idx: number) => {
+      const existing = updatingProduct?.image_urls ?? [];
+      const filteredExisting = existing.filter(
+        (u) => !imagesToDelete.includes(u),
+      );
+      const existingCount = filteredExisting.length; // number of existing images currently shown
 
-      if (existingUrls.includes(url)) {
+      // if it's an existing URL (idx < existingCount), mark it for deletion
+      if (idx < existingCount) {
         setImagesToDelete((prev) => {
           if (prev.includes(url)) return prev;
           const next = [...prev, url];
 
-          if (primaryImageUrl === url) {
-            setPrimaryImageUrl(null);
+          // after deletion, recompute display length
+          const newDisplayLength =
+            existing.length - next.length + newSelectedFiles.length;
+          // if removed item was primary, fallback to either 0 (first remaining existing) or first selected
+          if (primaryImageIndex === idx) {
+            const newPrimary = newDisplayLength > 0 ? 0 : -1;
+            setPrimaryImageIndex(newPrimary);
+          } else if (primaryImageIndex > idx) {
+            // shift primary index down because earlier existing was removed
+            setPrimaryImageIndex((p) => p - 1);
           }
 
+          // sync form field for server
           setValue("image_urls_to_delete", next, { shouldValidate: false });
           return next;
         });
@@ -223,47 +243,58 @@ export default function ProductForm({
         return;
       }
 
-      setSelectedFiles((prev) => {
-        const remaining = prev.filter((n) => {
-          if (n.url === url) {
-            URL.revokeObjectURL(n.url);
+      // otherwise it is a newly selected file (idx >= existingCount)
+      setNewSelectedFiles((prev) => {
+        const remaining = prev.filter((p) => {
+          if (p.url === url) {
+            URL.revokeObjectURL(p.url);
             return false;
           }
           return true;
         });
 
+        // sync RHF file field
         setValue(
           fileFieldName,
           remaining.map((n) => n.file),
           { shouldValidate: true },
         );
+
+        // calculate new display length and adjust primary index if needed
+        const newDisplayLength =
+          existing.filter((u) => !imagesToDelete.includes(u)).length +
+          remaining.length;
+        const removedGlobalIndex = idx;
+
+        setPrimaryImageIndex((prevPrimary) => {
+          if (prevPrimary === removedGlobalIndex) {
+            // if primary removed, fallback
+            return newDisplayLength > 0 ? 0 : -1;
+          }
+
+          if (prevPrimary > removedGlobalIndex) {
+            // shift down if removal was before primary
+            return prevPrimary - 1;
+          }
+
+          return prevPrimary;
+        });
+
         return remaining;
       });
     },
     [
       fileFieldName,
-      updatingProduct,
-      primaryImageUrl,
+      imagesToDelete,
+      primaryImageIndex,
+      newSelectedFiles,
       setValue,
-      setImagesToDelete,
+      updatingProduct,
     ],
   );
 
   const onSubmit = (data: ProductFormValues) => {
-    if (data.mode === "create") {
-      const files = selectedFiles.map((n) => n.file);
-      const formData = buildProductFormData({
-        fields: data,
-        files,
-        primaryImageUrl: data.primary_image_url,
-        isUpdate: false,
-      });
-      addProductMutation.mutate(formData);
-      onSaved();
-      return;
-    }
-
-    if (imagePreviews.length === 0) {
+    if (displayImages.length === 0) {
       setError("new_product_images", {
         type: "manual",
         message: "Product must retain at least one image",
@@ -271,26 +302,26 @@ export default function ProductForm({
       return;
     }
 
-    const files = selectedFiles.map((n) => n.file);
-    const formData = buildProductFormData({
+    const files = newSelectedFiles.map((s) => s.file);
+
+    const fd = buildProductFormData({
       fields: data,
       files,
       imagesToDelete,
-      primaryImageUrl: data.primary_image_url,
-      isUpdate: true,
-      productId: updatingProduct!.id,
+      primary_image_index: normalizePrimaryIndex(
+        primaryImageIndex,
+        displayImages.length,
+      ),
+      isUpdate: data.mode === "update",
+      productId: data.mode === "update" ? updatingProduct?.id : undefined,
     });
 
-    updateProductMutation.mutate(formData);
+    data.mode === "create"
+      ? addProductMutation.mutate(fd)
+      : updateProductMutation.mutate(fd);
+
     onSaved();
   };
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      selectedFiles.forEach((n) => URL.revokeObjectURL(n.url));
-    };
-  }, []);
 
   if (!open) return null;
 
@@ -417,17 +448,15 @@ export default function ProductForm({
                 {/* Image Upload */}
                 <div className="md: col-span-2">
                   <ImageUploadInput
+                    images={displayImages}
                     onSelectFiles={handleSelectFiles}
-                    previewImages={imagePreviews}
-                    onRemovePreview={handleRemovePreview}
-                    imagesToDelete={imagesToDelete}
-                    setImagesToDelete={setImagesToDelete}
-                    primaryImageUrl={primaryImageUrl}
-                    setPrimaryImageUrl={(url) => {
-                      setPrimaryImageUrl(url);
-                      setValue("primary_image_url", url);
-                    }}
+                    onRemoveImage={handleRemoveImage}
+                    primaryImageIndex={primaryImageIndex}
+                    setPrimaryImageIndex={setPrimaryImageIndex}
+                    maxImages={MAX_IMAGES}
                   />
+
+                  {/* show validation messages */}
                   {values.mode === "create" &&
                     (errors as FieldErrors<NewProduct>)?.product_images
                       ?.message && (
@@ -438,7 +467,6 @@ export default function ProductForm({
                         }
                       </p>
                     )}
-
                   {values.mode === "update" &&
                     (errors as FieldErrors<UpdateProduct>)?.new_product_images
                       ?.message && (
@@ -475,6 +503,8 @@ export default function ProductForm({
   );
 }
 
+// Helper for default values
+
 function getEmptyFormKV(): NewProduct {
   return {
     name: "",
@@ -482,6 +512,7 @@ function getEmptyFormKV(): NewProduct {
     description: "",
     color_variants: [],
     product_images: [],
+    primary_image_index: -1,
   };
 }
 
@@ -496,9 +527,6 @@ function getMappedUpdatingProductKV(
     color_variants: updatingProduct.color_variants ?? [],
     new_product_images: [],
     image_urls_to_delete: [],
-    primary_image_url:
-      updatingProduct.primary_image_url ??
-      updatingProduct.image_urls?.[0] ??
-      null,
+    primary_image_index: -1,
   };
 }

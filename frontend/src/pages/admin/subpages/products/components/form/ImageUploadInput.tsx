@@ -1,25 +1,25 @@
+import { memo } from "react";
 import { Info, UploadCloud } from "lucide-react";
 import { ProductImage } from "@/components/ProductImage";
 import { cn } from "@/lib/utils/cn";
 import { useToast } from "@/providers/ToastProvider";
-import { memo } from "react";
 
 type Props = {
-  previewImages: string[]; // derived: existing (minus deletions) + new file urls
+  images: string[]; // display images: existing (filtered) + newly selected blob urls
   onSelectFiles: (files: File[]) => void;
-  onRemovePreview: (url: string) => void;
-  imagesToDelete: string[];
-  setImagesToDelete: (urls: string[]) => void;
-  primaryImageUrl: string | null;
-  setPrimaryImageUrl: (url: string | null) => void;
+  onRemoveImage: (url: string, idx: number) => void;
+  primaryImageIndex: number;
+  setPrimaryImageIndex: (idx: number) => void;
+  maxImages?: number;
 };
 
 function ImageUploadInput({
-  previewImages,
+  images,
   onSelectFiles,
-  onRemovePreview,
-  primaryImageUrl,
-  setPrimaryImageUrl,
+  onRemoveImage,
+  primaryImageIndex,
+  setPrimaryImageIndex,
+  maxImages = 2,
 }: Props) {
   const { addToast } = useToast();
 
@@ -28,10 +28,12 @@ function ImageUploadInput({
       <div className="flex items-center gap-3">
         <label
           onClick={(e) => {
-            if (previewImages.length >= 2) {
+            if (images.length >= maxImages) {
               e.preventDefault();
-
-              addToast("You can upload up to 2 images only", "error");
+              addToast(
+                `You can upload up to ${maxImages} images only`,
+                "error",
+              );
             }
           }}
           className="cursor-pointer inline-flex items-center gap-2 px-3 py-2 border rounded-md"
@@ -46,6 +48,7 @@ function ImageUploadInput({
             className="hidden"
             onChange={(e) => {
               const files = e.target.files ? Array.from(e.target.files) : [];
+              if (files.length === 0) return;
               onSelectFiles(files);
             }}
           />
@@ -53,24 +56,25 @@ function ImageUploadInput({
 
         <UploadHint />
       </div>
+
       <div className="flex gap-3 overflow-x-auto">
-        {previewImages.map((u, idx) => {
-          const isPrimary = primaryImageUrl === u;
+        {images.map((src, idx) => {
+          const isPrimary = idx === primaryImageIndex;
 
           return (
             <div
-              key={u + idx}
+              key={`${src}-${idx}`}
               className="relative group w-28 h-28 rounded-md overflow-hidden border"
             >
               <ProductImage
-                src={u}
+                src={src}
                 alt={`preview-${idx}`}
                 className="w-full h-full object-cover"
               />
 
               <button
                 type="button"
-                onClick={() => onRemovePreview(u)}
+                onClick={() => onRemoveImage(src, idx)}
                 className={cn(
                   "remove-overlay absolute inset-0 bg-black/45 opacity-0 transition flex items-center justify-center text-white text-sm",
                   "hover:bg-black/60",
@@ -85,8 +89,7 @@ function ImageUploadInput({
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  // if (previewImages.length === 1) return;
-                  setPrimaryImageUrl(isPrimary ? null : u);
+                  setPrimaryImageIndex(idx);
                 }}
                 className={cn(
                   "primary-btn absolute bottom-1 right-1 text-xs px-2 py-1 rounded transition z-100",
@@ -131,7 +134,7 @@ function UploadHint({
         )}
       >
         {message ??
-          `You can only upload up to 2 images per product, each image under 20 MB. These limits exist to conserve cloud storage and maintain website performance.`}
+          `You can upload up to ${2} images per product; keep each under 20 MB.`}
       </div>
     </div>
   );

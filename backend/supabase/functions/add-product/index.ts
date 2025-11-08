@@ -65,13 +65,12 @@ Deno.serve(async (req) => {
     // File size and type validation
     await validateImageFile(productImages);
 
-    // Get all product data
+    // Parse core fields
     const productMetaData: Omit<NewProduct, "product_images"> = {
       name: formData.get("name") as string,
       price: Number(formData.get("price")),
     };
 
-    // add optional fields to product data if they exist
     const colorVariants = formData.get("color_variants") as string;
     if (colorVariants) {
       productMetaData.color_variants = parseJSONField<string[]>(
@@ -79,22 +78,22 @@ Deno.serve(async (req) => {
         colorVariants,
       );
     }
+
     const collectionName = formData.get("collection_name") as string;
     if (collectionName) {
       productMetaData.collection_name = collectionName;
     }
-    const primaryImageUrl = formData.get("primary_image_url") as string;
-    if (primaryImageUrl) {
-      productMetaData.primary_image_url = primaryImageUrl;
-    }
+
     const description = formData.get("description") as string;
     productMetaData.description = description;
 
     validateNewProduct(productMetaData);
 
+    const primaryImageIndex = Number(formData.get("primary_image_index") ?? 0);
+
+    // Resolve or create collection
     let PRODUCT_COLLECTION_ID: number | null = null;
     if (collectionName) {
-      // Check if collection name already exists
       const { data: existingCollection, error: findError } = await supabase
         .from("products_collection")
         .select("id")
@@ -130,6 +129,9 @@ Deno.serve(async (req) => {
 
     // Upload images to Supabase Storage concurrently
     const imageUrls = await uploadImagesToDB(supabase, productImages);
+    if (!imageUrls.length) throw CustomError.internal("Image upload failed");
+
+    const resolvedPrimaryUrl = imageUrls[primaryImageIndex] ?? imageUrls[0];
 
     // exclude collection_name since it's not part of products_metadata and we just need the ref ID of it.
     const { collection_name, primary_image_url, ...rest } = productMetaData;
@@ -140,7 +142,7 @@ Deno.serve(async (req) => {
       .insert({
         ...rest,
         image_urls: imageUrls,
-        primary_image_url: primary_image_url ?? imageUrls[0], // default to first image if not provided
+        primary_image_url: resolvedPrimaryUrl,
         product_collection_id: PRODUCT_COLLECTION_ID,
       })
       .select()

@@ -47,7 +47,7 @@ export const useProducts = () => {
       addToast(message, "error");
     },
     onSuccess: () => {
-      addToast("New product added!", "success");
+      addToast("Product added successfully", "success");
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
   });

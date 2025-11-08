@@ -90,7 +90,7 @@ export function ColorTagsInput({
               }
             }}
           />
-          <Button type="button" onClick={addColor}>
+          <Button type="button" onClick={addColor} className="bg-accent">
             Add Color
           </Button>
         </div>
