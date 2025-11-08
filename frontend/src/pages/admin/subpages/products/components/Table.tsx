@@ -130,7 +130,7 @@ function ProductTableItemInner({
           )}
 
           {product.color_variants !== undefined &&
-            product.color_variants.length && (
+            product.color_variants.length > 0 && (
               <div className="flex items-center gap-2 text-xs lg:text-sm text-muted-foreground line-clamp-2">
                 Color Variants:
                 <ProductColorVariants colorVariants={product.color_variants} />
