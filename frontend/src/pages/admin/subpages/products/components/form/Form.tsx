@@ -22,9 +22,10 @@ import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import { X } from "lucide-react";
 import ImageUploadInput from "./ImageUploadInput";
 import { buildProductFormData } from "@/pages/admin/utils/buildProductFormData";
-import { useProducts } from "@/hooks/useProducts";
+import { useProductMutations } from "@/pages/admin/hooks/useProductsMutations";
 import { ColorTagsInput } from "@/pages/admin/subpages/products/components/form/ColorVariantsInput";
 import z from "zod";
+import { formHasChanges } from "@/pages/admin/utils/formHasChanges";
 
 const createProductFormSchema = createProductSchema.extend({
   mode: z.literal("create"),
@@ -39,7 +40,7 @@ const productFormSchema = z.discriminatedUnion("mode", [
   updateProductFormSchema,
 ]);
 
-type ProductFormValues = z.input<typeof productFormSchema>;
+export type ProductFormValues = z.input<typeof productFormSchema>;
 
 type Props = {
   open: boolean;
@@ -61,7 +62,7 @@ export default function ProductForm({
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
   const [primaryImageIndex, setPrimaryImageIndex] = useState<number>(-1);
 
-  const { addProductMutation, updateProductMutation } = useProducts();
+  const { addProductMutation, updateProductMutation } = useProductMutations();
   const savingProductUpdate =
     addProductMutation.isPending || updateProductMutation.isPending;
 
@@ -87,6 +88,11 @@ export default function ProductForm({
   });
 
   const values = watch();
+
+  const hasChanges = formHasChanges(values, updatingProduct, {
+    imagesToDelete,
+    newSelectedFilesCount: newSelectedFiles.length,
+  });
 
   // Derive display images: existing (minus deletions) first, then selected blob urls
   const displayImages = useMemo(() => {
@@ -354,7 +360,7 @@ export default function ProductForm({
             )}
           >
             <div className="max-h-[70dvh] overflow-x-hidden overflow-y-auto">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6 ">
                 {/* Name */}
                 <div>
                   <label className="block text-sm mb-1 text-muted-foreground">
@@ -392,6 +398,7 @@ export default function ProductForm({
                           "ArrowLeft",
                           "ArrowRight",
                           "Delete",
+                          "Enter",
                         ].includes(e.key)
                       ) {
                         e.preventDefault();
@@ -406,7 +413,7 @@ export default function ProductForm({
                 </div>
 
                 {/* Collection */}
-                <div>
+                <div className="md:col-span-2">
                   <label className="block text-sm mb-1 text-muted-foreground">
                     Collection Name (optional)
                   </label>
@@ -436,7 +443,7 @@ export default function ProductForm({
                   </label>
                   <textarea
                     {...register("description")}
-                    className="w-full min-h-[100px] max-h-32 rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 resize-y"
+                    className="w-full min-h-[100px] max-h-32 rounded-md border border-input bg-background! px-3 py-2 text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 resize-y"
                   />
                   {errors.description && (
                     <p className="text-xs text-red-500 mt-1">
@@ -446,7 +453,7 @@ export default function ProductForm({
                 </div>
 
                 {/* Image Upload */}
-                <div className="md: col-span-2">
+                <div className="md:col-span-2">
                   <ImageUploadInput
                     images={displayImages}
                     onSelectFiles={handleSelectFiles}
@@ -482,14 +489,14 @@ export default function ProductForm({
             </div>
 
             {/* Actions */}
-            <div className="mt-4 flex justify-end gap-3">
+            <div className="mt-5 flex justify-end gap-3">
               <Button variant="outline" type="button" onClick={onClose}>
                 Cancel
               </Button>
 
               <Button
                 type="submit"
-                disabled={savingProductUpdate}
+                disabled={savingProductUpdate || !hasChanges}
                 className="bg-secondary hover:bg-secondary/90"
               >
                 {savingProductUpdate && <Spinner className="mr-2" />}
