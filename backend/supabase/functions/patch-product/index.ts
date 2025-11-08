@@ -74,7 +74,7 @@ Deno.serve(async (req) => {
 
     if (!existingProduct) throw CustomError.notFound("Product not found");
 
-    const fieldUpdates: UpdateProduct = {};
+    const updates: UpdateProduct = {};
     let PRODUCT_COLLECTION_ID: number | null = null;
 
     const name = formData.get("name") as string;
@@ -84,20 +84,20 @@ Deno.serve(async (req) => {
     const description = formData.get("description") as string;
 
     // Check what fields are being updated
-    if (name) fieldUpdates.name = name;
-    if (price) fieldUpdates.price = Number(price);
+    if (name) updates.name = name;
+    if (price) updates.price = Number(price);
     if (color_variants) {
-      fieldUpdates.color_variants = parseJSONField(
+      updates.color_variants = parseJSONField(
         "color_variants",
         color_variants as string,
       );
     }
-    if (collectionName) fieldUpdates.collection_name = collectionName;
-    if (description) fieldUpdates.description = description;
+    if (collectionName) updates.collection_name = collectionName;
+    if (description) updates.description = description;
 
     // Validate the field updates
-    if (Object.keys(fieldUpdates).length > 0) {
-      validateProductUpdate(fieldUpdates);
+    if (Object.keys(updates).length > 0) {
+      validateProductUpdate(updates);
     }
 
     if (collectionName) {
@@ -129,7 +129,7 @@ Deno.serve(async (req) => {
         }
         PRODUCT_COLLECTION_ID = newCollection.id;
       }
-      fieldUpdates.product_collection_id = PRODUCT_COLLECTION_ID;
+      updates.product_collection_id = PRODUCT_COLLECTION_ID;
     }
 
     // Handle image uploads
@@ -187,15 +187,16 @@ Deno.serve(async (req) => {
     // Update primary image if specified
     const primaryImageUrl = formData.get("primary_image_url") as string;
     if (primaryImageUrl && updatedImageUrls.includes(primaryImageUrl)) {
-      fieldUpdates.primary_image_url = primaryImageUrl;
+      updates.primary_image_url = primaryImageUrl;
     }
     // else if (updatedImageUrls.length > 0) {
     //   updates.primary_image_url = updatedImageUrls[0];
     // }
 
     // Update image URLs if they changed
-    const image_urls =
-      newProductImages.length || imagesToDelete ? updatedImageUrls : null;
+    if (newProductImages.length || imagesToDelete) {
+      updates.image_urls = updatedImageUrls;
+    }
 
     const primaryImageIndex = Number(formData.get("primary_image_index") ?? 0);
     const resolvedPrimaryImageUrl = Array.isArray(updatedImageUrls)
@@ -203,13 +204,12 @@ Deno.serve(async (req) => {
       : null;
 
     // exclude collection_name since it's not part of products_metadata and we just need the ref ID of it.
-    const { collection_name, ...rest } = fieldUpdates;
+    const { collection_name, ...restOfUpdates } = updates;
 
     const { data: updatedProduct, error: updateError } = await supabase
       .from("products_metadata")
       .update({
-        ...rest,
-        image_urls,
+        ...restOfUpdates,
         primary_image_url: resolvedPrimaryImageUrl,
       })
       .eq("id", productId)
