@@ -1,10 +1,10 @@
-const ProductColorVariants = ({
+const ProductColorVariantCircles = ({
   colorVariants,
 }: {
   colorVariants: string[];
 }) => {
   return (
-    <div className="flex gap-2 mx-auto [&>span:nth-child(n+4)]:max-[400px]:hidden">
+    <div className="flex gap-2 mx-auto [&>span:nth-child(n+3)]:max-[400px]:hidden [&>span:nth-child(n+4)]:max-[450px]:hidden">
       {colorVariants.map((color) => (
         <span
           key={color}
@@ -16,4 +16,4 @@ const ProductColorVariants = ({
   );
 };
 
-export default ProductColorVariants;
+export default ProductColorVariantCircles;

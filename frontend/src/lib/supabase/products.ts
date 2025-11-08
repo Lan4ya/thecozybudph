@@ -1,3 +1,15 @@
+// FILTERING AND SORTING LATER:
+//   for (const [key, value] of Object.entries(filters)) {
+//     if (value !== undefined && value !== null && value !== "") {
+//       query = query.eq(key, value);
+//     }
+//   }
+//
+//   // ↕️ Apply sorting
+//   if (sort?.column) {
+//     query = query.order(sort.column, { ascending: sort.ascending ?? true });
+//   }
+
 import axios from "axios";
 import { supabase } from "./connect";
 import type { ProductMetadata } from "@TheCozyBud/schema";
@@ -7,15 +19,26 @@ export type ProductPayloadFromDB = ProductMetadata & {
   products_collection?: { name: string } | null;
 };
 
-export async function fetchProducts(): Promise<ProductPayloadFromDB[]> {
-  const { data, error } = await supabase
+export type FetchProductOpts = {
+  page?: number;
+  perPage?: number;
+};
+
+export async function fetchProducts({
+  page = 0,
+  perPage = 12,
+}: FetchProductOpts): Promise<ProductPayloadFromDB[]> {
+  const query = supabase
     .from("products_metadata")
-    .select(`*, products_collection (name)`); // joins products_collection table
+    .select(`*, products_collection (name)`)
+    .range(page * perPage, (page + 1) * perPage - 1); // pagination range
+
+  const { data, error } = await query;
 
   console.log("Fetching products metadata...");
   console.log(data);
 
-  if (error) throw error;
+  if (error) throw error; // throwing err here so tanstack query can proerly catch it (personally don't like this pattern bruh)
   return data as ProductPayloadFromDB[];
 }
 

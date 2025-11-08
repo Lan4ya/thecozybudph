@@ -2,13 +2,13 @@ import PersistSuspense from "@/components/PersistSuspense";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Input } from "@/lib/ui/__shadcn__/input";
-import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import ProductTable from "./components/Table";
 import ProductForm from "./components/form/Form";
 import { Plus, Search } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import type { ProductPayloadFromDB } from "@/lib/supabase/products";
 import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
+import ProductTableItemSkeleton from "./components/skeletons/ProductTableItemSkeleton";
 
 export default function AdminDashboardProducts() {
   const [formOpen, setFormOpen] = useState(false);
@@ -87,8 +87,8 @@ export default function AdminDashboardProducts() {
       {/* NOTE: I might refactor this so that they both have Suspense individually, who knows  */}
       <PersistSuspense
         fallback={
-          <div className="h-56 flex-center">
-            <Spinner className="size-10 text-primary" />
+          <div className="flex flex-col gap-4">
+            <ProductTableItemSkeleton />
           </div>
         }
       >

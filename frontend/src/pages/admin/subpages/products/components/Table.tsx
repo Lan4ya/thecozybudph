@@ -1,13 +1,18 @@
-import { useState, useCallback, memo, useMemo } from "react";
-import ProductColorVariants from "@/components/ProductColorVariants";
-import { useProducts } from "@/hooks/useProducts";
+import { useState, useCallback, memo, useMemo, useRef, useEffect } from "react";
+import ProductColorVariantCircles from "@/components/ProductColorVariants";
+import { useProductMutations } from "@/pages/admin/hooks/useProductsMutations";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Trash2, Edit } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { ProductImage } from "@/components/ProductImage";
 import { DeleteProductDialog } from "./DeleteDialog";
-import type { ProductPayloadFromDB } from "@/lib/supabase/products";
+import {
+  fetchProducts,
+  type ProductPayloadFromDB,
+} from "@/lib/supabase/products";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
+import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
+import ProductTableItemSkeleton from "./skeletons/ProductTableItemSkeleton";
 
 export default function ProductTable({
   onEdit,
@@ -16,14 +21,51 @@ export default function ProductTable({
 }) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const {
-    data: products = [],
-    error,
-    isFetching,
-    deleteProductMutation,
-  } = useProducts();
+  const { deleteProductMutation } = useProductMutations();
 
-  if (error && !isFetching) throw error;
+  const perPage = 4;
+  const {
+    data: products,
+    fetchNextPage,
+    hasNextPage,
+    error,
+    isFetchingNextPage,
+    isFetching,
+  } = useSuspenseInfiniteQuery<ProductPayloadFromDB[]>({
+    queryKey: ["products"],
+    queryFn: ({ pageParam }) =>
+      fetchProducts({
+        page: pageParam as number,
+        perPage,
+      }),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) => {
+      return lastPage.length < perPage ? undefined : allPages.length;
+    },
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 5,
+  });
+
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!sentinelRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (hasNextPage && entry.isIntersecting && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { rootMargin: "-20px" },
+    );
+    observer.observe(sentinelRef.current);
+
+    return () => observer.disconnect();
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+  const allProducts = products.pages.flat();
 
   const handleDelete = useCallback(
     (id: string) => {
@@ -40,7 +82,8 @@ export default function ProductTable({
     [onEdit],
   );
 
-  if (!products.length) {
+  if (error && !isFetching) throw error;
+  if (!allProducts.length) {
     return (
       <div className="py-12 text-center text-muted-foreground">
         No products yet. Create one using the <strong>Plus Icon</strong> button.
@@ -50,7 +93,7 @@ export default function ProductTable({
 
   return (
     <div className="flex flex-col gap-4">
-      {products.map((p) => (
+      {allProducts.map((p) => (
         <ProductTableItem
           key={p.id}
           product={p}
@@ -59,6 +102,14 @@ export default function ProductTable({
           deletingId={deletingId}
         />
       ))}
+
+      {isFetchingNextPage && <ProductTableItemSkeleton />}
+
+      <div
+        ref={sentinelRef}
+        className="mx-auto h-5 invisible pointer-events-none"
+        aria-hidden="true"
+      />
     </div>
   );
 }
@@ -126,7 +177,9 @@ function ProductTableItemInner({
             product.color_variants.length > 0 && (
               <div className="flex items-center gap-2 text-xs lg:text-sm text-muted-foreground line-clamp-2">
                 Color Variants:
-                <ProductColorVariants colorVariants={product.color_variants} />
+                <ProductColorVariantCircles
+                  colorVariants={product.color_variants}
+                />
               </div>
             )}
 

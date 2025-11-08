@@ -24,7 +24,7 @@ function ImageUploadInput({
   const { addToast } = useToast();
 
   return (
-    <div className="flex gap-20">
+    <div className="flex flex-col gap-3 md:flex-row md:gap-20">
       <div className="flex items-center gap-3">
         <label
           onClick={(e) => {

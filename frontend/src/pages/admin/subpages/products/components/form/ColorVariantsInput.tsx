@@ -72,7 +72,8 @@ export function ColorTagsInput({
       <div>
         <div className="flex gap-2">
           <Input
-            placeholder="Type color name and click add color"
+            className="placeholder:text-[10px]"
+            placeholder="type color and click add color"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
@@ -84,13 +85,14 @@ export function ColorTagsInput({
                   "ArrowLeft",
                   "ArrowRight",
                   "Delete",
+                  "Enter",
                 ].includes(e.key)
               ) {
                 e.preventDefault();
               }
             }}
           />
-          <Button type="button" onClick={addColor} className="bg-accent">
+          <Button variant="outline" type="button" onClick={addColor}>
             Add Color
           </Button>
         </div>

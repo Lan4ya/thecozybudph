@@ -1,25 +1,19 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-  useSuspenseQuery,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
-import type { ProductPayloadFromDB } from "@/lib/supabase/products";
-import {
-  fetchProducts,
   addProduct,
   updateProduct,
   deleteProduct,
 } from "@/lib/supabase/products";
 import { useToast } from "@/providers/ToastProvider";
 
-export const useProducts = () => {
+export const useProductMutations = () => {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
 
   const deleteProductMutation = useMutation({
     mutationFn: async (id: string) => await deleteProduct(id),
     onMutate: () => {
-      addToast("Deleting product", "info");
+      addToast("Deleting product...", "info");
     },
     onError: (err: any) => {
       addToast(err?.message || "Failed to delete product", "error");
@@ -33,7 +27,7 @@ export const useProducts = () => {
   const addProductMutation = useMutation({
     mutationFn: async (formData: FormData) => await addProduct(formData),
     onMutate: () => {
-      addToast("Creating new product", "info");
+      addToast("Creating new product...", "info");
     },
     onError: (err: any) => {
       const message =
@@ -55,7 +49,7 @@ export const useProducts = () => {
   const updateProductMutation = useMutation({
     mutationFn: async (formData: FormData) => await updateProduct(formData),
     onMutate: () => {
-      addToast("Updating product data", "info");
+      addToast("Updating product data...", "info");
     },
     onError: (err: any) => {
       const message =
@@ -74,14 +68,7 @@ export const useProducts = () => {
     },
   });
 
-  const query = useSuspenseQuery<ProductPayloadFromDB[]>({
-    queryKey: ["products"],
-    queryFn: fetchProducts,
-    meta: { persist: true },
-  });
-
   return {
-    ...query,
     addProductMutation,
     deleteProductMutation,
     updateProductMutation,
