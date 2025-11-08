@@ -3,11 +3,11 @@ import ProductColorVariants from "@/components/ProductColorVariants";
 import { useProducts } from "@/hooks/useProducts";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Trash2, Edit } from "lucide-react";
-import { Skeleton } from "@/lib/ui/__shadcn__/skeleton";
 import { cn } from "@/lib/utils/cn";
 import { ProductImage } from "@/components/ProductImage";
 import { DeleteProductDialog } from "./DeleteDialog";
 import type { ProductPayloadFromDB } from "@/lib/supabase/products";
+import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 
 export default function ProductTable({
   onEdit,
@@ -87,11 +87,7 @@ function ProductTableItemInner({
         className={cn(isDeleting && "opacity-70 pointer-events-none")}
         aria-label={`Delete ${product.name}`}
       >
-        {isDeleting ? (
-          <Skeleton className="h-4 w-12" />
-        ) : (
-          <Trash2 className="size-4" />
-        )}
+        {isDeleting ? <Spinner /> : <Trash2 className="size-4" />}
       </Button>
     ),
     [isDeleting, product.name],
