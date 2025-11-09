@@ -12,7 +12,10 @@ import {
 import { Input } from "@/lib/ui/__shadcn__/input";
 import { useNavigate } from "react-router";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
-import { getCachedAdmin, setCachedAdmin } from "./utils/adminCache";
+import {
+  getCachedIsAdminCheck,
+  setCachedIsAdminCheck,
+} from "./utils/isAdminCheckCache";
 const admin_route_hash = import.meta.env.VITE_ADMIN_ROUTE_HASH!;
 
 const AdminLogin = () => {
@@ -40,7 +43,7 @@ const AdminLogin = () => {
       const user = sessionData.user;
 
       // Check if admin (with cache)
-      const cachedAdmin = getCachedAdmin(user.id);
+      const cachedAdmin = getCachedIsAdminCheck(user.id);
       let isAdmin = false;
 
       if (cachedAdmin !== null) {
@@ -55,7 +58,7 @@ const AdminLogin = () => {
 
         if (adminErr) throw adminErr;
         isAdmin = !!admin;
-        setCachedAdmin(user.id, isAdmin);
+        setCachedIsAdminCheck(user.id, isAdmin);
       }
 
       // Navigate if admin, show error if not

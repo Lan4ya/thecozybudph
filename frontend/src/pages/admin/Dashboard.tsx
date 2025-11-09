@@ -1,9 +1,11 @@
 import { Outlet, redirect } from "react-router";
 import AdminDashboardNavbar from "./DashboardNavBar";
 import { supabase } from "@/lib/supabase/connect";
-import { PageSpinner } from "@/lib/ui/__shadcn__/spinner";
 import SessionGuard from "@/components/SessionGuard";
-import { getCachedAdmin, setCachedAdmin } from "./utils/adminCache";
+import {
+  getCachedIsAdminCheck,
+  setCachedIsAdminCheck,
+} from "./utils/isAdminCheckCache";
 const admin_route_hash = import.meta.env.VITE_ADMIN_ROUTE_HASH!;
 
 export const loader = async () => {
@@ -14,7 +16,7 @@ export const loader = async () => {
   if (!session) return redirect(`/admin-${admin_route_hash}/login`);
 
   // Check cache first
-  const cachedAdmin = getCachedAdmin(session.user.id);
+  const cachedAdmin = getCachedIsAdminCheck(session.user.id);
   if (cachedAdmin !== null) {
     if (!cachedAdmin) return redirect("/", { status: 401 });
     return { session, admin: cachedAdmin };
@@ -30,7 +32,7 @@ export const loader = async () => {
   if (error) throw new Response(`${error.message}`, { status: 500 });
 
   // Update cache
-  setCachedAdmin(session.user.id, admin);
+  setCachedIsAdminCheck(session.user.id, admin);
 
   if (!admin) return redirect("/", { status: 401 });
   return { session, admin };
@@ -50,9 +52,3 @@ export default function AdminDashboard() {
     </>
   );
 }
-
-export const AdminDashboardFallbackSpinner = () => (
-  <div className="h-screen flex-center">
-    <PageSpinner />
-  </div>
-);
