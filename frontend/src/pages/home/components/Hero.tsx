@@ -28,18 +28,19 @@ export const HeroImage = () => {
       {loaded && (
         <img
           src={TBC_1}
-          alt=""
-          className="h-full w-full scale-150 opacity-100 transition-opacity duration-300 lg:scale-100 lg:object-cover"
+          alt="hero"
+          className="pointer-events-none select-none h-full w-full scale-150 opacity-100 transition-opacity duration-300 lg:scale-100 lg:object-cover"
+          draggable="false"
           loading="eager"
         />
       )}
 
       <div className="absolute top-[60%] left-[7%] flex flex-col gap-1 text-white md:top-[60%] md:left[15%] lg:gap-6">
-        <h1 className="font-ivy-ora-display font-bold text-destructive sm:text-xl md:text-2xl lg:text-4xl">
+        <h1 className="font-ivy-ora-display font-bold text-accent max-[395px]:text-base text-xl sm:text-2xl md:text-3xl lg:text-4xl">
           BLOSSOMING ELEGANCE
         </h1>
 
-        <p className="font-ivy-ora-display text-sm max-w-[230px] sm:text-[16px] sm:max-w-[270px] md:text-2xl md:max-w-[390px] lg:text-3xl lg:max-w-[490px]">
+        <p className="font-ivy-ora-display text-sm max-w-[230px] sm:text-[16px] sm:max-w-[270px] md:text-xl md:max-w-[390px]  lg:max-w-[490px]">
           Fresh, handcrafted arrangements designed to elevate everyday moments.
         </p>
       </div>
