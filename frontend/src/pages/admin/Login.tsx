@@ -12,6 +12,7 @@ import {
 import { Input } from "@/lib/ui/__shadcn__/input";
 import { useNavigate } from "react-router";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
+import { getCachedAdmin, setCachedAdmin } from "./utils/adminCache";
 const admin_route_hash = import.meta.env.VITE_ADMIN_ROUTE_HASH!;
 
 const AdminLogin = () => {
@@ -28,37 +29,45 @@ const AdminLogin = () => {
 
     try {
       const { data: sessionData, error } =
-        // this call automatically stores the session in local storage
         await supabase.auth.signInWithPassword({
           email,
           password,
         });
-
-      console.log(error);
 
       if (error || !sessionData?.user)
         throw error || new Error("Invalid credentials");
 
       const user = sessionData.user;
 
-      // const session = sessionData.session;
-      // console.log("Session data token:", session.access_token);
+      // Check if admin (with cache)
+      const cachedAdmin = getCachedAdmin(user.id);
+      let isAdmin = false;
 
-      // Check if admin
-      const { data: isAdmin, error: adminErr } = await supabase
-        .from("admins")
-        .select("*")
-        .eq("user_id", user.id)
-        .maybeSingle();
+      if (cachedAdmin !== null) {
+        isAdmin = cachedAdmin;
+      } else {
+        // Fresh check
+        const { data: admin, error: adminErr } = await supabase
+          .from("admins")
+          .select("user_id")
+          .eq("user_id", user.id)
+          .maybeSingle();
 
-      if (adminErr) throw adminErr;
-      if (!isAdmin)
-        throw new Error("You are not authorized to access this page.");
+        if (adminErr) throw adminErr;
+        isAdmin = !!admin;
+        setCachedAdmin(user.id, isAdmin);
+      }
 
-      navigate(`/admin-${admin_route_hash}/dashboard`, { replace: true });
+      // Navigate if admin, show error if not
+      if (isAdmin) {
+        navigate(`/admin-${admin_route_hash}/dashboard`, { replace: true });
+      } else {
+        navigate("/", { replace: true });
+      }
     } catch (err: any) {
       console.error("Login failed:", err);
       setErrorMsg(err.message || "Something went wrong");
+      setLoading(false);
     }
   }
 

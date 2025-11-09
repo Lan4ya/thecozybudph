@@ -3,49 +3,44 @@ import AdminDashboardNavbar from "./DashboardNavBar";
 import { supabase } from "@/lib/supabase/connect";
 import { PageSpinner } from "@/lib/ui/__shadcn__/spinner";
 import SessionGuard from "@/components/SessionGuard";
+import { getCachedAdmin, setCachedAdmin } from "./utils/adminCache";
+const admin_route_hash = import.meta.env.VITE_ADMIN_ROUTE_HASH!;
 
 export const loader = async () => {
   const {
     data: { session },
   } = await supabase.auth.getSession();
 
-  if (!session) {
-    // No session -> redirect or throw 401
-    // return redirect(`/admin-${admin_route_hash}/login`, { status: 401 });
-    // throw new Response(`Unauthorized`, { status: 401 });
+  if (!session) return redirect(`/admin-${admin_route_hash}/login`);
 
-    <SessionGuard />;
-    return;
+  // Check cache first
+  const cachedAdmin = getCachedAdmin(session.user.id);
+  if (cachedAdmin !== null) {
+    if (!cachedAdmin) return redirect("/", { status: 401 });
+    return { session, admin: cachedAdmin };
   }
 
-  // Check if user is admin
+  // Fresh check
   const { data: admin, error } = await supabase
     .from("admins")
     .select("*")
     .eq("user_id", session.user.id)
     .maybeSingle();
 
-  if (error) {
-    throw new Response(`${error.message}`, { status: 500 });
-  }
+  if (error) throw new Response(`${error.message}`, { status: 500 });
 
-  if (!admin) {
-    return redirect("/", { status: 401 });
-  }
+  // Update cache
+  setCachedAdmin(session.user.id, admin);
 
-  console.log("✅ Admin verified:", admin);
-  return !!admin;
+  if (!admin) return redirect("/", { status: 401 });
+  return { session, admin };
 };
 
 export default function AdminDashboard() {
-  // const isAdmin = useLoaderData();
-  // const navigate = useNavigate();
-  // if (!isAdmin) navigate("/", { replace: true });
-  // console.log("isAdmin:", isAdmin);
-
   return (
     <>
       <SessionGuard />
+
       <div className="pt-12 lg:pt-16 flex min-h-screen">
         <AdminDashboardNavbar />
         <main className="container flex-1">
