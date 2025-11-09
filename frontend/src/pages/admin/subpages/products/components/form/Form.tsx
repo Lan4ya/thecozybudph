@@ -516,6 +516,7 @@ function getEmptyFormKV(): NewProduct {
   return {
     name: "",
     price: "" as unknown as number,
+    collection_name: "",
     description: "",
     color_variants: [],
     product_images: [],
