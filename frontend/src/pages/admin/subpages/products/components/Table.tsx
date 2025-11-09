@@ -13,6 +13,7 @@ import {
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import ProductTableItemSkeleton from "./skeletons/ProductTableItemSkeleton";
+import { formatPrice } from "@/lib/utils/format";
 
 export default function ProductTable({
   onEdit,
@@ -181,9 +182,7 @@ function ProductTableItemInner({
               </div>
             )}
 
-          <p className="text-primary text-md">
-            ₱{product.price.toLocaleString()}
-          </p>
+          <p className="text-primary text-md">{formatPrice(product.price)}</p>
         </div>
       </div>
 
