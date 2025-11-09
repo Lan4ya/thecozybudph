@@ -18,7 +18,7 @@ export const ProductImage = ({
   const fallBackImg = "/no-image-light.png";
 
   return (
-    <div className={cn("relative overflow-hidden block rounded-md", className)}>
+    <div className={cn("relative overflow-hidden rounded-md", className)}>
       {!loaded && <Skeleton className="absolute inset-0 rounded-md" />}
       <img
         src={imgError ? fallBackImg : src}

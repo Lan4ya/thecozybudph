@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Skeleton } from "@/lib/ui/__shadcn__/skeleton";
 import TBC_1 from "@/assets/thecozybud/TCB_1.png";
 
-const Hero: React.FC = () => {
+const Hero = () => {
   return (
     <section
-      className="flex w-full items-center justify-center pb-10 lg:h-[550px] 2xl:h-[650px]"
+      className="flex w-full items-center justify-center h-[400px] lg:pb-6 lg:h-[550px] 2xl:h-[650px]"
       aria-label="Hero"
     >
       <HeroImage />
@@ -29,8 +29,7 @@ export const HeroImage = () => {
         <img
           src={TBC_1}
           alt="hero"
-          className="pointer-events-none select-none h-full w-full scale-150 opacity-100 transition-opacity duration-300 lg:scale-100 lg:object-cover"
-          draggable="false"
+          className="pointer-events-none select-none h-full w-full opacity-100 transition-opacity duration-300 object-cover"
           loading="eager"
         />
       )}

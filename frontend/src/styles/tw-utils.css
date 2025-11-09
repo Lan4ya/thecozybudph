@@ -5,7 +5,7 @@
 @layer utilities {
   /* Use this on all containers so it's assured they all have the same px */
   .container {
-    @apply !px-6 max-w-full max-[380px]:!px-3;
+    @apply px-4! sm:px-6! max-[380px]:px-3!;
   }
 
   /* flex utils */
@@ -24,7 +24,7 @@
     @apply text-[30px] font-bold;
   }
 
-  .text-26-bold {
+  .gext-26-bold {
     @apply font-bold text-[26px];
   }
 
