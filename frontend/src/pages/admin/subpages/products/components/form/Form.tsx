@@ -525,10 +525,9 @@ function getEmptyFormKV(): NewProduct {
 }
 
 function getMappedUpdatingProductKV(
-  updatingProduct: ProductPayloadFromDB,
-): UpdateProduct {
+  updatingProduct: Omit<ProductPayloadFromDB, "product_id">,
+): Omit<UpdateProduct, "product_id"> {
   return {
-    product_id: updatingProduct.id,
     name: updatingProduct.name,
     price: updatingProduct.price,
     collection_name: updatingProduct.products_collection?.name ?? undefined,
