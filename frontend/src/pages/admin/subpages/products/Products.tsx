@@ -4,7 +4,13 @@ import { Button } from "@/lib/ui/__shadcn__/button";
 import { Input } from "@/lib/ui/__shadcn__/input";
 import ProductTable from "./components/Table";
 import ProductForm from "./components/form/Form";
-import { Plus, Search } from "lucide-react";
+import {
+  Plus,
+  Search,
+  TableProperties,
+  Grid3x3,
+  LayoutGrid,
+} from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import type { ProductPayloadFromDB } from "@/lib/supabase/products";
 import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
@@ -44,43 +50,58 @@ export default function AdminDashboardProducts() {
 
   return (
     <div className="py-6 max-w-[1550px] mx-auto">
-      <div className="flex items-center justify-between mb-9">
+      <div className="flex flex-col gap-5">
         <h1 className="text-lg md:text-xl lg:text-2xl font-semibold">
           Products
         </h1>
 
-        <div className="flex-center gap-3">
-          {/* Search */}
-          <div className="h-8 relative flex items-center justify-end">
-            <Input
-              ref={searchInputRef}
-              value={searchInputVal}
-              onChange={(e) => setSearchInputVal(e.target.value)}
-              placeholder="Search..."
-              className={cn(
-                "transition-all duration-300 placeholder:text-xs placeholder:text-muted-foreground",
-                isSearchOpen
-                  ? "opacity-100 w-[min(90%,222px)]  pr-12"
-                  : "opacity-0 w-0 p-0 border-0",
-              )}
-            />
-            <Button
-              variant="outline"
-              size="sm"
-              className={cn(
-                isSearchOpen && "bg-transparent! hover:bg-accent/33! border-0",
-                "absolute top-0 right-0",
-              )}
-              onClick={handleSearchToggle}
-            >
-              <Search />
+        <div className="flex items-center justify-between mb-9">
+          <div className="flex-center gap-2">
+            <Button size="sm" variant="outline" className="">
+              <TableProperties />
+            </Button>
+            <Button size="sm" variant="outline">
+              <LayoutGrid />
+            </Button>
+            <Button size="sm" variant="outline">
+              <Grid3x3 />
             </Button>
           </div>
 
-          {/* Add Product */}
-          <Button variant="outline" size="sm" onClick={openCreateForm}>
-            <Plus />
-          </Button>
+          <div className="flex-center gap-3">
+            {/* Search */}
+            <div className="h-8 relative flex items-center justify-end">
+              <Input
+                ref={searchInputRef}
+                value={searchInputVal}
+                onChange={(e) => setSearchInputVal(e.target.value)}
+                placeholder="Search..."
+                className={cn(
+                  "transition-all duration-300 placeholder:text-xs placeholder:text-muted-foreground",
+                  isSearchOpen
+                    ? "opacity-100 w-[min(90%,222px)]  pr-12"
+                    : "opacity-0 w-0 p-0 border-0",
+                )}
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                className={cn(
+                  isSearchOpen &&
+                    "bg-transparent! hover:bg-accent/33! border-0",
+                  "absolute top-0 right-0",
+                )}
+                onClick={handleSearchToggle}
+              >
+                <Search />
+              </Button>
+            </div>
+
+            {/* Add Product */}
+            <Button variant="outline" size="sm" onClick={openCreateForm}>
+              <Plus />
+            </Button>
+          </div>
         </div>
       </div>
 
