@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { cn } from "@/lib/utils/cn";
 import { NavLink, useLocation } from "react-router";
+// import logo_mini_transparent from "@/assets/thecozybud/logo_mini_transparent.png";
 
 const navItems = [
   { label: "Shop", href: "/shop" },
@@ -35,7 +36,7 @@ const NavBar = () => {
   return (
     <nav
       className={cn(
-        "fixed top-0 z-999 w-screen py-3 flex-between px-4 md:px-8",
+        "container fixed top-0 z-999 max-w-screen py-3 flex-between",
         !menuOpen &&
           isBackgroundShown &&
           "border-b-foreground shadow-xs bg-background backdrop-blur-sm ",
@@ -43,6 +44,7 @@ const NavBar = () => {
     >
       {/* Brand */}
       <div className="flex items-center gap-1">
+        {/* <img src={logo_mini_transparent} alt="logo" className="size-8" /> */}
         <NavLink
           to="/"
           reloadDocument
@@ -172,7 +174,7 @@ const DesktopNavLinks = ({
             to={href}
             className={cn(
               "text-primary-foreground hover:text-primary-foreground/70 text-lg font-medium transition-colors",
-              isBackgroundShown && "text-secondary hover:text-primary/70",
+              isBackgroundShown && "text-foreground hover:text-primary/70",
             )}
           >
             {label}
@@ -183,7 +185,7 @@ const DesktopNavLinks = ({
             {active === href && (
               <motion.div
                 layoutId="nav-underline"
-                className="absolute -bottom-1 h-0.5 w-full bg-primary rounded-full"
+                className="absolute -bottom-1 h-0.5 bg-primary rounded-full"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -208,7 +210,7 @@ const DesktopNavLinks = ({
           to="/cart"
           className={cn(
             "text-primary-foreground hover:text-primary-foreground/70 transition-colors relative",
-            isBackgroundShown && "text-secondary hover:text-primary/70",
+            isBackgroundShown && "text-foreground hover:text-primary/70",
           )}
         >
           <div className="absolute -right-[14px] -top-[9px] flex-center text-secondary-foreground text-[9px] font-medium bg-secondary size-5 rounded-full select-none">
@@ -221,7 +223,7 @@ const DesktopNavLinks = ({
           {active === "/cart" && (
             <motion.div
               layoutId="nav-underline"
-              className="absolute -bottom-1 h-0.5 w-full bg-primary rounded-full"
+              className="absolute -bottom-1 h-0.5  bg-primary rounded-full"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
