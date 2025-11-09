@@ -6,13 +6,13 @@ import About from "./pages/about/About.tsx";
 import Contact from "./pages/contact/Contact.tsx";
 import Events from "./pages/events/Events.tsx";
 import AdminDashboard, {
-  AdminDashboardFallbackSpinner,
   loader as AdminLoader,
 } from "./pages/admin/Dashboard.tsx";
 import AdminLogin from "./pages/admin/Login.tsx";
 import AdminDashboardProducts from "./pages/admin/subpages/products/Products.tsx";
 import AdminDashboardOrders from "./pages/admin/subpages/orders/Orders.tsx";
 import { CatchAllErrorPage } from "./pages/ErrorPage.tsx";
+import { RouteLoaderFallback } from "./components/RouteLoaderFallback.tsx";
 
 const admin_route_hash = import.meta.env.VITE_ADMIN_ROUTE_HASH!;
 
@@ -37,7 +37,7 @@ const router = createBrowserRouter([
   {
     path: `/admin-${admin_route_hash}/dashboard`,
     loader: AdminLoader,
-    HydrateFallback: AdminDashboardFallbackSpinner,
+    HydrateFallback: RouteLoaderFallback,
     Component: AdminDashboard,
     ErrorBoundary: CatchAllErrorPage,
     children: [

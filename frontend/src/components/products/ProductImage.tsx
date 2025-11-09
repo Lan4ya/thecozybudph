@@ -4,11 +4,15 @@ import { cn } from "@/lib/utils/cn";
 
 type ProductImageProps = {
   src: string;
-  alt: string;
+  alt?: string;
   className?: string;
 };
 
-export const ProductImage = ({ src, alt, className }: ProductImageProps) => {
+export const ProductImage = ({
+  src,
+  alt = "product-image",
+  className,
+}: ProductImageProps) => {
   const [loaded, setLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
   const fallBackImg = "/no-image-light.png";

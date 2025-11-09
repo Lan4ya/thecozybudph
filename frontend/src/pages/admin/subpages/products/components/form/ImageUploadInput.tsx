@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { Info, UploadCloud } from "lucide-react";
-import { ProductImage } from "@/components/ProductImage";
+import { ProductImage } from "@/components/products/ProductImage";
 import { cn } from "@/lib/utils/cn";
 import { useToast } from "@/providers/ToastProvider";
 

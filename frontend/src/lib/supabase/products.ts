@@ -36,7 +36,7 @@ export async function fetchProducts({
   const { data, error } = await query;
 
   console.log("Fetching products metadata...");
-  console.log(data);
+  // console.log(data);
 
   if (error) throw error; // throwing err here so tanstack query can proerly catch it (personally don't like this pattern bruh)
   return data as ProductPayloadFromDB[];

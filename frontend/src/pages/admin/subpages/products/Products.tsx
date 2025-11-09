@@ -105,7 +105,6 @@ export default function AdminDashboardProducts() {
         </div>
       </div>
 
-      {/* NOTE: I might refactor this so that they both have Suspense individually, who knows  */}
       <PersistSuspense
         fallback={
           <div className="flex flex-col gap-4">

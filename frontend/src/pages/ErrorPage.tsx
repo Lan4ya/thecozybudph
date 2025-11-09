@@ -3,7 +3,6 @@
 import { useRouteError, isRouteErrorResponse } from "react-router";
 import { motion } from "framer-motion";
 import { Button } from "@/lib/ui/__shadcn__/button";
-import { Link } from "react-router";
 import { useNavigate } from "react-router";
 
 type ErrorPageProps = {
@@ -47,14 +46,29 @@ export const ErrorPage = ({ status, title, message }: ErrorPageProps) => {
               variant="default"
               size="lg"
               className="rounded-2xl"
+              aria-label="Retry loading the page"
             >
               Try Again
             </Button>
           ) : status === 404 ? (
-            <Button asChild variant="default" size="lg" className="rounded-2xl">
-              <Link to="/">Back to Home</Link>
+            <Button
+              onClick={() => navigate("/")}
+              variant="default"
+              size="lg"
+              className="rounded-2xl"
+            >
+              Back to Home
             </Button>
-          ) : null}
+          ) : (
+            <Button
+              onClick={() => navigate(-1)}
+              variant="secondary"
+              size="lg"
+              className="rounded-2xl"
+            >
+              Go Back
+            </Button>
+          )}
         </div>
       </motion.div>
     </div>

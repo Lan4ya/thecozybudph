@@ -81,7 +81,7 @@ const AdminDashboardNavbar = () => {
                   onClick={() => setMenuOpen(false)}
                   className={({ isActive }) =>
                     cn(
-                      "text-primary-foreground font-medium hover:text-primary transition-colors",
+                      "text-primary-foreground font-medium",
                       isActive ? "text-primary" : null,
                     )
                   }

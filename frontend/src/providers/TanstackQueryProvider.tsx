@@ -24,13 +24,14 @@ const TanstackQueryProvider = ({ children }: PropsWithChildren) => {
       client={queryClient}
       persistOptions={{
         persister: asyncStoragePersister,
-        // 👁️‍🗨️ Below is an example usage 'PER QUERY' to enable persistence across refresh
-        // useSuspenseQuery({
-        //   ...otherOptions,
-        //   meta: { persist: true },
+        // 👁️‍🗨️ Below is an example usage 'Per Query' to disable persistence...
+        // const { data, error, isFetching } = useSuspenseQuery<Product[]>({
+        //   queryKey: ["foo"],
+        //   queryFn: () => bar(),
+        //   meta: { persist: false }, <-- ADD THIS OPTION
         // });
         dehydrateOptions: {
-          shouldDehydrateQuery: (query) => query.meta?.persist === true,
+          shouldDehydrateQuery: (query) => query.meta?.persist !== false,
         },
       }}
     >

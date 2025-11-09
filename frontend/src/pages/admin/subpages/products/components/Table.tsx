@@ -1,10 +1,10 @@
 import { useState, useCallback, memo, useMemo, useRef, useEffect } from "react";
-import ProductColorVariantCircles from "@/components/ProductColorVariants";
+import ProductColorVariantCircles from "@/components/products/ProductColorVariants";
 import { useProductMutations } from "@/pages/admin/hooks/useProductsMutations";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Trash2, Edit } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
-import { ProductImage } from "@/components/ProductImage";
+import { ProductImage } from "@/components/products/ProductImage";
 import { DeleteProductDialog } from "./DeleteDialog";
 import {
   fetchProducts,
@@ -23,7 +23,7 @@ export default function ProductTable({
 
   const { deleteProductMutation } = useProductMutations();
 
-  const perPage = 4;
+  const perPage = 12;
   const {
     data: products,
     fetchNextPage,
@@ -42,8 +42,6 @@ export default function ProductTable({
     getNextPageParam: (lastPage, allPages) => {
       return lastPage.length < perPage ? undefined : allPages.length;
     },
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 5,
   });
 
   const sentinelRef = useRef<HTMLDivElement | null>(null);

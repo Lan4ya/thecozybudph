@@ -63,7 +63,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
               exit={{ opacity: 0, y: -20, scale: 0.9 }}
               transition={{ duration: 0.25 }}
               className={cn(
-                "w-72 rounded-lg px-4 py-3 shadow-md font-medium text-white",
+                "w-62 lg:w-72 rounded-lg px-4 py-3 shadow-md font-medium text-white",
                 t.type === "success" && "bg-green-600",
                 t.type === "error" && "bg-red-600",
                 t.type === "info" && "bg-white text-black",

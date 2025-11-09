@@ -1,4 +1,3 @@
-import React from "react";
 import ShopProductGrid from "./components/ShopProductGrid";
 
 const items = Array.from({ length: 12 }).map((_, i) => ({
@@ -8,7 +7,7 @@ const items = Array.from({ length: 12 }).map((_, i) => ({
   price: i % 2 === 0 ? "₱1,250" : "₱950",
 }));
 
-const Shop: React.FC = () => {
+const Shop = () => {
   return (
     <main className="overflow-x-hidden flex-1 flex flex-col gap-15">
       <ShopProductGrid items={items} />

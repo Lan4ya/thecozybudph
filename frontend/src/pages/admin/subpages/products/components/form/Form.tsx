@@ -496,7 +496,7 @@ export default function ProductForm({
 
               <Button
                 type="submit"
-                disabled={savingProductUpdate || !hasChanges}
+                disabled={!hasChanges}
                 className="bg-secondary hover:bg-secondary/90"
               >
                 {savingProductUpdate && <Spinner className="mr-2" />}
