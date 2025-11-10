@@ -1,6 +1,6 @@
 import isEqual from "fast-deep-equal";
 import type { ProductPayloadFromDB } from "@/lib/supabase/products";
-import type { ProductFormValues } from "../subpages/products/components/form/Form";
+import type { ProductFormValues } from "../pages/products/components/form/Form";
 
 export function formHasChanges(
   values: ProductFormValues,

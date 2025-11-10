@@ -47,6 +47,18 @@ const apiClient = axios.create({
   baseURL: `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`,
 });
 
+export const fetchProductById = async (productId: string) => {
+  const { data: product, error } = await supabase
+    .from("products_metadata")
+    .select("*")
+    .eq("id", productId)
+    .single();
+
+  console.log("fetching product id");
+  if (error) throw error;
+  return product;
+};
+
 // Add auth header to all requests
 apiClient.interceptors.request.use(async (config) => {
   const {

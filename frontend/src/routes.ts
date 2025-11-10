@@ -8,11 +8,13 @@ import Events from "./pages/events/Events.tsx";
 import AdminDashboard, {
   loader as AdminLoader,
 } from "./pages/admin/Dashboard.tsx";
-import AdminLogin from "./pages/admin/Login.tsx";
-import AdminDashboardProducts from "./pages/admin/subpages/products/Products.tsx";
-import AdminDashboardOrders from "./pages/admin/subpages/orders/Orders.tsx";
+import AdminLogin from "./pages/admin/pages/login/Login.tsx";
+import AdminDashboardProducts from "./pages/admin/pages/products/Products.tsx";
+import AdminDashboardOrders from "./pages/admin/pages/orders/Orders.tsx";
 import { CatchAllErrorPage } from "./pages/ErrorPage.tsx";
-import { RouteLoaderFallback } from "./components/RouteLoaderFallback.tsx";
+import { RouteLoader } from "./components/RouteLoaderFallback.tsx";
+import { ProductDetails } from "./pages/shop/pages/details/ProductDetails.tsx";
+import { fetchProductById } from "./lib/supabase/products.ts";
 
 const admin_route_hash = import.meta.env.VITE_ADMIN_ROUTE_HASH!;
 
@@ -24,7 +26,21 @@ const router = createBrowserRouter([
     children: [
       { index: true, Component: Home },
       { path: "about", Component: About },
-      { path: "shop", Component: Shop },
+      {
+        path: "shop",
+        children: [
+          { index: true, Component: Shop },
+          {
+            path: "products/:id",
+            Component: ProductDetails,
+            // loader: async ({ params }) => {
+            //   const initialData = await fetchProductById(params.id!);
+            //   return initialData;
+            // },
+            // HydrateFallback: RouteLoaderFallback,
+          },
+        ],
+      },
       { path: "events", Component: Events },
       { path: "contact", Component: Contact },
     ],
@@ -37,7 +53,7 @@ const router = createBrowserRouter([
   {
     path: `/admin-${admin_route_hash}/dashboard`,
     loader: AdminLoader,
-    HydrateFallback: RouteLoaderFallback,
+    HydrateFallback: RouteLoader,
     Component: AdminDashboard,
     ErrorBoundary: CatchAllErrorPage,
     children: [

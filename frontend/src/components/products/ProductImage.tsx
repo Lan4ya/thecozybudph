@@ -29,7 +29,7 @@ export const ProductImage = ({
         onError={() => setImgError(true)}
         className={cn(
           loaded ? "opacity-100" : "opacity-0",
-          "rounded h-full w-full object-cover transition-opacity duration-300",
+          "rounded-b-none h-full w-full object-cover transition-opacity duration-300",
         )}
       />
     </div>

@@ -1,5 +1,5 @@
 import { Outlet, redirect } from "react-router";
-import AdminDashboardNavbar from "./DashboardNavBar";
+import AdminDashboardNavbar from "./components/DashboardNavBar";
 import { supabase } from "@/lib/supabase/connect";
 import SessionGuard from "@/components/SessionGuard";
 import {
