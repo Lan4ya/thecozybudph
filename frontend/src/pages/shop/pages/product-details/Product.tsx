@@ -3,10 +3,8 @@
 import Carousel from "./Carousel";
 import { useParams } from "react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import {
-  fetchProductById,
-  type ProductPayloadFromDB,
-} from "@/lib/supabase/products";
+import { fetchProductById } from "@/lib/supabase/products";
+import type { FetchProductsResponse } from "@/types/api";
 import PersistSuspense from "@/components/PersistSuspense";
 // import { ProductDetailSkeleton } from "../../skeletons/ProductDetailSkeleton";
 import { RouteLoader } from "@/components/RouteLoaderFallback";
@@ -32,7 +30,7 @@ const ProductDetailContent = (
   }: Props,
 ) => {
   const { id } = useParams<{ id: string }>();
-  const { data: product } = useSuspenseQuery<ProductPayloadFromDB>({
+  const { data: product } = useSuspenseQuery<FetchProductsResponse>({
     queryKey: ["product", id],
     queryFn: () => fetchProductById(id!),
     staleTime: 1 * 60 * 60 * 1000,

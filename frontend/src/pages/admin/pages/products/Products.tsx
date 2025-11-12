@@ -12,14 +12,14 @@ import {
   LayoutGrid,
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
-import type { ProductPayloadFromDB } from "@/lib/supabase/products";
+import type { FetchProductsResponse } from "@/types/api";
 import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 import ProductTableItemSkeleton from "../../skeletons/ProductTableItemSkeleton";
 
 export default function AdminDashboardProducts() {
   const [formOpen, setFormOpen] = useState(false);
   const [updatingProduct, setUpdatingProduct] =
-    useState<ProductPayloadFromDB | null>(null);
+    useState<FetchProductsResponse | null>(null);
 
   const [isSearchOpen, setSearchOpen] = useState<boolean>(false);
   const [searchInputVal, setSearchInputVal] = useState("");
@@ -43,7 +43,7 @@ export default function AdminDashboardProducts() {
     setFormOpen(true);
   }
 
-  function openEditForm(product: ProductPayloadFromDB) {
+  function openEditForm(product: FetchProductsResponse) {
     setUpdatingProduct(product);
     setFormOpen(true);
   }
@@ -117,10 +117,7 @@ export default function AdminDashboardProducts() {
         <ProductForm
           open={formOpen}
           updatingProduct={updatingProduct}
-          onClose={() => setFormOpen(false)}
-          onSaved={() => {
-            setFormOpen(false);
-          }}
+          onToggle={setFormOpen}
         />
       </PersistSuspense>
     </div>

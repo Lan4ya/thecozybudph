@@ -1,9 +1,7 @@
 import ProductColorVariantCircles from "@/components/products/ProductColorVariants";
 import { ProductImage } from "@/components/products/ProductImage";
-import {
-  fetchProducts,
-  type ProductPayloadFromDB,
-} from "@/lib/supabase/products";
+import { fetchProducts } from "@/lib/supabase/products";
+import type { FetchProductsResponse } from "@/types/api";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import { cn } from "@/lib/utils/cn";
@@ -18,7 +16,7 @@ import { DeleteProductDialog } from "./DeleteDialog";
 export default function ProductTable({
   onEdit,
 }: {
-  onEdit: (selectedProduct: ProductPayloadFromDB) => void;
+  onEdit: (selectedProduct: FetchProductsResponse) => void;
 }) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -32,7 +30,7 @@ export default function ProductTable({
     error,
     isFetchingNextPage,
     isFetching,
-  } = useSuspenseInfiniteQuery<ProductPayloadFromDB[]>({
+  } = useSuspenseInfiniteQuery<FetchProductsResponse[]>({
     queryKey: ["products"],
     queryFn: ({ pageParam }) =>
       fetchProducts({
@@ -79,7 +77,7 @@ export default function ProductTable({
   );
 
   const handleEdit = useCallback(
-    (p: ProductPayloadFromDB) => onEdit(p),
+    (p: FetchProductsResponse) => onEdit(p),
     [onEdit],
   );
 
@@ -116,8 +114,8 @@ export default function ProductTable({
 }
 
 type ProductTableInnerProps = {
-  product: ProductPayloadFromDB;
-  onEdit: (p: ProductPayloadFromDB) => void;
+  product: FetchProductsResponse;
+  onEdit: (p: FetchProductsResponse) => void;
   deletingId: string | null;
   onDelete: (id: string) => void;
 };

@@ -38,7 +38,8 @@ const productBaseSchema = z.object({
 
 export type ProductBase = z.infer<typeof productBaseSchema>;
 
-// --- product_metadata Database Table Entity ---
+// -----------  DATABASE ENTITIES ----------- //
+
 export type ProductMetadata = Omit<ProductBase, "collection_name"> & {
   id: string;
   created_at: string;
@@ -46,6 +47,11 @@ export type ProductMetadata = Omit<ProductBase, "collection_name"> & {
   image_urls: string[];
   primary_image_url: string;
   product_collection_id: number | null;
+};
+
+export type ProductCollection = {
+  id: string;
+  name: string;
 };
 
 // ----------- ADMIN ONLY!!! ----------- //

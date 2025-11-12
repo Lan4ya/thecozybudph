@@ -1,10 +1,10 @@
 import isEqual from "fast-deep-equal";
-import type { ProductPayloadFromDB } from "@/lib/supabase/products";
+import type { FetchProductsResponse } from "@/types/api";
 import type { ProductFormValues } from "../pages/products/components/form/Form";
 
 export function formHasChanges(
   values: ProductFormValues,
-  updatingProduct: ProductPayloadFromDB | null,
+  updatingProduct: FetchProductsResponse | null,
   extra?: {
     imagesToDelete?: string[];
     newSelectedFilesCount?: number;

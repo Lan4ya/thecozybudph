@@ -1,3 +1,12 @@
+import axios from "axios";
+import { supabase } from "./connect";
+import type {
+  FetchProductsResponse,
+  FetchProductOpts,
+  AddProductResponse,
+  UpdateProductResponse,
+} from "@/types/api/index.d.ts";
+
 // FILTERING AND SORTING LATER:
 //   for (const [key, value] of Object.entries(filters)) {
 //     if (value !== undefined && value !== null && value !== "") {
@@ -10,24 +19,10 @@
 //     query = query.order(sort.column, { ascending: sort.ascending ?? true });
 //   }
 
-import axios from "axios";
-import { supabase } from "./connect";
-import type { ProductMetadata } from "@TheCozyBud/schema";
-
-// Modify the original database Product type since we're gonna do some db joins
-export type ProductPayloadFromDB = ProductMetadata & {
-  products_collection?: { name: string } | null;
-};
-
-export type FetchProductOpts = {
-  page?: number;
-  perPage?: number;
-};
-
 export async function fetchProducts({
   page = 0,
   perPage = 12,
-}: FetchProductOpts): Promise<ProductPayloadFromDB[]> {
+}: FetchProductOpts): Promise<FetchProductsResponse[]> {
   const query = supabase
     .from("products_metadata")
     .select(`*, products_collection (name)`)
@@ -39,7 +34,7 @@ export async function fetchProducts({
   // console.log(data);
 
   if (error) throw error; // throwing err here so tanstack query can proerly catch it (personally don't like this pattern bruh)
-  return data as ProductPayloadFromDB[];
+  return data as FetchProductsResponse[];
 }
 
 // Create reusable instance
@@ -75,21 +70,34 @@ apiClient.interceptors.request.use(async (config) => {
   return config;
 });
 
-export async function updateProduct(productFormData: FormData) {
-  console.log("Updating product with form data:", productFormData);
+export async function updateProduct(
+  productFormData: FormData,
+): Promise<UpdateProductResponse> {
   const response = await apiClient.patch("/patch-product", productFormData);
+  console.log("Updating product response:", response.data);
   return response.data;
 }
 
-export async function addProduct(productFormData: FormData) {
+export async function addProduct(
+  productFormData: FormData,
+): Promise<AddProductResponse> {
   const response = await apiClient.post("/add-product", productFormData);
   console.log("Add product response:", response.data);
   return response.data;
 }
 
-export async function deleteProduct(productId: string) {
+interface DeleteProductResponse {
+  success: true;
+  message: string;
+  deleted_product_id: string;
+}
+
+export async function deleteProduct(
+  productId: string,
+): Promise<DeleteProductResponse> {
   const response = await apiClient.delete("/delete-product", {
     params: { product_id: productId },
   });
+  console.log("Delete product response:", response.data);
   return response.data;
 }

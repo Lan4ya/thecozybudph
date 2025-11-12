@@ -9,7 +9,7 @@ import {
   createProductSchema,
   updateProductSchema,
 } from "@TheCozyBud/schema";
-import type { ProductPayloadFromDB } from "@/lib/supabase/products";
+import type { FetchProductsResponse } from "@/types/api";
 
 import {
   Card,
