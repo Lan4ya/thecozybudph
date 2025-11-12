@@ -1,6 +1,7 @@
 import z from "zod";
 
-const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 20MB
+const MAX_IMAGES = 3;
 const ACCEPTED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];
 
 export const imageFileSchema = z
@@ -9,7 +10,7 @@ export const imageFileSchema = z
     message: "Only .png, .jpg, and .webp files are allowed",
   })
   .refine((file) => file.size <= MAX_FILE_SIZE, {
-    message: "Image must be under 20MB",
+    message: "Image must be under 50MB",
   });
 
 // --- Base Product Schema ---
@@ -53,7 +54,7 @@ export const createProductSchema = productBaseSchema.extend({
   product_images: z
     .array(imageFileSchema)
     .min(1, "product image is required")
-    .max(2, "You can upload up to 2 images only"),
+    .max(MAX_IMAGES, `You can upload up to ${MAX_IMAGES} images only`),
   primary_image_index: z.number("Primary image index must be a number"),
 });
 

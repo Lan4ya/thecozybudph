@@ -15,9 +15,17 @@ export const validateImageFile = async (imgFiles: File[]) => {
     throw new CustomError(400, "No valid images uploaded");
   }
 
+  const maxImgs = 3;
+  if (filteredImages.length > maxImgs) {
+    throw new CustomError(
+      400,
+      `Too many images uploaded. Maximum allowed is ${maxImgs}.`,
+    );
+  }
+
   // File size and type validation
   for (const imgFile of filteredImages) {
-    // Check file size (50MB max per img)
+    // Check file size (50MB max per img) -- this is complies to Supabase's free tier limit
     if (imgFile.size > 50 * 1024 * 1024) {
       throw new CustomError(
         413, // 413 Payload Too Large
