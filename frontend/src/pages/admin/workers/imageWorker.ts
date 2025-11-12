@@ -32,6 +32,7 @@ self.onmessage = async (e: MessageEvent<WorkerInput>) => {
 
     const maxDimension = 1280;
     const scale = Math.min(
+      1, // never upscale
       maxDimension / bitmap.width,
       maxDimension / bitmap.height,
     );
@@ -47,7 +48,7 @@ self.onmessage = async (e: MessageEvent<WorkerInput>) => {
 
     const outBlob = await canvas.convertToBlob({
       type: "image/webp",
-      quality: 0.9,
+      quality: 1,
     });
 
     const outBuffer = await outBlob.arrayBuffer();

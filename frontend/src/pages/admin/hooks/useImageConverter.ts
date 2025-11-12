@@ -98,7 +98,7 @@ async function processWithBrowserImageCompression(file: File): Promise<File> {
   const blob = await imageCompression(file, {
     maxWidthOrHeight: 700,
     useWebWorker: true,
-    initialQuality: 0.9,
+    initialQuality: 1,
     fileType: "image/webp",
   });
 

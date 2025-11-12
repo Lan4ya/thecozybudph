@@ -51,16 +51,14 @@ export type ProductFormValues = z.input<typeof productFormSchema>;
 
 type Props = {
   open: boolean;
-  updatingProduct: ProductPayloadFromDB | null;
-  onSaved: () => void;
-  onClose: () => void;
+  updatingProduct: FetchProductsResponse | null;
+  onToggle: (t: boolean) => void;
 };
 
 export default function ProductForm({
   open,
-  onClose,
   updatingProduct,
-  onSaved,
+  onToggle,
 }: Props) {
   const [newSelectedFiles, setNewSelectedFiles] = useState<
     { file: File; url: string }[]
@@ -73,10 +71,14 @@ export default function ProductForm({
   const { addToast } = useToast();
 
   const { addProductMutation, updateProductMutation } = useProductMutations();
-  const savingProductUpdate = useMemo(
-    () => addProductMutation.isPending || updateProductMutation.isPending,
-    [addProductMutation.isPending, updateProductMutation.isPending],
-  );
+  const savingProductUpdate = useMemo(() => {
+    console.log(
+      "Saving state:",
+      addProductMutation.isPending,
+      updateProductMutation.isPending,
+    );
+    return addProductMutation.isPending || updateProductMutation.isPending;
+  }, [updateProductMutation.isPending, addProductMutation.isPending]);
 
   const MAX_IMAGES = 3;
   const fileFieldName = updatingProduct
@@ -320,15 +322,22 @@ export default function ProductForm({
       return;
     }
 
+    onToggle(false); // close form early
+
     const files = newSelectedFiles.map((s) => s.file);
     let compressedFiles: File[] = [];
     try {
       console.log("file before compression:", files);
-      console.log(formatFileSize(files[0]?.size ?? 0));
+      files.forEach((f) => {
+        console.log(formatFileSize(f?.size ?? 0));
+      });
 
       compressedFiles = await compressImages(files);
+
       console.log("files after compression", compressedFiles);
-      console.log(formatFileSize(compressedFiles[0]?.size ?? 0));
+      compressedFiles.forEach((f) => {
+        console.log(formatFileSize(f?.size ?? 0));
+      });
 
       console.log("Compression progress:", progress);
     } catch (err) {
@@ -351,8 +360,6 @@ export default function ProductForm({
     data.mode === "create"
       ? addProductMutation.mutate(fd)
       : updateProductMutation.mutate(fd);
-
-    onSaved();
   };
 
   if (!open) return null;
@@ -366,7 +373,7 @@ export default function ProductForm({
     >
       <Card className="w-full max-w-2xl relative">
         <button
-          onClick={onClose}
+          onClick={() => onToggle(false)}
           className="absolute top-3 right-3 p-1 rounded-md"
           aria-label="close"
         >
@@ -516,7 +523,11 @@ export default function ProductForm({
 
             {/* Actions */}
             <div className="mt-5 flex justify-end gap-3">
-              <Button variant="outline" type="button" onClick={onClose}>
+              <Button
+                variant="outline"
+                type="button"
+                onClick={() => onToggle(false)}
+              >
                 Cancel
               </Button>
 
@@ -551,7 +562,7 @@ function getEmptyFormKV(): NewProduct {
 }
 
 function getMappedUpdatingProductKV(
-  updatingProduct: Omit<ProductPayloadFromDB, "product_id">,
+  updatingProduct: Omit<FetchProductsResponse, "product_id">,
 ): Omit<UpdateProduct, "product_id"> {
   return {
     name: updatingProduct.name,
