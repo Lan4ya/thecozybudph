@@ -12,7 +12,7 @@ import PersistSuspense from "@/components/PersistSuspense";
 import { RouteLoader } from "@/components/RouteLoaderFallback";
 import ProductDetails from "./Details";
 
-export const Product = () => {
+export const ProductCheckout = () => {
   return (
     <PersistSuspense fallback={<RouteLoader />}>
       <ProductDetailContent />

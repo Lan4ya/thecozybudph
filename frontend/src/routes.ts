@@ -13,8 +13,7 @@ import AdminDashboardProducts from "./pages/admin/pages/products/Products.tsx";
 import AdminDashboardOrders from "./pages/admin/pages/orders/Orders.tsx";
 import { CatchAllErrorPage } from "./pages/ErrorPage.tsx";
 import { RouteLoader } from "./components/RouteLoaderFallback.tsx";
-import { ProductDetails } from "./pages/shop/pages/details/ProductDetails.tsx";
-import { fetchProductById } from "./lib/supabase/products.ts";
+import { ProductCheckout } from "./pages/shop/pages/product-details/Product.tsx";
 
 const admin_route_hash = import.meta.env.VITE_ADMIN_ROUTE_HASH!;
 
@@ -32,12 +31,7 @@ const router = createBrowserRouter([
           { index: true, Component: Shop },
           {
             path: "products/:id",
-            Component: ProductDetails,
-            // loader: async ({ params }) => {
-            //   const initialData = await fetchProductById(params.id!);
-            //   return initialData;
-            // },
-            // HydrateFallback: RouteLoaderFallback,
+            Component: ProductCheckout,
           },
         ],
       },
