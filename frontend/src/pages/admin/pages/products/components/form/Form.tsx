@@ -556,8 +556,8 @@ function getMappedUpdatingProductKV(
   return {
     name: updatingProduct.name,
     price: updatingProduct.price,
-    collection_name: updatingProduct.products_collection?.name ?? undefined,
-    description: updatingProduct.description ?? undefined,
+    collection_name: updatingProduct.products_collection?.name ?? "",
+    description: updatingProduct.description ?? "",
     color_variants: updatingProduct.color_variants ?? [],
     new_product_images: [],
     image_urls_to_delete: [],
