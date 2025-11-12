@@ -12,10 +12,11 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 // @ts-ignore
 import { CustomError, handleError } from "@shared/errors/mod.ts";
-// @ts-ignore
-import { validateImageFile } from "@shared/validateImageFile.ts";
-// @ts-ignore
-import { validateNewProduct } from "@shared/validateProductData.ts";
+import {
+  validateNewProductMetadata,
+  validateImageFile,
+  // @ts-ignore
+} from "@shared/validations/mod.ts";
 // @ts-ignore
 import { parseJSONField } from "@shared/parseJSONField.ts";
 // @ts-ignore
@@ -52,7 +53,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // check admin priveleges
+    // check admin previleges
     await authAdmin(supabase, req);
 
     const formData = await req.formData();
@@ -87,7 +88,7 @@ Deno.serve(async (req) => {
     const description = formData.get("description") as string;
     productMetaData.description = description;
 
-    validateNewProduct(productMetaData);
+    validateNewProductMetadata(productMetaData);
 
     const primaryImageIndex = Number(formData.get("primary_image_index") ?? 0);
 
@@ -156,7 +157,9 @@ Deno.serve(async (req) => {
       {
         product: {
           ...product_metadata_data,
+          collection_name,
         },
+        success: true,
       },
       { status: 201, headers: corsHeaders },
     );

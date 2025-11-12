@@ -12,10 +12,11 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 // @ts-ignore
 import { CustomError, handleError } from "@shared/errors/mod.ts";
-// @ts-ignore
-import { validateProductUpdate } from "@shared/validateProductData.ts";
-// @ts-ignore
-import { validateImageFile } from "@shared/validateImageFile.ts";
+import {
+  validateUpdateProductMetadata,
+  validateImageFile,
+  // @ts-ignore
+} from "@shared/validations/mod.ts";
 // @ts-ignore
 import { parseJSONField } from "@shared/parseJSONField.ts";
 // @ts-ignore
@@ -97,7 +98,7 @@ Deno.serve(async (req) => {
 
     // Validate the field updates
     if (Object.keys(updates).length > 0) {
-      validateProductUpdate(updates);
+      validateUpdateProductMetadata(updates);
     }
 
     if (collectionName) {
@@ -199,7 +200,6 @@ Deno.serve(async (req) => {
       ? (updatedImageUrls[primaryImageIndex] ?? updatedImageUrls[0])
       : null;
 
-    // exclude collection_name since it's not part of products_metadata and we just need the ref ID of it.
     const { collection_name, ...restOfUpdates } = updates;
 
     const { data: updatedProduct, error: updateError } = await supabase
@@ -220,9 +220,8 @@ Deno.serve(async (req) => {
 
     return Response.json(
       {
-        product: updatedProduct,
+        product: { ...updatedProduct, collection_name },
         success: true,
-        message: "Product updated successfully",
       },
       { status: 201, headers: corsHeaders },
     );

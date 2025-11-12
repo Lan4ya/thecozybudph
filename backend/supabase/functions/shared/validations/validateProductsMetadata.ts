@@ -1,37 +1,8 @@
+// @ts-ignore
 import type { NewProduct, UpdateProduct } from "@TheCozyBud/dist.index.d.ts";
-import { CustomError } from "./errors/CustomError.ts";
-
-const validateStringField = (
-  value: string | undefined,
-  fieldName: string,
-  errors: { message: string; field?: string }[],
-  maxLength: number,
-  isRequired: boolean = true,
-) => {
-  if (value === undefined || value === null) {
-    if (isRequired) {
-      errors.push({ field: fieldName, message: `${fieldName} is required.` });
-    }
-    return;
-  }
-
-  const trimmedValue = value.trim();
-  const valueLength = trimmedValue.length;
-
-  if (isRequired && !trimmedValue) {
-    errors.push({ field: fieldName, message: `${fieldName} is required.` });
-  } else if (isRequired && valueLength < 1) {
-    errors.push({
-      field: fieldName,
-      message: `${fieldName} must be at least 1 character long.`,
-    });
-  } else if (valueLength > maxLength) {
-    errors.push({
-      field: fieldName,
-      message: `${fieldName} cannot exceed ${maxLength} characters.`,
-    });
-  }
-};
+import { CustomError } from "../errors/CustomError.ts";
+import { validateStringField } from "./_validateStringField.ts";
+import { validateIfDefined } from "./_validateIfDefined.ts";
 
 const validateName = (
   name: string,
@@ -95,31 +66,15 @@ const validateColorVariants = (
   }
 };
 
-const validateIfDefined = <T>(
-  value: T | undefined,
-  validator: (val: T, errors: { message: string; field?: string }[]) => void,
-  errors: { message: string; field?: string }[],
-) => {
-  if (value != undefined) {
-    validator(value, errors);
-  }
-};
-
 // Main validation functions
 
-export function validateNewProduct(product: NewProduct): void {
+export function validateNewProductMetadata(product: NewProduct): void {
   const errors: { message: string; field?: string }[] = [];
 
   validateName(product.name, errors);
   validatePrice(product.price, errors);
-  validateStringField(
-    product.collection_name,
-    "collection_name",
-    errors,
-    100,
-    false,
-  );
-  validateStringField(product.description, "description", errors, 600, false);
+  validateCollectionName(product.collection_name, errors);
+  validateDescription(product.description, errors);
   validateIfDefined(product.color_variants, validateColorVariants, errors);
 
   if (errors.length > 0) {
@@ -127,7 +82,7 @@ export function validateNewProduct(product: NewProduct): void {
   }
 }
 
-export function validateProductUpdate(updates: UpdateProduct): void {
+export function validateUpdateProductMetadata(updates: UpdateProduct): void {
   const errors: { message: string; field?: string }[] = [];
 
   validateIfDefined(updates.name, validateName, errors);
