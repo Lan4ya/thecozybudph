@@ -112,7 +112,7 @@ Deno.serve(async (req) => {
         message: "Product deleted successfully",
         deleted_product_id: product_id,
       },
-      { status: 204, headers: corsHeaders },
+      { status: 200, headers: corsHeaders },
     );
   } catch (err) {
     return handleError(err, corsHeaders);
