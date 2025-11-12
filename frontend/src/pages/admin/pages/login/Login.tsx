@@ -20,7 +20,7 @@ const admin_route_hash = import.meta.env.VITE_ADMIN_ROUTE_HASH!;
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("thecozybud@gmail.com");
-  const [password, setPassword] = useState("TheCozyBud2025");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
