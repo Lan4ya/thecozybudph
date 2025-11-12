@@ -4,30 +4,6 @@ import {
   fetchProducts,
   type ProductPayloadFromDB,
 } from "@/lib/supabase/products";
-// const ProductCard = ({ name, imageUrl, price }: Props) => {
-//   return (
-//     <div className="group bg-card text-card-foreground rounded-lg border border-border/30 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden cursor-pointer active:scale-95">
-//       <div className="relative overflow-hidden">
-//         <ProductImage
-//           src={imageUrl}
-//           className="aspect-square group-hover:scale-105 group-active:scale-110 transition-transform duration-300 rounded-b-none"
-//         />
-//       </div>
-//
-//       <div className="p-2 space-y-1 text-center">
-//         <h3 className="font-medium text-sm lg:text-base line-clamp-2 leading-tight text-foreground">
-//           {name}
-//         </h3>
-//         <div className="font-medium lg:text-lg text-primary">
-//           {price.toLocaleString("en-PH", {
-//             style: "currency",
-//             currency: "PHP",
-//           })}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
 
 const ProductGrid = () => {
   const { data, error, isFetching } = useSuspenseQuery<ProductPayloadFromDB[]>({
