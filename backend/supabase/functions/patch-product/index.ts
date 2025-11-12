@@ -71,7 +71,10 @@ Deno.serve(async (req) => {
       .single();
 
     if (fetchError)
-      throw CustomError.internal("Failed to fetch existing product");
+      throw CustomError.internal(
+        "Failed to fetch existing product",
+        fetchError,
+      );
 
     if (!existingProduct) throw CustomError.notFound("Product not found");
 
