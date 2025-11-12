@@ -7,9 +7,9 @@ import type { PropsWithChildren } from "react";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // experimental_prefetchInRender: true,
-      staleTime: 1000 * 60 * 60 * 24 * 7, // 1 week
-      gcTime: 1000 * 60 * 60 * 24 * 7,
+      staleTime: 30 * 60 * 1000,
+      gcTime: 30 * 60 * 1000,
+      retry: 2,
     },
   },
 });
@@ -25,7 +25,7 @@ const TanstackQueryProvider = ({ children }: PropsWithChildren) => {
       persistOptions={{
         persister: asyncStoragePersister,
         // 👁️‍🗨️ Below is an example usage 'Per Query' to disable persistence...
-        // const { data, error, isFetching } = useSuspenseQuery<Product[]>({
+        // const { data, error, isFetching } =ruseSuspenseQuery<Product[]>({
         //   queryKey: ["foo"],
         //   queryFn: () => bar(),
         //   meta: { persist: false }, <-- ADD THIS OPTION
