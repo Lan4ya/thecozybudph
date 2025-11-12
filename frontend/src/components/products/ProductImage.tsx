@@ -5,38 +5,49 @@ import { cn } from "@/lib/utils/cn";
 type ProductImageProps = {
   src: string;
   alt?: string;
+  loading?: "eager" | "lazy";
+  roundedSize?: "sm" | "md" | "lg";
   className?: string;
 };
 
 export const ProductImage = ({
   src,
   alt = "product-image",
+  loading = "lazy",
+  roundedSize,
   className,
 }: ProductImageProps) => {
   const [loaded, setLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
   const fallBackImg = "/no-image-light.png";
+  const roundedClass = `rounded-${roundedSize ?? ""}`;
 
   return (
-    <div className={cn("relative overflow-hidden rounded-md", className)}>
-      {!loaded && <Skeleton className="absolute inset-0 rounded-md" />}
+    <div
+      className={cn(
+        "h-full w-full relative overflow-hidden",
+        roundedClass,
+        className,
+      )}
+    >
+      {!loaded && (
+        <Skeleton
+          className={cn("absolute inset-0 rounded-none", roundedClass)}
+        />
+      )}
       <img
         src={imgError ? fallBackImg : src}
         alt={alt}
-        loading="lazy"
+        loading={loading}
         decoding="async"
         onLoad={() => setLoaded(true)}
         onError={() => setImgError(true)}
+        draggable={false}
         className={cn(
           loaded ? "opacity-100" : "opacity-0",
-          "rounded-b-none h-full w-full object-cover transition-opacity duration-300",
+          "pointer-events-none h-full w-full object-cover transition-opacity duration-300",
         )}
       />
     </div>
   );
 };
-
-// export const ProductImage = React.memo(
-//   Base,
-//   (prev, next) => prev.src === next.src && prev.alt === next.alt,
-// );
