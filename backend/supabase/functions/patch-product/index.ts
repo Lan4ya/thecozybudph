@@ -155,11 +155,10 @@ Deno.serve(async (req) => {
     if (imagesToDelete && imagesToDelete.trim()) {
       const deleteUrls = JSON.parse(imagesToDelete) as string[];
 
-      if (existingProduct.image_urls.length - deleteUrls.length <= 0) {
+      if (updatedImageUrls.length - deleteUrls.length <= 0) {
         throw CustomError.badRequest("Product must retain at least one image");
       }
 
-      // NOTE: check existing only??
       updatedImageUrls = updatedImageUrls.filter(
         (url: string) => !deleteUrls.includes(url),
       );
@@ -189,9 +188,6 @@ Deno.serve(async (req) => {
     if (primaryImageUrl && updatedImageUrls.includes(primaryImageUrl)) {
       updates.primary_image_url = primaryImageUrl;
     }
-    // else if (updatedImageUrls.length > 0) {
-    //   updates.primary_image_url = updatedImageUrls[0];
-    // }
 
     // Update image URLs if they changed
     if (newProductImages.length || imagesToDelete) {
