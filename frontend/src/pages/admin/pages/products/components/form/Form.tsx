@@ -4,12 +4,12 @@ import { motion } from "framer-motion";
 import { useForm, type FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  type NewProduct,
-  type UpdateProduct,
+  type CreateProductForm,
+  type ProductData,
+  type UpdateProductForm,
   createProductSchema,
   updateProductSchema,
 } from "@TheCozyBud/schema";
-import type { FetchProductsResponse } from "@/types/api";
 
 import {
   Card,
@@ -36,7 +36,7 @@ const createProductFormSchema = createProductSchema.extend({
 
 const updateProductFormSchema = updateProductSchema
   .omit({
-    product_id: true,
+    productId: true,
   })
   .extend({
     mode: z.literal("update"),
@@ -51,7 +51,7 @@ export type ProductFormValues = z.input<typeof productFormSchema>;
 
 type Props = {
   open: boolean;
-  updatingProduct: FetchProductsResponse | null;
+  updatingProduct: ProductData | null;
   onToggle: (t: boolean) => void;
 };
 
@@ -81,9 +81,7 @@ export default function ProductForm({
   }, [updateProductMutation.isPending, addProductMutation.isPending]);
 
   const MAX_IMAGES = 3;
-  const fileFieldName = updatingProduct
-    ? "new_product_images"
-    : "product_images";
+  const fileFieldName = updatingProduct ? "newProductImages" : "productImages";
 
   const {
     register,
@@ -110,7 +108,7 @@ export default function ProductForm({
 
   // Derive display images: existing (minus deletions) first, then selected blob urls
   const displayImages = useMemo(() => {
-    const existing = updatingProduct?.image_urls ?? [];
+    const existing = updatingProduct?.imageUrls ?? [];
     const filteredExisting = existing.filter(
       (u) => !imagesToDelete.includes(u),
     );
@@ -134,9 +132,9 @@ export default function ProductForm({
 
     // set initial primary index:
     if (updatingProduct) {
-      const existing = updatingProduct.image_urls ?? [];
+      const existing = updatingProduct.imageUrls ?? [];
       const idx = existing.findIndex(
-        (u) => u === updatingProduct.primary_image_url,
+        (u) => u === updatingProduct.primaryImageUrl,
       );
       const initial = idx >= 0 ? idx : existing.length > 0 ? 0 : -1;
       setPrimaryImageIndex(initial);
@@ -166,7 +164,7 @@ export default function ProductForm({
     (files: File[]) => {
       clearErrors(fileFieldName);
 
-      const existingCount = (updatingProduct?.image_urls ?? []).filter(
+      const existingCount = (updatingProduct?.imageUrls ?? []).filter(
         (u) => !imagesToDelete.includes(u),
       ).length;
       const currentSelectedCount = newSelectedFiles.length;
@@ -206,7 +204,7 @@ export default function ProductForm({
 
         // if primary not set yet, set it to first newly added image
         if (primaryImageIndex === -1 && created.length > 0) {
-          const existingLen = (updatingProduct?.image_urls ?? []).filter(
+          const existingLen = (updatingProduct?.imageUrls ?? []).filter(
             (u) => !imagesToDelete.includes(u),
           ).length;
           const newPrimary = existingLen; // first new file index
@@ -231,9 +229,9 @@ export default function ProductForm({
 
   const handleRemoveImage = useCallback(
     (url: string, idx: number) => {
-      const existing = updatingProduct?.image_urls ?? [];
+      const existing = updatingProduct?.imageUrls ?? [];
       const filteredExisting = existing.filter(
-        (u) => !imagesToDelete.includes(u),
+        (u: string) => !imagesToDelete.includes(u),
       );
       const existingCount = filteredExisting.length; // number of existing images currently shown
 
@@ -256,7 +254,7 @@ export default function ProductForm({
           }
 
           // sync form field for server
-          setValue("image_urls_to_delete", next, { shouldValidate: false });
+          setValue("imageUrls_to_delete", next, { shouldValidate: false });
           return next;
         });
 
@@ -282,7 +280,7 @@ export default function ProductForm({
 
         // calculate new display length and adjust primary index if needed
         const newDisplayLength =
-          existing.filter((u) => !imagesToDelete.includes(u)).length +
+          existing.filter((u: string) => !imagesToDelete.includes(u)).length +
           remaining.length;
         const removedGlobalIndex = idx;
 
@@ -315,7 +313,7 @@ export default function ProductForm({
 
   const onSubmit = async (data: ProductFormValues) => {
     if (displayImages.length === 0) {
-      setError("new_product_images", {
+      setError("newProductImages", {
         type: "manual",
         message: "Product must retain at least one image",
       });
@@ -498,22 +496,22 @@ export default function ProductForm({
 
                   {/* show validation messages */}
                   {values.mode === "create" &&
-                    (errors as FieldErrors<NewProduct>)?.product_images
+                    (errors as FieldErrors<CreateProductForm>)?.productImages
                       ?.message && (
                       <p className="text-xs text-red-500 mt-1">
                         {
-                          (errors as FieldErrors<NewProduct>).product_images
-                            ?.message
+                          (errors as FieldErrors<CreateProductForm>)
+                            .productImages?.message
                         }
                       </p>
                     )}
                   {values.mode === "update" &&
-                    (errors as FieldErrors<UpdateProduct>)?.new_product_images
+                    (errors as FieldErrors<UpdateProductForm>)?.newProductImages
                       ?.message && (
                       <p className="text-xs text-red-500 mt-1">
                         {
-                          (errors as FieldErrors<UpdateProduct>)
-                            .new_product_images?.message
+                          (errors as FieldErrors<UpdateProductForm>)
+                            .newProductImages?.message
                         }
                       </p>
                     )}
@@ -549,29 +547,29 @@ export default function ProductForm({
 
 // Helper for default values
 
-function getEmptyFormKV(): NewProduct {
+function getEmptyFormKV(): CreateProductForm {
   return {
     name: "",
     price: "" as unknown as number,
-    collection_name: "",
+    collectionName: "",
     description: "",
-    color_variants: [],
-    product_images: [],
-    primary_image_index: -1,
+    colorVariants: [],
+    productImages: [],
+    primaryImageIndex: -1,
   };
 }
 
 function getMappedUpdatingProductKV(
-  updatingProduct: Omit<FetchProductsResponse, "product_id">,
-): Omit<UpdateProduct, "product_id"> {
+  updatingProduct: Omit<ProductData, "productId">,
+): Omit<UpdateProductForm, "productId"> {
   return {
     name: updatingProduct.name,
     price: updatingProduct.price,
-    collection_name: updatingProduct.products_collection?.name ?? "",
+    collectionName: updatingProduct.productsCollection?.name ?? "",
     description: updatingProduct.description ?? "",
-    color_variants: updatingProduct.color_variants ?? [],
-    new_product_images: [],
-    image_urls_to_delete: [],
-    primary_image_index: -1,
+    colorVariants: updatingProduct.colorVariants ?? [],
+    newProductImages: [],
+    imageUrlsToDelete: [],
+    primaryImageIndex: -1,
   };
 }

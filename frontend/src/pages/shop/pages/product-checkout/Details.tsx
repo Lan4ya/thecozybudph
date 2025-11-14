@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Star, Heart, Shield, Truck, Clock, Gift } from "lucide-react";
-import type { ProductMetadata } from "@TheCozyBud/schema";
 import { formatPrice } from "@/lib/utils/format";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Textarea } from "@/lib/ui/__shadcn__/textarea";
+import type { ProductData } from "@TheCozyBud/schema";
 
 interface ProductDetailsProps {
-  product: ProductMetadata;
+  product: ProductData;
 }
 
 const ProductDetails = ({ product }: ProductDetailsProps) => {
@@ -29,7 +29,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="w-full max-w-2xl space-y-8"
+      className="container max-w-2xl space-y-8"
     >
       {/* Product Header */}
       <div className="space-y-4">

@@ -1,13 +1,12 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "dist",
     "target": "ES2022",
     "module": "ESNext",
-    "moduleResolution": "bundler",
-    "declaration": true,
-    "emitDeclarationOnly": false,
-    "declarationMap": true
+    "moduleResolution": "Bundler",
+    "rootDir": "src",
+    "noEmit": true,
+    "allowImportingTsExtensions": true
   },
   "include": [
     "src/"

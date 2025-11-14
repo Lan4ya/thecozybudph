@@ -1,7 +1,8 @@
 {
   "imports": {
     "@shared/": "./shared/",
-    "file-type": "https://esm.sh/file-type@18.7.0",
-    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2"
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2",
+    "zod": "https://esm.sh/zod@4.1.12",
+    "file-type": "https://esm.sh/file-type@21.1.0"
   }
 }

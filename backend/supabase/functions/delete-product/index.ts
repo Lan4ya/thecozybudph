@@ -11,11 +11,17 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 // @ts-ignore
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 // @ts-ignore
-import { CustomError, handleError } from "@shared/errors/mod.ts";
+import { CustomError } from "@shared/errors/mod.ts";
 // @ts-ignore
 import { getCorsHeaders, handleCorsOptions } from "@shared/corsHeaders.ts";
 // @ts-ignore
 import { authAdmin } from "../shared/authAdmin.ts";
+// @ts-ignore
+import { handleError } from "@shared/response/handleError.ts";
+// @ts-ignore
+import { handleSuccess } from "@shared/response/handleSuccess.ts";
+// @ts-ignore
+import { DeleteProductRequest } from "@shared/schema/index.ts";
 
 const supabase = createClient(
   // @ts-ignore
@@ -26,8 +32,6 @@ const supabase = createClient(
 
 // @ts-ignore
 Deno.serve(async (req) => {
-  console.log("HEADERS:", Object.fromEntries(req.headers.entries()));
-
   const optionsRes = handleCorsOptions(req);
   if (optionsRes) return optionsRes;
 
@@ -45,16 +49,16 @@ Deno.serve(async (req) => {
     await authAdmin(supabase, req);
 
     const url = new URL(req.url);
-    const product_id = url.searchParams.get("product_id");
+    const productId: DeleteProductRequest = url.searchParams.get("productId");
 
-    if (!product_id) {
+    if (!productId) {
       throw CustomError.badRequest("Product ID is required");
     }
 
     const { data: product, error: fetchError } = await supabase
       .from("products_metadata")
       .select("id, image_urls")
-      .eq("id", product_id)
+      .eq("id", productId)
       .single();
 
     if (fetchError) {
@@ -73,9 +77,8 @@ Deno.serve(async (req) => {
         .map((url: string) => {
           const match = url.match(/\/products\/([^?]+)/);
 
-          // DEBUG LOG
-          console.log("Original URL:", url);
-          console.log("Matched file path:", match);
+          // console.log("Original URL:", url);
+          // console.log("Matched file path:", match);
 
           // grab the first capture group which is the file path
           return match ? match[1] : null;
@@ -98,7 +101,7 @@ Deno.serve(async (req) => {
     const { error: deleteError } = await supabase
       .from("products_metadata")
       .delete()
-      .eq("id", product_id);
+      .eq("id", productId);
 
     if (deleteError) {
       throw CustomError.internal(
@@ -106,14 +109,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    return Response.json(
-      {
-        success: true,
-        message: "Product deleted successfully",
-        deleted_product_id: product_id,
-      },
-      { status: 200, headers: corsHeaders },
-    );
+    return handleSuccess({ productId }, corsHeaders);
   } catch (err) {
     return handleError(err, corsHeaders);
   }

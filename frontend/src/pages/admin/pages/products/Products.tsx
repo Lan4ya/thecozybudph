@@ -12,14 +12,15 @@ import {
   LayoutGrid,
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
-import type { FetchProductsResponse } from "@/types/api";
+import type { ProductData } from "@TheCozyBud/schema";
 import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 import ProductTableItemSkeleton from "../../skeletons/ProductTableItemSkeleton";
 
 export default function AdminDashboardProducts() {
   const [formOpen, setFormOpen] = useState(false);
-  const [updatingProduct, setUpdatingProduct] =
-    useState<FetchProductsResponse | null>(null);
+  const [updatingProduct, setUpdatingProduct] = useState<ProductData | null>(
+    null,
+  );
 
   const [isSearchOpen, setSearchOpen] = useState<boolean>(false);
   const [searchInputVal, setSearchInputVal] = useState("");
@@ -43,7 +44,7 @@ export default function AdminDashboardProducts() {
     setFormOpen(true);
   }
 
-  function openEditForm(product: FetchProductsResponse) {
+  function openEditForm(product: ProductData) {
     setUpdatingProduct(product);
     setFormOpen(true);
   }

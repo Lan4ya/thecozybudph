@@ -1,0 +1,24 @@
+{
+  "name": "TheCozyBud",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev:db-start": "pnpm --filter backend db start && pnpm --filter backend db functions serve --no-verify-jwt",
+    "dev:db-stop": "pnpm --filter backend db stop",
+    "dev:db-status": "pnpm --filter backend db status",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "dev:backend": "pnpm --filter backend dev",
+    "dev": "concurrently \"pnpm run dev:db-start\" \"pnpm --filter backend dev\" \"pnpm --filter frontend dev\"",
+    "build:frontend": "pnpm --filter frontend build",
+    "build:backend": "pnpm --filter backend build",
+    "build": "pnpm -r build",
+    "build:packages-schema": "pnpm --filter @TheCozyBud/schema build && rm -rf ./backend/supabase/functions/shared/schema/* && mkdir -p ./backend/supabase/functions/shared/schema && cp -r ./packages/schema/src/* ./backend/supabase/functions/shared/schema/",
+    "start": "pnpm --filter backend start"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "dependencies": {
+    "zod": "^4.1.12"
+  }
+}

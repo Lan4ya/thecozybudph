@@ -13,7 +13,7 @@ import AdminDashboardProducts from "./pages/admin/pages/products/Products.tsx";
 import AdminDashboardOrders from "./pages/admin/pages/orders/Orders.tsx";
 import { CatchAllErrorPage } from "./pages/ErrorPage.tsx";
 import { RouteLoader } from "./components/RouteLoaderFallback.tsx";
-import { ProductCheckout } from "./pages/shop/pages/product-details/Product.tsx";
+import { ProductCheckout } from "./pages/shop/pages/product-checkout/ProductCheckout.tsx";
 
 const admin_route_hash = import.meta.env.VITE_ADMIN_ROUTE_HASH!;
 

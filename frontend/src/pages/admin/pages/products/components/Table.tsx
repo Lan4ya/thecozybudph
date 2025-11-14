@@ -1,7 +1,7 @@
 import ProductColorVariantCircles from "@/components/products/ProductColorVariants";
 import { ProductImage } from "@/components/products/ProductImage";
-import { fetchProducts } from "@/lib/supabase/products";
-import type { FetchProductsResponse } from "@/types/api";
+import { ProductAPI } from "@/services/api/products";
+import type { ProductData } from "@TheCozyBud/schema";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import { cn } from "@/lib/utils/cn";
@@ -16,7 +16,7 @@ import { DeleteProductDialog } from "./DeleteDialog";
 export default function ProductTable({
   onEdit,
 }: {
-  onEdit: (selectedProduct: FetchProductsResponse) => void;
+  onEdit: (selectedProduct: ProductData) => void;
 }) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -30,10 +30,10 @@ export default function ProductTable({
     error,
     isFetchingNextPage,
     isFetching,
-  } = useSuspenseInfiniteQuery<FetchProductsResponse[]>({
+  } = useSuspenseInfiniteQuery<ProductData[]>({
     queryKey: ["products"],
     queryFn: ({ pageParam }) =>
-      fetchProducts({
+      ProductAPI.getAll({
         page: pageParam as number,
         perPage,
       }),
@@ -76,10 +76,7 @@ export default function ProductTable({
     [deleteProductMutation],
   );
 
-  const handleEdit = useCallback(
-    (p: FetchProductsResponse) => onEdit(p),
-    [onEdit],
-  );
+  const handleEdit = useCallback((p: ProductData) => onEdit(p), [onEdit]);
 
   if (error && !isFetching) throw error;
   if (!allProducts.length) {
@@ -114,8 +111,8 @@ export default function ProductTable({
 }
 
 type ProductTableInnerProps = {
-  product: FetchProductsResponse;
-  onEdit: (p: FetchProductsResponse) => void;
+  product: ProductData;
+  onEdit: (p: ProductData) => void;
   deletingId: string | null;
   onDelete: (id: string) => void;
 };
@@ -153,9 +150,9 @@ function ProductTableItemInner({
   return (
     <article className="border flex-between gap-4 px-3 py-4 rounded-lg hover:shadow-sm transition">
       <div className="flex items-center gap-4 min-w-0">
-        {product.image_urls?.[0] && (
+        {product.imageUrls?.[0] && (
           <ProductImage
-            src={product.image_urls[0]}
+            src={product.imageUrls[0]}
             alt={product.name}
             roundedSize="md"
             className="size-25"
@@ -167,21 +164,20 @@ function ProductTableItemInner({
             {product.name}
           </h3>
 
-          {product.products_collection?.name && (
+          {product.productsCollection?.name && (
             <p className="text-xs lg:text-sm mt-1 text-muted-foreground line-clamp-2">
-              Collection: {product.products_collection.name}
+              Collection: {product.productsCollection.name}
             </p>
           )}
 
-          {product.color_variants !== undefined &&
-            product.color_variants.length > 0 && (
-              <div className="flex items-center gap-2 text-xs lg:text-sm text-muted-foreground line-clamp-2">
-                Color Variants:
-                <ProductColorVariantCircles
-                  colorVariants={product.color_variants}
-                />
-              </div>
-            )}
+          {product.colorVariants.length > 0 && (
+            <div className="flex items-center gap-2 text-xs lg:text-sm text-muted-foreground line-clamp-2">
+              Color Variants:
+              <ProductColorVariantCircles
+                colorVariants={product.colorVariants}
+              />
+            </div>
+          )}
 
           <p className="text-primary text-md">{formatPrice(product.price)}</p>
         </div>

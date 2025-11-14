@@ -11,22 +11,37 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 // @ts-ignore
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 // @ts-ignore
-import { CustomError, handleError } from "@shared/errors/mod.ts";
 import {
-  validateUpdateProductMetadata,
-  validateImageFile,
+  CustomError,
+  transformZodError,
   // @ts-ignore
-} from "@shared/validations/mod.ts";
+} from "@shared/errors/mod.ts";
+// @ts-ignore
+import { handleError } from "@shared/response/handleError.ts";
+// @ts-ignore
+import { handleSuccess } from "@shared/response/handleSuccess.ts";
+import {
+  updateProductSchema,
+  parseAndValidateFormData,
+  Product,
+  UpdateProductRequest,
+  // @ts-ignore
+} from "@shared/schema/index.ts";
 // @ts-ignore
 import { parseJSONField } from "@shared/parseJSONField.ts";
 // @ts-ignore
-import { uploadImagesToDB } from "@shared/uploadImagesToDB.ts";
+import {
+  validateImageFile,
+  // @ts-ignore
+} from "@shared/validations/mod.ts";
+import {
+  uploadImagesToDB,
+  // @ts-ignore
+} from "@shared/uploadImagesToDB.ts";
 // @ts-ignore
 import { authAdmin } from "../shared/authAdmin.ts";
 // @ts-ignore
 import { getCorsHeaders, handleCorsOptions } from "@shared/corsHeaders.ts";
-// @ts-ignore
-import type { UpdateProduct } from "@TheCozyBud/dist.index.d.ts";
 
 const supabase = createClient(
   // @ts-ignore
@@ -37,12 +52,8 @@ const supabase = createClient(
 
 // @ts-ignore
 Deno.serve(async (req) => {
-  console.log("METHOD:", req.method);
-  console.log("HEADERS:", Object.fromEntries(req.headers.entries()));
-
   const optionsRes = handleCorsOptions(req);
   if (optionsRes) return optionsRes;
-
   const corsHeaders = getCorsHeaders(req);
 
   if (req.method !== "PATCH") {
@@ -53,180 +64,152 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // check admin priveleges
+    // admin check
     await authAdmin(supabase, req);
 
-    const formData = await req.formData();
-    const productId = formData.get("product_id") as string;
+    const result = await parseAndValidateFormData<UpdateProductRequest>(
+      req,
+      updateProductSchema,
+      (fd: FormData) => {
+        const payload: UpdateProductRequest = {
+          productId: fd.get("productId") ?? "",
+          name: fd.get("name"),
+          price: fd.get("price"),
+          collectionName: fd.get("collectionName"),
+          colorVariants: fd.getAll("colorVariants"),
+          description: fd.get("description"),
+          newProductImages: fd.getAll("newProductImages") as File[] | undefined,
+          imageUrlsToDelete: fd.getAll("imageUrlsToDelete"),
+          primaryImageIndex: fd.get("primaryImageIndex"),
+        };
 
-    if (!productId) {
-      throw CustomError.badRequest("Product ID is required");
+        Object.keys(payload).forEach((key) => {
+          if (key === "productId") return; // skip required field
+
+          const val = payload[key];
+          if (
+            val == undefined ||
+            (typeof val === "string" && val.trim() === "") ||
+            (Array.isArray(val) && val.filter(Boolean).length === 0)
+          ) {
+            delete payload[key];
+          }
+        });
+
+        return payload;
+      },
+      { async: true },
+    );
+
+    if (!result.success) {
+      throw CustomError.validation(transformZodError(result.error));
     }
+    const data: UpdateProductRequest = result.data;
 
-    // Verify product exists
+    // check existence and get some data
     const { data: existingProduct, error: fetchError } = await supabase
       .from("products_metadata")
       .select("id, image_urls")
-      .eq("id", productId)
+      .eq("id", data.productId)
       .single();
 
     if (fetchError)
-      throw CustomError.internal(
-        "Failed to fetch existing product",
-        fetchError,
-      );
-
+      throw CustomError.internal("Failed to fetch product", fetchError);
     if (!existingProduct) throw CustomError.notFound("Product not found");
 
-    const updates: UpdateProduct = {};
-    let PRODUCT_COLLECTION_ID: number | null = null;
-
-    const name = formData.get("name") as string;
-    const price = formData.get("price");
-    const color_variants = formData.get("color_variants");
-    const collectionName = formData.get("collection_name") as string;
-    const description = formData.get("description") as string;
-
-    // Check what fields are being updated
-    if (name) updates.name = name;
-    if (price) updates.price = Number(price);
-    if (color_variants) {
-      updates.color_variants = parseJSONField(
-        "color_variants",
-        color_variants as string,
-      );
-    }
-    if (collectionName) updates.collection_name = collectionName;
-    if (description) updates.description = description;
-
-    // Validate the field updates
-    if (Object.keys(updates).length > 0) {
-      validateUpdateProductMetadata(updates);
-    }
-
-    if (collectionName) {
-      // Already exists use the existing collection
+    // handle collection updates
+    let productCollectionId: number | null = null;
+    if (data.collectionName) {
       const { data: existingCollection, error: findError } = await supabase
         .from("products_collection")
         .select("id")
-        .eq("name", collectionName)
+        .eq("name", data.collectionName)
         .maybeSingle();
 
-      if (findError) {
+      if (findError)
         throw CustomError.internal(`Database error: ${findError.message}`);
-      }
 
       if (existingCollection) {
-        PRODUCT_COLLECTION_ID = existingCollection.id;
+        productCollectionId = existingCollection.id;
       } else {
-        // Create a new collection and use it
         const { data: newCollection, error: insertError } = await supabase
           .from("products_collection")
-          .insert({ name: collectionName })
+          .insert({ name: data.collectionName })
           .select("id")
           .single();
-
-        if (insertError) {
+        if (insertError)
           throw CustomError.internal(
             `Failed to create collection: ${insertError.message}`,
           );
-        }
-        PRODUCT_COLLECTION_ID = newCollection.id;
+        productCollectionId = newCollection.id;
       }
-      updates.product_collection_id = PRODUCT_COLLECTION_ID;
     }
 
-    // Handle image uploads
+    let updatedImageUrls = existingProduct.image_urls ?? [];
 
-    const productImages = formData.getAll("new_product_images") as File[];
-    const imagesToDelete = formData.get("image_urls_to_delete");
+    const finalImageCount =
+      updatedImageUrls.length -
+      (data.imageUrlsToDelete?.length ?? 0) +
+      (data.newProductImages?.length ?? 0);
 
-    let newProductImages: File[] = [];
-    let updatedImageUrls = existingProduct.image_urls || [];
+    if (finalImageCount < 1)
+      throw CustomError.badRequest("Product must retain at least one image");
+    else if (finalImageCount > 3)
+      throw CustomError.badRequest("Product can have up to 3 images only");
 
-    if (productImages && productImages.length) {
-      await validateImageFile(productImages);
-      newProductImages = productImages;
-    }
-
-    // Upload new images if provided
-    if (newProductImages && newProductImages.length) {
-      const newImageUrls = await uploadImagesToDB(supabase, newProductImages);
+    // handle image uploads
+    if (data.newProductImages?.length) {
+      const newImageUrls = await uploadImagesToDB(
+        supabase,
+        data.newProductImages,
+      );
       updatedImageUrls = [...updatedImageUrls, ...newImageUrls];
     }
 
-    // Handle image deletion
-    if (imagesToDelete && imagesToDelete.trim()) {
-      const deleteUrls = JSON.parse(imagesToDelete) as string[];
-
-      if (updatedImageUrls.length - deleteUrls.length <= 0) {
-        throw CustomError.badRequest("Product must retain at least one image");
-      }
-
+    // handle image deletion
+    if (data.imageUrlsToDelete?.length) {
       updatedImageUrls = updatedImageUrls.filter(
-        (url: string) => !deleteUrls.includes(url),
+        (url: string) => !data.imageUrlsToDelete!.includes(url),
       );
 
-      // Delete files from storage
-      const filePaths = deleteUrls
-        .map((url) => {
-          const match = url.match(/\/products\/([^?]+)/);
-          return match ? match[1] : null; // get the first capture group which is the file path
-        })
-        .filter(Boolean);
+      const filePaths = data.imageUrlsToDelete
+        .map((url: string) => url.match(/\/products\/([^?]+)/)?.[1])
+        .filter(Boolean) as string[];
 
       if (filePaths.length > 0) {
         const { error: deleteError } = await supabase.storage
           .from("products")
-          .remove(filePaths); // batch delete
-
-        if (deleteError) {
+          .remove(filePaths);
+        if (deleteError)
           console.error("Failed to delete some images:", deleteError);
-          // Not throwing an error here to allow the update to proceed even if some images fail to delete
-        }
       }
     }
 
-    // Update primary image if specified
-    const primaryImageUrl = formData.get("primary_image_url") as string;
-    if (primaryImageUrl && updatedImageUrls.includes(primaryImageUrl)) {
-      updates.primary_image_url = primaryImageUrl;
-    }
-
-    // Update image URLs if they changed
-    if (newProductImages.length || imagesToDelete) {
-      updates.image_urls = updatedImageUrls;
-    }
-
-    const primaryImageIndex = Number(formData.get("primary_image_index") ?? 0);
-    const resolvedPrimaryImageUrl = Array.isArray(updatedImageUrls)
-      ? (updatedImageUrls[primaryImageIndex] ?? updatedImageUrls[0])
-      : null;
-
-    const { collection_name, ...restOfUpdates } = updates;
+    const DBUpdates: Omit<Product, "created_at" | "updated_at" | "id"> = {
+      name: data.name,
+      price: data.price,
+      color_variants: data.colorVariants,
+      description: data.description,
+      product_collection_id: productCollectionId ?? undefined,
+      image_urls: updatedImageUrls,
+      primary_image_url: updatedImageUrls[data.primaryImageIndex ?? 0],
+    };
 
     const { data: updatedProduct, error: updateError } = await supabase
       .from("products_metadata")
-      .update({
-        ...restOfUpdates,
-        primary_image_url: resolvedPrimaryImageUrl,
-      })
-      .eq("id", productId)
+      .update(DBUpdates) // update ignores undefined fields
+      .eq("id", data.productId)
       .select()
       .single();
 
-    if (updateError) {
+    if (updateError)
       throw CustomError.internal(
         `Failed to update product: ${updateError.message}`,
       );
-    }
 
-    return Response.json(
-      {
-        product: { ...updatedProduct, collection_name },
-        success: true,
-      },
-      { status: 201, headers: corsHeaders },
+    return handleSuccess(
+      { ...updatedProduct, collectionName: data.collectionName },
+      corsHeaders,
     );
   } catch (err) {
     return handleError(err, corsHeaders);

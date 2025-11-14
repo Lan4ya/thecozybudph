@@ -1,10 +1,11 @@
 import isEqual from "fast-deep-equal";
 import type { FetchProductsResponse } from "@/types/api";
 import type { ProductFormValues } from "../pages/products/components/form/Form";
+import type { UpdateProduct } from "@TheCozyBud/schema";
 
 export function formHasChanges(
   values: ProductFormValues,
-  updatingProduct: FetchProductsResponse | null,
+  updatingProduct: UpdateProduct | null,
   extra?: {
     imagesToDelete?: string[];
     newSelectedFilesCount?: number;
@@ -48,7 +49,7 @@ export function formHasChanges(
     price: updatingProduct.price,
     description: updatingProduct.description ?? "",
     color_variants: updatingProduct.color_variants ?? [],
-    collection_name: updatingProduct.products_collection?.name ?? "",
+    collection_name: updatingProduct.collection_name ?? "",
   };
 
   const current = {

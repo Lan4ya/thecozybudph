@@ -4,7 +4,7 @@ import { CustomError } from "./errors/CustomError.ts";
 export const uploadImagesToDB = async (
   supabase: SupabaseClient,
   images: File[],
-) => {
+): Promise<string[]> => {
   const imageUploads = images.map(async (file) => {
     const filePath = `${crypto.randomUUID()}-${file.name}`;
     const { data: _uploadData, error: uploadError } = await supabase.storage
@@ -18,7 +18,6 @@ export const uploadImagesToDB = async (
       );
     }
 
-    // dev log
     console.log(`Upload data: `, _uploadData);
 
     // Get the public URL for each image

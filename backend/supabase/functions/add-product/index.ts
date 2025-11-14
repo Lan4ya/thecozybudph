@@ -1,5 +1,5 @@
 /**
- * Add a new product to DB
+ * Create a new product to DB
  *
  * @admin - requires admin privileges
  * @method POST
@@ -10,23 +10,30 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 // @ts-ignore
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-// @ts-ignore
-import { CustomError, handleError } from "@shared/errors/mod.ts";
 import {
-  validateNewProductMetadata,
-  validateImageFile,
+  CustomError,
+  transformZodError,
   // @ts-ignore
-} from "@shared/validations/mod.ts";
+} from "@shared/errors/mod.ts";
 // @ts-ignore
-import { parseJSONField } from "@shared/parseJSONField.ts";
+import { handleError } from "@shared/response/handleError.ts";
+// @ts-ignore
+import { handleSuccess } from "@shared/response/handleSuccess.ts";
 // @ts-ignore
 import { uploadImagesToDB } from "@shared/uploadImagesToDB.ts";
 // @ts-ignore
 import { authAdmin } from "@shared/authAdmin.ts";
 // @ts-ignore
-import { getCorsHeaders, handleCorsOptions } from "@shared/corsHeaders.ts";
+import { snakeToCamel } from "@shared/caseConverter.ts";
 // @ts-ignore
-import type { NewProduct } from "@TheCozyBud/dist.index.d.ts";
+import { getCorsHeaders, handleCorsOptions } from "@shared/corsHeaders.ts";
+import {
+  createProductSchema,
+  parseAndValidateFormData,
+  Product,
+  CreateProductRequest,
+  // @ts-ignore
+} from "@shared/schema/index.ts";
 
 const supabase = createClient(
   // @ts-ignore
@@ -37,9 +44,6 @@ const supabase = createClient(
 
 // @ts-ignore
 Deno.serve(async (req) => {
-  console.log("METHOD:", req.method);
-  console.log("HEADERS:", Object.fromEntries(req.headers.entries()));
-
   const optionsRes = handleCorsOptions(req);
   if (optionsRes) return optionsRes;
 
@@ -53,52 +57,60 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // check admin previleges
+    // check admin privileges
     await authAdmin(supabase, req);
 
-    const formData = await req.formData();
+    const result = await parseAndValidateFormData<CreateProductRequest>(
+      req,
+      createProductSchema,
+      (fd: FormData) => {
+        const payload: CreateProductRequest = {
+          name: fd.get("name"),
+          price: fd.get("price"),
+          collectionName: fd.get("collectionName"),
+          colorVariants: fd.getAll("colorVariants"),
+          description: fd.get("description"),
+          productImages: fd.getAll("productImages") as File[],
+          primaryImageIndex: fd.get("primaryImageIndex"),
+        };
 
-    const productImages = formData.getAll("product_images") as File[];
-    if (!productImages || productImages.length === 0) {
-      throw CustomError.badRequest("No images uploaded");
+        // delete empty optional fields
+        Object.keys(payload).forEach((key) => {
+          const requiredFields = [
+            "name",
+            "price",
+            "productImages",
+            "primaryImageIndex",
+          ];
+          if (requiredFields.includes(key)) return;
+
+          const val = payload[key];
+          if (
+            val == null ||
+            (typeof val === "string" && val.trim() === "") ||
+            (Array.isArray(val) && val.filter(Boolean).length === 0)
+          ) {
+            delete payload[key];
+          }
+        });
+
+        return payload;
+      },
+      { async: true },
+    );
+
+    if (!result.success) {
+      throw CustomError.validation(transformZodError(result.error));
     }
-
-    // File size and type validation
-    await validateImageFile(productImages);
-
-    // Parse core fields
-    const productMetaData: Omit<NewProduct, "product_images"> = {
-      name: formData.get("name") as string,
-      price: Number(formData.get("price")),
-    };
-
-    const colorVariants = formData.get("color_variants") as string;
-    if (colorVariants) {
-      productMetaData.color_variants = parseJSONField<string[]>(
-        "color_variants",
-        colorVariants,
-      );
-    }
-
-    const collectionName = formData.get("collection_name") as string;
-    if (collectionName) {
-      productMetaData.collection_name = collectionName;
-    }
-
-    const description = formData.get("description") as string;
-    productMetaData.description = description;
-
-    validateNewProductMetadata(productMetaData);
-
-    const primaryImageIndex = Number(formData.get("primary_image_index") ?? 0);
+    const data: CreateProductRequest = result.data;
 
     // Resolve or create collection
-    let PRODUCT_COLLECTION_ID: number | null = null;
-    if (collectionName) {
+    let productCollectionId: number | null = null;
+    if (data.collectionName) {
       const { data: existingCollection, error: findError } = await supabase
         .from("products_collection")
         .select("id")
-        .eq("name", collectionName.trim())
+        .eq("name", data.collectionName)
         .maybeSingle();
 
       if (findError) {
@@ -106,46 +118,36 @@ Deno.serve(async (req) => {
       }
 
       if (existingCollection) {
-        PRODUCT_COLLECTION_ID = existingCollection.id;
-        console.log(
-          `Using existing collection: "${collectionName}" (ID: ${existingCollection.id})`,
-        );
+        productCollectionId = existingCollection.id;
       } else {
         const { data: newCollection, error: insertError } = await supabase
           .from("products_collection")
-          .insert({ name: collectionName.trim() })
+          .insert({ name: data.collectionName })
           .select("id")
           .single();
 
-        if (insertError) {
-          throw CustomError.internal(insertError.message);
-        }
+        if (insertError) throw CustomError.internal(insertError.message);
 
-        PRODUCT_COLLECTION_ID = newCollection.id;
-        console.log(
-          `Created new collection: "${collectionName}" (ID: ${newCollection.id})`,
-        );
+        productCollectionId = newCollection.id;
       }
     }
 
     // Upload images to Supabase Storage concurrently
-    const imageUrls = await uploadImagesToDB(supabase, productImages);
-    if (!imageUrls.length) throw CustomError.internal("Image upload failed");
+    const imageUrls = await uploadImagesToDB(supabase, data.productImages);
 
-    const resolvedPrimaryUrl = imageUrls[primaryImageIndex] ?? imageUrls[0];
+    const DBInserts: Omit<Product, "created_at" | "updated_at" | "id"> = {
+      name: data.name,
+      price: data.price,
+      color_variants: data.colorVariants,
+      description: data.description,
+      image_urls: imageUrls,
+      primary_image_url: imageUrls[data.primaryImageIndex ?? 0],
+      product_collection_id: productCollectionId ?? null,
+    };
 
-    // exclude collection_name since it's not part of products_metadata and we just need the ref ID of it.
-    const { collection_name, primary_image_url, ...rest } = productMetaData;
-
-    // Insert metadata + ALL image URLs into DB
-    const { data: product_metadata_data, error: insertError } = await supabase
+    const { data: createdProduct, error: insertError } = await supabase
       .from("products_metadata")
-      .insert({
-        ...rest,
-        image_urls: imageUrls,
-        primary_image_url: resolvedPrimaryUrl,
-        product_collection_id: PRODUCT_COLLECTION_ID,
-      })
+      .insert(DBInserts)
       .select()
       .single();
 
@@ -153,15 +155,9 @@ Deno.serve(async (req) => {
       throw CustomError.internal(insertError.message);
     }
 
-    return Response.json(
-      {
-        product: {
-          ...product_metadata_data,
-          collection_name,
-        },
-        success: true,
-      },
-      { status: 201, headers: corsHeaders },
+    return handleSuccess(
+      { ...createdProduct, collectionName: data.collectionName },
+      corsHeaders,
     );
   } catch (err) {
     return handleError(err, corsHeaders);

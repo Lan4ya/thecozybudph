@@ -1,4 +1,4 @@
-import { supabase } from "./connect";
+import { supabase } from "../../lib/supabase/connect";
 
 export async function getFileUrlFromDB(
   bucket: string,

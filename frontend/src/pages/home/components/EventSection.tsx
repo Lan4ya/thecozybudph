@@ -1,4 +1,4 @@
-import { getAllFileUrlsFromDB } from "@/lib/supabase/storage";
+import { getAllFileUrlsFromDB } from "@/services/api/storage";
 import { useEffect, useState } from "react";
 
 const EventSection = () => {

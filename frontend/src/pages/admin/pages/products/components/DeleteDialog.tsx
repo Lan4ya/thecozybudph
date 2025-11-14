@@ -8,14 +8,14 @@ import {
 } from "@/lib/ui/__shadcn__/dialog";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { useState } from "react";
-import type { FetchProductsResponse } from "@/lib/supabase/products";
+import type { ProductData } from "@TheCozyBud/schema";
 
 export function DeleteProductDialog({
   product,
   onConfirm,
   trigger,
 }: {
-  product: FetchProductsResponse;
+  product: ProductData;
   onConfirm: () => void;
   trigger: React.ReactNode;
 }) {

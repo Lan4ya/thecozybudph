@@ -1,2 +1,2 @@
 export { CustomError } from "./CustomError.ts";
-export { handleError } from "./handleError.ts";
+export { transformZodError } from "./transformZodErrors.ts";

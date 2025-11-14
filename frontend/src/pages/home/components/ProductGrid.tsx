@@ -1,15 +1,13 @@
 import ProductCard from "@/components/products/ProductCard";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { fetchProducts } from "@/lib/supabase/products";
-import type { FetchProductsResponse } from "@/types/api";
+import { ProductAPI } from "@/services/api/products";
+import type { ProductData } from "@TheCozyBud/schema";
 
 const ProductGrid = () => {
-  const { data, error, isFetching } = useSuspenseQuery<FetchProductsResponse[]>(
-    {
-      queryKey: ["homepagerproduct-recommendations"],
-      queryFn: () => fetchProducts({ perPage: 12 }),
-    },
-  );
+  const { data, error, isFetching } = useSuspenseQuery<ProductData[]>({
+    queryKey: ["homepagerproduct-recommendations"],
+    queryFn: () => ProductAPI.getAll({ perPage: 12 }),
+  });
 
   if (error && !isFetching) throw error;
 
@@ -31,7 +29,7 @@ const ProductGrid = () => {
             key={d.id}
             productId={d.id}
             name={d.name}
-            imageUrl={d.image_urls[0]}
+            imageUrl={d.imageUrls[0]}
             price={d.price}
           />
         ))}
