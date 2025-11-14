@@ -42,13 +42,13 @@ const NavBar = () => {
           "border-b-foreground shadow-xs bg-background backdrop-blur-sm ",
       )}
     >
-      {/* Brand */}
+      {/* Logo */}
       <div className="flex items-center gap-1">
         {/* <img src={logo_mini_transparent} alt="logo" className="size-8" /> */}
         <NavLink
           to="/"
           reloadDocument
-          className="font-back-to-black text-primary hover:text-primary/80 text-2xl lg:text-4xl lg:font-semibold"
+          className="font-back-to-black select-none text-primary hover:text-primary/85 text-2xl lg:text-3xl lg:font-semibold"
         >
           TheCozyBud
         </NavLink>
