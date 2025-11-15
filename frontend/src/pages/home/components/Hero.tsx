@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+
 import { Skeleton } from "@/lib/ui/__shadcn__/skeleton";
 import TBC_1 from "@/assets/thecozybud/TCB_1.png";
+import { useAnimateOnView } from "@/hooks/useAnimateOnView";
 
 const Hero = () => {
   return (
@@ -34,15 +36,28 @@ export const HeroImage = () => {
         />
       )}
 
-      <div className="absolute top-[60%] left-[7%] flex flex-col gap-1 text-white md:top-[60%] md:left[15%] lg:gap-6">
-        <h1 className="font-ivy-ora-display font-bold text-accent max-[395px]:text-base text-xl sm:text-2xl md:text-3xl lg:text-4xl">
-          BLOSSOMING ELEGANCE
-        </h1>
+      <HeroText />
+    </div>
+  );
+};
 
-        <p className="font-ivy-ora-display text-sm max-w-[230px] sm:text-[16px] sm:max-w-[270px] md:text-xl md:max-w-[390px]  lg:max-w-[490px]">
-          Fresh, handcrafted arrangements designed to elevate everyday moments.
-        </p>
-      </div>
+export const HeroText = () => {
+  const { registerSentinel, visibleMap } = useAnimateOnView();
+
+  return (
+    <div
+      ref={registerSentinel}
+      className={`absolute top-[60%] left-[7%] flex flex-col gap-1 text-white md:top-[60%] md:left-[7%] lg:gap-6 transition-all duration-1100 ease-out
+        ${visibleMap[0] ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}
+      `}
+    >
+      <h1 className="font-ivy-ora-display font-bold text-accent max-[395px]:text-base text-xl sm:text-2xl md:text-3xl lg:text-4xl">
+        BLOSSOMING ELEGANCE
+      </h1>
+
+      <p className="font-ivy-ora-display text-sm max-w-[230px] sm:text-[16px] sm:max-w-[270px] md:text-xl md:max-w-[390px] lg:max-w-[490px]">
+        Fresh, handcrafted arrangements designed to elevate everyday moments.
+      </p>
     </div>
   );
 };
