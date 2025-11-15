@@ -5,7 +5,7 @@ import type { ProductData } from "@TheCozyBud/schema";
 
 const ProductGrid = () => {
   const { data, error, isFetching } = useSuspenseQuery<ProductData[]>({
-    queryKey: ["homepagerproduct-recommendations"],
+    queryKey: ["homepage-product-recommendations"],
     queryFn: () => ProductAPI.getAll({ perPage: 12 }),
   });
 
