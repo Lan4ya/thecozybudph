@@ -12,13 +12,10 @@
     "build:frontend": "pnpm --filter frontend build",
     "build:backend": "pnpm --filter backend build",
     "build": "pnpm -r build",
-    "build:packages-schema": "pnpm --filter @TheCozyBud/schema build && rm -rf ./backend/supabase/functions/shared/schema/* && mkdir -p ./backend/supabase/functions/shared/schema && cp -r ./packages/schema/src/* ./backend/supabase/functions/shared/schema/",
+    "build:packages-schema": "pnpm --filter @TheCozyBud/schema build && rm -rf ./backend/supabase/functions/shared/schema/* && mkdir -p ./backend/supabase/shared/schema && cp -r ./packages/schema/src/* ./backend/supabase/shared/schema/",
     "start": "pnpm --filter backend start"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"
-  },
-  "dependencies": {
-    "zod": "^4.1.12"
   }
 }

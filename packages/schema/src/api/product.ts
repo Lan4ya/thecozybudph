@@ -5,7 +5,7 @@ import z from "zod";
 
 export type CreateProductRequest = z.infer<typeof createProductSchema>;
 export type UpdateProductRequest = z.infer<typeof updateProductSchema>;
-export type DeleteProductRequest = { productId: string };
+export type DeleteProductRequest = string;
 
 export type CreateProductData = SnakeToCamel<ProductDB>;
 export type UpdateProductData = SnakeToCamel<ProductDB>;
