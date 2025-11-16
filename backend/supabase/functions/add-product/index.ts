@@ -1,48 +1,31 @@
 /**
  * Create a new product to DB
  *
- * @admin - requires admin privileges
+ * @admin
  * @method POST
  * @endpoint https://utmrwkolxhuawhaajmng.supabase.co/functions/v1/add-product
  *
  */
 
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-// @ts-ignore
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import {
-  CustomError,
-  transformZodError,
-  // @ts-ignore
-} from "@shared/errors/mod.ts";
-// @ts-ignore
+import { createClient } from "supabase";
+import { CustomError, transformZodError } from "@shared/errors/mod.ts";
 import { handleError } from "@shared/response/handleError.ts";
-// @ts-ignore
 import { handleSuccess } from "@shared/response/handleSuccess.ts";
-// @ts-ignore
 import { uploadImagesToDB } from "@shared/uploadImagesToDB.ts";
-// @ts-ignore
 import { authAdmin } from "@shared/authAdmin.ts";
-// @ts-ignore
-import { snakeToCamel } from "@shared/caseConverter.ts";
-// @ts-ignore
 import { getCorsHeaders, handleCorsOptions } from "@shared/corsHeaders.ts";
 import {
   createProductSchema,
   parseAndValidateFormData,
-  Product,
+  ProductDB,
   CreateProductRequest,
-  // @ts-ignore
 } from "@shared/schema/index.ts";
 
 const supabase = createClient(
-  // @ts-ignore
   Deno.env.get("SUPABASE_URL")!,
-  // @ts-ignore
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
 );
 
-// @ts-ignore
 Deno.serve(async (req) => {
   const optionsRes = handleCorsOptions(req);
   if (optionsRes) return optionsRes;
@@ -65,13 +48,24 @@ Deno.serve(async (req) => {
       createProductSchema,
       (fd: FormData) => {
         const payload: CreateProductRequest = {
-          name: fd.get("name"),
-          price: fd.get("price"),
-          collectionName: fd.get("collectionName"),
-          colorVariants: fd.getAll("colorVariants"),
-          description: fd.get("description"),
-          productImages: fd.getAll("productImages") as File[],
-          primaryImageIndex: fd.get("primaryImageIndex"),
+          // name: fd.get("name") as string,
+          // price: fd.get("price"),
+          // collectionName: fd.get("collectionName"),
+          // colorVariants: fd.getAll("colorVariants"),
+          // description: fd.get("description"),
+          // productImages: fd.getAll("productImages") as File[],
+          // primaryImageIndex: fd.get("primaryImageIndex"),
+          name: fd.get("name")?.toString() ?? "",
+          price: Number(fd.get("price")),
+          collectionName: fd.get("collectionName")?.toString(),
+          colorVariants: fd
+            .getAll("colorVariants")
+            .filter((v) => typeof v === "string"),
+          description: fd.get("description")?.toString(),
+          productImages: fd
+            .getAll("productImages")
+            .filter((v) => v instanceof File) as File[],
+          primaryImageIndex: Number(fd.get("primaryImageIndex")),
         };
 
         // delete empty optional fields
@@ -84,13 +78,13 @@ Deno.serve(async (req) => {
           ];
           if (requiredFields.includes(key)) return;
 
-          const val = payload[key];
+          const val = payload[key as keyof CreateProductRequest];
           if (
             val == null ||
             (typeof val === "string" && val.trim() === "") ||
             (Array.isArray(val) && val.filter(Boolean).length === 0)
           ) {
-            delete payload[key];
+            delete payload[key as keyof CreateProductRequest];
           }
         });
 
@@ -135,10 +129,10 @@ Deno.serve(async (req) => {
     // Upload images to Supabase Storage concurrently
     const imageUrls = await uploadImagesToDB(supabase, data.productImages);
 
-    const DBInserts: Omit<Product, "created_at" | "updated_at" | "id"> = {
+    const DBInserts: Omit<ProductDB, "created_at" | "updated_at" | "id"> = {
       name: data.name,
       price: data.price,
-      color_variants: data.colorVariants,
+      color_variants: data.colorVariants ?? [],
       description: data.description,
       image_urls: imageUrls,
       primary_image_url: imageUrls[data.primaryImageIndex ?? 0],

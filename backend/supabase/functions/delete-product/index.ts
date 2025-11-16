@@ -1,36 +1,25 @@
 /**
  * Delete a product from DB
  *
- * @admin - requires admin privileges
+ * @admin
  * @method DELETE
  * @endpoint https://utmrwkolxhuawhaajmng.supabase.co/functions/v1/delete-product
  *
  */
 
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-// @ts-ignore
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-// @ts-ignore
+import { createClient } from "supabase";
 import { CustomError } from "@shared/errors/mod.ts";
-// @ts-ignore
 import { getCorsHeaders, handleCorsOptions } from "@shared/corsHeaders.ts";
-// @ts-ignore
-import { authAdmin } from "../shared/authAdmin.ts";
-// @ts-ignore
+import { authAdmin } from "@shared/authAdmin.ts";
 import { handleError } from "@shared/response/handleError.ts";
-// @ts-ignore
 import { handleSuccess } from "@shared/response/handleSuccess.ts";
-// @ts-ignore
 import { DeleteProductRequest } from "@shared/schema/index.ts";
 
 const supabase = createClient(
-  // @ts-ignore
   Deno.env.get("SUPABASE_URL")!,
-  // @ts-ignore
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
 );
 
-// @ts-ignore
 Deno.serve(async (req) => {
   const optionsRes = handleCorsOptions(req);
   if (optionsRes) return optionsRes;
@@ -49,7 +38,8 @@ Deno.serve(async (req) => {
     await authAdmin(supabase, req);
 
     const url = new URL(req.url);
-    const productId: DeleteProductRequest = url.searchParams.get("productId");
+    const productId: DeleteProductRequest =
+      url.searchParams.get("productId") ?? "";
 
     if (!productId) {
       throw CustomError.badRequest("Product ID is required");

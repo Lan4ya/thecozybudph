@@ -1,4 +1,4 @@
-import { SupabaseClient } from "@supabase/supabase-js";
+import { SupabaseClient } from "supabase";
 import { CustomError } from "./errors/CustomError.ts";
 
 interface AuthRequest {

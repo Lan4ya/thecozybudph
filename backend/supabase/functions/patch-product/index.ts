@@ -1,56 +1,32 @@
 /**
  * Update a product in DB
  *
- * @admin - requires admin privileges
+ * @admin
  * @method PATCH
  * @endpoint https://utmrwkolxhuawhaajmng.supabase.co/functions/v1/patch-product
  *
  */
 
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-// @ts-ignore
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-// @ts-ignore
-import {
-  CustomError,
-  transformZodError,
-  // @ts-ignore
-} from "@shared/errors/mod.ts";
-// @ts-ignore
+import { createClient } from "supabase";
+import { CustomError, transformZodError } from "@shared/errors/mod.ts";
 import { handleError } from "@shared/response/handleError.ts";
-// @ts-ignore
 import { handleSuccess } from "@shared/response/handleSuccess.ts";
 import {
   updateProductSchema,
   parseAndValidateFormData,
-  Product,
+  ProductDB,
   UpdateProductRequest,
-  // @ts-ignore
 } from "@shared/schema/index.ts";
-// @ts-ignore
-import { parseJSONField } from "@shared/parseJSONField.ts";
-// @ts-ignore
-import {
-  validateImageFile,
-  // @ts-ignore
-} from "@shared/validations/mod.ts";
-import {
-  uploadImagesToDB,
-  // @ts-ignore
-} from "@shared/uploadImagesToDB.ts";
-// @ts-ignore
-import { authAdmin } from "../shared/authAdmin.ts";
-// @ts-ignore
+import { validateImageFile } from "@shared/validations/mod.ts";
+import { uploadImagesToDB } from "@shared/uploadImagesToDB.ts";
+import { authAdmin } from "@shared/authAdmin.ts";
 import { getCorsHeaders, handleCorsOptions } from "@shared/corsHeaders.ts";
 
 const supabase = createClient(
-  // @ts-ignore
   Deno.env.get("SUPABASE_URL")!,
-  // @ts-ignore
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
 );
 
-// @ts-ignore
 Deno.serve(async (req) => {
   const optionsRes = handleCorsOptions(req);
   if (optionsRes) return optionsRes;
@@ -72,27 +48,34 @@ Deno.serve(async (req) => {
       updateProductSchema,
       (fd: FormData) => {
         const payload: UpdateProductRequest = {
-          productId: fd.get("productId") ?? "",
-          name: fd.get("name"),
-          price: fd.get("price"),
-          collectionName: fd.get("collectionName"),
-          colorVariants: fd.getAll("colorVariants"),
-          description: fd.get("description"),
-          newProductImages: fd.getAll("newProductImages") as File[] | undefined,
-          imageUrlsToDelete: fd.getAll("imageUrlsToDelete"),
-          primaryImageIndex: fd.get("primaryImageIndex"),
+          productId: fd.get("productId")?.toString() ?? "",
+          name: fd.get("name")?.toString(),
+          price: Number(fd.get("price")),
+          collectionName: fd.get("collectionName")?.toString(),
+          colorVariants: fd.getAll("colorVariants").map((v) => v.toString()),
+          description: fd.get("description")?.toString(),
+          newProductImages: fd
+            .getAll("newProductImages")
+            .filter((v) => v instanceof File) as File[],
+          imageUrlsToDelete: fd
+            .getAll("imageUrlsToDelete")
+            .map((v) => v.toString()),
+          primaryImageIndex:
+            fd.get("primaryImageIndex") !== null
+              ? Number(fd.get("primaryImageIndex"))
+              : undefined,
         };
 
         Object.keys(payload).forEach((key) => {
           if (key === "productId") return; // skip required field
 
-          const val = payload[key];
+          const val = payload[key as keyof UpdateProductRequest];
           if (
             val == undefined ||
             (typeof val === "string" && val.trim() === "") ||
             (Array.isArray(val) && val.filter(Boolean).length === 0)
           ) {
-            delete payload[key];
+            delete payload[key as keyof UpdateProductRequest];
           }
         });
 
@@ -114,7 +97,7 @@ Deno.serve(async (req) => {
       .single();
 
     if (fetchError)
-      throw CustomError.internal("Failed to fetch product", fetchError);
+      throw CustomError.internal(`Failed to fetch product: ${fetchError}`);
     if (!existingProduct) throw CustomError.notFound("Product not found");
 
     // handle collection updates
@@ -185,14 +168,18 @@ Deno.serve(async (req) => {
       }
     }
 
-    const DBUpdates: Omit<Product, "created_at" | "updated_at" | "id"> = {
-      name: data.name,
-      price: data.price,
-      color_variants: data.colorVariants,
-      description: data.description,
-      product_collection_id: productCollectionId ?? undefined,
-      image_urls: updatedImageUrls,
-      primary_image_url: updatedImageUrls[data.primaryImageIndex ?? 0],
+    const DBUpdates: Omit<ProductDB, "created_at" | "updated_at" | "id"> = {
+      ...(data.name && { name: data.name }),
+      ...(data.price && { price: data.price }),
+      ...(data.colorVariants && { color_variants: data.colorVariants }),
+      ...(data.description && { description: data.description }),
+      ...(productCollectionId != null && {
+        product_collection_id: productCollectionId,
+      }),
+      ...(updatedImageUrls && { image_urls: updatedImageUrls }),
+      ...(updatedImageUrls && {
+        primary_image_url: updatedImageUrls[data.primaryImageIndex ?? 0],
+      }),
     };
 
     const { data: updatedProduct, error: updateError } = await supabase

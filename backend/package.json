@@ -7,27 +7,9 @@
     "build": "tsc ."
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.75.1",
-    "@types/cors": "^2.8.19",
-    "cors": "^2.8.5",
-    "cross-env": "^10.1.0",
-    "dotenv": "^17.2.3",
-    "express": "^5.1.0",
-    "file-type": "^21.0.0",
-    "helmet": "^8.1.0",
-    "mime": "^4.1.0",
-    "multer": "^2.0.2"
+    "@supabase/supabase-js": "^2.75.1"
   },
   "devDependencies": {
-    "@TheCozyBud/schema": "workspace:*",
-    "@types/express": "^5.0.3",
-    "@types/morgan": "^1.9.10",
-    "@types/multer": "^2.0.0",
-    "@types/node": "^24.8.1",
-    "morgan": "^1.10.1",
-    "nodemon": "^3.1.10",
-    "supabase": "^2.51.0",
-    "tsx": "^4.20.6",
-    "typescript": "^5.9.3"
+    "@TheCozyBud/schema": "workspace:*"
   }
 }
