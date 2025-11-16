@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
+import LOGO from "@/assets/thecozybud/logo_transparent_oneline1.png";
+// import LOGOS from "@/assets/thecozybud/logo_transparent_oneline1.svg";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { ShoppingCart, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { cn } from "@/lib/utils/cn";
 import { NavLink, useLocation } from "react-router";
+import { useAnimateOnView } from "@/hooks/useAnimateOnView";
 // import logo_mini_transparent from "@/assets/thecozybud/logo_mini_transparent.png";
 
 const navItems = [
@@ -19,6 +22,7 @@ const NavBar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isBackgroundShown, setShowBackground] = useState(false);
   const location = useLocation();
+  const { registerSentinel, visibleMap } = useAnimateOnView();
 
   useEffect(() => {
     if (location.pathname !== "/") {
@@ -26,8 +30,16 @@ const NavBar = () => {
       return;
     }
 
+    let ticking = false;
+
     const handleScroll = () => {
-      setShowBackground(window.scrollY > 0);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setShowBackground(window.scrollY > 0);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -35,8 +47,12 @@ const NavBar = () => {
 
   return (
     <nav
+      ref={registerSentinel}
       className={cn(
-        "container fixed top-0 z-999 max-w-screen py-3 flex-between",
+        "container fixed top-0 z-999 max-w-screen py-3 flex-between ease-out duration-900 transition-opacity transition-transform",
+        visibleMap[0]
+          ? "opacity-100 translate-y-0"
+          : "opacity-0 -translate-y-6",
         !menuOpen &&
           isBackgroundShown &&
           "border-b-foreground shadow-xs bg-background backdrop-blur-sm ",
@@ -44,14 +60,28 @@ const NavBar = () => {
     >
       {/* Logo */}
       <div className="flex items-center gap-1">
-        {/* <img src={logo_mini_transparent} alt="logo" className="size-8" /> */}
         <NavLink
           to="/"
           reloadDocument
           className="font-back-to-black select-none text-primary hover:text-primary/85 text-2xl lg:text-3xl lg:font-semibold"
         >
-          TheCozyBud
+          <div className={cn("w-32 lg:w-37 p-0 m-0 ")}>
+            <img
+              decoding="async"
+              src={LOGO}
+              alt="logo"
+              className="w-full h-full"
+            />
+          </div>
         </NavLink>
+        {/* <NavLink */}
+        {/*   to="/" */}
+        {/*   reloadDocument */}
+        {/*   className="font-back-to-black select-none text-primary hover:text-primary/85 text-2xl lg:text-3xl lg:font-semibold" */}
+        {/* > */}
+        {/* <img src={logo_mini_transparent} alt="logo" className="size-10" /> */}
+        {/*   CozyBud */}
+        {/* </NavLink> */}
       </div>
 
       {/* Mobile Menu Button */}

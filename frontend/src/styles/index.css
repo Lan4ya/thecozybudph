@@ -9,7 +9,7 @@
   }
 
   body {
-    font-family: "NeueHaasGrotesk", system-ui, sans-serif;
+    font-family: "NeueHaasGrotesk", apple-system, system-ui, sans-serif;
   }
 
   input {
@@ -116,8 +116,8 @@
 }
 
 @theme {
-  --font-ivy-ora-display: "IvyOraDisplay", "sans-serif";
-  --font-back-to-black: "BackToBlack", "sans-serif";
+  --font-ivy-ora-display: "IvyOraDisplay", Georgia, sans-serif;
+  --font-back-to-black: "BackToBlack", system-ui;
 
   --animate-shimmer: shimmer 1.6s ease-in-out infinite;
   --animate-rotate: rotate 1s linear infinite;
