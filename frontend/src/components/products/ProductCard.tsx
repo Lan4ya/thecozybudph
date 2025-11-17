@@ -15,6 +15,7 @@ const ProductCard = ({ productId, name, imageUrl, price }: Props) => {
       <div className="group bg-card select-none text-card-foreground rounded-lg border border-border/30 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden cursor-pointer active:scale-[0.95] active:shadow-lg">
         <div className="relative overflow-hidden">
           <ProductImage
+            loading="lazy"
             src={imageUrl}
             className="pointer-events-none  aspect-square group-hover:scale-105 transition-transform duration-200 rounded-b-none"
           />
