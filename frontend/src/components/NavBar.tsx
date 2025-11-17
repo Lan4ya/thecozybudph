@@ -95,7 +95,8 @@ const NavBar = () => {
           <Menu
             className={cn(
               "text-primary-foreground group-hover:text-primary-foreground/80",
-              isBackgroundShown && "text-primary group-hover:text-primary/80",
+              isBackgroundShown &&
+                "text-foreground group-hover:text-foreground/80",
             )}
           />
         </Button>
