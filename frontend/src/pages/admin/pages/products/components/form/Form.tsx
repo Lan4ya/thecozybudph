@@ -104,6 +104,7 @@ export default function ProductForm({
   const hasChanges = formHasChanges(values, updatingProduct, {
     imagesToDelete,
     newSelectedFilesCount: newSelectedFiles.length,
+    primaryImageIndex,
   });
 
   // Derive display images: existing (minus deletions) first, then selected blob urls
@@ -136,10 +137,10 @@ export default function ProductForm({
       const idx = existing.findIndex(
         (u) => u === updatingProduct.primaryImageUrl,
       );
-      const initial = idx >= 0 ? idx : existing.length > 0 ? 0 : -1;
+      const initial = idx >= 0 ? idx : 0;
       setPrimaryImageIndex(initial);
     } else {
-      setPrimaryImageIndex(-1);
+      setPrimaryImageIndex(0);
     }
   }, [open, updatingProduct, reset]);
 
@@ -154,7 +155,7 @@ export default function ProductForm({
 
   // helper: ensure primary index is valid given new display length
   const normalizePrimaryIndex = useCallback((idx: number, length: number) => {
-    if (length === 0) return -1;
+    if (length === 0) return 0;
     if (idx < 0) return 0;
     if (idx >= length) return length - 1;
     return idx;
@@ -250,7 +251,7 @@ export default function ProductForm({
             setPrimaryImageIndex(newPrimary);
           } else if (primaryImageIndex > idx) {
             // shift primary index down because earlier existing was removed
-            setPrimaryImageIndex((p) => p - 1);
+            setPrimaryImageIndex((p) => (p > 0 ? p - 1 : 0));
           }
 
           // sync form field for server
@@ -320,7 +321,7 @@ export default function ProductForm({
       return;
     }
 
-    onToggle(false); // close form early
+    onToggle(false); // close form early while still processing code below
 
     const files = newSelectedFiles.map((s) => s.file);
     let compressedFiles: File[] = [];
@@ -347,7 +348,7 @@ export default function ProductForm({
       fields: data,
       files: compressedFiles,
       imagesToDelete,
-      primary_image_index: normalizePrimaryIndex(
+      primaryImageIndex: normalizePrimaryIndex(
         primaryImageIndex,
         displayImages.length,
       ),
@@ -387,7 +388,7 @@ export default function ProductForm({
         <CardContent>
           <form
             onSubmit={handleSubmit(onSubmit, (err) =>
-              console.log("Validation errors:", err),
+              console.log("Form validation errors:", err),
             )}
           >
             <div className="max-h-[70dvh] overflow-x-hidden overflow-y-auto">
@@ -448,7 +449,12 @@ export default function ProductForm({
                   <label className="block text-sm mb-1 text-muted-foreground">
                     Collection Name (optional)
                   </label>
-                  <Input {...register("collection_name")} />
+                  <Input {...register("collectionName")} />
+                  {errors.description && (
+                    <p className="text-xs text-red-500 mt-1">
+                      {errors.collectionName.message}
+                    </p>
+                  )}
                 </div>
 
                 {/* Color Variants */}
@@ -457,8 +463,8 @@ export default function ProductForm({
                     Color Variants (optional)
                   </label>
                   <ColorTagsInput
-                    value={watch("color_variants") ?? []}
-                    onChange={(colors) => setValue("color_variants", colors)}
+                    value={watch("colorVariants") ?? []}
+                    onChange={(colors) => setValue("colorVariants", colors)}
                   />
                   {errors.color_variants && (
                     <p className="text-xs text-red-500 mt-1">
@@ -493,8 +499,6 @@ export default function ProductForm({
                     setPrimaryImageIndex={setPrimaryImageIndex}
                     maxImages={MAX_IMAGES}
                   />
-
-                  {/* show validation messages */}
                   {values.mode === "create" &&
                     (errors as FieldErrors<CreateProductForm>)?.productImages
                       ?.message && (
@@ -555,7 +559,7 @@ function getEmptyFormKV(): CreateProductForm {
     description: "",
     colorVariants: [],
     productImages: [],
-    primaryImageIndex: -1,
+    primaryImageIndex: 0,
   };
 }
 
@@ -570,6 +574,8 @@ function getMappedUpdatingProductKV(
     colorVariants: updatingProduct.colorVariants ?? [],
     newProductImages: [],
     imageUrlsToDelete: [],
-    primaryImageIndex: -1,
+    primaryImageIndex: updatingProduct.imageUrls.findIndex(
+      (u) => u === updatingProduct.primaryImageUrl,
+    ),
   };
 }
