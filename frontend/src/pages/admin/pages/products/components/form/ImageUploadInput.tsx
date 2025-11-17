@@ -1,11 +1,64 @@
 import { memo } from "react";
-import { Info, UploadCloud } from "lucide-react";
+import { Info, UploadCloud, X } from "lucide-react";
 import { ProductImage } from "@/components/products/ProductImage";
 import { cn } from "@/lib/utils/cn";
 import { useToast } from "@/providers/ToastProvider";
+import { Button } from "@/lib/ui/__shadcn__/button";
+
+type ImageItemProps = {
+  src: string;
+  idx: number;
+  isPrimary: boolean;
+  onRemoveImage: (url: string, idx: number) => void;
+  setPrimaryImageIndex: (idx: number) => void;
+};
+
+const ImageItem = ({
+  src,
+  idx,
+  isPrimary,
+  onRemoveImage,
+  setPrimaryImageIndex,
+}: ImageItemProps) => {
+  return (
+    <div className="select-none relative size-28 rounded-md border mt-2">
+      <div className="w-full h-full rounded-md overflow-hidden">
+        <ProductImage
+          src={src}
+          alt={`preview-${idx}`}
+          className="w-full h-full object-cover"
+        />
+      </div>
+
+      <Button
+        variant="destructive"
+        onClick={() => onRemoveImage(src, idx)}
+        className="size-6! absolute -top-2 -right-2 z-50 bg-white rounded-full opacity-100"
+      >
+        <X className="size-3" />
+      </Button>
+
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          setPrimaryImageIndex(idx);
+        }}
+        className={cn(
+          "absolute bottom-1 right-1 text-xs px-2 py-1 rounded transition z-10",
+          isPrimary
+            ? "bg-green-600 text-white"
+            : "bg-gray-700 text-gray-200 hover:bg-gray-600",
+        )}
+      >
+        {isPrimary ? "Primary" : "Set Primary"}
+      </button>
+    </div>
+  );
+};
 
 type Props = {
-  images: string[]; // display images: existing (filtered) + newly selected blob urls
+  images: string[];
   onSelectFiles: (files: File[]) => void;
   onRemoveImage: (url: string, idx: number) => void;
   primaryImageIndex: number;
@@ -58,51 +111,16 @@ function ImageUploadInput({
       </div>
 
       <div className="flex gap-3 overflow-x-auto">
-        {images.map((src, idx) => {
-          const isPrimary = idx === primaryImageIndex;
-
-          return (
-            <div
-              key={`${src}-${idx}`}
-              className="relative group w-28 h-28 rounded-md overflow-hidden border"
-            >
-              <ProductImage
-                src={src}
-                alt={`preview-${idx}`}
-                className="w-full h-full object-cover"
-              />
-
-              <button
-                type="button"
-                onClick={() => onRemoveImage(src, idx)}
-                className={cn(
-                  "remove-overlay absolute inset-0 bg-black/45 opacity-0 transition flex items-center justify-center text-white text-sm",
-                  "hover:bg-black/60",
-                  "group-hover:opacity-100",
-                  "[.primary-btn:hover_~_&]:opacity-0",
-                )}
-              >
-                Remove
-              </button>
-
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setPrimaryImageIndex(idx);
-                }}
-                className={cn(
-                  "primary-btn absolute bottom-1 right-1 text-xs px-2 py-1 rounded transition z-100",
-                  isPrimary
-                    ? "bg-green-600 text-white"
-                    : "bg-gray-700 text-gray-200 hover:bg-gray-600",
-                )}
-              >
-                {isPrimary ? "Primary" : "Set Primary"}
-              </button>
-            </div>
-          );
-        })}
+        {images.map((src, idx) => (
+          <ImageItem
+            key={`${src}-${idx}`}
+            src={src}
+            idx={idx}
+            isPrimary={idx === primaryImageIndex}
+            onRemoveImage={onRemoveImage}
+            setPrimaryImageIndex={setPrimaryImageIndex}
+          />
+        ))}
       </div>
     </div>
   );
