@@ -6,8 +6,8 @@ interface CarouselProps {
   urls: string[];
 }
 
-const SWIPE_THRESHOLD = 100; // px
-const SWIPE_VELOCITY = 500; // px/s
+const SWIPE_THRESHOLD = 200; // px
+const SWIPE_VELOCITY = 100; // px/s
 
 const Carousel = ({ urls }: CarouselProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -46,10 +46,13 @@ const Carousel = ({ urls }: CarouselProps) => {
       const target = -index * containerWidth;
       // animate the motion value to the target with a spring for bounce feel
       animate(x, target, {
-        type: "spring",
-        stiffness: 180,
-        damping: 22,
-        mass: 0.6,
+        // type: "spring",
+        // stiffness: 180,
+        // damping: 22,
+        // mass: 0.6,
+        type: "tween",
+        duration: 0.55,
+        ease: [0.22, 1, 0.36, 1],
       });
     },
     [containerWidth, x],
