@@ -38,7 +38,7 @@ export const HeroImage = ({
           "pointer-events-none select-none h-full w-full transition-all duration-700 ease-out object-cover",
           loaded && visibleMap[0]
             ? "opacity-100 translate-y-0"
-            : "opacity-0 translate-y-6",
+            : "opacity-0 -translate-y-6",
         )}
         loading="eager"
         decoding="async"
