@@ -5,7 +5,7 @@ import { useForm, type FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   type CreateProductForm,
-  type ProductData,
+  type ProductDataWithJoins,
   type UpdateProductForm,
   createProductSchema,
   updateProductSchema,
@@ -51,7 +51,7 @@ export type ProductFormValues = z.input<typeof productFormSchema>;
 
 type Props = {
   open: boolean;
-  updatingProduct: ProductData | null;
+  updatingProduct: ProductDataWithJoins | null;
   onToggle: (t: boolean) => void;
 };
 
@@ -72,11 +72,6 @@ export default function ProductForm({
 
   const { addProductMutation, updateProductMutation } = useProductMutations();
   const savingProductUpdate = useMemo(() => {
-    console.log(
-      "Saving state:",
-      addProductMutation.isPending,
-      updateProductMutation.isPending,
-    );
     return addProductMutation.isPending || updateProductMutation.isPending;
   }, [updateProductMutation.isPending, addProductMutation.isPending]);
 
@@ -154,12 +149,12 @@ export default function ProductForm({
   // --- Handlers ---
 
   // helper: ensure primary index is valid given new display length
-  const normalizePrimaryIndex = useCallback((idx: number, length: number) => {
-    if (length === 0) return 0;
-    if (idx < 0) return 0;
-    if (idx >= length) return length - 1;
-    return idx;
-  }, []);
+  // const normalizePrimaryIndex = useCallback((idx: number, length: number) => {
+  //   if (length === 0) return 0;
+  //   if (idx < 0) return 0;
+  //   if (idx >= length) return length - 1;
+  //   return idx;
+  // }, []);
 
   const handleSelectFiles = useCallback(
     (files: File[]) => {
@@ -348,10 +343,7 @@ export default function ProductForm({
       fields: data,
       files: compressedFiles,
       imagesToDelete,
-      primaryImageIndex: normalizePrimaryIndex(
-        primaryImageIndex,
-        displayImages.length,
-      ),
+      primaryImageIndex,
       isUpdate: data.mode === "update",
       productId: data.mode === "update" ? updatingProduct?.id : undefined,
     });
@@ -564,7 +556,7 @@ function getEmptyFormKV(): CreateProductForm {
 }
 
 function getMappedUpdatingProductKV(
-  updatingProduct: Omit<ProductData, "productId">,
+  updatingProduct: Omit<ProductDataWithJoins, "productId">,
 ): Omit<UpdateProductForm, "productId"> {
   return {
     name: updatingProduct.name,

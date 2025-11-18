@@ -1,12 +1,12 @@
-import type { NewProduct, UpdateProduct } from "@TheCozyBud/schema";
+import type { CreateProductData, UpdateProductData } from "@TheCozyBud/schema";
 
 type BuildOpts = {
-  fields: NewProduct | UpdateProduct;
+  fields: CreateProductData | UpdateProductData;
   files?: File[];
   imagesToDelete?: string[];
   isUpdate?: boolean;
   productId?: string;
-  primary_image_index: number;
+  primaryImageIndex: number;
 };
 
 export function buildProductFormData(opts: BuildOpts) {
@@ -16,7 +16,7 @@ export function buildProductFormData(opts: BuildOpts) {
     imagesToDelete = [],
     isUpdate,
     productId,
-    primary_image_index,
+    primaryImageIndex: primaryImageIndex,
   } = opts;
 
   const formData = new FormData();
@@ -39,7 +39,7 @@ export function buildProductFormData(opts: BuildOpts) {
   if ((fields as any).description)
     formData.append("description", (fields as any).description);
 
-  formData.append("primary_image_index", String(primary_image_index));
+  formData.append("primary_image_index", String(primaryImageIndex));
 
   // ---- CREATE FLOW ----
   if (!isUpdate) {

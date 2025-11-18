@@ -1,7 +1,7 @@
 import ProductColorVariantCircles from "@/components/products/ProductColorVariants";
 import { ProductImage } from "@/components/products/ProductImage";
 import { ProductAPI } from "@/services/api/products";
-import type { ProductData } from "@TheCozyBud/schema";
+import type { ProductDataWithJoins } from "@TheCozyBud/schema";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import { cn } from "@/lib/utils/cn";
@@ -10,13 +10,13 @@ import { useProductMutations } from "@/pages/admin/hooks/useProductsMutations";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { Edit, Trash2 } from "lucide-react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import ProductTableItemSkeleton from "../../../skeletons/ProductTableItemSkeleton";
+import ProductTableItemSkeleton from "@/pages/admin/skeletons/ProductTableItemSkeleton";
 import { DeleteProductDialog } from "./DeleteDialog";
 
 export default function ProductTable({
   onEdit,
 }: {
-  onEdit: (selectedProduct: ProductData) => void;
+  onEdit: (selectedProduct: ProductDataWithJoins) => void;
 }) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -30,7 +30,7 @@ export default function ProductTable({
     error,
     isFetchingNextPage,
     isFetching,
-  } = useSuspenseInfiniteQuery<ProductData[]>({
+  } = useSuspenseInfiniteQuery<ProductDataWithJoins[]>({
     queryKey: ["products"],
     queryFn: ({ pageParam }) =>
       ProductAPI.getAll({
@@ -39,6 +39,7 @@ export default function ProductTable({
       }),
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
+      if (!lastPage) return undefined;
       return lastPage.length < perPage ? undefined : allPages.length;
     },
     staleTime: 1000 * 60 * 60 * 7,
@@ -76,7 +77,10 @@ export default function ProductTable({
     [deleteProductMutation],
   );
 
-  const handleEdit = useCallback((p: ProductData) => onEdit(p), [onEdit]);
+  const handleEdit = useCallback(
+    (p: ProductDataWithJoins) => onEdit(p),
+    [onEdit],
+  );
 
   if (error && !isFetching) throw error;
   if (!allProducts.length) {
@@ -111,8 +115,8 @@ export default function ProductTable({
 }
 
 type ProductTableInnerProps = {
-  product: ProductData;
-  onEdit: (p: ProductData) => void;
+  product: ProductDataWithJoins;
+  onEdit: (p: ProductDataWithJoins) => void;
   deletingId: string | null;
   onDelete: (id: string) => void;
 };

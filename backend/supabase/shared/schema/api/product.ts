@@ -1,17 +1,30 @@
-import type { ProductDB } from "../db/product.ts";
+import type { ProductsMetadataRow } from "../db/product.ts";
 import type { SnakeToCamel } from "../utils/snakeToCamelCase.ts";
 import { createProductSchema, updateProductSchema } from "../forms/product.ts";
 import z from "zod";
+
+// REQUEST TYPES:
 
 export type CreateProductRequest = z.infer<typeof createProductSchema>;
 export type UpdateProductRequest = z.infer<typeof updateProductSchema>;
 export type DeleteProductRequest = string;
 
-export type CreateProductData = SnakeToCamel<ProductDB>;
-export type UpdateProductData = SnakeToCamel<ProductDB>;
-export type DeleteProductData = { productId: string };
-export type ProductData = SnakeToCamel<
-  ProductDB & {
-    products_collection: { name: string } | null;
+// RESPONSE TYPES:
+
+export type ProductData = SnakeToCamel<ProductsMetadataRow>;
+export type ProductDataWithJoins = ProductData & {
+  productsCollection: {
+    name: string | null;
+  } | null;
+};
+export type CreateProductData = SnakeToCamel<
+  ProductsMetadataRow & {
+    collectionName: string | null;
   }
 >;
+export type UpdateProductData = SnakeToCamel<
+  ProductsMetadataRow & {
+    collectionName: string | null;
+  }
+>;
+export type DeleteProductData = { productId: string };

@@ -1,6 +1,8 @@
+export type ApiError = string | { message: string; field?: string }[];
+
 export type ApiResponseError = {
   success: false;
-  error: string | { message: string; field?: string }[];
+  error: ApiError;
 };
 
 export type ApiResponseSuccess<T> = {

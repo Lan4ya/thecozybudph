@@ -1,17 +1,4 @@
-export type ProductDB = {
-  id: string;
-  name: string;
-  price: number;
-  color_variants: string[];
-  description?: string | null;
-  image_urls: string[];
-  primary_image_url: string;
-  product_collection_id: number | null;
-  created_at: string;
-  updated_at: string;
-};
+import type { Tables } from "./supabase.types";
 
-export type ProducbCollectionDB = {
-  id: string;
-  name: string;
-};
+export type ProductsMetadataRow = Tables<"products_metadata">;
+export type ProductsCollectionRow = Tables<"products_collection">;

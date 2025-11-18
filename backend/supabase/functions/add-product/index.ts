@@ -19,6 +19,7 @@ import {
   parseAndValidateFormData,
   ProductDB,
   CreateProductRequest,
+  CreateProductData,
 } from "@shared/schema/index.ts";
 
 const supabase = createClient(
@@ -148,11 +149,12 @@ Deno.serve(async (req) => {
     if (insertError) {
       throw CustomError.internal(insertError.message);
     }
+    const res: CreateProductData = {
+      ...createdProduct,
+      collectionName: data.collectionName,
+    };
 
-    return handleSuccess(
-      { ...createdProduct, collectionName: data.collectionName },
-      corsHeaders,
-    );
+    return handleSuccess(res, corsHeaders);
   } catch (err) {
     return handleError(err, corsHeaders);
   }

@@ -5,21 +5,21 @@ import type { ProductData } from "@TheCozyBud/schema";
 
 type ProductsQueryData = {
   pages: ProductData[][];
-  pageParams?: any[];
+  pageParams?: number[];
 };
 
 export const useProductMutations = () => {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
-  const { deleteById, update, getAll, create } = ProductAPI;
+  const { deleteById, update, create } = ProductAPI;
 
   const deleteProductMutation = useMutation({
     mutationFn: async (id: string) => await deleteById(id),
     onMutate: () => {
       addToast("Deleting product...", "info");
     },
-    onError: (err: any) => {
-      addToast(err?.message || "Failed to delete product", "error");
+    onError: (err: Error) => {
+      addToast(err.message || "Failed to delete product", "error");
     },
     onSuccess: (deletedProduct) => {
       queryClient.setQueryData<ProductsQueryData>(["products"], (oldData) => {
@@ -42,15 +42,9 @@ export const useProductMutations = () => {
     onMutate: () => {
       addToast("Creating new product...", "info");
     },
-    onError: (err: any) => {
-      const message =
-        err?.response?.data?.error?.[0]?.message ||
-        err?.message ||
-        "Failed to add product";
-
-      // console.error("Full error object:", err);
+    onError: (err: Error) => {
+      const message = err.message || "Failed to add product";
       console.error("Backend error message:", message);
-
       addToast(message, "error");
     },
     onSuccess: (product) => {
@@ -73,20 +67,17 @@ export const useProductMutations = () => {
   });
 
   const updateProductMutation = useMutation({
-    mutationFn: async (formData: FormData) => await updateProduct(formData),
+    mutationFn: async (formData: FormData) => await update(formData),
     onMutate: () => {
       addToast("Updating product data...", "info");
     },
-    onError: (err: any) => {
-      const message =
-        err?.response?.data?.error?.[0]?.message ||
-        err?.message ||
-        "Failed to update product";
+    onError: (err: Error) => {
+      const message = err.message || "Failed to update product";
 
       console.error("Backend error message:", message);
       addToast(message, "error");
     },
-    onSuccess: ({ product: updatedProduct }) => {
+    onSuccess: (updatedProduct) => {
       queryClient.setQueryData<ProductsQueryData>(["products"], (oldData) => {
         if (!oldData?.pages) return oldData;
 

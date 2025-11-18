@@ -86,20 +86,38 @@ const NavBar = () => {
 
       {/* Mobile Menu Button */}
       {!menuOpen && isMediumScreenAndBelow && (
-        <Button
-          variant="minimal"
-          size="auto"
-          className="group"
-          onClick={() => setMenuOpen((prev) => !prev)}
-        >
-          <Menu
-            className={cn(
-              "text-primary-foreground group-hover:text-primary-foreground/80",
-              isBackgroundShown &&
-                "text-foreground group-hover:text-foreground/80",
-            )}
-          />
-        </Button>
+        <div className="flex-center gap-6">
+          <div className="relative">
+            <div className="absolute -right-[14px] -top-[9px] flex-center text-secondary-foreground text-[9px] font-medium bg-secondary size-5 rounded-full select-none">
+              0
+            </div>
+
+            <NavLink
+              to="/cart"
+              className={cn(
+                "text-primary-foreground text-lg hover:text-primary-foreground/80 cursor-pointer",
+                isBackgroundShown && "text-foreground hover:text-foreground/80",
+              )}
+            >
+              <ShoppingCart />
+            </NavLink>
+          </div>
+
+          <Button
+            variant="minimal"
+            size="auto"
+            className="group"
+            onClick={() => setMenuOpen((prev) => !prev)}
+          >
+            <Menu
+              className={cn(
+                "text-primary-foreground group-hover:text-primary-foreground/80",
+                isBackgroundShown &&
+                  "text-foreground group-hover:text-foreground/80",
+              )}
+            />
+          </Button>
+        </div>
       )}
 
       <AnimatePresence>
@@ -123,30 +141,14 @@ const NavBar = () => {
             </Button>
 
             {/* Cart */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25 }}
-              className="relative"
-            >
-              {/* Cart item count */}
-              <div className="absolute -right-[14px] -top-[9px] flex-center text-secondary-foreground text-[9px] font-medium bg-secondary size-5 rounded-full select-none">
-                0
-              </div>
-
-              <NavLink
-                to="/cart"
-                onClick={() => setMenuOpen(false)}
-                className={({ isActive }) =>
-                  cn(
-                    "text-primary-foreground text-lg hover:text-primary transition-colors cursor-pointer",
-                    isActive ? "text-primary" : null,
-                  )
-                }
-              >
-                <ShoppingCart />
-              </NavLink>
-            </motion.div>
+            {/* <motion.div */}
+            {/*   initial={{ opacity: 0, y: 20 }} */}
+            {/*   animate={{ opacity: 1, y: 0 }} */}
+            {/*   transition={{ delay: 0.25 }} */}
+            {/*   className="relative" */}
+            {/* > */}
+            {/* Cart item count */}
+            {/* </motion.div> */}
 
             {/* Menu Items */}
             {navItems.map(({ label, href }, idx) => (
@@ -154,7 +156,7 @@ const NavBar = () => {
                 key={label}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.25 + (idx + 1) * 0.05 }}
+                transition={{ delay: 0.25 + (idx + 0) * 0.05 }}
               >
                 <NavLink
                   to={href}

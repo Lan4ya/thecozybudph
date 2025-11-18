@@ -10,11 +10,11 @@
 //     query = query.order(sort.column, { ascending: sort.ascending ?? true });
 //   }
 import { supabase } from "../../lib/supabase/connect";
-import type {
-  ProductData,
-  CreateProductData,
-  UpdateProductData,
-  DeleteProductData,
+import {
+  type ProductDataWithJoins,
+  type CreateProductData,
+  type UpdateProductData,
+  type DeleteProductData,
 } from "@TheCozyBud/schema";
 import { snakeToCamel } from "../../lib/utils/caseConverter";
 import { apiClient } from "./interceptors/interceptors";
@@ -30,29 +30,29 @@ export const ProductAPI = {
   getAll: async ({
     page = 0,
     perPage = 12,
-  }: FetchProductOpts): Promise<ProductData[]> => {
+  }: FetchProductOpts): Promise<ProductDataWithJoins[]> => {
     const query = supabase
       .from("products_metadata")
       .select(`*, products_collection (name)`)
       .range(page * perPage, (page + 1) * perPage - 1);
-    const { data, error } = await query;
 
+    const { data, error } = await query;
     console.log("Fetching products...");
+
     if (error) throw error;
-    return snakeToCamel(data);
+    return snakeToCamel(data ?? []) satisfies ProductDataWithJoins[];
   },
 
-  getById: async (productId: string): Promise<ProductData> => {
+  getById: async (productId: string): Promise<ProductDataWithJoins> => {
     const { data, error } = await supabase
       .from("products_metadata")
-      .select("*")
+      .select("*, products_collection (name)")
       .eq("id", productId)
       .single();
 
     console.log("Fetching product id");
-    console.log(data);
     if (error) throw error;
-    return snakeToCamel(data);
+    return snakeToCamel(data ?? []) satisfies ProductDataWithJoins;
   },
 
   update: async (productFormData: FormData): Promise<UpdateProductData> => {

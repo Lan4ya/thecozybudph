@@ -22,14 +22,14 @@ export const productBaseSchema = z.object({
   collectionName: z
     .string()
     .trim()
-    .min(1, "Collection name must contain at least 1 character")
+    // .min(1, "Collection name must contain at least 1 character")
     .max(150, "Collection name can't exceed 150 characters")
     .optional(),
 
   description: z
     .string()
     .trim()
-    .min(1, "Description must contain at least 1 character")
+    // .min(1, "Description must contain at least 1 character")
     .max(600, "Description can't exceed 600 characters")
     .optional(),
 });

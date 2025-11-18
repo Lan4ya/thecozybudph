@@ -16,6 +16,7 @@ import {
   parseAndValidateFormData,
   ProductDB,
   UpdateProductRequest,
+  UpdateProductData,
 } from "@shared/schema/index.ts";
 import { validateImageFile } from "@shared/validations/mod.ts";
 import { uploadImagesToDB } from "@shared/uploadImagesToDB.ts";
@@ -194,10 +195,12 @@ Deno.serve(async (req) => {
         `Failed to update product: ${updateError.message}`,
       );
 
-    return handleSuccess(
-      { ...updatedProduct, collectionName: data.collectionName },
-      corsHeaders,
-    );
+    const res: UpdateProductData = {
+      ...updatedProduct,
+      collectionName: data.collectionName,
+    };
+
+    return handleSuccess(res, corsHeaders);
   } catch (err) {
     return handleError(err, corsHeaders);
   }
