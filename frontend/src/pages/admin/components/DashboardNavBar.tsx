@@ -1,4 +1,5 @@
 import { NavLink } from "react-router";
+import LOGO from "@/assets/thecozybud/logo_transparent_oneline1.png";
 import { useState } from "react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { cn } from "@/lib/utils/cn";
@@ -22,7 +23,7 @@ const AdminDashboardNavbar = () => {
   return (
     <nav
       className={cn(
-        "fixed top-0 z-999 bg-background border-b-foreground shadow-xs w-full py-3 flex-between px-4 md:px-8",
+        "custom-container fixed top-0 z-999 bg-background border-b-foreground shadow-xs py-3 flex-between",
       )}
     >
       {/* Brand */}
@@ -32,7 +33,14 @@ const AdminDashboardNavbar = () => {
           reloadDocument
           className="font-back-to-black text-primary hover:text-primary/80 text-2xl lg:text-4xl lg:font-semibold"
         >
-          TheCozyBud
+          <div className={cn("w-32 lg:w-37 p-0 m-0 ")}>
+            <img
+              decoding="async"
+              src={LOGO}
+              alt="logo"
+              className="w-full h-full"
+            />
+          </div>
         </NavLink>
       </div>
 

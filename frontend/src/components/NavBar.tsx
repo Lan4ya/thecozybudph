@@ -49,7 +49,7 @@ const NavBar = () => {
     <nav
       ref={registerSentinel}
       className={cn(
-        "container fixed top-0 z-999 max-w-screen py-3 flex-between ease-out duration-900 transition-opacity transition-transform",
+        "custom-container fixed top-0 z-999 max-w-screen py-3 flex-between ease-out duration-900 transition-opacity transition-transform",
         visibleMap[0]
           ? "opacity-100 translate-y-0"
           : "opacity-0 -translate-y-6",
@@ -74,6 +74,7 @@ const NavBar = () => {
             />
           </div>
         </NavLink>
+
         {/* <NavLink */}
         {/*   to="/" */}
         {/*   reloadDocument */}
