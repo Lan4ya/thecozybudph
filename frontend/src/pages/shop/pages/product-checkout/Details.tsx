@@ -29,7 +29,7 @@ const ProductDetails = ({ product }: ProductDetailsProps) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="container max-w-2xl space-y-8"
+      className="custom-container max-w-2xl space-y-8"
     >
       {/* Product Header */}
       <div className="space-y-4">

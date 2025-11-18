@@ -19,7 +19,7 @@ const EventSection = () => {
   }, []);
 
   return (
-    <section className="container flex flex-col gap-6">
+    <section className="custom-container flex flex-col gap-6">
       {urls.map((url, idx) => (
         <div key={url} className="relative flex">
           <p className="absolute left-0 top-0 max-w-[200px] text-sm md:text-base">

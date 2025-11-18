@@ -14,11 +14,11 @@ const ProductGrid = () => {
   return (
     <section
       aria-labelledby="recommendations-heading"
-      className="container max-w-[1600px] mx-auto"
+      className="custom-container max-w-[1600px] mx-auto"
     >
       <h2
         id="recommendations-heading"
-        className="text-lg font-semibold lg:text-3xl text-center mb-6 lg:mb-12"
+        className="lext-md sm:text-lg font-semibold lg:text-3xl text-center mb-6 lg:mb-12"
       >
         Recommendations For You
       </h2>

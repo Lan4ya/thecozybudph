@@ -45,7 +45,7 @@ export default function AdminDashboard() {
 
       <div className="pt-12 lg:pt-16 flex min-h-screen">
         <AdminDashboardNavbar />
-        <main className="container flex-1">
+        <main className="flex-1 custom-container">
           <Outlet />
         </main>
       </div>

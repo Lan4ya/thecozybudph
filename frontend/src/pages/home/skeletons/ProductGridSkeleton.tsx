@@ -2,7 +2,7 @@ import { Skeleton } from "@/lib/ui/__shadcn__/skeleton";
 
 const ProductGridSkeleton = () => {
   return (
-    <div className="container mt-3 max-w-[1600px] mx-auto">
+    <div className="custom-container mt-3 max-w-[1600px] mx-auto">
       <Skeleton
         id="recommendations-heading"
         className="mx-auto mb-14 w-45 h-5 lg:h-7 lg:w-90 lg:mb-12"

@@ -4,7 +4,7 @@
 
 @layer utilities {
   /* Use this on all containers so it's assured they all have the same px */
-  .container {
+  .custom-container {
     @apply px-4! sm:px-6! max-[380px]:px-2!;
   }
 
