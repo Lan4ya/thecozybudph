@@ -3,6 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
+    "gen-supabase-types": "pnpm dlx supabase gen types typescript --project-id utmrwkolxhuawhaajmng > ./packages/schema/src/db/supabase.types.ts",
     "dev:db-start": "pnpm --filter backend db start && pnpm --filter backend db functions serve --no-verify-jwt",
     "dev:db-stop": "pnpm --filter backend db stop",
     "dev:db-status": "pnpm --filter backend db status",
@@ -12,10 +13,11 @@
     "build:frontend": "pnpm --filter frontend build",
     "build:backend": "pnpm --filter backend build",
     "build": "pnpm -r build",
-    "build:packages-schema": "pnpm --filter @TheCozyBud/schema build && rm -rf ./backend/supabase/functions/shared/schema/* && mkdir -p ./backend/supabase/shared/schema && cp -r ./packages/schema/src/* ./backend/supabase/shared/schema/",
+    "build:packages-schema": "pnpm gen-supabase-types && pnpm --filter @TheCozyBud/schema build && rm -rf ./backend/supabase/functions/shared/schema/* && mkdir -p ./backend/supabase/shared/schema && cp -r ./packages/schema/src/* ./backend/supabase/shared/schema/",
     "start": "pnpm --filter backend start"
   },
   "devDependencies": {
-    "concurrently": "^9.2.1"
+    "concurrently": "^9.2.1",
+    "supabase": "^2.58.5"
   }
 }
