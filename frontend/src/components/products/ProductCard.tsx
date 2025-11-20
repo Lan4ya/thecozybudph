@@ -1,5 +1,5 @@
 import { formatPrice } from "@/lib/utils/format";
-import { Link } from "react-router";
+import { useNavigate } from "react-router";
 import { ProductImage } from "./ProductImage";
 
 type Props = {
@@ -10,8 +10,16 @@ type Props = {
 };
 
 const ProductCard = ({ productId, name, imageUrl, price }: Props) => {
+  const navigate = useNavigate();
+
+  const handleClick = async () => {
+    navigate("/shop");
+    // await Promise.resolve(); // forces next tick, so react router does not batch the navigation processesing the navigation correctly
+    navigate(`/shop/products/${productId}`);
+  };
+
   return (
-    <Link to={`/shop/products/${productId}`} className="block">
+    <div onClick={handleClick}>
       <div className="group bg-card select-none text-card-foreground rounded-lg border border-border/30 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden cursor-pointer active:scale-[0.95] active:shadow-lg">
         <div className="relative overflow-hidden">
           <ProductImage
@@ -31,7 +39,7 @@ const ProductCard = ({ productId, name, imageUrl, price }: Props) => {
           </div>
         </div>
       </div>
-    </Link>
+    </div>
   );
 };
 

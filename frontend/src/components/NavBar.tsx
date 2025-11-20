@@ -21,11 +21,11 @@ const NavBar = () => {
   const isMediumScreenAndBelow = useMediaQuery("(max-width: 1023px)");
   const [menuOpen, setMenuOpen] = useState(false);
   const [isBackgroundShown, setShowBackground] = useState(false);
-  const location = useLocation();
+  const pathname = useLocation().pathname;
   const { registerSentinel, visibleMap } = useAnimateOnView();
 
   useEffect(() => {
-    if (location.pathname !== "/") {
+    if (pathname !== "/") {
       setShowBackground(true);
       return;
     }
@@ -43,7 +43,7 @@ const NavBar = () => {
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [location.pathname]);
+  }, [pathname]);
 
   return (
     <nav
@@ -62,8 +62,10 @@ const NavBar = () => {
       <div className="flex items-center gap-1">
         <NavLink
           to="/"
-          reloadDocument
-          className="font-back-to-black select-none text-primary hover:text-primary/85 text-2xl lg:text-3xl lg:font-semibold"
+          className={cn(
+            "font-back-to-black select-none text-primary hover:text-primary/85 text-2xl lg:text-3xl lg:font-semibold",
+            pathname === "/" ? "cursor-default" : "cursor-pointer",
+          )}
         >
           <div className={cn("w-32 lg:w-37 p-0 m-0 ")}>
             <img
