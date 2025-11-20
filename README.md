@@ -29,12 +29,21 @@ npm install -g pnpm
 ```bash
 git clone https://github.com/isMaya404/thecozybudph && cd thecozybudph && pnpm install
 ```
-#### 3. Run development server
+
+#### 3. Put the correct environment variables in frontend/.env
+```bash
+# add proper values
+VITE_SUPABASE_URL=
+VITE_SUPABASE_ANON_KEY=
+VITE_ADMIN_ROUTE_HASH=
+```
+
+#### 4. Run development server
 ###### ⚠️ NOTE ⚠️: This cmd only runs the frontend dev server and does not include the backend dev server since that is not needed. When you're creating a feature that involves an api call to the backend (e.g. a button that pre-orders a flower 'api/v1/pre-order/...' or a submitting a form with user input details to schedule an event), just message me and I'll just provide an api endpoint that's already deployed so you won't have to touch the backend at all.
 ```bash
 pnpm dev:frontend
 ```
-#### 4. Open the website
+#### 5. Open the website
 ```bash
 http://localhost:5173
 ```
