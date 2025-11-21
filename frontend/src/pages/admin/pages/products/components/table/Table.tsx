@@ -45,6 +45,7 @@ export default function ProductTable({
     staleTime: 1000 * 60 * 60 * 7,
     gcTime: 1000 * 60 * 60 * 24 * 7,
   });
+  if (error && !isFetching) throw error;
 
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
@@ -82,7 +83,6 @@ export default function ProductTable({
     [onEdit],
   );
 
-  if (error && !isFetching) throw error;
   if (!allProducts.length) {
     return (
       <div className="py-12 text-center text-muted-foreground">
