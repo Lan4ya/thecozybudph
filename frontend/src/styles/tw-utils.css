@@ -5,7 +5,7 @@
 @layer utilities {
   /* Use this on all containers so it's assured they all have the same px */
   .custom-container {
-    @apply px-4! sm:px-6! max-[380px]:px-2!;
+    @apply w-full px-4! sm:px-6! max-[380px]:px-2!;
   }
 
   /* flex utils */
