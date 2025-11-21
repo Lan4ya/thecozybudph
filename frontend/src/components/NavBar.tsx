@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import LOGO from "@/assets/thecozybud/logo_transparent_oneline1.png";
 // import LOGOS from "@/assets/thecozybud/logo_transparent_oneline1.svg";
 import { Button } from "@/lib/ui/__shadcn__/button";
@@ -30,20 +30,22 @@ const NavBar = () => {
       return;
     }
 
-    let ticking = false;
-
     const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          setShowBackground(window.scrollY > 0);
-          ticking = false;
-        });
-        ticking = true;
-      }
+      // only update state if it actually changes
+      const shouldShow = window.scrollY > 0;
+      setShowBackground((prev) => (prev === shouldShow ? prev : shouldShow));
     };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const onScroll = () => window.requestAnimationFrame(handleScroll);
+
+    window.addEventListener("scroll", onScroll);
+    handleScroll();
+
+    return () => window.removeEventListener("scroll", onScroll);
   }, [pathname]);
+
+  const handleLogoClick = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   return (
     <nav
@@ -64,8 +66,9 @@ const NavBar = () => {
           to="/"
           className={cn(
             "font-back-to-black select-none text-primary hover:text-primary/85 text-2xl lg:text-3xl lg:font-semibold",
-            pathname === "/" ? "cursor-default" : "cursor-pointer",
+            // pathname === "/" ? "cursor-default" : "cursor-pointer",
           )}
+          onClick={handleLogoClick}
         >
           <div className={cn("w-32 lg:w-37 p-0 m-0 ")}>
             <img
@@ -76,18 +79,8 @@ const NavBar = () => {
             />
           </div>
         </NavLink>
-
-        {/* <NavLink */}
-        {/*   to="/" */}
-        {/*   reloadDocument */}
-        {/*   className="font-back-to-black select-none text-primary hover:text-primary/85 text-2xl lg:text-3xl lg:font-semibold" */}
-        {/* > */}
-        {/* <img src={logo_mini_transparent} alt="logo" className="size-10" /> */}
-        {/*   CozyBud */}
-        {/* </NavLink> */}
       </div>
 
-      {/* Mobile Menu Button */}
       {!menuOpen && isMediumScreenAndBelow && (
         <div className="flex-center gap-6">
           <div className="relative">
@@ -95,6 +88,7 @@ const NavBar = () => {
               0
             </div>
 
+            {/* Cart  */}
             <NavLink
               to="/cart"
               className={cn(
@@ -106,6 +100,7 @@ const NavBar = () => {
             </NavLink>
           </div>
 
+          {/* Mobile Menu */}
           <Button
             variant="minimal"
             size="auto"
@@ -142,16 +137,6 @@ const NavBar = () => {
             >
               <X className="text-primary-foreground" />
             </Button>
-
-            {/* Cart */}
-            {/* <motion.div */}
-            {/*   initial={{ opacity: 0, y: 20 }} */}
-            {/*   animate={{ opacity: 1, y: 0 }} */}
-            {/*   transition={{ delay: 0.25 }} */}
-            {/*   className="relative" */}
-            {/* > */}
-            {/* Cart item count */}
-            {/* </motion.div> */}
 
             {/* Menu Items */}
             {navItems.map(({ label, href }, idx) => (
@@ -200,6 +185,7 @@ const DesktopNavLinks = ({
       className="flex items-center gap-8 relative"
       onMouseLeave={() => setHovered(null)}
     >
+      {/* Links */}
       {navItems.map(({ label, href }) => (
         <div
           key={href}
@@ -216,15 +202,14 @@ const DesktopNavLinks = ({
             {label}
           </NavLink>
 
-          {/* Animated underline */}
           <AnimatePresence>
             {active === href && (
               <motion.div
                 layoutId="nav-underline"
-                className="absolute -bottom-1 h-0.5 bg-primary rounded-full"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
+                className="absolute -bottom-1 h-0.5 bg-primary rounded-full w-full"
+                initial={{ opacity: 0, scaleX: 0.8 }}
+                animate={{ opacity: 1, scaleX: 1 }}
+                exit={{ opacity: 0, scaleX: 0.8 }}
                 transition={{
                   type: "spring",
                   stiffness: 400,
@@ -258,11 +243,11 @@ const DesktopNavLinks = ({
         <AnimatePresence>
           {active === "/cart" && (
             <motion.div
-              layoutId="nav-underline"
-              className="absolute -bottom-1 h-0.5  bg-primary rounded-full"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              layoutId="nav-underline" // Different layoutId for cart
+              className="absolute -bottom-1 h-0.5 bg-primary rounded-full w-8" // Fixed width for cart
+              initial={{ opacity: 0, scaleX: 0.8 }}
+              animate={{ opacity: 1, scaleX: 1 }}
+              exit={{ opacity: 0, scaleX: 0.8 }}
               transition={{
                 type: "spring",
                 stiffness: 400,
