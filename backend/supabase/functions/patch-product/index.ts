@@ -170,18 +170,21 @@ Deno.serve(async (req) => {
     }
 
     const DBUpdates: Omit<ProductDB, "created_at" | "updated_at" | "id"> = {
-      ...(data.name && { name: data.name }),
-      ...(data.price && { price: data.price }),
-      ...(data.colorVariants && { color_variants: data.colorVariants }),
-      ...(data.description && { description: data.description }),
+      ...(data.name !== undefined && { name: data.name }),
+      ...(data.price !== undefined && { price: data.price }),
+      ...(data.colorVariants !== undefined && {
+        color_variants: data.colorVariants,
+      }),
+      ...(data.description !== undefined && { description: data.description }),
       ...(productCollectionId != null && {
         product_collection_id: productCollectionId,
       }),
-      ...(updatedImageUrls && { image_urls: updatedImageUrls }),
-      ...(updatedImageUrls && {
+      ...(updatedImageUrls !== undefined && { image_urls: updatedImageUrls }),
+      ...(updatedImageUrls !== undefined && {
         primary_image_url: updatedImageUrls[data.primaryImageIndex ?? 0],
       }),
     };
+    console.log("db updates", DBUpdates);
 
     const { data: updatedProduct, error: updateError } = await supabase
       .from("products_metadata")
@@ -195,9 +198,11 @@ Deno.serve(async (req) => {
         `Failed to update product: ${updateError.message}`,
       );
 
+    console.log("updated product", updatedProduct);
+
     const res: UpdateProductData = {
       ...updatedProduct,
-      collectionName: data.collectionName,
+      productsCollection: { name: data.collectionName },
     };
 
     return handleSuccess(res, corsHeaders);

@@ -151,7 +151,7 @@ Deno.serve(async (req) => {
     }
     const res: CreateProductData = {
       ...createdProduct,
-      collectionName: data.collectionName,
+      productsCollection: { name: data.collectionName },
     };
 
     return handleSuccess(res, corsHeaders);
