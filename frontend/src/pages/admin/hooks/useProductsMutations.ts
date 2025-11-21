@@ -1,10 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ProductAPI } from "@/services/api/products";
 import { useToast } from "@/providers/ToastProvider";
-import type { ProductData } from "@TheCozyBud/schema";
+import type { CreateProductData, UpdateProductData } from "@TheCozyBud/schema";
 
-type ProductsQueryData = {
-  pages: ProductData[][];
+type UpdateProductsQueryData = {
+  pages: UpdateProductData[][];
+  pageParams?: number[];
+};
+
+type CreateProductsQueryData = {
+  pages: CreateProductData[][];
   pageParams?: number[];
 };
 
@@ -22,16 +27,21 @@ export const useProductMutations = () => {
       addToast(err.message || "Failed to delete product", "error");
     },
     onSuccess: (deletedProduct) => {
-      queryClient.setQueryData<ProductsQueryData>(["products"], (oldData) => {
-        if (!oldData?.pages) return oldData;
+      queryClient.setQueryData<CreateProductsQueryData>(
+        ["products"],
+        (oldData) => {
+          if (!oldData?.pages) return oldData;
 
-        // remove the deleted product from all pages
-        const pages = oldData.pages
-          .map((page) => page.filter((p) => p.id !== deletedProduct.productId))
-          .filter((page) => page.length > 0);
+          // remove the deleted product from all pages
+          const pages = oldData.pages
+            .map((page) =>
+              page.filter((p) => p.id !== deletedProduct.productId),
+            )
+            .filter((page) => page.length > 0);
 
-        return { ...oldData, pages };
-      });
+          return { ...oldData, pages };
+        },
+      );
 
       addToast("Product deleted successfully", "success");
     },
@@ -48,19 +58,22 @@ export const useProductMutations = () => {
       addToast(message, "error");
     },
     onSuccess: (product) => {
-      queryClient.setQueryData<ProductsQueryData>(["products"], (oldData) => {
-        if (!oldData) return oldData;
+      queryClient.setQueryData<CreateProductsQueryData>(
+        ["products"],
+        (oldData) => {
+          if (!oldData) return oldData;
 
-        const firstPage = oldData.pages[0] ?? [];
+          const firstPage = oldData.pages[0] ?? [];
 
-        return {
-          ...oldData,
-          pages: [
-            [product, ...firstPage], // prepend new product to first page
-            ...oldData.pages.slice(1),
-          ],
-        };
-      });
+          return {
+            ...oldData,
+            pages: [
+              [product, ...firstPage], // prepend new product to first page
+              ...oldData.pages.slice(1),
+            ],
+          };
+        },
+      );
 
       addToast("Product added successfully", "success");
     },
@@ -74,26 +87,31 @@ export const useProductMutations = () => {
     onError: (err: Error) => {
       const message = err.message || "Failed to update product";
 
-      console.error("Backend error message:", message);
+      // console.error("Backend error message:", message);
       addToast(message, "error");
     },
     onSuccess: (updatedProduct) => {
-      queryClient.setQueryData<ProductsQueryData>(["products"], (oldData) => {
-        if (!oldData?.pages) return oldData;
+      queryClient.setQueryData<UpdateProductsQueryData>(
+        ["products"],
+        (oldData) => {
+          if (!oldData?.pages) return oldData;
 
-        const pageIndex = oldData.pages.findIndex((page) =>
-          page.some((p) => p.id === updatedProduct.id),
-        );
-        if (pageIndex === -1) return oldData;
+          const pageIndex = oldData.pages.findIndex((page) =>
+            page.some((p) => p.id === updatedProduct.id),
+          );
+          if (pageIndex === -1) return oldData;
 
-        const pages = oldData.pages.map((page, idx) =>
-          idx === pageIndex
-            ? page.map((p) => (p.id === updatedProduct.id ? updatedProduct : p))
-            : page,
-        );
+          const pages = oldData.pages.map((page, idx) =>
+            idx === pageIndex
+              ? page.map((p) =>
+                  p.id === updatedProduct.id ? updatedProduct : p,
+                )
+              : page,
+          );
 
-        return { ...oldData, pages };
-      });
+          return { ...oldData, pages };
+        },
+      );
 
       addToast("Product updated successfully", "success");
     },

@@ -1,10 +1,10 @@
 import isEqual from "fast-deep-equal";
-import type { ProductData } from "@TheCozyBud/schema";
+import type { ProductDataWithJoins } from "@TheCozyBud/schema";
 import type { ProductFormValues } from "../pages/products/components/form/Form";
 
 export function formHasChanges(
   values: ProductFormValues,
-  updatingProduct: ProductData | null,
+  updatingProduct: ProductDataWithJoins | null,
   stateOnlyValues?: {
     imagesToDelete?: string[];
     newSelectedFilesCount?: number;

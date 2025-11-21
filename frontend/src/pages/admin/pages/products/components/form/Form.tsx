@@ -29,6 +29,7 @@ import { formHasChanges } from "@/pages/admin/utils/formHasChanges";
 import { useProductMutations } from "@/pages/admin/hooks/useProductsMutations";
 import { useImageCompressor } from "@/pages/admin/hooks/useImageConverter";
 import { formatFileSize } from "@/lib/utils/format";
+import { deepDiff } from "@/lib/utils/deepDiff";
 
 const createProductFormSchema = createProductSchema.extend({
   mode: z.literal("create"),
@@ -47,7 +48,7 @@ const productFormSchema = z.discriminatedUnion("mode", [
   updateProductFormSchema,
 ]);
 
-export type ProductFormValues = z.input<typeof productFormSchema>;
+export type ProductFormValues = z.infer<typeof productFormSchema>;
 
 type Props = {
   open: boolean;
@@ -64,7 +65,7 @@ export default function ProductForm({
     { file: File; url: string }[]
   >([]);
   // images to mark for deletion from existing DB URLs
-  const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
+  const [imageUrlsToDelete, setImageUrlsToDelete] = useState<string[]>([]);
   const [primaryImageIndex, setPrimaryImageIndex] = useState<number>(-1);
 
   const { compressImages, progress } = useImageCompressor();
@@ -97,7 +98,7 @@ export default function ProductForm({
   const values = watch();
 
   const hasChanges = formHasChanges(values, updatingProduct, {
-    imagesToDelete,
+    imagesToDelete: imageUrlsToDelete,
     newSelectedFilesCount: newSelectedFiles.length,
     primaryImageIndex,
   });
@@ -106,11 +107,11 @@ export default function ProductForm({
   const displayImages = useMemo(() => {
     const existing = updatingProduct?.imageUrls ?? [];
     const filteredExisting = existing.filter(
-      (u) => !imagesToDelete.includes(u),
+      (u: string) => !imageUrlsToDelete.includes(u),
     );
     const newUrls = newSelectedFiles.map((n) => n.url);
     return [...filteredExisting, ...newUrls];
-  }, [updatingProduct, imagesToDelete, newSelectedFiles]);
+  }, [updatingProduct, imageUrlsToDelete, newSelectedFiles]);
 
   // Reset component state & form when modal opens
   useEffect(() => {
@@ -118,7 +119,7 @@ export default function ProductForm({
 
     newSelectedFiles.forEach((s) => URL.revokeObjectURL(s.url)); // cleanup previous blobs
     setNewSelectedFiles([]);
-    setImagesToDelete([]);
+    setImageUrlsToDelete([]);
 
     reset(
       updatingProduct
@@ -130,7 +131,7 @@ export default function ProductForm({
     if (updatingProduct) {
       const existing = updatingProduct.imageUrls ?? [];
       const idx = existing.findIndex(
-        (u) => u === updatingProduct.primaryImageUrl,
+        (u: string) => u === updatingProduct.primaryImageUrl,
       );
       const initial = idx >= 0 ? idx : 0;
       setPrimaryImageIndex(initial);
@@ -146,22 +147,12 @@ export default function ProductForm({
     };
   }, [newSelectedFiles]);
 
-  // --- Handlers ---
-
-  // helper: ensure primary index is valid given new display length
-  // const normalizePrimaryIndex = useCallback((idx: number, length: number) => {
-  //   if (length === 0) return 0;
-  //   if (idx < 0) return 0;
-  //   if (idx >= length) return length - 1;
-  //   return idx;
-  // }, []);
-
   const handleSelectFiles = useCallback(
     (files: File[]) => {
       clearErrors(fileFieldName);
 
       const existingCount = (updatingProduct?.imageUrls ?? []).filter(
-        (u) => !imagesToDelete.includes(u),
+        (u: string) => !imageUrlsToDelete.includes(u),
       ).length;
       const currentSelectedCount = newSelectedFiles.length;
       if (existingCount + currentSelectedCount + files.length > MAX_IMAGES) {
@@ -201,7 +192,7 @@ export default function ProductForm({
         // if primary not set yet, set it to first newly added image
         if (primaryImageIndex === -1 && created.length > 0) {
           const existingLen = (updatingProduct?.imageUrls ?? []).filter(
-            (u) => !imagesToDelete.includes(u),
+            (u: string) => !imageUrlsToDelete.includes(u),
           ).length;
           const newPrimary = existingLen; // first new file index
           setPrimaryImageIndex(newPrimary);
@@ -212,7 +203,7 @@ export default function ProductForm({
     },
     [
       fileFieldName,
-      imagesToDelete,
+      imageUrlsToDelete,
       MAX_IMAGES,
       primaryImageIndex,
       newSelectedFiles.length,
@@ -227,13 +218,13 @@ export default function ProductForm({
     (url: string, idx: number) => {
       const existing = updatingProduct?.imageUrls ?? [];
       const filteredExisting = existing.filter(
-        (u: string) => !imagesToDelete.includes(u),
+        (u: string) => !imageUrlsToDelete.includes(u),
       );
       const existingCount = filteredExisting.length; // number of existing images currently shown
 
       // if it's an existing URL (idx < existingCount), mark it for deletion
       if (idx < existingCount) {
-        setImagesToDelete((prev) => {
+        setImageUrlsToDelete((prev) => {
           if (prev.includes(url)) return prev;
           const next = [...prev, url];
 
@@ -276,8 +267,8 @@ export default function ProductForm({
 
         // calculate new display length and adjust primary index if needed
         const newDisplayLength =
-          existing.filter((u: string) => !imagesToDelete.includes(u)).length +
-          remaining.length;
+          existing.filter((u: string) => !imageUrlsToDelete.includes(u))
+            .length + remaining.length;
         const removedGlobalIndex = idx;
 
         setPrimaryImageIndex((prevPrimary) => {
@@ -299,7 +290,7 @@ export default function ProductForm({
     },
     [
       fileFieldName,
-      imagesToDelete,
+      imageUrlsToDelete,
       primaryImageIndex,
       newSelectedFiles,
       setValue,
@@ -307,7 +298,7 @@ export default function ProductForm({
     ],
   );
 
-  const onSubmit = async (data: ProductFormValues) => {
+  const onSubmit = async (fieldData: ProductFormValues) => {
     if (displayImages.length === 0) {
       setError("newProductImages", {
         type: "manual",
@@ -316,39 +307,33 @@ export default function ProductForm({
       return;
     }
 
-    onToggle(false); // close form early while still processing code below
+    onToggle(false); // close form early
 
     const files = newSelectedFiles.map((s) => s.file);
     let compressedFiles: File[] = [];
-    try {
-      console.log("file before compression:", files);
-      files.forEach((f) => {
-        console.log(formatFileSize(f?.size ?? 0));
-      });
 
-      compressedFiles = await compressImages(files);
+    if (files.length) {
+      const compressableFiles = files.filter((f) => f.size > 850 * 1024);
+      const nonCompressableFiles = files.filter((f) => f.size <= 850 * 1024);
 
-      console.log("files after compression", compressedFiles);
-      compressedFiles.forEach((f) => {
-        console.log(formatFileSize(f?.size ?? 0));
-      });
+      compressedFiles =
+        compressableFiles.length > 0
+          ? await compressImages(compressableFiles)
+          : [];
 
-      console.log("Compression progress:", progress);
-    } catch (err) {
-      console.error("Compression failed:", err);
-      addToast("Image compression failed. Please try again.");
+      compressedFiles = [...compressedFiles, ...nonCompressableFiles];
     }
 
     const fd = buildProductFormData({
-      fields: data,
+      fields: fieldData,
       files: compressedFiles,
-      imagesToDelete,
+      isUpdate: fieldData.mode === "update",
+      imageUrlsToDelete,
       primaryImageIndex,
-      isUpdate: data.mode === "update",
-      productId: data.mode === "update" ? updatingProduct?.id : undefined,
+      productId: fieldData.mode === "update" ? updatingProduct?.id : undefined,
     });
 
-    data.mode === "create"
+    fieldData.mode === "create"
       ? addProductMutation.mutate(fd)
       : updateProductMutation.mutate(fd);
   };
@@ -556,7 +541,7 @@ function getEmptyFormKV(): CreateProductForm {
 }
 
 function getMappedUpdatingProductKV(
-  updatingProduct: Omit<ProductDataWithJoins, "productId">,
+  updatingProduct: ProductDataWithJoins,
 ): Omit<UpdateProductForm, "productId"> {
   return {
     name: updatingProduct.name,
@@ -566,8 +551,8 @@ function getMappedUpdatingProductKV(
     colorVariants: updatingProduct.colorVariants ?? [],
     newProductImages: [],
     imageUrlsToDelete: [],
-    primaryImageIndex: updatingProduct.imageUrls.findIndex(
-      (u) => u === updatingProduct.primaryImageUrl,
+    primaryImageIndex: updatingProduct.imageUrls.indexOf(
+      updatingProduct.primaryImageUrl,
     ),
   };
 }
