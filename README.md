@@ -58,7 +58,7 @@ General packages:
 
 ShadCN components:
 ```bash
-  pnpm dlx shadcn@latest add <component-name> --cwd ./frontend
+  pnpm dlx shadcn@latest add <component-name> --cwd frontend
 ```
 
 
