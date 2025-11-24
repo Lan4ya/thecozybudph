@@ -10,7 +10,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "@/components/dropdown";
+} from "../dropdown";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { ChevronDown } from "lucide-react";
 import PersistSuspense from "@/components/PersistSuspense";
@@ -112,7 +112,7 @@ export const FilterDropdownMenu = ({
           }}
         >
           <div className="border relative flex h-[45px] w-full items-center rounded-md p-3 outline dark:outline-0 outline-ring focus-within:outline-2">
-            {!isInputFocused && hasFilters && filterVal !== undefined && (
+            {!isInputFocused && hasValue(filterVal) && (
               <DisplaySelectedFilters dropdownType={dropdownType} />
             )}
 
@@ -126,8 +126,7 @@ export const FilterDropdownMenu = ({
               onBlur={() => setInputFocus(false)}
               className="h-full w-full placeholder-muted-foreground focus:outline-none"
               placeholder={
-                (hasFilters && filterVal !== undefined && !isInputFocused) ||
-                isInputFocused
+                (hasValue(filterVal) && !isInputFocused) || isInputFocused
                   ? ""
                   : "Any"
               }
@@ -261,3 +260,5 @@ const DisplaySelectedFilters = ({
     </Button>
   );
 };
+
+const hasValue = (v: unknown) => (Array.isArray(v) ? v.length > 0 : v != null);
