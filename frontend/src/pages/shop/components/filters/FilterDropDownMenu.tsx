@@ -1,6 +1,8 @@
 import React, {
   type ReactNode,
+  useCallback,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -15,7 +17,7 @@ import PersistSuspense from "@/components/PersistSuspense";
 import { Skeleton } from "@/lib/ui/__shadcn__/skeleton";
 import { useFilters } from "../../hooks/useFilters";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import type { Filters, PriceRange } from "../../types";
+import type { Filters, PriceRangeOption } from "../../types";
 import isDev from "@/lib/utils/isDev";
 import { formatPriceRange } from "./PriceRange";
 
@@ -24,7 +26,7 @@ type DropdownFilterLabels = Exclude<keyof Filters, "search" | "sort">;
 const filterLabels: Record<DropdownFilterLabels, string> = {
   priceRange: "Price range",
   categories: "Categories",
-  collectionName: "Collection name",
+  collectionName: "Collections",
 };
 
 type FilterDropdownMenuProps = {
@@ -109,7 +111,7 @@ export const FilterDropdownMenu = ({
             !open && setOpen(true);
           }}
         >
-          <div className="border relative flex h-[45px] w-full items-center rounded-md p-3 outline dark:outline-0 outline-ring focus-within:outline-2  dark:bg-sec">
+          <div className="border relative flex h-[45px] w-full items-center rounded-md p-3 outline dark:outline-0 outline-ring focus-within:outline-2">
             {!isInputFocused && hasFilters && filterVal !== undefined && (
               <DisplaySelectedFilters dropdownType={dropdownType} />
             )}
@@ -153,7 +155,7 @@ export const FilterDropdownMenu = ({
         {/* Will contain all the filter dropdown items */}
         <DropdownMenuContent
           style={{ width: triggerWidth }}
-          className={`max-w-[203px] min-h-[25px] max-h-[520px] dark:bg-sec`}
+          className={`max-w-[243px] min-h-[25px] max-h-[520px] bg-background text-muted-foreground`}
           sideOffset={15}
           align="center"
         >
@@ -203,22 +205,23 @@ const DisplaySelectedFilters = ({
   const filterVal = filters[dropdownType];
 
   const smScreen = useMediaQuery("(max-width: 449px)");
-  const vals = Array.isArray(filterVal) ? filterVal : [filterVal];
+  const vals = useMemo(
+    () => (Array.isArray(filterVal) ? filterVal : [filterVal]),
+    [filterVal],
+  );
   const [first, ...rest] = vals;
-
-  const normalizedFirst = (() => {
+  const normalizedFirst = useMemo(() => {
     if (dropdownType === "priceRange") {
-      return formatPriceRange(first as PriceRange);
+      return formatPriceRange(first as PriceRangeOption);
     }
-    // for other dropdown types, just use string or empty string fallback
-    return typeof first === "string" ? first : "";
-  })();
+    return first;
+  }, [first, dropdownType]);
 
   return (
     <Button
       variant="minimal"
       size="auto"
-      className="gap-1! text-sm absolute left-2 top-1/2 -translate-y-1/2"
+      className="gap-1! text-sm absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground"
       onClick={(e) => {
         e.stopPropagation();
 
@@ -237,15 +240,21 @@ const DisplaySelectedFilters = ({
         });
       }}
     >
-      {smScreen ? (
-        <span className="bg-prim rounded-md px-3 py-2">+{vals.length}</span>
-      ) : (
+      {smScreen && vals.length > 0 && (
+        <span className="bg-background rounded-md px-2 py-1.5">
+          +{vals.length}
+        </span>
+      )}
+
+      {!smScreen && (
         <>
-          <span className="bg-prim rounded-md px-3 py-2">
-            {normalizedFirst}
-          </span>
+          {normalizedFirst && (
+            <span className="bg-background rounded-md px-2 py-1.5">
+              {normalizedFirst}
+            </span>
+          )}
           {rest.length > 0 && (
-            <span className="bg-prim rounded-md px-3 py-2">+{rest.length}</span>
+            <span className="bg-background">+ {rest.length}</span>
           )}
         </>
       )}

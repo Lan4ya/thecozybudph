@@ -24,12 +24,16 @@
     @apply text-[30px] font-bold;
   }
 
-  .gext-26-bold {
+  .text-26-bold {
     @apply font-bold text-[26px];
   }
 
   .text-20-semibold {
     @apply font-semibold text-[20px];
+  }
+
+  .text-18-semibold {
+    @apply font-semibold text-[18px];
   }
 
   .text-16-medium {

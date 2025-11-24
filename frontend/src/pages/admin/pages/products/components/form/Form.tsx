@@ -29,7 +29,6 @@ import { formHasChanges } from "@/pages/admin/utils/formHasChanges";
 import { useProductMutations } from "@/pages/admin/hooks/useProductsMutations";
 import { useImageCompressor } from "@/pages/admin/hooks/useImageConverter";
 import { formatFileSize } from "@/lib/utils/format";
-import { deepDiff } from "@/lib/utils/deepDiff";
 
 const createProductFormSchema = createProductSchema.extend({
   mode: z.literal("create"),

@@ -17,11 +17,11 @@ const Categories = () => {
       inputValue={inputValue}
       setInputValue={setInputValue}
     >
-      {filteredCategories.map((categories) => (
+      {filteredCategories.map((category) => (
         <FilterDropdownMenuItem
-          key={categories}
+          key={category}
           filterKey="categories"
-          filterVal={categories}
+          filterVal={category}
         />
       ))}
     </FilterDropdownMenu>

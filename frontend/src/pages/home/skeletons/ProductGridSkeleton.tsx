@@ -1,6 +1,6 @@
 import { Skeleton } from "@/lib/ui/__shadcn__/skeleton";
 
-const ProductGridSkeleton = () => {
+const HomeProductGridSkeleton = () => {
   return (
     <div className="custom-container mt-3 max-w-[1600px] mx-auto">
       <Skeleton
@@ -28,4 +28,4 @@ const ProductGridSkeleton = () => {
   );
 };
 
-export default ProductGridSkeleton;
+export default HomeProductGridSkeleton;

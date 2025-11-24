@@ -13,7 +13,7 @@ const ProductCard = ({ productId, name, imageUrl, price }: Props) => {
   const navigate = useNavigate();
 
   const handleClick = async () => {
-    navigate("/shop");
+    // navigate("/shop");
     // await Promise.resolve(); // forces next tick, so react router does not batch the navigation processesing the navigation correctly
     navigate(`/shop/products/${productId}`);
   };

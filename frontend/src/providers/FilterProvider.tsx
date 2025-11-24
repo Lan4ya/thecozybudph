@@ -4,7 +4,7 @@ import type {
   Filters,
   Category,
   SortOption,
-  PriceRange,
+  PriceRangeOption,
 } from "@/pages/shop/types";
 
 type FilterContextType = {
@@ -22,17 +22,20 @@ export function FilterProvider({ children }: { children: React.ReactNode }) {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const filters: Filters = useMemo(() => {
-    return {
-      search: searchParams.get("search") || undefined,
-      categories: searchParams.getAll("categories").length
-        ? (searchParams.getAll("categories") as Category[])
-        : undefined,
-      collectionName: searchParams.getAll("collectionName").length
-        ? (searchParams.getAll("collectionName") as Filters["collectionName"])
-        : undefined,
-      priceRange: searchParams.get("priceRange") as PriceRange,
-      sort: (searchParams.get("sort") as SortOption) || undefined,
+    const next = {
+      search: searchParams.get("search"),
+      categories: searchParams.getAll("categories") as Category[],
+      collectionName: searchParams.getAll(
+        "collectionName",
+      ) as Filters["collectionName"],
+      priceRange: searchParams.get("priceRange") as PriceRangeOption,
+      sort: searchParams.get("sort") as SortOption,
     };
+
+    // remove keys with null values
+    return Object.fromEntries(
+      Object.entries(next).filter(([_, v]) => v !== null),
+    ) as Filters;
   }, [searchParams]);
 
   const setFilters = useCallback(
@@ -40,14 +43,12 @@ export function FilterProvider({ children }: { children: React.ReactNode }) {
       // Rebuild current filters from searchParams
       const currentFilters: Filters = {
         search: searchParams.get("search") || undefined,
-        categories: searchParams.getAll("categories").length
-          ? (searchParams.getAll("categories") as Category[])
-          : undefined,
-        collectionName: searchParams.getAll("collectionName").length
-          ? (searchParams.getAll("collectionName") as Filters["collectionName"])
-          : undefined,
-        priceRange: searchParams.get("priceRange") as PriceRange,
-        sort: (searchParams.get("sort") as SortOption) || undefined,
+        categories: searchParams.getAll("categories") as Category[],
+        collectionName: searchParams.getAll(
+          "collectionName",
+        ) as Filters["collectionName"],
+        priceRange: searchParams.get("priceRange") as PriceRangeOption,
+        sort: searchParams.get("sort") as SortOption,
       };
 
       console.log("filters in setFilters", filters.categories);

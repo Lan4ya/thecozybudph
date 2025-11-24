@@ -7,7 +7,7 @@ import {
   type ArrayFilterKeys,
   type Filters,
   type NonArrayFilterKeys,
-  type PriceRange,
+  type PriceRangeOption,
 } from "../../types";
 import { arrayFilters } from "../../types";
 import { formatPriceRange } from "./PriceRange";
@@ -27,7 +27,7 @@ type FilterDropdownMenuItemProps =
   | NonArrayFilterProps<NonArrayFilterKeys>;
 
 // hoist icon
-const CheckIcon = <Check className="text-white h-3! w-3!" />;
+const CheckIcon = <Check className="text-white size-3.5" />;
 
 export const FilterDropdownMenuItem = ({
   filterKey,
@@ -68,14 +68,14 @@ export const FilterDropdownMenuItem = ({
 
   return (
     <DropdownMenuItem
-      className="flex-between filter-dropdown-item-spacing focus:bg-prim"
+      className="flex-between filter-dropdown-item-spacing focus:bg-input/30"
       onSelect={handleToggle}
     >
       {filterKey === "priceRange"
-        ? formatPriceRange(filterVal as PriceRange)
+        ? formatPriceRange(filterVal as PriceRangeOption)
         : filterVal}
       {isItemActive && (
-        <div className="flex-center bg-accent rounded-full p-.05">
+        <div className="grid place-items-center bg-accent rounded-full p-[1.5px] pr-[1.6px]">
           {CheckIcon}
         </div>
       )}

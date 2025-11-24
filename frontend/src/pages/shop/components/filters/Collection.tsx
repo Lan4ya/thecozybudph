@@ -2,13 +2,18 @@ import searchSubstring from "@/lib/utils/searchSubstring";
 import { useMemo, useState } from "react";
 import { FilterDropdownMenu } from "./FilterDropDownMenu";
 import { FilterDropdownMenuItem } from "./FilterDropdownMenuItem";
-import { CATEGORIES } from "../../types";
 
-const CollectionName = () => {
+const collections = [
+  "Whispering Garden",
+  "Moonlight Sonata",
+  "Forest Evergreen",
+];
+
+const Collections = () => {
   const [inputValue, setInputValue] = useState("");
 
-  const filteredCategories = useMemo(() => {
-    return searchSubstring([...CATEGORIES], inputValue);
+  const filteredCollections = useMemo(() => {
+    return searchSubstring(collections, inputValue);
   }, [inputValue]);
 
   return (
@@ -17,15 +22,15 @@ const CollectionName = () => {
       inputValue={inputValue}
       setInputValue={setInputValue}
     >
-      {filteredCategories.map((categories) => (
+      {filteredCollections.map((collection) => (
         <FilterDropdownMenuItem
-          key={categories}
+          key={collection}
           filterKey="collectionName"
-          filterVal={categories}
+          filterVal={collection}
         />
       ))}
     </FilterDropdownMenu>
   );
 };
 
-export default CollectionName;
+export default Collections;

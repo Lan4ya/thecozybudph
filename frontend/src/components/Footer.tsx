@@ -9,7 +9,7 @@ const Footer = () => {
         <Link to={`/admin-${admin_route_hash}/login`}>DEV</Link>
       </Button>
 
-      <div className="container mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="custom-container mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <h4 className="font-back-to-black text-primary-foreground text-20-bold">
             The Cozy Bud

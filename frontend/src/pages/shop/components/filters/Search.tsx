@@ -30,7 +30,7 @@ const Search = () => {
   return (
     <div className="flex flex-col gap-2 w-full">
       <div className="">Search</div>
-      <div className="relative border border-ring dark:border-0 dark:bg-sec w-full rounded-sm  h-10">
+      <div className="relative w-full rounded-sm  h-10">
         <SearchIcon
           className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
           size={16}
