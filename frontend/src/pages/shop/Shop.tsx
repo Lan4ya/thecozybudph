@@ -3,6 +3,7 @@ import { Store, TableProperties } from "lucide-react";
 import { ProductAPI } from "@/services/api/products";
 import { useFilters } from "./hooks/useFilters";
 import { useEffect } from "react";
+import { SortDropdownMenu } from "./components/SortDropDownMenu";
 import type { ProductDataWithJoins } from "@TheCozyBud/schema";
 import Search from "./components/filters/Search";
 import PriceRange from "./components/filters/PriceRange";
@@ -99,11 +100,9 @@ const ShopInner = () => {
 
             {!isXLScreen && (
               <div className="flex items-center gap-3">
-                <Button variant="minimal" size="lg" className="px-0!">
-                  <ArrowUpDown className="text-muted-foreground" /> Popularity
-                </Button>
+                <SortDropdownMenu />
 
-                <div className="h-5 w-px bg-muted-foreground" />
+                <div className="mr-3 h-5 w-px bg-muted-foreground" />
 
                 <Button variant="minimal" size="auto">
                   <Grid3x3 className="size-5! text-muted-foreground -mr-1" />
@@ -112,9 +111,10 @@ const ShopInner = () => {
                 <Button variant="minimal" size="auto">
                   <LayoutGrid className="size-5! text-muted-foreground" />
                 </Button>
-                {/* <Button variant="minimal" size="auto"> */}
-                {/*   <TableProperties className="rotate-180 text-muted-foreground" /> */}
-                {/* </Button> */}
+
+                <Button variant="minimal" size="auto">
+                  <TableProperties className="rotate-180 text-muted-foreground" />
+                </Button>
               </div>
             )}
           </div>

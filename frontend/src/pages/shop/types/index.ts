@@ -1,11 +1,11 @@
-export const CATEGORIES = ["bouquet", "vases", "mugs"] as const;
+export const CATEGORIES = ["Bouquet", "Vases", "Mugs"] as const;
 export type Category = (typeof CATEGORIES)[number];
 
 export type SortOption =
-  | "mostPopular"
-  | "mostRecent"
-  | "lowestToHighestPrice"
-  | "highestToLowestPrice";
+  | "Popularity"
+  | "Most Recent"
+  | "Highest Price"
+  | "Lowest Price";
 
 export type PriceRangeOption =
   | "0-2000"
