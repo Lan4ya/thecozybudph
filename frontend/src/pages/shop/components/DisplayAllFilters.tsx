@@ -94,12 +94,12 @@ const DisplayAllFilters = () => {
                     key={`${key}-${String(val)}`}
                     label={String(val)}
                     filterKey={key as keyof Filters}
-                    isLgScreen={isXlScreen}
+                    isXlScreen={isXlScreen}
                   />
                 ))}
 
                 {filterCount >= 2 && (
-                  <FilterItem label="Clear" isLgScreen={isXlScreen} />
+                  <FilterItem label="Clear" isXlScreen={isXlScreen} />
                 )}
               </>
             ) : (
@@ -120,14 +120,14 @@ const DisplayAllFilters = () => {
                 key={`${key}-${String(val)}`}
                 label={String(val)}
                 filterKey={key as keyof Filters}
-                isLgScreen={isXlScreen}
+                isXlScreen={isXlScreen}
               />
             ))}
 
             {/* TODO add && (if filters has atleast 2 keys) */}
             {/* add anim fade */}
             {filterCount >= 2 && isClearFilterItemsBtnShown && (
-              <FilterItem label="Clear" isLgScreen={isXlScreen} />
+              <FilterItem label="Clear" isXlScreen={isXlScreen} />
             )}
           </div>
         </>
@@ -139,10 +139,10 @@ const DisplayAllFilters = () => {
 type FilterItemProps = {
   label: string;
   filterKey?: keyof Filters;
-  isLgScreen: boolean;
+  isXlScreen: boolean;
 };
 
-const FilterItem = ({ label, filterKey, isLgScreen }: FilterItemProps) => {
+const FilterItem = ({ label, filterKey, isXlScreen }: FilterItemProps) => {
   const { setFilters, clearFilters } = useFilters();
 
   return (
@@ -177,8 +177,10 @@ const FilterItem = ({ label, filterKey, isLgScreen }: FilterItemProps) => {
       {filterKey === "priceRange"
         ? formatPriceRange(label as PriceRangeOption)
         : label}
-      {isLgScreen && (
+      {isXlScreen ? (
         <span className="hidden group-hover:inline-block">{xIcon}</span>
+      ) : (
+        xIcon
       )}
     </Button>
   );
