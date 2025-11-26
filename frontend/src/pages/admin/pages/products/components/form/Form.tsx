@@ -21,9 +21,9 @@ import { Input } from "@/lib/ui/__shadcn__/input";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import { X } from "lucide-react";
-import ImageUploadInput from "./ImageUploadInput";
+import ImageUploadInput from "./ImageUpload";
 import { buildProductFormData } from "@/pages/admin/utils/buildProductFormData";
-import { ColorTagsInput } from "./ColorVariantsInput";
+import { ColorTagsInput } from "./ColorVariants";
 import z from "zod";
 import { formHasChanges } from "@/pages/admin/utils/formHasChanges";
 import { useProductMutations } from "@/pages/admin/hooks/useProductsMutations";
@@ -68,7 +68,6 @@ export default function ProductForm({
   const [primaryImageIndex, setPrimaryImageIndex] = useState<number>(-1);
 
   const { compressImages, progress } = useImageCompressor();
-  const { addToast } = useToast();
 
   const { addProductMutation, updateProductMutation } = useProductMutations();
   const savingProductUpdate = useMemo(() => {
@@ -319,6 +318,9 @@ export default function ProductForm({
         compressableFiles.length > 0
           ? await compressImages(compressableFiles)
           : [];
+
+      console.log(compressableFiles.map((f) => formatFileSize(f.size)));
+      console.log(compressedFiles.map((f) => formatFileSize(f.size)));
 
       compressedFiles = [...compressedFiles, ...nonCompressableFiles];
     }

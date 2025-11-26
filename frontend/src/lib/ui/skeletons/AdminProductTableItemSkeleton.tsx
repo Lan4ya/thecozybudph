@@ -1,6 +1,6 @@
 import { Skeleton } from "@/lib/ui/__shadcn__/skeleton";
 
-const ProductTableItemSkeleton = () => {
+const ProductTableItemsSkeleton = () => {
   return (
     <>
       {Array.from({ length: 4 }).map((_, i) => (
@@ -29,4 +29,4 @@ const ProductTableItemSkeleton = () => {
   );
 };
 
-export default ProductTableItemSkeleton;
+export default ProductTableItemsSkeleton;

@@ -14,7 +14,7 @@ import {
 import { cn } from "@/lib/utils/cn";
 import type { ProductDataWithJoins } from "@TheCozyBud/schema";
 import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
-import ProductTableItemSkeleton from "../../skeletons/ProductTableItemSkeleton";
+import ProductTableItemsSkeleton from "../../../../lib/ui/skeletons/AdminProductTableItemSkeleton";
 
 export default function AdminDashboardProducts() {
   const [formOpen, setFormOpen] = useState(false);
@@ -108,7 +108,7 @@ export default function AdminDashboardProducts() {
       <PersistSuspense
         fallback={
           <div className="flex flex-col gap-4">
-            <ProductTableItemSkeleton />
+            <ProductTableItemsSkeleton />
           </div>
         }
       >

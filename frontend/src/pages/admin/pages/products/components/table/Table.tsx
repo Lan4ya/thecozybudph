@@ -10,7 +10,7 @@ import { useProductMutations } from "@/pages/admin/hooks/useProductsMutations";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { Edit, Trash2 } from "lucide-react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import ProductTableItemSkeleton from "@/pages/admin/skeletons/ProductTableItemSkeleton";
+import ProductTableItemsSkeleton from "@/lib/ui/skeletons/AdminProductTableItemSkeleton";
 import { DeleteProductDialog } from "./DeleteDialog";
 
 export default function ProductTable({
@@ -103,7 +103,7 @@ export default function ProductTable({
         />
       ))}
 
-      {isFetchingNextPage && <ProductTableItemSkeleton />}
+      {isFetchingNextPage && <ProductTableItemsSkeleton />}
 
       <div
         ref={sentinelRef}

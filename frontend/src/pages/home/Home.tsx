@@ -1,7 +1,7 @@
 import PersistSuspense from "@/components/PersistSuspense";
 import Hero from "./components/Hero";
 import ProductGrid from "./components/ProductGrid";
-import HomeProductGridSkeleton from "./skeletons/ProductGridSkeleton";
+import HomeProductGridSkeleton from "@/lib/ui/skeletons/HomeProductGridSkeleton";
 
 const Home = () => {
   return (

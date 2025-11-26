@@ -3,7 +3,7 @@ import GridStyleButtons from "./components/GridStyleButtons";
 import { ShoppingBag } from "lucide-react";
 import { ProductAPI } from "@/services/api/products";
 import { useFilters } from "./hooks/useFilters";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { SortDropdownMenu } from "./components/SortDropDown";
 import type { ProductDataWithJoins } from "@TheCozyBud/schema";
 import Search from "./components/filters/Search";
@@ -12,41 +12,18 @@ import Categories from "./components/filters/Categories";
 import Collections from "./components/filters/Collection";
 import ProductCard from "@/components/products/ProductCard";
 import PersistSuspense from "@/components/PersistSuspense";
-import ShopProductGridSkeleton from "./skeletons/ProductGridSkeleton";
+import ShopProductGridSkeleton from "../../lib/ui/skeletons/ShopProductGridItemsSkeleton";
 import Tags from "./components/Tags";
 import { useIsExtraLargeScreen } from "@/hooks/useMediaQuery";
+import ProductGridSkeleton from "@/lib/ui/skeletons/ShopProductGridItemsSkeleton";
+
+// const Shop = () => {
+//   return <ShopInner />;
+// };
 
 const Shop = () => {
-  return <ShopInner />;
-};
-
-const ShopInner = () => {
   const { filters, hasFilters } = useFilters();
   const isXLScreen = useIsExtraLargeScreen();
-
-  const perPage = 12;
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    error,
-    isFetchingNextPage,
-    isFetching,
-  } = useSuspenseInfiniteQuery<ProductDataWithJoins[]>({
-    queryKey: ["products"],
-    queryFn: ({ pageParam }) =>
-      ProductAPI.getAll({
-        page: pageParam as number,
-        perPage,
-      }),
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, allPages) => {
-      if (!lastPage) return undefined;
-      return lastPage.length < perPage ? undefined : allPages.length;
-    },
-  });
-  if (error && !isFetching) throw error;
-  const products = data.pages.flat() ?? [];
 
   useEffect(() => {
     console.log("currennt filters: ", filters);
@@ -93,15 +70,63 @@ const ShopInner = () => {
           </div>
         </div>
 
-        <PersistSuspense fallback={<ShopProductGridSkeleton />}>
-          <ProductGrid products={products} />
+        <PersistSuspense
+          fallback={
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 xl:gap-8 2xl:gap-10 ">
+              <ShopProductGridSkeleton />
+            </div>
+          }
+        >
+          <ProductGrid />
         </PersistSuspense>
       </main>
     </div>
   );
 };
 
-const ProductGrid = ({ products }: { products: ProductDataWithJoins[] }) => {
+const ProductGrid = () => {
+  const perPage = 12;
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    error,
+    isFetchingNextPage,
+    isFetching,
+  } = useSuspenseInfiniteQuery<ProductDataWithJoins[]>({
+    queryKey: ["products"],
+    queryFn: ({ pageParam }) =>
+      ProductAPI.getAll({
+        page: pageParam as number,
+        perPage,
+      }),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) => {
+      if (!lastPage) return undefined;
+      return lastPage.length < perPage ? undefined : allPages.length;
+    },
+  });
+  if (error && !isFetching) throw error;
+  const products = data.pages.flat() ?? [];
+
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (!sentinelRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (hasNextPage && entry.isIntersecting && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { rootMargin: "-20px" },
+    );
+    observer.observe(sentinelRef.current);
+
+    return () => observer.disconnect();
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 xl:gap-8 2xl:gap-10 ">
       {products.map((p) => (
@@ -113,8 +138,15 @@ const ProductGrid = ({ products }: { products: ProductDataWithJoins[] }) => {
           price={p.price}
         />
       ))}
+
+      {isFetchingNextPage && <ProductGridSkeleton />}
+
+      <div
+        ref={sentinelRef}
+        className="mx-auto border w-5 h-5 invisible pointer-events-none"
+        aria-hidden="true"
+      />
     </div>
   );
 };
-
 export default Shop;
