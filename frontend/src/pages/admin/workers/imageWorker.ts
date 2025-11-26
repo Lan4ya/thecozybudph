@@ -37,14 +37,14 @@ self.onmessage = async (e: MessageEvent<WorkerInput>) => {
       maxDimension / bitmap.height,
     );
 
-    const canvas = new OffscreenCanvas(
-      bitmap.width * scale,
-      bitmap.height * scale,
-    );
+    const canvasWidth = bitmap.width * scale;
+    const canvasHeight = bitmap.height * scale;
+
+    const canvas = new OffscreenCanvas(canvasWidth, canvasHeight);
     const ctx = canvas.getContext("2d");
     if (!ctx) throw new Error("Failed to get 2D context");
 
-    ctx.drawImage(bitmap, 0, 0);
+    ctx.drawImage(bitmap, 0, 0, canvasWidth, canvasHeight);
 
     const outBlob = await canvas.convertToBlob({
       type: "image/webp",
