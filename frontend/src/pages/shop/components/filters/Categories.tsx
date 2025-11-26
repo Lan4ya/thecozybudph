@@ -1,7 +1,7 @@
 import searchSubstring from "@/lib/utils/searchSubstring";
 import { useMemo, useState } from "react";
-import { FilterDropdownMenu } from "./FilterDropDownMenu";
-import { FilterDropdownMenuItem } from "./FilterDropdownMenuItem";
+import { FilterDropdown } from "./FilterDropDown";
+import { FilterDropdownMenuItem } from "./FilterDropdownItem";
 import { CATEGORIES } from "../../types";
 
 const Categories = () => {
@@ -12,7 +12,7 @@ const Categories = () => {
   }, [inputValue]);
 
   return (
-    <FilterDropdownMenu
+    <FilterDropdown
       dropdownType="categories"
       inputValue={inputValue}
       setInputValue={setInputValue}
@@ -24,7 +24,7 @@ const Categories = () => {
           filterVal={category}
         />
       ))}
-    </FilterDropdownMenu>
+    </FilterDropdown>
   );
 };
 

@@ -1,7 +1,7 @@
 import searchSubstring from "@/lib/utils/searchSubstring";
 import { useMemo, useState } from "react";
-import { FilterDropdownMenu } from "./FilterDropDownMenu";
-import { FilterDropdownMenuItem } from "./FilterDropdownMenuItem";
+import { FilterDropdown } from "./FilterDropDown";
+import { FilterDropdownMenuItem } from "./FilterDropdownItem";
 
 const collections = [
   "Whispering Garden",
@@ -17,7 +17,7 @@ const Collections = () => {
   }, [inputValue]);
 
   return (
-    <FilterDropdownMenu
+    <FilterDropdown
       dropdownType="collectionName"
       inputValue={inputValue}
       setInputValue={setInputValue}
@@ -29,7 +29,7 @@ const Collections = () => {
           filterVal={collection}
         />
       ))}
-    </FilterDropdownMenu>
+    </FilterDropdown>
   );
 };
 

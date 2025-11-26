@@ -1,6 +1,5 @@
 import React, {
   type ReactNode,
-  useCallback,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -16,7 +15,7 @@ import { ChevronDown } from "lucide-react";
 import PersistSuspense from "@/components/PersistSuspense";
 import { Skeleton } from "@/lib/ui/__shadcn__/skeleton";
 import { useFilters } from "../../hooks/useFilters";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useIsSmallScreen, useMediaQuery } from "@/hooks/useMediaQuery";
 import type { Filters, PriceRangeOption } from "../../types";
 import isDev from "@/lib/utils/isDev";
 import { formatPriceRange } from "./PriceRange";
@@ -36,16 +35,17 @@ type FilterDropdownMenuProps = {
   setInputValue?: React.Dispatch<React.SetStateAction<string>>;
 };
 
-// Used by all the filter components as base except Search
+// INFO: This is used by all the filter components as base except Search and Sort
 
-export const FilterDropdownMenu = ({
+export const FilterDropdown = ({
   children,
   dropdownType,
   inputValue: controlledValue,
   setInputValue: setControlledValue,
 }: FilterDropdownMenuProps) => {
   const [open, setOpen] = useState(false);
-  const { filters, hasFilters } = useFilters();
+  const { filters } = useFilters();
+  const isMobile = useIsSmallScreen();
 
   const [isInputFocused, setInputFocus] = useState(false);
 
@@ -108,30 +108,38 @@ export const FilterDropdownMenu = ({
           onClick={() => {
             document.activeElement !== inputRef.current &&
               inputRef.current?.focus();
-            !open && setOpen(true);
+            // !open && setOpen(true);
+            setOpen(!open);
           }}
         >
           <div className="border relative flex h-[45px] w-full items-center rounded-md p-3 outline dark:outline-0 outline-ring focus-within:outline-2">
             {!isInputFocused && hasValue(filterVal) && (
               <DisplaySelectedFilters dropdownType={dropdownType} />
             )}
-
-            <input
-              ref={inputRef}
-              // name={inputId}
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onClick={() => !open && setOpen(true)}
-              onFocus={() => setInputFocus(true)}
-              onBlur={() => setInputFocus(false)}
-              className="h-full w-full placeholder-muted-foreground focus:outline-none"
-              placeholder={
-                (hasValue(filterVal) && !isInputFocused) || isInputFocused
-                  ? ""
-                  : "Any"
-              }
-              type="text"
-            />
+            {/* INFO: */}
+            {/* input causes dropdown content positioning bugs on mobile that is */}
+            {/* not so simple to fix, so I disabled it temporarily on mobiles. */}
+            {!isMobile ? (
+              <input
+                ref={inputRef}
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onClick={() => !open && setOpen(true)}
+                onFocus={() => setInputFocus(true)}
+                onBlur={() => setInputFocus(false)}
+                className="h-full w-full placeholder-muted-foreground focus:outline-none"
+                placeholder={
+                  (hasValue(filterVal) && !isInputFocused) || isInputFocused
+                    ? ""
+                    : "Any"
+                }
+                type="text"
+              />
+            ) : (
+              <div className="text-muted-foreground text-xs">
+                {hasValue(filterVal) ? null : "Any"}
+              </div>
+            )}
             <Button
               variant="minimal"
               size="auto"
@@ -143,6 +151,7 @@ export const FilterDropdownMenu = ({
                   inputRef.current?.focus();
                 setOpen(!open);
               }}
+              className="ml-auto"
             >
               <ChevronDown
                 className={`transition-transform duration-200 ease-out ${open ? "rotate-180" : ""}`}

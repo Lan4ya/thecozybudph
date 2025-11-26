@@ -1,4 +1,4 @@
-import { X, Tags } from "lucide-react";
+import { X, Tags as TagIcon } from "lucide-react";
 import type { Filters, PriceRangeOption } from "../types";
 import { useFilters } from "../hooks/useFilters";
 import { useIsExtraLargeScreen } from "@/hooks/useMediaQuery";
@@ -16,7 +16,7 @@ import { formatPriceRange } from "./filters/PriceRange";
 
 const xIcon = <X className="size-4" />;
 
-const DisplayAllFilters = () => {
+const Tags = () => {
   const [isClearFilterItemsBtnShown, showClearFilterItemsBtn] = useState(false);
   const { filters, hasFilters } = useFilters();
   const isXlScreen = useIsExtraLargeScreen();
@@ -44,36 +44,33 @@ const DisplayAllFilters = () => {
   }, [filters]);
 
   return (
-    <div className="text-muted-foreground flex gap-5 text-sm items-center flex-1">
+    <div className="xl:h-10 -mt-2 text-muted-foreground flex gap-5 text-sm items-center flex-1">
       {!isXlScreen ? (
         <Popover>
           {/* @ts-ignore */}
           <PopoverTrigger asChild>
-            <Button variant="minimal" size="auto" className="p-0">
-              <div className="relative ">
-                <Tags className="text-muted-foreground" />
-
-                {hasFilters && (
-                  <>
-                    {/* notification bubble */}
-                    {/*               <span */}
-                    {/*                 className=" */}
-                    {/*   absolute -top-1 -right-1 */}
-                    {/*   h-2.5 w-2.5 rounded-full bg-red-500 */}
-                    {/*   animate-ping */}
-                    {/*   opacity-75 */}
-                    {/* " */}
-                    {/*               /> */}
-                    {/* stable dot so ping pulse has a core */}
-                    <span
-                      className="
+            <Button variant="minimal" size="icon" className="relative border">
+              <TagIcon className="text-muted-foreground size-5" />
+              {hasFilters && (
+                <>
+                  {/* notification bubble */}
+                  {/*               <span */}
+                  {/*                 className=" */}
+                  {/*   absolute -top-1 -right-1 */}
+                  {/*   h-2.5 w-2.5 rounded-full bg-red-500 */}
+                  {/*   animate-ping */}
+                  {/*   opacity-75 */}
+                  {/* " */}
+                  {/*               /> */}
+                  {/* stable dot so ping pulse has a core */}
+                  <span
+                    className="
         absolute -top-1 -right-1
         h-2.5 w-2.5 rounded-full bg-red-500
       "
-                    />
-                  </>
-                )}
-              </div>
+                  />
+                </>
+              )}
             </Button>
           </PopoverTrigger>
 
@@ -109,7 +106,7 @@ const DisplayAllFilters = () => {
         </Popover>
       ) : (
         <>
-          <Tags className="text-muted-foreground" />
+          <TagIcon className="text-muted-foreground" />
           <div
             onMouseEnter={() => showClearFilterItemsBtn(true)}
             onMouseLeave={() => showClearFilterItemsBtn(false)}
@@ -124,8 +121,6 @@ const DisplayAllFilters = () => {
               />
             ))}
 
-            {/* TODO add && (if filters has atleast 2 keys) */}
-            {/* add anim fade */}
             {filterCount >= 2 && isClearFilterItemsBtnShown && (
               <FilterItem label="Clear" isXlScreen={isXlScreen} />
             )}
@@ -186,4 +181,4 @@ const FilterItem = ({ label, filterKey, isXlScreen }: FilterItemProps) => {
   );
 };
 
-export default DisplayAllFilters;
+export default Tags;

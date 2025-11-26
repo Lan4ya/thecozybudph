@@ -42,7 +42,7 @@
   --popover: oklch(0.95 0.015 70);
   --popover-foreground: oklch(0.18 0.02 70);
 
-  --muted: oklch(0.92 0.01 70);
+  --muted: #6b7280;
   --muted-foreground: oklch(0.4 0.02 70);
 
   /* --accent: oklch(0.9 0.05 30); */
@@ -116,7 +116,7 @@
 
 @theme {
   --font-ivy-ora-display: "IvyOraDisplay", Georgia, sans-serif;
-  --font-back-to-black: "BackToBlack", system-ui;
+  --font-back-to-black: "BackToBlack", Didot, Georgia, system-ui;
 
   --animate-shimmer: shimmer 1.6s ease-in-out infinite;
   --animate-rotate: rotate 1s linear infinite;

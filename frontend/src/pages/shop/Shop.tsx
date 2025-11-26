@@ -1,9 +1,10 @@
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
-import { Store, TableProperties } from "lucide-react";
+import GridStyleButtons from "./components/GridStyleButtons";
+import { ShoppingBag } from "lucide-react";
 import { ProductAPI } from "@/services/api/products";
 import { useFilters } from "./hooks/useFilters";
 import { useEffect } from "react";
-import { SortDropdownMenu } from "./components/SortDropDownMenu";
+import { SortDropdownMenu } from "./components/SortDropDown";
 import type { ProductDataWithJoins } from "@TheCozyBud/schema";
 import Search from "./components/filters/Search";
 import PriceRange from "./components/filters/PriceRange";
@@ -12,10 +13,8 @@ import Collections from "./components/filters/Collection";
 import ProductCard from "@/components/products/ProductCard";
 import PersistSuspense from "@/components/PersistSuspense";
 import ShopProductGridSkeleton from "./skeletons/ProductGridSkeleton";
-import { ArrowUpDown, Grid3x3, LayoutGrid } from "lucide-react";
-import { Button } from "@/lib/ui/__shadcn__/button";
-import DisplayAllFilters from "./components/DisplayAllFilters";
-import { useIsExtraLargeScreen, useIsLargeScreen } from "@/hooks/useMediaQuery";
+import Tags from "./components/Tags";
+import { useIsExtraLargeScreen } from "@/hooks/useMediaQuery";
 
 const Shop = () => {
   return <ShopInner />;
@@ -56,15 +55,15 @@ const ShopInner = () => {
 
   return (
     <div className="max-w-[1600px] mx-auto">
-      <header className="custom-container mt-2 mb-4 md:mb-10 md:mt-4">
+      <header className="custom-container mt-2 mb-8 md:mb-14 md:mt-4">
         <h1 className="flex gap-2 items-center font-medium text-lg md:text-2xl border-b pb-2">
-          <Store /> Shop
+          <ShoppingBag /> Shop
         </h1>
       </header>
 
       <main className="custom-container mt-2 mb-35   flex flex-col gap-10 lg:gap-15">
         <div className="flex flex-col gap-4 lg:gap-6">
-          <div className="xl:flex gap-6">
+          <div className="xl:flex xl:gap-6">
             <div className="grid grid-cols-2 md:grid-cols-4  place-items-center gap-x-4 md:gap-x-6  gap-y-4">
               <Search />
               <PriceRange />
@@ -74,47 +73,21 @@ const ShopInner = () => {
 
             {isXLScreen && (
               <div className="2xl:ml-60 flex items-center gap-3 mt-8">
-                <Button variant="outline" size="lg" className="">
-                  <ArrowUpDown className="text-muted-foreground" /> Popularity
-                </Button>
-
-                <div className="h-6 w-px bg-muted-foreground" />
-
-                <Button variant="outline" size="icon" className="">
-                  <Grid3x3 className="size-5! text-muted-foreground" />
-                </Button>
-
-                <Button variant="outline" size="icon" className="">
-                  <LayoutGrid className="size-5! text-muted-foreground" />
-                </Button>
-
-                <Button variant="outline" size="icon" className="">
-                  <TableProperties className="rotate-180 text-muted-foreground" />
-                </Button>
+                <SortDropdownMenu />
+                <div className="h-7 w-px bg-muted-foreground" />
+                <GridStyleButtons />
               </div>
             )}
           </div>
 
-          <div className="flex-between items-center">
-            <DisplayAllFilters />
+          <div className="flex-between items-center mt-1">
+            <Tags />
 
             {!isXLScreen && (
               <div className="flex items-center gap-3">
                 <SortDropdownMenu />
-
-                <div className="mr-3 h-5 w-px bg-muted-foreground" />
-
-                <Button variant="minimal" size="auto">
-                  <Grid3x3 className="size-5! text-muted-foreground -mr-1" />
-                </Button>
-
-                <Button variant="minimal" size="auto">
-                  <LayoutGrid className="size-5! text-muted-foreground" />
-                </Button>
-
-                <Button variant="minimal" size="auto">
-                  <TableProperties className="rotate-180 text-muted-foreground" />
-                </Button>
+                <div className="h-7 w-px bg-muted-foreground" />
+                <GridStyleButtons />
               </div>
             )}
           </div>

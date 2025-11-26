@@ -1,7 +1,7 @@
 import searchSubstring from "@/lib/utils/searchSubstring";
 import { useMemo, useState } from "react";
-import { FilterDropdownMenu } from "./FilterDropDownMenu";
-import { FilterDropdownMenuItem } from "./FilterDropdownMenuItem";
+import { FilterDropdown } from "./FilterDropDown";
+import { FilterDropdownMenuItem } from "./FilterDropdownItem";
 import type { PriceRangeOption } from "../../types";
 
 const PRICE_RANGES: PriceRangeOption[] = [
@@ -36,7 +36,7 @@ const PriceRange = () => {
   }, [inputValue]);
 
   return (
-    <FilterDropdownMenu
+    <FilterDropdown
       dropdownType="priceRange"
       inputValue={inputValue}
       setInputValue={setInputValue}
@@ -48,7 +48,7 @@ const PriceRange = () => {
           filterVal={range}
         />
       ))}
-    </FilterDropdownMenu>
+    </FilterDropdown>
   );
 };
 

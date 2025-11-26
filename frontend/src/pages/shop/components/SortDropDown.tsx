@@ -33,21 +33,17 @@ export function SortDropdownMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="minimal" size="lg">
+        <Button variant="minimal" size="lg" className="border">
           <ArrowUpDown className="text-muted-foreground" /> {sortOpt}
         </Button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="w-56">
-        <DropdownMenuRadioItem
-          value="Popularity"
-          className={focusStyle}
-          onSelect={() => handleToggle("Popularity")}
-        >
-          Popularity
-        </DropdownMenuRadioItem>
-
         <DropdownMenuRadioGroup value={sortOpt} onValueChange={handleToggle}>
+          <DropdownMenuRadioItem value="Popularity" className={focusStyle}>
+            Popularity
+          </DropdownMenuRadioItem>
+
           <DropdownMenuRadioItem value="Most Recent" className={focusStyle}>
             Most Recent
           </DropdownMenuRadioItem>

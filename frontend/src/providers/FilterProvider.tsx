@@ -38,6 +38,7 @@ export function FilterProvider({ children }: { children: React.ReactNode }) {
     ) as Filters;
   }, [searchParams]);
 
+  // TODO: cleanup empty arrays
   const setFilters = useCallback(
     (updates: Partial<Filters> | ((filters: Filters) => Partial<Filters>)) => {
       // Rebuild current filters from searchParams

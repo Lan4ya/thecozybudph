@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react";
-import { DropdownMenuItem } from "@/components/dropdown";
+import { DropdownMenuItem } from "../dropdown";
 import { Check } from "lucide-react";
 import { useFilters } from "../../hooks/useFilters";
 import toggleArrItem from "@/lib/utils/toggleArrItem";
@@ -27,7 +27,7 @@ type FilterDropdownMenuItemProps =
   | NonArrayFilterProps<NonArrayFilterKeys>;
 
 // hoist icon
-const CheckIcon = <Check className="text-white size-3.5" />;
+const CheckIcon = <Check className="text-white size-3" />;
 
 export const FilterDropdownMenuItem = ({
   filterKey,
@@ -52,6 +52,7 @@ export const FilterDropdownMenuItem = ({
   const handleToggle = useCallback(() => {
     setFilters((prev) => {
       console.log("filterVal", filterVal);
+
       const curr = prev[filterKey];
       const updated = isArr
         ? toggleArrItem(curr as unknown[], filterVal)
@@ -75,7 +76,7 @@ export const FilterDropdownMenuItem = ({
         ? formatPriceRange(filterVal as PriceRangeOption)
         : filterVal}
       {isItemActive && (
-        <div className="grid place-items-center bg-accent rounded-full p-[1.5px] pr-[1.6px]">
+        <div className="grid place-items-center bg-accent rounded-full p-[1.2px] pr-[2.4px]">
           {CheckIcon}
         </div>
       )}
