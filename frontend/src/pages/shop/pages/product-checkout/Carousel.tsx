@@ -1,193 +1,126 @@
-import { useState, useCallback, useRef, useEffect } from "react";
-import { motion, useMotionValue, animate, type PanInfo } from "framer-motion";
+import { useState } from "react";
+import { Navigation, A11y, Thumbs } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/swiper.css";
+// import "swiper/swiper-bundle.css";
 import { ProductImage } from "@/components/products/ProductImage";
 
 interface CarouselProps {
   urls: string[];
 }
 
-const SWIPE_THRESHOLD = 200; // px
-const SWIPE_VELOCITY = 100; // px/s
-
 const Carousel = ({ urls }: CarouselProps) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
   if (!urls || urls.length === 0) return null;
 
-  // measure container width so we can compute pixel-based snapping
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const [containerWidth, setContainerWidth] = useState(0);
-
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver(() => setContainerWidth(el.clientWidth));
-    ro.observe(el);
-    setContainerWidth(el.clientWidth);
-    return () => ro.disconnect();
-  }, []);
-
-  // motion value for x offset in px
-  const x = useMotionValue(0);
-
-  // bounds for dragConstraints (allow dragging past first/last by a bit because of dragElastic)
-  // left = negative max scroll (last slide aligned) e.g. -(n-1) * width
-  const maxNegative = -Math.max(0, (urls.length - 1) * containerWidth);
-  // right bound is 0 (start)
-  const constraints = { left: maxNegative, right: 0 };
-
-  const clampIndex = useCallback(
-    (i: number) => Math.max(0, Math.min(urls.length - 1, i)),
-    [urls.length],
-  );
-
-  const snapToIndex = useCallback(
-    (index: number) => {
-      const target = -index * containerWidth;
-      // animate the motion value to the target with a spring for bounce feel
-      animate(x, target, {
-        // type: "spring",
-        // stiffness: 180,
-        // damping: 22,
-        // mass: 0.6,
-        type: "tween",
-        duration: 0.55,
-        ease: [0.22, 1, 0.36, 1],
-      });
-    },
-    [containerWidth, x],
-  );
-
-  // whenever currentIndex changes (e.g. via buttons), snap the x
-  useEffect(() => {
-    if (!containerWidth) return;
-    snapToIndex(currentIndex);
-  }, [currentIndex, containerWidth, snapToIndex]);
-
-  const nextSlide = useCallback(() => {
-    setCurrentIndex((i) => clampIndex(i + 1));
-  }, [clampIndex]);
-
-  const prevSlide = useCallback(() => {
-    setCurrentIndex((i) => clampIndex(i - 1));
-  }, [clampIndex]);
-
-  const goToSlide = useCallback(
-    (index: number) => {
-      setCurrentIndex(clampIndex(index));
-    },
-    [clampIndex],
-  );
-
-  // drag handler: use offset + velocity to decide
-  const handleDragEnd = useCallback(
-    (_event: PointerEvent | MouseEvent | TouchEvent, info: PanInfo) => {
-      // offset.x is how far the pointer moved during the drag (px)
-      // velocity.x is px/s
-      const { offset, velocity } = info;
-      const swipe = offset.x;
-      const v = velocity.x ?? 0;
-
-      // if user dragged left (swipe negative) strongly -> next
-      if (swipe < -SWIPE_THRESHOLD || v < -SWIPE_VELOCITY) {
-        setCurrentIndex((i) => clampIndex(i + 1));
-      }
-      // if user dragged right strongly -> prev
-      else if (swipe > SWIPE_THRESHOLD || v > SWIPE_VELOCITY) {
-        setCurrentIndex((i) => clampIndex(i - 1));
-      } else {
-        // small drag: snap back to current index
-        snapToIndex(currentIndex);
-      }
-    },
-    [clampIndex, currentIndex, snapToIndex],
-  );
-
-  const isFirstSlide = currentIndex === 0;
-  const isLastSlide = currentIndex === urls.length - 1;
+  const isFirstSlide = activeIndex === 0;
+  const isLastSlide = activeIndex === urls.length - 1;
 
   return (
-    <div className="flex flex-col w-full max-w-[500px] gap-4 lg:pt-0">
-      {/* Carousel Container */}
-      <div
-        ref={containerRef}
-        className="min-[504px]:rounded-xl relative aspect-[3/3.8] w-full overflow-hidden  bg-background group content-visibility-auto "
-      >
-        {/* Slides Container: make THIS draggable and controlled by motion-value x */}
-        <motion.div
-          className="flex h-full active:cursor-grabbing"
-          style={{ x }} // bind motion value so drag moves it and we can animate it programmatically
-          drag="x"
-          dragConstraints={constraints}
-          dragElastic={0.6} // gives the rubber-y feel when dragging past bounds
-          onDragEnd={handleDragEnd}
-          // touch-action none is helpful for a better touch experience
-          // (you can add inline style or tailwind plugin)
+    <div className="flex flex-col w-full -mt-0.5 lg:mt-0 max-w-[500px] gap-4 lg:pt-0">
+      {/* Main Carousel */}
+      <div className=" overflow-hidden relative w-full  bg-background group active:cursor-grabbing">
+        <Swiper
+          modules={[Thumbs, Navigation, A11y]}
+          spaceBetween={0}
+          slidesPerView={1}
+          navigation={{
+            prevEl: ".custom-prev",
+            nextEl: ".custom-next",
+          }}
+          thumbs={{ swiper: thumbsSwiper }}
+          onSlideChange={(swiper) => {
+            setActiveIndex(swiper.activeIndex);
+          }}
+          edgeSwipeDetection={true}
+          speed={400}
+          longSwipes={true}
         >
           {urls.map((u, index) => (
-            <div key={index} className="shrink-0 w-full h-full">
+            <SwiperSlide key={index} className="aspect-[3/3.8]">
               <ProductImage
-                loading={index === currentIndex ? "eager" : "lazy"}
+                loading={index === activeIndex ? "eager" : "lazy"}
                 src={u}
                 alt={`Slide ${index + 1}`}
               />
-            </div>
+            </SwiperSlide>
           ))}
-        </motion.div>
+        </Swiper>
 
-        {/* Navigation Buttons (unchanged) */}
-        {urls.length > 1 && (
-          <>
-            <button
-              className={`absolute left-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 backdrop-blur-sm rounded-full flex items-center justify-center text-2xl font-bold transition-all duration-200 shadow-lg border ${
-                isFirstSlide
-                  ? "bg-white/10 border-accent/10 text-accent/30 cursor-not-allowed"
-                  : "bg-white/20 hover:bg-white/30 border-white/30 hover:scale-110 text-accent"
-              }`}
-              onClick={prevSlide}
-              disabled={isFirstSlide}
-            >
-              ‹
-            </button>
+        {/* Nav Buttons */}
+        <button
+          className={`custom-prev absolute left-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 backdrop-blur-sm rounded-full flex items-center justify-center text-2xl font-bold transition-all duration-200 shadow-lg border ${
+            isFirstSlide
+              ? "bg-white/10 border-accent/10 text-accent/30 cursor-not-allowed"
+              : "bg-white/20 hover:bg-white/30 border-white/30 hover:scale-110 text-accent"
+          }`}
+          disabled={isFirstSlide}
+        >
+          ‹
+        </button>
 
-            <button
-              className={`absolute right-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 backdrop-blur-sm rounded-full flex items-center justify-center text-2xl font-bold transition-all duration-200 shadow-lg border ${
-                isLastSlide
-                  ? "bg-white/10 border-accent/10 text-accent/30 cursor-not-allowed"
-                  : "bg-white/20 hover:bg-white/30 border-white/30 hover:scale-110 text-accent"
-              }`}
-              onClick={nextSlide}
-              disabled={isLastSlide}
-            >
-              ›
-            </button>
-          </>
-        )}
+        <button
+          className={`custom-next absolute right-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 backdrop-blur-sm rounded-full flex items-center justify-center text-2xl font-bold transition-all duration-200 shadow-lg border ${
+            isLastSlide
+              ? "bg-white/10 border-accent/10 text-accent/30 cursor-not-allowed"
+              : "bg-white/20 hover:bg-white/30 border-white/30 hover:scale-110 text-accent"
+          }`}
+          disabled={isLastSlide}
+        >
+          ›
+        </button>
 
-        {/* Slide Indicator */}
-        <div className="absolute bottom-6 right-6 z-30 bg-black/50 text-white px-4 py-2 rounded-full text-sm backdrop-blur-sm font-medium">
-          {currentIndex + 1} / {urls.length}
+        {/* Index Count */}
+        <div className="select-none absolute bottom-6 right-6 z-30 bg-black/50 text-white px-4 py-2 rounded-full text-sm backdrop-blur-sm font-medium">
+          {activeIndex + 1} / {urls.length}
         </div>
       </div>
 
-      {/* Thumbnail Strip (unchanged) */}
-      <div className="w-full overflow-x-auto px-6 py-4 rounded-2xl">
-        <div className="flex gap-4 min-w-max">
-          {urls.map((u, index) => (
+      <ThumbnailStrip
+        urls={urls}
+        onThumbsSwiper={setThumbsSwiper}
+        activeIndex={activeIndex}
+      />
+    </div>
+  );
+};
+
+const ThumbnailStrip = ({
+  urls,
+  activeIndex,
+  onThumbsSwiper,
+}: {
+  urls: string[];
+  activeIndex: number;
+  onThumbsSwiper: (swiper: any) => void;
+}) => {
+  return (
+    <div className="w-full overflow-x-auto px-6 py-4 rounded-2xl">
+      <Swiper
+        watchSlidesProgress={true}
+        onSwiper={onThumbsSwiper}
+        spaceBetween={16}
+        className="overflow-visible!"
+      >
+        {urls.map((u, index) => (
+          <SwiperSlide key={index} className="size-20!">
             <button
-              key={index}
-              className={`shrink-0 w-20 h-20 rounded-xl overflow-hidden transition-all duration-300 border-2 ${
-                index === currentIndex
+              className={`w-full h-full rounded-xl overflow-hidden transition-all duration-300 border-2 ${
+                index === activeIndex
                   ? "border-accent scale-110 shadow-lg ring-2 ring-accent/50"
                   : "border-muted-foreground opacity-60 hover:opacity-100 hover:border-muted-foreground/80"
               } hover:scale-105 transform-gpu`}
-              onClick={() => goToSlide(index)}
             >
-              <ProductImage src={u} alt={`Thumbnail ${index + 1}`} />
+              <ProductImage
+                src={u}
+                alt={`Thumbnail ${index + 1}`}
+                loading="lazy"
+              />
             </button>
-          ))}
-        </div>
-      </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
     </div>
   );
 };
