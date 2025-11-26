@@ -4,6 +4,9 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/swiper.css";
 // import "swiper/swiper-bundle.css";
 import { ProductImage } from "@/components/products/ProductImage";
+import { Link } from "react-router";
+import { ArrowLeft } from "lucide-react";
+import { useIsLargeScreen } from "@/hooks/useMediaQuery";
 
 interface CarouselProps {
   urls: string[];
@@ -13,6 +16,7 @@ const Carousel = ({ urls }: CarouselProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
   if (!urls || urls.length === 0) return null;
+  const isLgScreen = useIsLargeScreen();
 
   const isFirstSlide = activeIndex === 0;
   const isLastSlide = activeIndex === urls.length - 1;
@@ -21,6 +25,15 @@ const Carousel = ({ urls }: CarouselProps) => {
     <div className="flex flex-col w-full -mt-0.5 lg:mt-0 max-w-[500px] gap-4 lg:pt-0">
       {/* Main Carousel */}
       <div className=" overflow-hidden relative w-full  bg-background group active:cursor-grabbing">
+        {!isLgScreen && (
+          <Link
+            to="/shop"
+            className="z-10 absolute left-3 top-5 rounded-xl bg-black/50  text-white px-3 py-3"
+          >
+            <ArrowLeft className="size-5" />
+          </Link>
+        )}
+
         <Swiper
           modules={[Thumbs, Navigation, A11y]}
           spaceBetween={0}
@@ -72,7 +85,7 @@ const Carousel = ({ urls }: CarouselProps) => {
         </button>
 
         {/* Index Count */}
-        <div className="select-none absolute bottom-6 right-6 z-30 bg-black/50 text-white px-4 py-2 rounded-full text-sm backdrop-blur-sm font-medium">
+        <div className="select-none absolute bottom-6 right-6 z-1 bg-black/50 text-white px-4 py-2 rounded-full text-sm backdrop-blur-sm font-medium">
           {activeIndex + 1} / {urls.length}
         </div>
       </div>

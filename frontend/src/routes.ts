@@ -2,6 +2,7 @@ import { createBrowserRouter, redirect } from "react-router";
 import Root from "./pages/Root.tsx";
 import Home from "./pages/home/Home.tsx";
 import Shop from "./pages/shop/Shop.tsx";
+import Cart from "./pages/cart/Cart.tsx";
 import About from "./pages/about/About.tsx";
 import Contact from "./pages/contact/Contact.tsx";
 import Events from "./pages/events/Events.tsx";
@@ -36,6 +37,7 @@ const router = createBrowserRouter([
         ],
       },
       { path: "events", Component: Events },
+      { path: "cart", Component: Cart },
       { path: "contact", Component: Contact },
     ],
   },
