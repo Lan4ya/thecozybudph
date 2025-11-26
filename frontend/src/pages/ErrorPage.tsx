@@ -13,7 +13,7 @@ type ErrorPageProps = {
 
 const messages: Record<number, string> = {
   401: "You’re not authorized to view this page.",
-  404: "The page you’re looking for doesn’t exist.",
+  404: "Oops! The page you’re looking for doesn’t exist.",
   500: "Oops! Something went wrong on our servers.",
 };
 

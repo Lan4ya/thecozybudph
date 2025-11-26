@@ -65,10 +65,10 @@ export const HeroText = ({
         visibleMap[1] ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6",
       )}
     >
-      <h1 className="font-ivy-ora-display font-medium lg:font-bold text-accent max-[395px]:text-base text-xl sm:text-2xl md:text-3xl lg:text-4xl">
+      <h1 className="font-ivy-ora-display font-medium lg:font-bold text-accent max-[395px]:text-base text-[22px] sm:text-2xl md:text-3xl lg:text-5xl">
         BLOSSOMING ELEGANCE
       </h1>
-      <p className="font-ivy-ora-display text-sm max-w-[230px] sm:text-[16px] sm:max-w-[270px] md:text-xl md:max-w-[390px] lg:max-w-[490px]">
+      <p className="font-ivy-ora-display max-w-[280px] fold-semibold sm:text-lg md:text-xl lg:text-3xl sm:max-w-[270px] md:max-w-[390px] lg:max-w-[540px]">
         Fresh, handcrafted arrangements designed to elevate everyday moments.
       </p>
     </div>

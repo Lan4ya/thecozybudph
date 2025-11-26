@@ -18,7 +18,7 @@ const ProductGrid = () => {
     >
       <h2
         id="recommendations-heading"
-        className="lext-md sm:text-lg font-semibold lg:text-3xl text-center mb-6 lg:mb-12"
+        className="text-lg font-semibold lg:text-3xl text-center mb-6 lg:mb-12"
       >
         Recommendations For You
       </h2>
