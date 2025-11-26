@@ -1,5 +1,5 @@
 import { Outlet, useLocation } from "react-router";
-import NavBar from "@/components/NavBar";
+import NavBar from "@/components/nav/NavBar";
 import Footer from "@/components/Footer";
 import { cn } from "@/lib/utils/cn";
 import { ScrollToTop } from "@/components/ScrollTop";
