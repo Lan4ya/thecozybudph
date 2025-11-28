@@ -22,7 +22,7 @@ export function buildProductFormData(opts: BuildOpts) {
   const formData = new FormData();
 
   // ---- BASIC FIELDS ----
-  if (fields.name !== undefined) formData.append("name", String(fields.name));
+  if (fields.name !== undefined) formData.append("name", fields.name);
 
   if (fields.price !== undefined)
     formData.append("price", String(fields.price));
@@ -40,11 +40,11 @@ export function buildProductFormData(opts: BuildOpts) {
 
   formData.append("primaryImageIndex", String(primaryImageIndex));
 
-  // ---- CREATE FLOW ----
+  // ---- CREATE ----
   if (!isUpdate) {
     for (const f of files) formData.append("productImages", f);
   } else {
-    // ---- UPDATE FLOW ----
+    // ---- PATCH ----
     if (productId) formData.append("productId", productId);
     for (const f of files) formData.append("newProductImages", f);
 

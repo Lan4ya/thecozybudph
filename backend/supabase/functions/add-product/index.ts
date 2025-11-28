@@ -17,7 +17,7 @@ import { getCorsHeaders, handleCorsOptions } from "@shared/corsHeaders.ts";
 import {
   createProductSchema,
   parseAndValidateFormData,
-  ProductDB,
+  ProductsMetadataRow,
   CreateProductRequest,
   CreateProductData,
 } from "@shared/schema/index.ts";
@@ -49,35 +49,37 @@ Deno.serve(async (req) => {
       createProductSchema,
       (fd: FormData) => {
         const payload: CreateProductRequest = {
-          // name: fd.get("name") as string,
-          // price: fd.get("price"),
-          // collectionName: fd.get("collectionName"),
-          // colorVariants: fd.getAll("colorVariants"),
-          // description: fd.get("description"),
-          // productImages: fd.getAll("productImages") as File[],
-          // primaryImageIndex: fd.get("primaryImageIndex"),
-          name: fd.get("name")?.toString() ?? "",
-          price: Number(fd.get("price")),
-          collectionName: fd.get("collectionName")?.toString(),
-          colorVariants: fd
-            .getAll("colorVariants")
-            .filter((v) => typeof v === "string"),
-          description: fd.get("description")?.toString(),
+          name: fd.get("name") as string,
+          price: fd.get("price") ? Number(fd.get("price")) : 0,
+          collectionName: fd.get("collectionName") as string,
+          category: fd.get("category") as string,
+          colorVariants: (() => {
+            const values = fd.getAll("colorVariants") as string[];
+            if (!values.length) return [];
+            const fv = values.filter(Boolean);
+            return fv.length > 0 ? fv : [];
+          })(),
+          description: (fd.get("description") as string) || undefined,
           productImages: fd
             .getAll("productImages")
             .filter((v) => v instanceof File) as File[],
-          primaryImageIndex: Number(fd.get("primaryImageIndex")),
+          primaryImageIndex: (() => {
+            const pii = fd.get("primaryImageIndex");
+            return pii ? Number(pii) : 0;
+          })(),
         };
+
+        const requiredFields = new Set([
+          "name",
+          "price",
+          "category",
+          "productImages",
+          "primaryImageIndex",
+        ]);
 
         // delete empty optional fields
         Object.keys(payload).forEach((key) => {
-          const requiredFields = [
-            "name",
-            "price",
-            "productImages",
-            "primaryImageIndex",
-          ];
-          if (requiredFields.includes(key)) return;
+          if (requiredFields.has(key)) return;
 
           const val = payload[key as keyof CreateProductRequest];
           if (
@@ -99,12 +101,38 @@ Deno.serve(async (req) => {
     }
     const data: CreateProductRequest = result.data;
 
+    // Resolve or create category
+    let productCategory: { id: number; name: string } | null = null;
+    const { data: existingCategory, error: findError } = await supabase
+      .from("products_category")
+      .select("id, name")
+      .eq("name", data.category)
+      .maybeSingle();
+
+    if (findError) {
+      throw CustomError.internal(findError.message);
+    }
+
+    if (existingCategory) {
+      productCategory = existingCategory;
+    } else {
+      const { data: newCategory, error: insertError } = await supabase
+        .from("products_category")
+        .insert({ name: data.category })
+        .select("id, name")
+        .single();
+
+      if (insertError) throw CustomError.internal(insertError.message);
+
+      productCategory = newCategory;
+    }
+
     // Resolve or create collection
-    let productCollectionId: number | null = null;
+    let productCollection: { id: number; name: string } | null = null;
     if (data.collectionName) {
       const { data: existingCollection, error: findError } = await supabase
         .from("products_collection")
-        .select("id")
+        .select("id, name")
         .eq("name", data.collectionName)
         .maybeSingle();
 
@@ -113,37 +141,41 @@ Deno.serve(async (req) => {
       }
 
       if (existingCollection) {
-        productCollectionId = existingCollection.id;
+        productCollection = existingCollection;
       } else {
         const { data: newCollection, error: insertError } = await supabase
           .from("products_collection")
           .insert({ name: data.collectionName })
-          .select("id")
+          .select("id, name")
           .single();
 
         if (insertError) throw CustomError.internal(insertError.message);
 
-        productCollectionId = newCollection.id;
+        productCollection = newCollection;
       }
     }
 
     // Upload images to Supabase Storage concurrently
     const imageUrls = await uploadImagesToDB(supabase, data.productImages);
 
-    const DBInserts: Omit<ProductDB, "created_at" | "updated_at" | "id"> = {
+    const DBInserts: Omit<
+      ProductsMetadataRow,
+      "created_at" | "updated_at" | "id"
+    > = {
       name: data.name,
       price: data.price,
       color_variants: data.colorVariants ?? [],
-      description: data.description,
+      description: data.description ?? null,
       image_urls: imageUrls,
       primary_image_url: imageUrls[data.primaryImageIndex ?? 0],
-      product_collection_id: productCollectionId ?? null,
+      product_collection_id: productCollection?.id ?? null,
+      product_category_id: productCategory.id,
     };
 
     const { data: createdProduct, error: insertError } = await supabase
       .from("products_metadata")
       .insert(DBInserts)
-      .select()
+      .select("*")
       .single();
 
     if (insertError) {
@@ -151,7 +183,8 @@ Deno.serve(async (req) => {
     }
     const res: CreateProductData = {
       ...createdProduct,
-      productsCollection: { name: data.collectionName },
+      productsCollection: productCollection?.name ?? null,
+      productsCategory: productCategory?.name ?? null,
     };
 
     return handleSuccess(res, corsHeaders);

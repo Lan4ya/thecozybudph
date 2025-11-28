@@ -17,14 +17,22 @@ export type ProductDataWithJoins = ProductData & {
     name: string | null;
   } | null;
 };
-export type CreateProductData = SnakeToCamel<
-  ProductsMetadataRow & {
-    collectionName: string | null;
-  }
->;
-export type UpdateProductData = SnakeToCamel<
-  ProductsMetadataRow & {
-    collectionName: string | null;
-  }
->;
+export type CreateProductData = ProductData & {
+  productsCollection: {
+    name: string;
+  } | null;
+
+  productsCategory: {
+    name: string;
+  } | null;
+};
+export type UpdateProductData = ProductData & {
+  productsCollection: {
+    name: string;
+  } | null;
+
+  productsCategory: {
+    name: string;
+  } | null;
+};
 export type DeleteProductData = { productId: string };

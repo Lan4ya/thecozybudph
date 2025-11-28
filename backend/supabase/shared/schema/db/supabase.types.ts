@@ -26,6 +26,21 @@ export type Database = {
         }
         Relationships: []
       }
+      products_category: {
+        Row: {
+          id: string
+          name: string
+        }
+        Insert: {
+          id?: string
+          name: string
+        }
+        Update: {
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       products_collection: {
         Row: {
           id: string
@@ -51,6 +66,7 @@ export type Database = {
           name: string
           price: number
           primary_image_url: string
+          product_category_id: string | null
           product_collection_id: string | null
           updated_at: string | null
         }
@@ -63,6 +79,7 @@ export type Database = {
           name: string
           price: number
           primary_image_url: string
+          product_category_id?: string | null
           product_collection_id?: string | null
           updated_at?: string | null
         }
@@ -75,10 +92,18 @@ export type Database = {
           name?: string
           price?: number
           primary_image_url?: string
+          product_category_id?: string | null
           product_collection_id?: string | null
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "products_metadata_product_category_id_fkey"
+            columns: ["product_category_id"]
+            isOneToOne: false
+            referencedRelation: "products_category"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "products_metadata_product_collection_id_fkey"
             columns: ["product_collection_id"]

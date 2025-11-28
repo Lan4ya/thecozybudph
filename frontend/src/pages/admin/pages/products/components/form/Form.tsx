@@ -1,4 +1,3 @@
-import { useToast } from "@/providers/ToastProvider";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useForm, type FieldErrors } from "react-hook-form";
@@ -239,7 +238,7 @@ export default function ProductForm({
           }
 
           // sync form field for server
-          setValue("imageUrls_to_delete", next, { shouldValidate: false });
+          setValue("imageUrlsToDelete", next, { shouldValidate: false });
           return next;
         });
 
@@ -358,18 +357,18 @@ export default function ProductForm({
         </button>
 
         <CardHeader>
-          <CardTitle>
+          <CardTitle className="">
             {updatingProduct ? "Edit Product" : "Create Product"}
           </CardTitle>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="px-0!">
           <form
             onSubmit={handleSubmit(onSubmit, (err) =>
               console.log("Form validation errors:", err),
             )}
           >
-            <div className="max-h-[70dvh] overflow-x-hidden overflow-y-auto">
+            <div className="max-h-[70dvh] px-6 overflow-x-visible overflow-y-auto">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 ">
                 {/* Name */}
                 <div>
@@ -422,13 +421,29 @@ export default function ProductForm({
                   )}
                 </div>
 
+                {/* Category */}
+                <div className="md:col-span-2">
+                  <label className="block text-sm mb-1 text-muted-foreground">
+                    Category
+                  </label>
+                  <Input
+                    placeholder="bouquet, vase, mugs, etc."
+                    {...register("category")}
+                  />
+                  {errors.category && (
+                    <p className="text-xs text-red-500 mt-1">
+                      {errors.category.message}
+                    </p>
+                  )}
+                </div>
+
                 {/* Collection */}
                 <div className="md:col-span-2">
                   <label className="block text-sm mb-1 text-muted-foreground">
                     Collection Name (optional)
                   </label>
                   <Input {...register("collectionName")} />
-                  {errors.description && (
+                  {errors.collectionName && (
                     <p className="text-xs text-red-500 mt-1">
                       {errors.collectionName.message}
                     </p>
@@ -444,9 +459,9 @@ export default function ProductForm({
                     value={watch("colorVariants") ?? []}
                     onChange={(colors) => setValue("colorVariants", colors)}
                   />
-                  {errors.color_variants && (
+                  {errors.colorVariants && (
                     <p className="text-xs text-red-500 mt-1">
-                      {errors.color_variants.message}
+                      {errors.colorVariants.message}
                     </p>
                   )}
                 </div>
@@ -533,8 +548,9 @@ function getEmptyFormKV(): CreateProductForm {
   return {
     name: "",
     price: "" as unknown as number,
-    collectionName: "",
-    description: "",
+    category: "",
+    collectionName: undefined,
+    description: undefined,
     colorVariants: [],
     productImages: [],
     primaryImageIndex: 0,
@@ -547,8 +563,8 @@ function getMappedUpdatingProductKV(
   return {
     name: updatingProduct.name,
     price: updatingProduct.price,
-    collectionName: updatingProduct.productsCollection?.name ?? "",
-    description: updatingProduct.description ?? "",
+    collectionName: updatingProduct.productsCollection?.name ?? null,
+    description: updatingProduct.description ?? null,
     colorVariants: updatingProduct.colorVariants ?? [],
     newProductImages: [],
     imageUrlsToDelete: [],

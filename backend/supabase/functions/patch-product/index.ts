@@ -14,11 +14,11 @@ import { handleSuccess } from "@shared/response/handleSuccess.ts";
 import {
   updateProductSchema,
   parseAndValidateFormData,
-  ProductDB,
+  ProductsMetadataRow,
   UpdateProductRequest,
   UpdateProductData,
 } from "@shared/schema/index.ts";
-import { validateImageFile } from "@shared/validations/mod.ts";
+// import { validateImageFile } from "@shared/validations/mod.ts";
 import { uploadImagesToDB } from "@shared/uploadImagesToDB.ts";
 import { authAdmin } from "@shared/authAdmin.ts";
 import { getCorsHeaders, handleCorsOptions } from "@shared/corsHeaders.ts";
@@ -41,7 +41,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // admin check
+    // Admin check
     await authAdmin(supabase, req);
 
     const result = await parseAndValidateFormData<UpdateProductRequest>(
@@ -49,37 +49,32 @@ Deno.serve(async (req) => {
       updateProductSchema,
       (fd: FormData) => {
         const payload: UpdateProductRequest = {
-          productId: fd.get("productId")?.toString() ?? "",
-          name: fd.get("name")?.toString(),
-          price: Number(fd.get("price")),
-          collectionName: fd.get("collectionName")?.toString(),
-          colorVariants: fd.getAll("colorVariants").map((v) => v.toString()),
-          description: fd.get("description")?.toString(),
+          productId: fd.get("productId") as string,
+          name: fd.get("name") as string,
+          price: fd.get("price") ? Number(fd.get("price")) : undefined,
+          collectionName: fd.get("collectionName") as string,
+          colorVariants: (() => {
+            const values = fd.getAll("colorVariants") as string[];
+            if (!values.length) return [];
+            const fv = values.filter(Boolean);
+            return fv.length > 0 ? fv : [];
+          })(),
+          category: fd.get("category") as string,
+          description: fd.get("description") as string,
           newProductImages: fd
             .getAll("newProductImages")
             .filter((v) => v instanceof File) as File[],
-          imageUrlsToDelete: fd
-            .getAll("imageUrlsToDelete")
-            .map((v) => v.toString()),
-          primaryImageIndex:
-            fd.get("primaryImageIndex") !== null
-              ? Number(fd.get("primaryImageIndex"))
-              : undefined,
+          imageUrlsToDelete: (() => {
+            const values = fd.getAll("imageUrlsToDelete") as string[];
+            return values.length > 0 ? values : [];
+          })(),
+          primaryImageIndex: (() => {
+            const pii = fd.get("primaryImageIndex");
+            return pii ? Number(pii) : 0;
+          })(),
         };
 
-        Object.keys(payload).forEach((key) => {
-          if (key === "productId") return; // skip required field
-
-          const val = payload[key as keyof UpdateProductRequest];
-          if (
-            val == undefined ||
-            (typeof val === "string" && val.trim() === "") ||
-            (Array.isArray(val) && val.filter(Boolean).length === 0)
-          ) {
-            delete payload[key as keyof UpdateProductRequest];
-          }
-        });
-
+        console.log({ payload });
         return payload;
       },
       { async: true },
@@ -90,7 +85,7 @@ Deno.serve(async (req) => {
     }
     const data: UpdateProductRequest = result.data;
 
-    // check existence and get some data
+    // Check product existence and get image_urls along the way for upload logic
     const { data: existingProduct, error: fetchError } = await supabase
       .from("products_metadata")
       .select("id, image_urls")
@@ -101,12 +96,43 @@ Deno.serve(async (req) => {
       throw CustomError.internal(`Failed to fetch product: ${fetchError}`);
     if (!existingProduct) throw CustomError.notFound("Product not found");
 
-    // handle collection updates
-    let productCollectionId: number | null = null;
-    if (data.collectionName) {
+    // Handle required field category updates
+    let productCategory: { id: number; name: string } | null = null;
+    if (data.category) {
+      const { data: existingCategory, error: findError } = await supabase
+        .from("products_category")
+        .select("id, name")
+        .eq("name", data.category)
+        .maybeSingle();
+
+      if (findError)
+        throw CustomError.internal(`Database error: ${findError.message}`);
+
+      if (existingCategory) {
+        productCategory = existingCategory;
+      } else {
+        const { data: newCategory, error: insertError } = await supabase
+          .from("products_category")
+          .insert({ name: data.category })
+          .select("id, name")
+          .single();
+        if (insertError)
+          throw CustomError.internal(
+            `Failed to create collection: ${insertError.message}`,
+          );
+        productCategory = newCategory;
+      }
+    }
+
+    // Handle optional field collection updates
+    let productCollection: { id: number; name: string } | null = null;
+
+    if (!data.collectionName) {
+      productCollection = null;
+    } else {
       const { data: existingCollection, error: findError } = await supabase
         .from("products_collection")
-        .select("id")
+        .select("id, name")
         .eq("name", data.collectionName)
         .maybeSingle();
 
@@ -114,20 +140,22 @@ Deno.serve(async (req) => {
         throw CustomError.internal(`Database error: ${findError.message}`);
 
       if (existingCollection) {
-        productCollectionId = existingCollection.id;
+        productCollection = existingCollection;
       } else {
         const { data: newCollection, error: insertError } = await supabase
           .from("products_collection")
           .insert({ name: data.collectionName })
-          .select("id")
+          .select("id, name")
           .single();
         if (insertError)
           throw CustomError.internal(
             `Failed to create collection: ${insertError.message}`,
           );
-        productCollectionId = newCollection.id;
+        productCollection = newCollection;
       }
     }
+
+    // Handle image uploads
 
     let updatedImageUrls = existingProduct.image_urls ?? [];
 
@@ -141,7 +169,6 @@ Deno.serve(async (req) => {
     else if (finalImageCount > 3)
       throw CustomError.badRequest("Product can have up to 3 images only");
 
-    // handle image uploads
     if (data.newProductImages?.length) {
       const newImageUrls = await uploadImagesToDB(
         supabase,
@@ -150,7 +177,8 @@ Deno.serve(async (req) => {
       updatedImageUrls = [...updatedImageUrls, ...newImageUrls];
     }
 
-    // handle image deletion
+    // Handle image deletion
+
     if (data.imageUrlsToDelete?.length) {
       updatedImageUrls = updatedImageUrls.filter(
         (url: string) => !data.imageUrlsToDelete!.includes(url),
@@ -169,28 +197,27 @@ Deno.serve(async (req) => {
       }
     }
 
-    const DBUpdates: Omit<ProductDB, "created_at" | "updated_at" | "id"> = {
-      ...(data.name !== undefined && { name: data.name }),
-      ...(data.price !== undefined && { price: data.price }),
-      ...(data.colorVariants !== undefined && {
-        color_variants: data.colorVariants,
-      }),
-      ...(data.description !== undefined && { description: data.description }),
-      ...(productCollectionId != null && {
-        product_collection_id: productCollectionId,
-      }),
-      ...(updatedImageUrls !== undefined && { image_urls: updatedImageUrls }),
-      ...(updatedImageUrls !== undefined && {
-        primary_image_url: updatedImageUrls[data.primaryImageIndex ?? 0],
-      }),
+    const dbUpdates: Omit<
+      ProductsMetadataRow,
+      "created_at" | "updated_at" | "id"
+    > = {
+      // set null or [] for optional fields (deletion patch)
+      name: data.name,
+      price: data.price ?? 0,
+      color_variants: data.colorVariants ?? [],
+      description: data.description ?? null,
+      product_collection_id: productCollection?.id ?? null,
+      product_category_id: productCategory?.id ?? null,
+      image_urls: updatedImageUrls,
+      primary_image_url: updatedImageUrls[data.primaryImageIndex ?? 0],
     };
-    console.log("db updates", DBUpdates);
+    console.log("db updates", dbUpdates);
 
     const { data: updatedProduct, error: updateError } = await supabase
       .from("products_metadata")
-      .update(DBUpdates) // update ignores undefined fields
+      .update(dbUpdates)
       .eq("id", data.productId)
-      .select()
+      .select("*")
       .single();
 
     if (updateError)
@@ -202,7 +229,10 @@ Deno.serve(async (req) => {
 
     const res: UpdateProductData = {
       ...updatedProduct,
-      productsCollection: { name: data.collectionName },
+      productsCollection: productCollection
+        ? { name: productCollection.name }
+        : null,
+      productsCategory: productCategory ? { name: productCategory.name } : null,
     };
 
     return handleSuccess(res, corsHeaders);

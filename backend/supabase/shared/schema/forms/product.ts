@@ -8,32 +8,32 @@ const ACCEPTED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];
 export const imageFileSchema = z
   .instanceof(File)
   .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), {
-    message: "Only .png, .jpeg, and .webp files are allowed",
+    message: "only png, jpeg, and webp files are allowed",
   })
   .refine((file) => file.size <= MAX_FILE_SIZE, {
-    message: "Image must be under 50MB",
+    message: "image must be under 50MB",
   });
 
 export const createProductSchema = productBaseSchema.extend({
   productImages: z
     .array(imageFileSchema)
-    .min(1, "At least one product image is required")
-    .max(MAX_IMAGES, `You can upload up to ${MAX_IMAGES} images only`),
+    .min(1, "image is required")
+    .max(MAX_IMAGES, `you can upload up to ${MAX_IMAGES} images only`),
   primaryImageIndex: z.coerce
     .number()
-    .min(0, "Primary image index is required"),
+    .min(0, "primary image index is required"),
 });
 
 export const updateProductSchema = productBaseSchema.partial().extend({
-  productId: z.string().min(1, "Product ID is required"),
+  productId: z.string().min(1, "product ID is required"),
   newProductImages: z
     .array(imageFileSchema)
-    .max(MAX_IMAGES, `You can upload up to ${MAX_IMAGES} images only`)
+    .max(MAX_IMAGES, `you can upload up to ${MAX_IMAGES} images only`)
     .optional(),
   imageUrlsToDelete: z.array(z.url()).optional(),
   primaryImageIndex: z.coerce
     .number()
-    .min(0, "Primary image index is required")
+    .min(0, "primary image index is required")
     .optional(),
   productCollectionId: z.string().optional(),
 });

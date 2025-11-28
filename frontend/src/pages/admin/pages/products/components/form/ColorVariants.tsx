@@ -72,7 +72,7 @@ export function ColorTagsInput({
       <div>
         <div className="flex gap-2">
           <Input
-            className="placeholder:text-[10px]"
+            className="max-[390px]:placeholder:text-[11px]"
             placeholder="type color and click add color"
             value={input}
             onChange={(e) => setInput(e.target.value)}

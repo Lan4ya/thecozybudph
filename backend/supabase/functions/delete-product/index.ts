@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
 
     const url = new URL(req.url);
     const productId: DeleteProductRequest =
-      url.searchParams.get("productId") ?? "";
+      url.searchParams.get("productId") ?? undefined;
 
     if (!productId) {
       throw CustomError.badRequest("Product ID is required");
