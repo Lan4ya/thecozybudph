@@ -15,6 +15,7 @@ import {
   type CreateProductData,
   type UpdateProductData,
   type DeleteProductData,
+  type ProductData,
 } from "@TheCozyBud/schema";
 import { snakeToCamel } from "../../lib/utils/caseConverter";
 import { apiClient } from "./interceptors/interceptors";
@@ -43,16 +44,19 @@ export const ProductAPI = {
     return snakeToCamel(data ?? []) satisfies ProductDataWithJoins[];
   },
 
-  getById: async (productId: string): Promise<ProductDataWithJoins> => {
+  getById: async (productId: string): Promise<ProductData | null> => {
     const { data, error } = await supabase
       .from("products_metadata")
-      .select("*, products_collection (name)")
+      .select("*")
       .eq("id", productId)
-      .single();
+      .maybeSingle();
 
     console.log("Fetching product id");
+
     if (error) throw error;
-    return snakeToCamel(data ?? []) satisfies ProductDataWithJoins;
+    if (!data) return null;
+
+    return snakeToCamel(data) satisfies ProductData;
   },
 
   update: async (productFormData: FormData): Promise<UpdateProductData> => {

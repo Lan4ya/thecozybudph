@@ -21,13 +21,27 @@ export const ProductCheckout = () => {
 
 const ProductDetailContent = () => {
   const { id } = useParams<{ id: string }>();
-  const { data: product } = useSuspenseQuery<ProductData>({
+
+  const {
+    data: product,
+    isLoading,
+    error,
+  } = useSuspenseQuery<ProductData | null>({
     queryKey: ["product", id],
+    // queryFn: () => ProductAPI.getById(id!),
     queryFn: () => ProductAPI.getById(id!),
     staleTime: 1 * 60 * 60 * 1000,
     gcTime: 1 * 60 * 60 * 1000,
   });
   const smScreenAndBelow = useMediaQuery("(max-width: 518px)");
+
+  if (!product)
+    return (
+      <div className="mt-40 text-center text-lg lg:text-xl text-muted-foreground">
+        Product Not Found
+      </div>
+    );
+  if (error && !isLoading) throw error;
 
   return (
     <>
