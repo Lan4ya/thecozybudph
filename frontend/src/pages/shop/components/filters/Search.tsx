@@ -1,31 +1,34 @@
-import { useFilters } from "../../hooks/useFilters";
+import { useProductQuery } from "../../hooks/useFilters";
 import { Search as SearchIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const Search = () => {
-  const { filters, setFilters } = useFilters();
+  const { productQuery, setProductQuery } = useProductQuery();
   const [search, setSearch] = useState("");
 
-  // sync local state with global state
+  // sync local state with context state
   useEffect(() => {
-    setSearch((filters.search as string) ?? "");
-  }, [filters.search]);
+    setSearch((productQuery.filters?.search as string) ?? "");
+  }, [productQuery.filters?.search]);
 
   // debounced search
   useEffect(() => {
     const handler = setTimeout(() => {
       const nextVal = search.trim() || undefined;
       // avoid unnecessary updates
-      if (filters.search !== nextVal) {
-        setFilters((prev) => ({
+      if (productQuery.filters?.search !== nextVal) {
+        setProductQuery((prev) => ({
           ...prev,
-          search: nextVal,
+          filters: {
+            ...prev.filters,
+            search: nextVal,
+          },
         }));
       }
     }, 300);
 
     return () => clearTimeout(handler);
-  }, [search, filters.search, setFilters]);
+  }, [search, productQuery.filters?.search, setProductQuery]);
 
   return (
     <div className="flex flex-col gap-2 w-full">

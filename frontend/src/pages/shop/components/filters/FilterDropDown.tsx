@@ -14,7 +14,7 @@ import { Button } from "@/lib/ui/__shadcn__/button";
 import { ChevronDown } from "lucide-react";
 import PersistSuspense from "@/components/PersistSuspense";
 import { Skeleton } from "@/lib/ui/__shadcn__/skeleton";
-import { useFilters } from "../../hooks/useFilters";
+import { useProductQuery } from "../../hooks/useFilters";
 import { useIsSmallScreen, useMediaQuery } from "@/hooks/useMediaQuery";
 import type { Filters, PriceRangeOption } from "../../types";
 import isDev from "@/lib/utils/isDev";
@@ -35,7 +35,7 @@ type FilterDropdownMenuProps = {
   setInputValue?: React.Dispatch<React.SetStateAction<string>>;
 };
 
-// INFO: This is used by all the filter components as base except Search and Sort
+// INFO: This is used by all the filter components as base except Search
 
 export const FilterDropdown = ({
   children,
@@ -44,7 +44,7 @@ export const FilterDropdown = ({
   setInputValue: setControlledValue,
 }: FilterDropdownMenuProps) => {
   const [open, setOpen] = useState(false);
-  const { filters } = useFilters();
+  const { productQuery } = useProductQuery();
   const isMobile = useIsSmallScreen();
 
   const [isInputFocused, setInputFocus] = useState(false);
@@ -89,7 +89,7 @@ export const FilterDropdown = ({
   }, []);
 
   const label = filterLabels[dropdownType];
-  const filterVal = filters[dropdownType];
+  const filterVal = productQuery.filters?.[dropdownType];
   const childrenWithValue =
     typeof children === "function" ? children(inputValue) : children;
 
@@ -209,8 +209,8 @@ const DisplaySelectedFilters = ({
 }: {
   dropdownType: DropdownFilterLabels;
 }) => {
-  const { setFilters, filters } = useFilters();
-  const filterVal = filters[dropdownType];
+  const { setProductQuery, productQuery } = useProductQuery();
+  const filterVal = productQuery.filters?.[dropdownType];
 
   const smScreen = useMediaQuery("(max-width: 449px)");
   const vals = useMemo(
@@ -233,8 +233,8 @@ const DisplaySelectedFilters = ({
       onClick={(e) => {
         e.stopPropagation();
 
-        setFilters((prev) => {
-          const currVal = prev[dropdownType];
+        setProductQuery((prev) => {
+          const currVal = prev.filters?.[dropdownType];
 
           const updated =
             Array.isArray(currVal) && currVal.length >= 2
@@ -243,12 +243,15 @@ const DisplaySelectedFilters = ({
 
           return {
             ...prev,
-            [dropdownType]: updated,
+            filters: {
+              ...prev.filters,
+              [dropdownType]: updated,
+            },
           };
         });
       }}
     >
-      {smScreen && vals.length > 0 && (
+      {smScreen && vals.length && (
         <span className="bg-background rounded-md px-2 py-1.5">
           +{vals.length}
         </span>

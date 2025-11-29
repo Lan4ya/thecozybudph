@@ -1,7 +1,7 @@
 import searchSubstring from "@/lib/utils/searchSubstring";
 import { useMemo, useState } from "react";
 import { FilterDropdown } from "./FilterDropDown";
-import { FilterDropdownMenuItem } from "./FilterDropdownItem";
+import { FilterDropdownItem } from "./FilterDropdownItem";
 import type { PriceRangeOption } from "../../types";
 
 const PRICE_RANGES: PriceRangeOption[] = [
@@ -14,7 +14,7 @@ const PRICE_RANGES: PriceRangeOption[] = [
 ];
 
 export const formatPriceRange = (range: PriceRangeOption) => {
-  console.log("formatPriceRange input:", range);
+  // console.log("formatPriceRange input:", range);
   if (!PRICE_RANGES.includes(range)) return undefined;
 
   if (range.endsWith("+")) {
@@ -31,7 +31,7 @@ export const formatPriceRange = (range: PriceRangeOption) => {
 const PriceRange = () => {
   const [inputValue, setInputValue] = useState("");
 
-  const filteredPriceRanges = useMemo(() => {
+  const priceRangeSearchResult = useMemo(() => {
     return searchSubstring(PRICE_RANGES, inputValue);
   }, [inputValue]);
 
@@ -41,8 +41,8 @@ const PriceRange = () => {
       inputValue={inputValue}
       setInputValue={setInputValue}
     >
-      {filteredPriceRanges.map((range) => (
-        <FilterDropdownMenuItem
+      {priceRangeSearchResult.map((range) => (
+        <FilterDropdownItem
           key={range}
           filterKey="priceRange"
           filterVal={range}

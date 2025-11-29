@@ -1,7 +1,7 @@
 import searchSubstring from "@/lib/utils/searchSubstring";
 import { useMemo, useState } from "react";
 import { FilterDropdown } from "./FilterDropDown";
-import { FilterDropdownMenuItem } from "./FilterDropdownItem";
+import { FilterDropdownItem } from "./FilterDropdownItem";
 
 const collections = [
   "Whispering Garden",
@@ -23,7 +23,7 @@ const Collections = () => {
       setInputValue={setInputValue}
     >
       {filteredCollections.map((collection) => (
-        <FilterDropdownMenuItem
+        <FilterDropdownItem
           key={collection}
           filterKey="collectionName"
           filterVal={collection}

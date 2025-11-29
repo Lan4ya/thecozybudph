@@ -3,13 +3,13 @@ import NavBar from "@/components/nav/NavBar";
 import Footer from "@/components/Footer";
 import { cn } from "@/lib/utils/cn";
 import { ScrollToTop } from "@/components/ScrollTop";
-import { FilterProvider } from "@/providers/FilterProvider";
+import { ProductQueryProvider } from "@/providers/ProductQueryProvider";
 
 function Root() {
   const location = useLocation();
 
   return (
-    <FilterProvider>
+    <ProductQueryProvider>
       <div
         className={cn(
           "flex flex-col min-h-screen",
@@ -21,7 +21,7 @@ function Root() {
         <Outlet />
         <Footer />
       </div>
-    </FilterProvider>
+    </ProductQueryProvider>
   );
 }
 

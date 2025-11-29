@@ -1,8 +1,8 @@
 import { useContext } from "react";
-import { FilterContext } from "@/providers/FilterProvider";
+import { ProductQueryContext } from "@/providers/ProductQueryProvider";
 
-export const useFilters = () => {
-  const ctx = useContext(FilterContext);
+export const useProductQuery = () => {
+  const ctx = useContext(ProductQueryContext);
   if (!ctx) throw new Error("useFilters must used inside FilterContext");
   return ctx;
 };

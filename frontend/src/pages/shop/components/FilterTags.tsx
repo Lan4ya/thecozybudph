@@ -1,6 +1,6 @@
 import { X, Tags as TagIcon } from "lucide-react";
 import type { Filters, PriceRangeOption } from "../types";
-import { useFilters } from "../hooks/useFilters";
+import { useProductQuery } from "../hooks/useFilters";
 import { useIsExtraLargeScreen } from "@/hooks/useMediaQuery";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import toggleArrItem from "@/lib/utils/toggleArrItem";
@@ -18,21 +18,23 @@ const xIcon = <X className="size-4" />;
 
 const Tags = () => {
   const [isClearFilterItemsBtnShown, showClearFilterItemsBtn] = useState(false);
-  const { filters, hasFilters } = useFilters();
+  const { productQuery, hasProductQueryFilters } = useProductQuery();
   const isXlScreen = useIsExtraLargeScreen();
 
-  const filterCount = useMemo(
+  const queryCount = useMemo(
     () =>
-      Object.values(filters).reduce((n, v) => {
+      Object.values(productQuery.filters || {}).reduce((n, v) => {
         if (Array.isArray(v)) return n + v.filter(Boolean).length;
         if (v != null && v !== "") return n + 1;
         return n;
       }, 0),
-    [filters],
+    [productQuery],
   );
 
   const flattenedFilters = useMemo(() => {
-    return Object.entries(filters).reduce<{ key: string; val: unknown }[]>(
+    return Object.entries(productQuery.filters || {}).reduce<
+      { key: string; val: string }[]
+    >(
       (acc, [key, value]) =>
         acc.concat(
           Array.isArray(value)
@@ -41,7 +43,7 @@ const Tags = () => {
         ),
       [],
     );
-  }, [filters]);
+  }, [productQuery]);
 
   return (
     <div className="xl:h-10 -mt-2 text-muted-foreground flex gap-5 text-sm items-center flex-1">
@@ -51,25 +53,8 @@ const Tags = () => {
           <PopoverTrigger asChild>
             <Button variant="minimal" size="icon" className="relative border">
               <TagIcon className="text-muted-foreground size-5" />
-              {hasFilters && (
-                <>
-                  {/* notification bubble */}
-                  {/*               <span */}
-                  {/*                 className=" */}
-                  {/*   absolute -top-1 -right-1 */}
-                  {/*   h-2.5 w-2.5 rounded-full bg-red-500 */}
-                  {/*   animate-ping */}
-                  {/*   opacity-75 */}
-                  {/* " */}
-                  {/*               /> */}
-                  {/* stable dot so ping pulse has a core */}
-                  <span
-                    className="
-        absolute -top-1 -right-1
-        h-2.5 w-2.5 rounded-full bg-red-500
-      "
-                  />
-                </>
+              {hasProductQueryFilters && (
+                <span className=" absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-red-500" />
               )}
             </Button>
           </PopoverTrigger>
@@ -80,23 +65,25 @@ const Tags = () => {
             align="start"
             className={cn(
               "flex flex-wrap gap-3 w-full",
-              hasFilters ? "max-w-95 md:max-w-120" : "justify-center p-2 w-30",
+              hasProductQueryFilters
+                ? "max-w-95 md:max-w-120"
+                : "justify-center p-2 w-30",
             )}
           >
             <PopoverArrow />
-            {hasFilters ? (
+            {hasProductQueryFilters ? (
               <>
                 {flattenedFilters.map(({ key, val }) => (
-                  <FilterItem
-                    key={`${key}-${String(val)}`}
-                    label={String(val)}
+                  <TagItem
+                    key={`${key}-${val}`}
+                    label={val}
                     filterKey={key as keyof Filters}
                     isXlScreen={isXlScreen}
                   />
                 ))}
 
-                {filterCount >= 2 && (
-                  <FilterItem label="Clear" isXlScreen={isXlScreen} />
+                {queryCount >= 2 && (
+                  <TagItem label="Clear" isXlScreen={isXlScreen} />
                 )}
               </>
             ) : (
@@ -113,7 +100,7 @@ const Tags = () => {
             className="flex gap-3 w-full"
           >
             {flattenedFilters.map(({ key, val }) => (
-              <FilterItem
+              <TagItem
                 key={`${key}-${String(val)}`}
                 label={String(val)}
                 filterKey={key as keyof Filters}
@@ -121,8 +108,8 @@ const Tags = () => {
               />
             ))}
 
-            {filterCount >= 2 && isClearFilterItemsBtnShown && (
-              <FilterItem label="Clear" isXlScreen={isXlScreen} />
+            {queryCount >= 2 && isClearFilterItemsBtnShown && (
+              <TagItem label="Clear" isXlScreen={isXlScreen} />
             )}
           </div>
         </>
@@ -131,14 +118,14 @@ const Tags = () => {
   );
 };
 
-type FilterItemProps = {
+type TagItemProps = {
   label: string;
   filterKey?: keyof Filters;
   isXlScreen: boolean;
 };
 
-const FilterItem = ({ label, filterKey, isXlScreen }: FilterItemProps) => {
-  const { setFilters, clearFilters } = useFilters();
+const TagItem = ({ label, filterKey, isXlScreen }: TagItemProps) => {
+  const { setProductQuery, clearProductQueryFilters } = useProductQuery();
 
   return (
     <Button
@@ -148,24 +135,37 @@ const FilterItem = ({ label, filterKey, isXlScreen }: FilterItemProps) => {
       className={cn("group flex items-center gap-1")}
       onClick={() => {
         if (label === "Clear") {
-          clearFilters();
+          clearProductQueryFilters();
           return;
         }
 
         if (!filterKey) return;
 
-        setFilters((prev) => {
-          const next = { ...prev };
-          const curr = next[filterKey];
+        setProductQuery((prev) => {
+          // const next = {
+          //   ...prev,
+          //   filters: { ...(prev.filters || {}) },
+          // };
+          const curr = prev.filters?.[filterKey];
+          const updated = Array.isArray(curr)
+            ? toggleArrItem(curr, label)
+            : curr === label
+              ? undefined
+              : label;
 
-          if (Array.isArray(curr)) {
-            const updated = toggleArrItem(curr, label);
-            (next[filterKey] as string[]) = updated;
-          } else if (curr === label) {
-            next[filterKey] = undefined;
-          }
+          // if (Array.isArray(curr)) {
+          //   (prev.filters[filterKey] as string[]) = toggleArrItem(curr, label);
+          // } else if (curr === label) {
+          //   prev.filters[filterKey] = undefined;
+          // }
 
-          return next;
+          return {
+            ...prev,
+            filters: {
+              ...(prev.filters || {}),
+              [filterKey]: updated,
+            },
+          };
         });
       }}
     >

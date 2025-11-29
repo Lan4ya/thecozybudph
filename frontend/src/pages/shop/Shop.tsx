@@ -2,7 +2,7 @@ import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import GridStyleButtons from "./components/GridStyleButtons";
 import { ShoppingBag } from "lucide-react";
 import { ProductAPI } from "@/services/api/products";
-import { useFilters } from "./hooks/useFilters";
+import { useProductQuery } from "./hooks/useFilters";
 import { useEffect, useRef } from "react";
 import { SortDropdownMenu } from "./components/SortDropDown";
 import type { ProductDataWithJoins } from "@TheCozyBud/schema";
@@ -13,7 +13,7 @@ import Collections from "./components/filters/Collection";
 import ProductCard from "@/components/products/ProductCard";
 import PersistSuspense from "@/components/PersistSuspense";
 import ShopProductGridSkeleton from "../../lib/ui/skeletons/ShopProductGridItemsSkeleton";
-import Tags from "./components/Tags";
+import Tags from "./components/FilterTags";
 import { useIsExtraLargeScreen } from "@/hooks/useMediaQuery";
 import ProductGridSkeleton from "@/lib/ui/skeletons/ShopProductGridItemsSkeleton";
 
@@ -22,12 +22,12 @@ import ProductGridSkeleton from "@/lib/ui/skeletons/ShopProductGridItemsSkeleton
 // };
 
 const Shop = () => {
-  const { filters, hasFilters } = useFilters();
+  const { productQuery, hasProductQueryFilters } = useProductQuery();
   const isXLScreen = useIsExtraLargeScreen();
 
   useEffect(() => {
-    console.log("currennt filters: ", filters);
-    console.log("has filters: ", hasFilters);
+    console.log("product query: ", productQuery);
+    console.log("has query filters: ", hasProductQueryFilters);
   });
 
   return (

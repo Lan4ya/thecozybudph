@@ -1,7 +1,7 @@
 import searchSubstring from "@/lib/utils/searchSubstring";
 import { useMemo, useState } from "react";
 import { FilterDropdown } from "./FilterDropDown";
-import { FilterDropdownMenuItem } from "./FilterDropdownItem";
+import { FilterDropdownItem } from "./FilterDropdownItem";
 import { CATEGORIES } from "../../types";
 
 const Categories = () => {
@@ -18,7 +18,7 @@ const Categories = () => {
       setInputValue={setInputValue}
     >
       {filteredCategories.map((category) => (
-        <FilterDropdownMenuItem
+        <FilterDropdownItem
           key={category}
           filterKey="categories"
           filterVal={category}
