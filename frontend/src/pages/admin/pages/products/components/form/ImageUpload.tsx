@@ -25,7 +25,7 @@ function ImageUploadInput({
   const { addToast } = useToast();
 
   return (
-    <div className="flex flex-col gap-3 md:flex-row md:gap-15">
+    <div className="flex flex-col gap-3 pb-1 md:flex-row md:gap-15">
       <div className="flex items-center gap-3">
         <label
           onClick={(e) => {
@@ -151,7 +151,7 @@ const UploadHint = ({
           "before:border-4 before:border-transparent before:border-t-popover", // tail pointing down
         )}
       >
-        {`You can upload up to ${maxImages} images per product; keep each under
+        {`You can only upload up to ${maxImages} images per product; keep each image under
         50 MB.`}
       </div>
     </div>

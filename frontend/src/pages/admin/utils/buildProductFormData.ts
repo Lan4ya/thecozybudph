@@ -38,6 +38,9 @@ export function buildProductFormData(opts: BuildOpts) {
   if ((fields as any).description)
     formData.append("description", (fields as any).description);
 
+  if ((fields as any).category)
+    formData.append("category", (fields as any).category);
+
   formData.append("primaryImageIndex", String(primaryImageIndex));
 
   // ---- CREATE ----

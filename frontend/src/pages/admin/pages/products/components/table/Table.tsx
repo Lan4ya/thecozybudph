@@ -9,7 +9,15 @@ import { formatPrice } from "@/lib/utils/format";
 import { useProductMutations } from "@/pages/admin/hooks/useProductsMutations";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { Edit, Trash2 } from "lucide-react";
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  memo,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 import ProductTableItemsSkeleton from "@/lib/ui/skeletons/AdminProductTableItemSkeleton";
 import { DeleteProductDialog } from "./DeleteDialog";
 
@@ -18,9 +26,7 @@ export default function ProductTable({
 }: {
   onEdit: (selectedProduct: ProductDataWithJoins) => void;
 }) {
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-
-  const { deleteProductMutation } = useProductMutations();
+  const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
 
   const perPage = 12;
   const {
@@ -31,7 +37,7 @@ export default function ProductTable({
     isFetchingNextPage,
     isFetching,
   } = useSuspenseInfiniteQuery<ProductDataWithJoins[]>({
-    queryKey: ["products"],
+    queryKey: ["__admin__products__"],
     queryFn: ({ pageParam }) =>
       ProductAPI.getAll({
         page: pageParam as number,
@@ -68,21 +74,6 @@ export default function ProductTable({
 
   const allProducts = products.pages.flat();
 
-  const handleDelete = useCallback(
-    (id: string) => {
-      setDeletingId(id);
-      deleteProductMutation.mutate(id, {
-        onSettled: () => setDeletingId(null),
-      });
-    },
-    [deleteProductMutation],
-  );
-
-  const handleEdit = useCallback(
-    (p: ProductDataWithJoins) => onEdit(p),
-    [onEdit],
-  );
-
   if (!allProducts.length) {
     return (
       <div className="py-12 text-center text-muted-foreground">
@@ -96,10 +87,10 @@ export default function ProductTable({
       {allProducts.map((p) => (
         <ProductTableItem
           key={p.id}
+          onEdit={onEdit}
           product={p}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          deletingId={deletingId}
+          deletingIds={deletingIds}
+          setDeletingIds={setDeletingIds}
         />
       ))}
 
@@ -116,40 +107,36 @@ export default function ProductTable({
 
 type ProductTableInnerProps = {
   product: ProductDataWithJoins;
-  onEdit: (p: ProductDataWithJoins) => void;
-  deletingId: string | null;
-  onDelete: (id: string) => void;
+  onEdit: (selectedProduct: ProductDataWithJoins) => void;
+  deletingIds: Set<string>;
+  setDeletingIds: Dispatch<SetStateAction<Set<string>>>;
 };
 
 function ProductTableItemInner({
   product,
   onEdit,
-  deletingId,
-  onDelete,
+  deletingIds,
+  setDeletingIds,
 }: ProductTableInnerProps) {
-  const isDeleting = deletingId === product.id;
+  const isDeleting = deletingIds.has(product.id);
 
-  const deleteTrigger = useMemo(
-    () => (
-      <Button
-        variant="destructive"
-        size="sm"
-        disabled={isDeleting}
-        className={cn(isDeleting && "opacity-70 pointer-events-none")}
-        aria-label={`Delete ${product.name}`}
-      >
-        {isDeleting ? <Spinner /> : <Trash2 className="size-4" />}
-      </Button>
-    ),
-    [isDeleting, product.name],
-  );
+  const { deleteProductMutation } = useProductMutations();
 
-  const handleEdit = useCallback(() => onEdit(product), [onEdit, product]);
+  const handleDelete = useCallback(() => {
+    setDeletingIds((prev) => new Set(prev).add(product.id));
 
-  const handleConfirmDelete = useCallback(
-    () => onDelete(product.id),
-    [onDelete, product.id],
-  );
+    deleteProductMutation.mutate(product.id, {
+      onSettled: () => {
+        setDeletingIds((prev) => {
+          const next = new Set(prev);
+          next.delete(product.id);
+          return next;
+        });
+      },
+    });
+  }, [deleteProductMutation, product.id]);
+
+  const handleEdit = useCallback(() => onEdit(product), [onEdit]);
 
   return (
     <article className="border flex-between gap-4 px-3 py-4 rounded-lg hover:shadow-sm transition">
@@ -199,8 +186,18 @@ function ProductTableItemInner({
 
         <DeleteProductDialog
           product={product}
-          onConfirm={handleConfirmDelete}
-          trigger={deleteTrigger}
+          onConfirm={handleDelete}
+          trigger={
+            <Button
+              variant="destructive"
+              size="sm"
+              disabled={isDeleting}
+              className={cn(isDeleting && "opacity-70 pointer-events-none")}
+              aria-label={`Delete ${product.name}`}
+            >
+              {isDeleting ? <Spinner /> : <Trash2 className="size-4" />}
+            </Button>
+          }
         />
       </div>
     </article>

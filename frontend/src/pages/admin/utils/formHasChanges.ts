@@ -18,6 +18,7 @@ export function formHasChanges(
       price,
       description,
       colorVariants,
+      category,
       productImages,
       collectionName,
     } = values;
@@ -27,6 +28,7 @@ export function formHasChanges(
       (!collectionName || collectionName.trim() === "") &&
       (!price || Number(price) === 0) &&
       (!description || description.trim() === "") &&
+      (!category || category.trim() === "") &&
       (!colorVariants || colorVariants.length === 0);
 
     const noImages =
@@ -41,24 +43,26 @@ export function formHasChanges(
   // --- UPDATE MODE ---
   if (!updatingProduct) return false;
 
-  const { name, price, description, colorVariants, collectionName } = values;
-
   const original = {
     name: updatingProduct.name,
     price: updatingProduct.price,
     description: updatingProduct.description ?? "",
     colorVariants: updatingProduct.colorVariants ?? [],
+    category: updatingProduct.productsCategory?.name ?? "",
     collectionName: updatingProduct.productsCollection?.name ?? "",
-    primaryImageIndex: updatingProduct.imageUrls.indexOf(
-      updatingProduct.primaryImageUrl,
-    ),
+    primaryImageIndex:
+      updatingProduct.imageUrls.indexOf(updatingProduct.primaryImageUrl) ?? 0,
   };
+
+  const { name, price, description, category, colorVariants, collectionName } =
+    values;
 
   const current = {
     name,
     price,
     description: description ?? "",
     colorVariants: colorVariants ?? [],
+    category: category ?? "",
     collectionName: collectionName ?? "",
     primaryImageIndex: stateOnlyValues?.primaryImageIndex ?? 0,
   };

@@ -59,19 +59,17 @@ export default function ProductForm({
   updatingProduct,
   onToggle,
 }: Props) {
+  const [submitting, setSubmitting] = useState(false);
   const [newSelectedFiles, setNewSelectedFiles] = useState<
     { file: File; url: string }[]
   >([]);
   // images to mark for deletion from existing DB URLs
   const [imageUrlsToDelete, setImageUrlsToDelete] = useState<string[]>([]);
-  const [primaryImageIndex, setPrimaryImageIndex] = useState<number>(-1);
+  const [primaryImageIndex, setPrimaryImageIndex] = useState<number>(0);
 
-  const { compressImages, progress } = useImageCompressor();
+  const { compressImages } = useImageCompressor();
 
   const { addProductMutation, updateProductMutation } = useProductMutations();
-  const savingProductUpdate = useMemo(() => {
-    return addProductMutation.isPending || updateProductMutation.isPending;
-  }, [updateProductMutation.isPending, addProductMutation.isPending]);
 
   const MAX_IMAGES = 3;
   const fileFieldName = updatingProduct ? "newProductImages" : "productImages";
@@ -92,9 +90,9 @@ export default function ProductForm({
       : { mode: "create", ...getEmptyFormKV() },
   });
 
-  const values = watch();
+  const formValues = watch();
 
-  const hasChanges = formHasChanges(values, updatingProduct, {
+  const hasChanges = formHasChanges(formValues, updatingProduct, {
     imagesToDelete: imageUrlsToDelete,
     newSelectedFilesCount: newSelectedFiles.length,
     primaryImageIndex,
@@ -296,6 +294,8 @@ export default function ProductForm({
   );
 
   const onSubmit = async (fieldData: ProductFormValues) => {
+    setSubmitting(true);
+
     if (displayImages.length === 0) {
       setError("newProductImages", {
         type: "manual",
@@ -323,19 +323,23 @@ export default function ProductForm({
 
       compressedFiles = [...compressedFiles, ...nonCompressableFiles];
     }
+    try {
+      const fd = buildProductFormData({
+        fields: fieldData,
+        files: compressedFiles,
+        isUpdate: fieldData.mode === "update",
+        imageUrlsToDelete,
+        primaryImageIndex,
+        productId:
+          fieldData.mode === "update" ? updatingProduct?.id : undefined,
+      });
 
-    const fd = buildProductFormData({
-      fields: fieldData,
-      files: compressedFiles,
-      isUpdate: fieldData.mode === "update",
-      imageUrlsToDelete,
-      primaryImageIndex,
-      productId: fieldData.mode === "update" ? updatingProduct?.id : undefined,
-    });
-
-    fieldData.mode === "create"
-      ? addProductMutation.mutate(fd)
-      : updateProductMutation.mutate(fd);
+      fieldData.mode === "create"
+        ? addProductMutation.mutateAsync(fd)
+        : updateProductMutation.mutateAsync(fd);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (!open) return null;
@@ -393,7 +397,7 @@ export default function ProductForm({
                     inputMode="decimal"
                     type="number"
                     step="any"
-                    {...register("price", { valueAsNumber: true })}
+                    {...register("price")}
                     onPaste={(e) => {
                       const text = e.clipboardData.getData("text");
                       if (!/^\d*\.?\d*$/.test(text)) e.preventDefault();
@@ -473,17 +477,30 @@ export default function ProductForm({
                   </label>
                   <textarea
                     {...register("description")}
-                    className="w-full min-h-[100px] max-h-32 rounded-md border border-input bg-background! px-3 py-2 text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 resize-y"
+                    className="w-full min-h-[100px] max-h-32 rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 resize-y"
                   />
-                  {errors.description && (
-                    <p className="text-xs text-red-500 mt-1">
-                      {errors.description.message}
-                    </p>
-                  )}
+
+                  <div className="flex-between">
+                    {errors.description && (
+                      <p className="text-xs text-red-500 mt-1">
+                        {errors.description.message}
+                      </p>
+                    )}
+
+                    <span
+                      className={`ml-auto text-xs ${
+                        formValues.description?.length > 600
+                          ? "text-red-500"
+                          : "text-muted-foreground"
+                      }`}
+                    >
+                      {formValues.description?.length ?? 0}/600
+                    </span>
+                  </div>
                 </div>
 
                 {/* Image Upload */}
-                <div className="md:col-span-2">
+                <div className="relative md:col-span-2">
                   <ImageUploadInput
                     images={displayImages}
                     onSelectFiles={handleSelectFiles}
@@ -492,17 +509,17 @@ export default function ProductForm({
                     setPrimaryImageIndex={setPrimaryImageIndex}
                     maxImages={MAX_IMAGES}
                   />
-                  {values.mode === "create" &&
+                  {formValues.mode === "create" &&
                     (errors as FieldErrors<CreateProductForm>)?.productImages
                       ?.message && (
-                      <p className="text-xs text-red-500 mt-1">
+                      <p className="absolute -bottom-1 text-xs text-red-500 mt-1">
                         {
                           (errors as FieldErrors<CreateProductForm>)
                             .productImages?.message
                         }
                       </p>
                     )}
-                  {values.mode === "update" &&
+                  {formValues.mode === "update" &&
                     (errors as FieldErrors<UpdateProductForm>)?.newProductImages
                       ?.message && (
                       <p className="text-xs text-red-500 mt-1">
@@ -528,10 +545,10 @@ export default function ProductForm({
 
               <Button
                 type="submit"
-                disabled={!hasChanges || savingProductUpdate}
+                disabled={!hasChanges || submitting}
                 className="bg-secondary hover:bg-secondary/90"
               >
-                {savingProductUpdate && <Spinner className="mr-2" />}
+                {submitting && <Spinner className="mr-2" />}
                 {updatingProduct ? "Update" : "Create"}
               </Button>
             </div>
@@ -549,8 +566,8 @@ function getEmptyFormKV(): CreateProductForm {
     name: "",
     price: "" as unknown as number,
     category: "",
-    collectionName: undefined,
-    description: undefined,
+    collectionName: "",
+    description: "",
     colorVariants: [],
     productImages: [],
     primaryImageIndex: 0,
@@ -563,8 +580,9 @@ function getMappedUpdatingProductKV(
   return {
     name: updatingProduct.name,
     price: updatingProduct.price,
-    collectionName: updatingProduct.productsCollection?.name ?? null,
-    description: updatingProduct.description ?? null,
+    collectionName: updatingProduct.productsCollection?.name ?? "",
+    description: updatingProduct.description ?? "",
+    category: updatingProduct.productsCategory?.name ?? "",
     colorVariants: updatingProduct.colorVariants ?? [],
     newProductImages: [],
     imageUrlsToDelete: [],

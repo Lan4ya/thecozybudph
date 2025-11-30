@@ -28,18 +28,37 @@ export const useProductMutations = () => {
     },
     onSuccess: (deletedProduct) => {
       queryClient.setQueryData<CreateProductsQueryData>(
-        ["products"],
+        ["__admin__products__"],
         (oldData) => {
           if (!oldData?.pages) return oldData;
 
-          // remove the deleted product from all pages
-          const pages = oldData.pages
-            .map((page) =>
-              page.filter((p) => p.id !== deletedProduct.productId),
-            )
+          const productPositionMap = new Map<
+            string,
+            { pageIndex: number; productIndex: number }
+          >();
+          oldData.pages.forEach((page, pIdx) => {
+            page.forEach((product, prodIdx) => {
+              productPositionMap.set(product.id, {
+                pageIndex: pIdx,
+                productIndex: prodIdx,
+              });
+            });
+          });
+
+          const pos = productPositionMap.get(deletedProduct.productId);
+          if (!pos) return oldData; // product not found
+
+          const { pageIndex, productIndex } = pos;
+          const newPages = oldData.pages
+            .map((page, idx) => {
+              if (idx !== pageIndex) return page; // other pages unchanged
+              const newPage = [...page];
+              newPage.splice(productIndex, 1); // remove the product
+              return newPage;
+            })
             .filter((page) => page.length > 0);
 
-          return { ...oldData, pages };
+          return { ...oldData, pages: newPages };
         },
       );
 
@@ -59,7 +78,7 @@ export const useProductMutations = () => {
     },
     onSuccess: (product) => {
       queryClient.setQueryData<CreateProductsQueryData>(
-        ["products"],
+        ["__admin__products__"],
         (oldData) => {
           if (!oldData) return oldData;
 
@@ -92,24 +111,36 @@ export const useProductMutations = () => {
     },
     onSuccess: (updatedProduct) => {
       queryClient.setQueryData<UpdateProductsQueryData>(
-        ["products"],
+        ["__admin__products__"],
         (oldData) => {
           if (!oldData?.pages) return oldData;
 
-          const pageIndex = oldData.pages.findIndex((page) =>
-            page.some((p) => p.id === updatedProduct.id),
-          );
-          if (pageIndex === -1) return oldData;
+          // Build lookup once
+          const productPositionMap = new Map<
+            string,
+            { pageIndex: number; productIndex: number }
+          >();
+          oldData.pages.forEach((page, pIdx) => {
+            page.forEach((prod, prodIdx) => {
+              productPositionMap.set(prod.id, {
+                pageIndex: pIdx,
+                productIndex: prodIdx,
+              });
+            });
+          });
 
-          const pages = oldData.pages.map((page, idx) =>
-            idx === pageIndex
-              ? page.map((p) =>
-                  p.id === updatedProduct.id ? updatedProduct : p,
-                )
-              : page,
-          );
+          const pos = productPositionMap.get(updatedProduct.id);
+          if (!pos) return oldData;
 
-          return { ...oldData, pages };
+          const { pageIndex, productIndex } = pos;
+          const newPages = oldData.pages.map((page, idx) => {
+            if (idx !== pageIndex) return page;
+            const newPage = [...page];
+            newPage[productIndex] = updatedProduct;
+            return newPage;
+          });
+
+          return { ...oldData, pages: newPages };
         },
       );
 

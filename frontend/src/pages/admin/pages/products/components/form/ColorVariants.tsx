@@ -8,7 +8,7 @@ export function ColorTagsInput({
   value,
   onChange,
   className,
-  max = 50, // sensible limit
+  max = 100, // sensible limit
 }: {
   value: string[];
   onChange: (colors: string[]) => void;
@@ -19,10 +19,10 @@ export function ColorTagsInput({
   const [error, setError] = useState<string | null>(null);
 
   const validateColor = (color: string) => {
-    if (!color) return "Color cannot be empty.";
-    if (color.length > 30) return "Color name too long.";
-    if (value.includes(color)) return "Already added.";
-    if (value.length >= max) return `Max ${max} colors allowed.`;
+    if (!color) return "color name can't be empty";
+    if (color.length > 100) return "color name can't exceed 100 characters";
+    if (value.includes(color)) return "color already exists";
+    if (value.length >= max) return `max ${max} colors are allowed`;
     return null;
   };
 
@@ -78,7 +78,7 @@ export function ColorTagsInput({
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
               if (
-                !/[a-z.]$/.test(e.key) &&
+                !/[a-zA-Z]$/.test(e.key) &&
                 ![
                   "Backspace",
                   "Tab",
