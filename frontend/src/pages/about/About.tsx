@@ -1,5 +1,11 @@
 const About = () => {
-  return <div className="flex-1 flex-center">About Page...</div>;
+  return (
+    <div className="flex-1 flex-center">
+      <div className="border  py-4 px-2 rounded-lg">
+        🚧 About Page Under Development... 🚧
+      </div>
+    </div>
+  );
 };
 
 export default About;
