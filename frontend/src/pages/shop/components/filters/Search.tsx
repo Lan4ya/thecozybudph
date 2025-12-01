@@ -25,7 +25,7 @@ const Search = () => {
           },
         }));
       }
-    }, 300);
+    }, 450);
 
     return () => clearTimeout(handler);
   }, [search, productQuery.filters?.search, setProductQuery]);

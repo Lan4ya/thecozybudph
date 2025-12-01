@@ -5,12 +5,12 @@ import { cn } from "@/lib/utils/cn";
 import { Button } from "@/lib/ui/__shadcn__/button";
 
 export function ColorTagsInput({
-  value,
+  colorVals,
   onChange,
   className,
   max = 100, // sensible limit
 }: {
-  value: string[];
+  colorVals: string[];
   onChange: (colors: string[]) => void;
   className?: string;
   max?: number;
@@ -21,8 +21,8 @@ export function ColorTagsInput({
   const validateColor = (color: string) => {
     if (!color) return "color name can't be empty";
     if (color.length > 100) return "color name can't exceed 100 characters";
-    if (value.includes(color)) return "color already exists";
-    if (value.length >= max) return `max ${max} colors are allowed`;
+    if (colorVals.includes(color)) return "color already exists";
+    if (colorVals.length >= max) return `max ${max} colors are allowed`;
     return null;
   };
 
@@ -36,21 +36,21 @@ export function ColorTagsInput({
     }
 
     setError(null);
-    onChange([...value, color]);
+    onChange([...colorVals, color]);
     setInput("");
   };
 
   const removeColor = (color: string) => {
-    onChange(value.filter((c) => c !== color));
+    onChange(colorVals.filter((c) => c !== color));
     setError(null);
   };
 
   return (
     <div className={cn("flex flex-col gap-2", className)}>
       {/* Tag list */}
-      {value.length > 0 && (
+      {colorVals.length > 0 && (
         <div className="flex flex-wrap gap-2">
-          {value.map((color) => (
+          {colorVals.map((color) => (
             <span
               key={color}
               className={cn(

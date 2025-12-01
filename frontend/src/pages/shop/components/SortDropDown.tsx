@@ -9,7 +9,7 @@ import {
 } from "@/lib/ui/__shadcn__/dropdown-menu";
 import { ArrowUpDown } from "lucide-react";
 import { useProductQuery } from "../hooks/useFilters";
-import type { SortOption } from "../types";
+import type { SortOption } from "../../../types";
 import { DropdownMenuRadioGroup } from "@radix-ui/react-dropdown-menu";
 
 export function SortDropdownMenu() {

@@ -1,14 +1,14 @@
 import { useLocation, useSearchParams } from "react-router";
 import { createContext, useCallback, useEffect, useMemo } from "react";
-import type { ProductQuery } from "@/pages/shop/types";
-import { parseQueryParams } from "@/lib/utils/parse";
+import type { ProductQueryDomain } from "@/types";
+import { getProductQueryParams } from "@/pages/shop/utils/parseProductQueryParams";
 
 type ProductQueryContextType = {
-  productQuery: ProductQuery;
+  productQuery: ProductQueryDomain;
   setProductQuery: (
     updates:
-      | Partial<ProductQuery>
-      | ((filters: ProductQuery) => Partial<ProductQuery>),
+      | Partial<ProductQueryDomain>
+      | ((filters: ProductQueryDomain) => Partial<ProductQueryDomain>),
   ) => void;
   hasProductQueryFilters: boolean;
   clearProductQueryFilters: () => void;
@@ -27,7 +27,7 @@ export function ProductQueryProvider({
   const [searchParams, setSearchParams] = useSearchParams();
   const pathname = useLocation().pathname;
 
-  const productQuery: ProductQuery = parseQueryParams(searchParams);
+  const productQuery: ProductQueryDomain = getProductQueryParams(searchParams);
 
   // default sort search param
   useEffect(() => {
@@ -40,10 +40,10 @@ export function ProductQueryProvider({
   const setProductQuery = useCallback(
     (
       updates:
-        | Partial<ProductQuery>
-        | ((pq: ProductQuery) => Partial<ProductQuery>),
+        | Partial<ProductQueryDomain>
+        | ((pq: ProductQueryDomain) => Partial<ProductQueryDomain>),
     ) => {
-      const qp: ProductQuery = parseQueryParams(searchParams);
+      const qp: ProductQueryDomain = getProductQueryParams(searchParams);
       const nextQp = typeof updates === "function" ? updates(qp) : updates;
 
       // Handle filters
@@ -75,7 +75,7 @@ export function ProductQueryProvider({
   );
 
   const clearProductQueryFilters = useCallback(() => {
-    const qp = parseQueryParams(searchParams);
+    const qp = getProductQueryParams(searchParams);
 
     if (qp.filters) {
       Object.keys(qp.filters).forEach((key) => {

@@ -1,14 +1,3 @@
-// FILTERING AND SORTING LATER:
-//   for (const [key, value] of Object.entries(filters)) {
-//     if (value !== undefined && value !== null && value !== "") {
-//       query = query.eq(key, value);
-//     }
-//   }
-//
-//   // ↕️ Apply sorting
-//   if (sort?.column) {
-//     query = query.order(sort.column, { ascending: sort.ascending ?? true });
-//   }
 import { supabase } from "../../lib/supabase/connect";
 import {
   type ProductDataWithJoins,
@@ -16,26 +5,66 @@ import {
   type UpdateProductData,
   type DeleteProductData,
   type ProductData,
+  type ProductsCategoryData,
+  type ProductsCollectionData,
 } from "@TheCozyBud/schema";
 import { snakeToCamel } from "../../lib/utils/caseConverter";
 import { apiClient } from "./interceptors/interceptors";
 import { unwrapResponse } from "./utils";
-
-export type FetchProductOpts = {
-  page?: number;
-  perPage?: number;
-  // filters and sorting here later
-};
+import type { ProductQueryAPI } from "@/types";
 
 export const ProductAPI = {
   getAll: async ({
+    filters,
+    sort,
     page = 0,
     perPage = 12,
-  }: FetchProductOpts): Promise<ProductDataWithJoins[]> => {
-    const query = supabase
+  }: ProductQueryAPI): Promise<ProductDataWithJoins[]> => {
+    let query = supabase
       .from("products_metadata")
-      .select(`*, products_collection (name)`)
+      .select("*, products_collection (*), products_category(*)")
       .range(page * perPage, (page + 1) * perPage - 1);
+
+    // Apply filters
+    console.log("API Filters: ", filters);
+
+    if (filters?.search) {
+      query = query.ilike("name", `%${filters.search}%`);
+    }
+
+    if (filters?.categoryIds?.length) {
+      query = query.in("product_category_id", filters.categoryIds);
+    }
+
+    if (filters?.collectionIds?.length) {
+      query = query.in("product_collection_id", filters.collectionIds);
+    }
+
+    const pr = filters?.priceRange;
+    if (pr) {
+      if (pr.max !== undefined) {
+        query = query.gte("price", pr.min).lte("price", pr.max);
+        // .order("price", { ascending: true });
+      } else {
+        query = query.gte("price", pr.min).order("price", { ascending: true });
+      }
+    }
+
+    if (sort) {
+      switch (sort) {
+        case "Lowest Price":
+          query.order("price", { ascending: true });
+          break;
+        case "Highest Price":
+          query.order("price", { ascending: false });
+          break;
+        case "Most Recent":
+          query.order("created_at", { ascending: false });
+          break;
+        default:
+          query = query.order("created_at", { ascending: true });
+      }
+    }
 
     const { data, error } = await query;
     console.log("Fetching products...");
@@ -74,5 +103,28 @@ export const ProductAPI = {
       params: { productId },
     });
     return unwrapResponse(res.data);
+  },
+
+  getCategories: async (): Promise<ProductsCategoryData[]> => {
+    const { data, error } = await supabase
+      .from("products_category")
+      .select("*");
+
+    console.log("Fetching categories...");
+    console.log(data);
+    if (error) throw error;
+    return snakeToCamel(data ?? []) satisfies ProductsCategoryData[];
+  },
+
+  getCollections: async (): Promise<ProductsCollectionData[]> => {
+    const { data, error } = await supabase
+      .from("products_collection")
+      .select("*");
+
+    console.log("Fetching collections...");
+    console.log(data);
+
+    if (error) throw error;
+    return snakeToCamel(data ?? []) satisfies ProductsCollectionData[];
   },
 };

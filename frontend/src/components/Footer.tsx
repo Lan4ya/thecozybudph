@@ -1,14 +1,6 @@
-import { Button } from "@/lib/ui/__shadcn__/button";
-import { Link } from "react-router";
-const admin_route_hash = import.meta.env.VITE_ADMIN_ROUTE_HASH!;
-
 const Footer = () => {
   return (
     <footer className="mt-auto bg-secondary text-secondary-foreground py-8">
-      <Button asChild className="fixed bottom-5 left-5">
-        <Link to={`/admin-${admin_route_hash}/login`}>DEV</Link>
-      </Button>
-
       <div className="custom-container mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <h4 className="font-back-to-black text-primary-foreground text-20-bold">

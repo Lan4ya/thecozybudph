@@ -460,7 +460,7 @@ export default function ProductForm({
                     Color Variants (optional)
                   </label>
                   <ColorTagsInput
-                    value={watch("colorVariants") ?? []}
+                    colorVals={watch("colorVariants") ?? []}
                     onChange={(colors) => setValue("colorVariants", colors)}
                   />
                   {errors.colorVariants && (

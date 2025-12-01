@@ -19,10 +19,14 @@ export type ProductData = SnakeToCamel<ProductsMetadataRow>;
 
 export type ProductDataWithJoins = ProductData & {
   productsCollection: {
-    // name: string | null;
+    name: string;
+  } | null;
+
+  productsCategory: {
     name: string;
   } | null;
 };
+
 export type CreateProductData = ProductData & {
   productsCollection: {
     name: string;

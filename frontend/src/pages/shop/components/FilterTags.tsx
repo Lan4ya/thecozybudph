@@ -1,5 +1,5 @@
 import { X, Tags as TagIcon } from "lucide-react";
-import type { Filters, PriceRangeOption } from "../types";
+import type { FiltersDomain, PriceRangeOption } from "../../../types";
 import { useProductQuery } from "../hooks/useFilters";
 import { useIsExtraLargeScreen } from "@/hooks/useMediaQuery";
 import { Button } from "@/lib/ui/__shadcn__/button";
@@ -77,7 +77,7 @@ const Tags = () => {
                   <TagItem
                     key={`${key}-${val}`}
                     label={val}
-                    filterKey={key as keyof Filters}
+                    filterKey={key as keyof FiltersDomain}
                     isXlScreen={isXlScreen}
                   />
                 ))}
@@ -103,7 +103,7 @@ const Tags = () => {
               <TagItem
                 key={`${key}-${String(val)}`}
                 label={String(val)}
-                filterKey={key as keyof Filters}
+                filterKey={key as keyof FiltersDomain}
                 isXlScreen={isXlScreen}
               />
             ))}
@@ -120,7 +120,7 @@ const Tags = () => {
 
 type TagItemProps = {
   label: string;
-  filterKey?: keyof Filters;
+  filterKey?: keyof FiltersDomain;
   isXlScreen: boolean;
 };
 

@@ -16,16 +16,16 @@ import PersistSuspense from "@/components/PersistSuspense";
 import { Skeleton } from "@/lib/ui/__shadcn__/skeleton";
 import { useProductQuery } from "../../hooks/useFilters";
 import { useIsSmallScreen, useMediaQuery } from "@/hooks/useMediaQuery";
-import type { Filters, PriceRangeOption } from "../../types";
+import type { FiltersDomain, PriceRangeOption } from "../../../../types";
 import isDev from "@/lib/utils/isDev";
 import { formatPriceRange } from "./PriceRange";
 
-type DropdownFilterLabels = Exclude<keyof Filters, "search" | "sort">;
+type DropdownFilterLabels = Exclude<keyof FiltersDomain, "search" | "sort">;
 
 const filterLabels: Record<DropdownFilterLabels, string> = {
   priceRange: "Price range",
   categories: "Categories",
-  collectionName: "Collections",
+  collectionNames: "Collections",
 };
 
 type FilterDropdownMenuProps = {
@@ -163,7 +163,7 @@ export const FilterDropdown = ({
         {/* Will contain all the filter dropdown items */}
         <DropdownMenuContent
           style={{ width: triggerWidth }}
-          className={`max-w-[243px] min-h-[25px] max-h-[520px] bg-background text-muted-foreground`}
+          className={`max-w-[243px] min-h-[25px] max-h-[370px] lg:max-h-[520px] bg-background text-muted-foreground`}
           sideOffset={15}
           align="center"
         >

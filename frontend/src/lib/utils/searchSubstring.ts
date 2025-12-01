@@ -24,24 +24,3 @@ export default function searchSubstring<T>(
     str.toLowerCase().includes(q),
   ) as unknown as T[];
 }
-
-// export default function searchSubstring<T>(
-//   arr: (string | T)[],
-//   query: string,
-//   selector?: (item: T) => string,
-// ): (string | T)[] {
-//   const q = query.trim().toLowerCase();
-//
-//   if (selector) {
-//     // selector returns string
-//     return (arr as T[]).filter((item) =>
-//       selector(item).toLowerCase().includes(q),
-//     );
-//   }
-//
-//   return (arr as unknown as string[]).filter((str) =>
-//     str.toLowerCase().includes(q),
-//   ) as unknown as T[];
-//   // return (arr as string[]).filter((str) => str.toLowerCase().includes(q));
-// }
-//

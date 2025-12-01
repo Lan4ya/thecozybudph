@@ -5,21 +5,21 @@ import { useProductQuery } from "../../hooks/useFilters";
 import toggleArrItem from "@/lib/utils/toggleArrItem";
 import {
   type ArrayFilterKeys,
-  type Filters,
+  type FiltersDomain,
   type NonArrayFilterKeys,
   type PriceRangeOption,
-} from "../../types";
-import { arrayFilters } from "../../types";
+} from "../../../../types";
+import { arrayFiltersKeys } from "../../../../types";
 import { formatPriceRange } from "./PriceRange";
 
 type ArrayFilterProps<K extends ArrayFilterKeys> = {
   filterKey: K;
-  filterVal: Extract<Filters[K], readonly unknown[]>[number];
+  filterVal: Extract<FiltersDomain[K], readonly unknown[]>[number];
 };
 
 type NonArrayFilterProps<K extends NonArrayFilterKeys> = {
   filterKey: K;
-  filterVal: Filters[K];
+  filterVal: FiltersDomain[K];
 };
 
 type FilterDropdownItemProps =
@@ -36,7 +36,7 @@ export const FilterDropdownItem = ({
   const { productQuery, setProductQuery } = useProductQuery();
 
   const isArr = useMemo(
-    () => arrayFilters.includes(filterKey as ArrayFilterKeys),
+    () => arrayFiltersKeys.includes(filterKey as ArrayFilterKeys),
     [filterKey],
   );
 
@@ -76,6 +76,7 @@ export const FilterDropdownItem = ({
     });
   }, [filterKey, filterVal, isArr]);
 
+  // Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quia, omnis perferendis aspernatur qui, assumenda reprehenderit possimus fugit debitis officiis, odit veritatis aliquam totam corrupti. Mollitia sunt cum et neque sequi?
   return (
     <DropdownMenuItem
       className="flex-between filter-dropdown-item-spacing focus:bg-input/30"

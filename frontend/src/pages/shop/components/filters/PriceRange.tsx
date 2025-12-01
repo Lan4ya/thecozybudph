@@ -2,7 +2,7 @@ import searchSubstring from "@/lib/utils/searchSubstring";
 import { useMemo, useState } from "react";
 import { FilterDropdown } from "./FilterDropDown";
 import { FilterDropdownItem } from "./FilterDropdownItem";
-import type { PriceRangeOption } from "../../types";
+import type { PriceRangeOption } from "../../../../types";
 
 const PRICE_RANGES: PriceRangeOption[] = [
   "0-2000",

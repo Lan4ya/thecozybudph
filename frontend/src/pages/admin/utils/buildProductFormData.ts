@@ -1,3 +1,7 @@
+import {
+  capitalizeFirstLetter,
+  capitalizeFirstLetterOfEachWord,
+} from "@/lib/utils/format";
 import type { CreateProductData, UpdateProductData } from "@TheCozyBud/schema";
 
 type BuildOpts = {
@@ -28,7 +32,10 @@ export function buildProductFormData(opts: BuildOpts) {
     formData.append("price", String(fields.price));
 
   if ((fields as any).collectionName)
-    formData.append("collectionName", (fields as any).collectionName);
+    formData.append(
+      "collectionName",
+      capitalizeFirstLetterOfEachWord((fields as any).collectionName),
+    );
 
   if ((fields as any).colorVariants)
     fields.colorVariants.forEach((color: string) =>
@@ -36,10 +43,16 @@ export function buildProductFormData(opts: BuildOpts) {
     );
 
   if ((fields as any).description)
-    formData.append("description", (fields as any).description);
+    formData.append(
+      "description",
+      capitalizeFirstLetter((fields as any).description),
+    );
 
   if ((fields as any).category)
-    formData.append("category", (fields as any).category);
+    formData.append(
+      "category",
+      capitalizeFirstLetterOfEachWord((fields as any).category),
+    );
 
   formData.append("primaryImageIndex", String(primaryImageIndex));
 
