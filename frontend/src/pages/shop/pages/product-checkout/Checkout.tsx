@@ -8,6 +8,7 @@ import { RouteLoader } from "@/components/RouteLoaderFallback";
 import ProductDetails from "./Details";
 import { ArrowLeft } from "lucide-react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useEffect, useState } from "react";
 
 export const ProductCheckout = () => {
   return (
@@ -21,6 +22,14 @@ export const ProductCheckout = () => {
 
 const ProductDetailContent = () => {
   const { id } = useParams<{ id: string }>();
+  const [isValidUUID, setIsValidUUID] = useState(false);
+
+  // validate UUID format before making the API call
+  useEffect(() => {
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    setIsValidUUID(uuidRegex.test(id || ""));
+  }, [id]);
 
   const {
     data: product,
@@ -28,14 +37,16 @@ const ProductDetailContent = () => {
     error,
   } = useSuspenseQuery<ProductData | null>({
     queryKey: ["product", id],
-    // queryFn: () => ProductAPI.getById(id!),
-    queryFn: () => ProductAPI.getById(id!),
+    queryFn: () => {
+      if (!isValidUUID || !id) return Promise.resolve(null);
+      return ProductAPI.getById(id);
+    },
     staleTime: 1 * 60 * 60 * 1000,
     gcTime: 1 * 60 * 60 * 1000,
   });
   const smScreenAndBelow = useMediaQuery("(max-width: 518px)");
 
-  if (!product)
+  if (!product || !isValidUUID)
     return (
       <div className="mt-40 text-center text-lg lg:text-xl text-muted-foreground">
         Product Not Found
