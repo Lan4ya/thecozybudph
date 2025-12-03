@@ -15,6 +15,11 @@ import AdminDashboardOrders from "./pages/admin/pages/orders/Orders.tsx";
 import { CatchAllErrorPage } from "./pages/ErrorPage.tsx";
 import { RouteLoader } from "./components/RouteLoaderFallback.tsx";
 import { ProductCheckout } from "./pages/shop/pages/product-checkout/Checkout.tsx";
+import Login from "./pages/auth/Login.tsx";
+import Dashboard from "./pages/dashboard/Dashboard.tsx";
+import SignUp from "./pages/auth/Signup.tsx";
+import TOS from "./pages/TOS/TOS.tsx";
+import PrivacyPolicy from "./pages/PrivacyPolicy/PrivacyPolicy.tsx";
 
 const admin_route_hash = import.meta.env.VITE_ADMIN_ROUTE_HASH!;
 
@@ -25,6 +30,9 @@ const router = createBrowserRouter([
     ErrorBoundary: CatchAllErrorPage,
     children: [
       { index: true, Component: Home },
+      { path: "auth/signup", Component: SignUp },
+      { path: "auth/login", Component: Login },
+      { path: "dashboard", Component: Dashboard },
       { path: "about", Component: About },
       {
         path: "shop",
@@ -39,6 +47,8 @@ const router = createBrowserRouter([
       { path: "events", Component: Events },
       { path: "cart", Component: Cart },
       { path: "contact", Component: Contact },
+      { path: "terms-of-service", Component: TOS },
+      { path: "privacy-policy", Component: PrivacyPolicy },
     ],
   },
   {
