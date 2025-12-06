@@ -100,7 +100,7 @@ const Signup = () => {
         password,
         options: {
           emailRedirectTo: isDev
-            ? "http://localhost:5173/dashboard"
+            ? "http://localhost:5173/"
             : "https:thecozybud.vercel.app",
         },
       });
