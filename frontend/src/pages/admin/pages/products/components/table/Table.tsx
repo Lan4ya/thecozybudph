@@ -143,7 +143,7 @@ function ProductTableItemInner({
       <div className="flex items-center gap-4 min-w-0">
         {product.imageUrls?.[0] && (
           <ProductImage
-            src={product.imageUrls[0]}
+            src={product.primaryImageUrl ?? product.imageUrls[0]}
             alt={product.name}
             roundedSize="md"
             className="size-25"

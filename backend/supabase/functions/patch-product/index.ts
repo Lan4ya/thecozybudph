@@ -28,7 +28,7 @@ const supabase = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
 );
 
-Deno.serve(async (req) => {
+Deno.serve(async (req: Request): Promise<Response> => {
   const optionsRes = handleCorsOptions(req);
   if (optionsRes) return optionsRes;
   const corsHeaders = getCorsHeaders(req);

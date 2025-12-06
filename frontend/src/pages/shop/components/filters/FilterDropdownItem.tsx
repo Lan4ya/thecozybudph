@@ -53,7 +53,7 @@ export const FilterDropdownItem = ({
 
   const handleToggle = useCallback(() => {
     setProductQuery((prev) => {
-      console.log("filterVal", filterVal);
+      // console.log("filterVal", filterVal);
 
       const curr = prev.filters?.[filterKey];
       const updated = isArr
@@ -70,8 +70,6 @@ export const FilterDropdownItem = ({
         },
       };
 
-      console.log("prev", prev.filters?.priceRange);
-      console.log("next", next.filters?.priceRange);
       return next;
     });
   }, [filterKey, filterVal, isArr]);

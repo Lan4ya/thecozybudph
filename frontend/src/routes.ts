@@ -13,13 +13,14 @@ import AdminLogin from "./pages/admin/pages/login/Login.tsx";
 import AdminDashboardProducts from "./pages/admin/pages/products/Products.tsx";
 import AdminDashboardOrders from "./pages/admin/pages/orders/Orders.tsx";
 import { CatchAllErrorPage } from "./pages/ErrorPage.tsx";
-import { RouteLoader } from "./components/RouteLoaderFallback.tsx";
+import { RouteLoaderSpinner } from "./components/RouteLoaderSpinner.tsx";
 import { ProductCheckout } from "./pages/shop/pages/product-checkout/Checkout.tsx";
 import Login from "./pages/auth/Login.tsx";
-import Dashboard from "./pages/dashboard/Dashboard.tsx";
+import Profile from "./pages/profile/Profile.tsx";
 import SignUp from "./pages/auth/Signup.tsx";
-import TOS from "./pages/TOS/TOS.tsx";
-import PrivacyPolicy from "./pages/PrivacyPolicy/PrivacyPolicy.tsx";
+import TOS from "./pages/terms-of-service/TOS.tsx";
+import PrivacyPolicy from "./pages/privacy-policy/PrivacyPolicy.tsx";
+import { ConfirmEmail } from "./pages/auth/ConfirmEmail.tsx";
 
 const admin_route_hash = import.meta.env.VITE_ADMIN_ROUTE_HASH!;
 
@@ -31,8 +32,9 @@ const router = createBrowserRouter([
     children: [
       { index: true, Component: Home },
       { path: "auth/signup", Component: SignUp },
+      { path: "auth/confirm-email", Component: ConfirmEmail },
       { path: "auth/login", Component: Login },
-      { path: "dashboard", Component: Dashboard },
+      { path: "profile", Component: Profile },
       { path: "about", Component: About },
       {
         path: "shop",
@@ -59,7 +61,7 @@ const router = createBrowserRouter([
   {
     path: `/admin-${admin_route_hash}/dashboard`,
     loader: AdminLoader,
-    HydrateFallback: RouteLoader,
+    HydrateFallback: RouteLoaderSpinner,
     Component: AdminDashboard,
     ErrorBoundary: CatchAllErrorPage,
     children: [

@@ -6,7 +6,7 @@ type ProductImageProps = {
   src: string;
   alt?: string;
   loading?: "eager" | "lazy";
-  roundedSize?: "sm" | "md" | "lg";
+  roundedSize?: "sm" | "md" | "lg" | "xl";
   className?: string;
 };
 
@@ -20,19 +20,19 @@ export const ProductImage = ({
   const [loaded, setLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
   const fallBackImg = "/no-image-light.png";
-  const roundedClass = `rounded-${roundedSize ?? ""}`;
+  const borderRadius = `rounded-${roundedSize ?? ""}`;
 
   return (
     <div
       className={cn(
         "h-full w-full relative overflow-hidden",
-        roundedClass,
+        borderRadius,
         className,
       )}
     >
       {!loaded && (
         <Skeleton
-          className={cn("absolute inset-0 rounded-none", roundedClass)}
+          className={cn("absolute inset-0 rounded-none", borderRadius)}
         />
       )}
       <img

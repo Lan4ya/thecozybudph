@@ -9,8 +9,5 @@
   },
   "dependencies": {
     "zod": "^4.1.12"
-  },
-  "devDependencies": {
-    "supabase": "^2.58.5"
   }
 }

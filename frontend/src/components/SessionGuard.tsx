@@ -11,17 +11,14 @@ import {
 } from "@/lib/ui/__shadcn__/card";
 import { Button } from "@/lib/ui/__shadcn__/button";
 
-const admin_route_hash = import.meta.env.VITE_ADMIN_ROUTE_HASH!;
-
 export default function SessionGuard() {
   const [expired, setExpired] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check session on mount
-    // supabase.auth.getSession().then(({ data: { session } }) => {
-    //   if (!session) setExpired(true);
-    // });
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) setExpired(true);
+    });
 
     // Subscribe to real-time auth changes
     const { data } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -31,9 +28,7 @@ export default function SessionGuard() {
     return () => data.subscription.unsubscribe();
   }, []);
 
-  const handleLoginRedirect = () => {
-    navigate(`/admin-${admin_route_hash}/login`);
-  };
+  const handleLoginRedirect = () => navigate("/auth/signup");
 
   if (!expired) return null;
 

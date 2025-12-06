@@ -1,18 +1,13 @@
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-// @ts-ignore
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-// @ts-ignore
-import { CustomError, handleError } from "@shared/errors/mod.ts";
+import { createClient } from "supabase";
+import { CustomError } from "@shared/errors/mod.ts";
+import { handleError } from "@shared/response/handleError.ts";
 
 const supabase = createClient(
-  // @ts-ignore
   Deno.env.get("SUPABASE_URL")!,
-  // @ts-ignore
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
 );
 
-// @ts-ignore
-Deno.serve(async (req) => {
+Deno.serve((req) => {
   if (req.method !== "POST") {
     return Response.json({ error: "Method not allowed" }, { status: 405 });
   }

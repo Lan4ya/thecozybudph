@@ -6,20 +6,27 @@ import { ScrollToTop } from "@/components/ScrollTop";
 import { ProductQueryProvider } from "@/providers/ProductQueryProvider";
 
 function Root() {
-  const location = useLocation();
+  const pn = useLocation().pathname;
+  const hideNav = pn === "/auth/login" || pn === "/auth/signup";
+  const hideFooter = pn === "/auth/login" || pn === "/auth/signup";
 
   return (
     <ProductQueryProvider>
       <div
         className={cn(
           "flex flex-col min-h-screen",
-          location.pathname !== "/" && "pt-15 lg:pt-20",
+          pn !== "/" &&
+            pn !== "/auth/signup" &&
+            pn !== "/auth/login" &&
+            "pt-15 lg:pt-20",
         )}
       >
+        {/*  always scroll to top on route change */}
         <ScrollToTop />
-        <NavBar />
+
+        {!hideNav && <NavBar />}
         <Outlet />
-        <Footer />
+        {!hideFooter && <Footer />}
       </div>
     </ProductQueryProvider>
   );

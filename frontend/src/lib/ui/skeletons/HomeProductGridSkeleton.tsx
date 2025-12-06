@@ -9,7 +9,7 @@ const HomeProductGridSkeleton = () => {
       />
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 xl:gap-8 2xl:gap-10 ">
-        {Array.from({ length: 8 }).map((_, i) => (
+        {Array.from({ length: 6 }).map((_, i) => (
           <div key={i} className="border border-border/30 rounded-lg">
             <Skeleton className="aspect-square rounded-b-none" />
 

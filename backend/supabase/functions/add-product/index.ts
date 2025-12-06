@@ -27,7 +27,7 @@ const supabase = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
 );
 
-Deno.serve(async (req) => {
+Deno.serve(async (req: Request): Promise<Response> => {
   const optionsRes = handleCorsOptions(req);
   if (optionsRes) return optionsRes;
 
@@ -183,8 +183,10 @@ Deno.serve(async (req) => {
     }
     const res: CreateProductData = {
       ...createdProduct,
-      productsCollection: productCollection?.name ?? null,
-      productsCategory: productCategory?.name ?? null,
+      productsCollection: productCollection
+        ? { name: productCollection.name }
+        : null,
+      productsCategory: productCategory ? { name: productCategory.name } : null,
     };
 
     return handleSuccess(res, corsHeaders);

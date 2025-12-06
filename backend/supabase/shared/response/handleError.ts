@@ -1,4 +1,3 @@
-// @ts-ignore
 import { CustomError } from "../errors/CustomError.ts";
 import type { ApiResponseError } from "../schema/index.ts";
 

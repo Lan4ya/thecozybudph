@@ -28,6 +28,7 @@ import { formHasChanges } from "@/pages/admin/utils/formHasChanges";
 import { useProductMutations } from "@/pages/admin/hooks/useProductsMutations";
 import { useImageCompressor } from "@/pages/admin/hooks/useImageConverter";
 import { formatFileSize } from "@/lib/utils/format";
+import isDev from "@/lib/utils/isDev";
 
 const createProductFormSchema = createProductSchema.extend({
   mode: z.literal("create"),
@@ -77,12 +78,12 @@ export default function ProductForm({
   const {
     register,
     handleSubmit,
-    setValue,
     watch,
     formState: { errors },
     reset,
-    clearErrors,
+    setValue,
     setError,
+    clearErrors,
   } = useForm<ProductFormValues>({
     resolver: zodResolver(productFormSchema),
     defaultValues: updatingProduct
@@ -368,8 +369,9 @@ export default function ProductForm({
 
         <CardContent className="px-0!">
           <form
-            onSubmit={handleSubmit(onSubmit, (err) =>
-              console.log("Form validation errors:", err),
+            onSubmit={handleSubmit(
+              onSubmit,
+              (err) => isDev && console.log("Form validation errors:", err),
             )}
           >
             <div className="max-h-[70dvh] px-6 overflow-x-visible overflow-y-auto">
@@ -531,26 +533,25 @@ export default function ProductForm({
                     )}
                 </div>
               </div>
-            </div>
+              {/* Actions */}
+              <div className="mt-5 flex justify-end gap-3">
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={() => onToggle(false)}
+                >
+                  Cancel
+                </Button>
 
-            {/* Actions */}
-            <div className="mt-5 flex justify-end gap-3">
-              <Button
-                variant="outline"
-                type="button"
-                onClick={() => onToggle(false)}
-              >
-                Cancel
-              </Button>
-
-              <Button
-                type="submit"
-                disabled={!hasChanges || submitting}
-                className="bg-secondary hover:bg-secondary/90"
-              >
-                {submitting && <Spinner className="mr-2" />}
-                {updatingProduct ? "Update" : "Create"}
-              </Button>
+                <Button
+                  type="submit"
+                  disabled={!hasChanges || submitting}
+                  className="bg-secondary hover:bg-secondary/90"
+                >
+                  {submitting && <Spinner className="mr-2" />}
+                  {updatingProduct ? "Update" : "Create"}
+                </Button>
+              </div>
             </div>
           </form>
         </CardContent>

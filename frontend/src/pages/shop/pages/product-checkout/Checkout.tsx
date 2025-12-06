@@ -4,16 +4,16 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { ProductAPI } from "@/services/api/products";
 import type { ProductData } from "@TheCozyBud/schema";
 import PersistSuspense from "@/components/PersistSuspense";
-import { RouteLoader } from "@/components/RouteLoaderFallback";
+import { RouteLoaderSpinner } from "@/components/RouteLoaderSpinner";
 import ProductDetails from "./Details";
 import { ArrowLeft } from "lucide-react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 
 export const ProductCheckout = () => {
   return (
     <div className="max-w-7xl flex flex-col items-center gap-8 mb-25 lg:grid lg:grid-cols-2 lg:gap-12 lg:items-start lg:mt-8 justify-center lg:mx-auto lg:px-6! max-[380px]:px-2!">
-      <PersistSuspense fallback={<RouteLoader />}>
+      <PersistSuspense fallback={<RouteLoaderSpinner />}>
         <ProductDetailContent />
       </PersistSuspense>
     </div>
@@ -22,15 +22,15 @@ export const ProductCheckout = () => {
 
 const ProductDetailContent = () => {
   const { id } = useParams<{ id: string }>();
-  const [isValidUUID, setIsValidUUID] = useState(false);
 
-  // validate UUID format before making the API call
-  useEffect(() => {
+  const isValidUUID = useMemo(() => {
+    if (!id) return false;
     const uuidRegex =
       /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-    setIsValidUUID(uuidRegex.test(id || ""));
+    return uuidRegex.test(id);
   }, [id]);
 
+  console.log("isValidUUID:", isValidUUID);
   const {
     data: product,
     isLoading,
@@ -48,7 +48,7 @@ const ProductDetailContent = () => {
 
   if (!product || !isValidUUID)
     return (
-      <div className="mt-40 text-center text-lg lg:text-xl text-muted-foreground">
+      <div className="absolute inset-0 z-10 flex-center mb-70 text-lg lg:text-xl text-muted-foreground">
         Product Not Found
       </div>
     );

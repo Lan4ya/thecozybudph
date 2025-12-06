@@ -19,11 +19,20 @@ export const ProductAPI = {
     sort,
     page = 0,
     perPage = 12,
-  }: ProductQueryAPI): Promise<ProductDataWithJoins[]> => {
+    noDummyProduct = false,
+  }: ProductQueryAPI & { noDummyProduct?: boolean }): Promise<
+    ProductDataWithJoins[]
+  > => {
+    console.log({ page });
+
     let query = supabase
       .from("products_metadata")
       .select("*, products_collection (*), products_category(*)")
       .range(page * perPage, (page + 1) * perPage - 1);
+
+    if (noDummyProduct) {
+      query = query.not("name", "ilike", "%dummy product%");
+    }
 
     // Apply filters
     console.log("API Filters: ", filters);
@@ -50,6 +59,7 @@ export const ProductAPI = {
       }
     }
 
+    // Apply sort
     if (sort) {
       switch (sort) {
         case "Lowest Price":

@@ -33,7 +33,6 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const addToast = useCallback(
     (message: string, type: ToastType = "info") => {
-      // Prevent more than 3 of the same message
       setToasts((prev) => {
         const sameMessageCount = prev.filter(
           (t) => t.message === message,
@@ -41,7 +40,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
         if (sameMessageCount >= 3) return prev; // skip adding
         const id = crypto.randomUUID();
         const newToasts = [...prev, { id, message, type }];
-        setTimeout(() => removeToast(id), 3000);
+        setTimeout(() => removeToast(id), 3_000);
         return newToasts;
       });
     },
@@ -52,7 +51,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
     <ToastContext.Provider value={{ addToast }}>
       {children}
 
-      <div className="text-center fixed top-5 right-5 z-9999 flex flex-col gap-3">
+      <div className="text-center fixed bottom-5 right-5 z-9999 flex flex-col gap-3">
         <AnimatePresence>
           {toasts.map((t) => (
             <motion.div
@@ -63,13 +62,14 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
               exit={{ opacity: 0, y: -20, scale: 0.9 }}
               transition={{ duration: 0.25 }}
               className={cn(
-                "w-62 lg:w-72 rounded-lg px-4 py-3 shadow-md font-medium text-white",
+                "w-45 lg:w-65 rounded-lg px-4 py-3 shadow-md  font-medium text-white",
                 t.type === "success" && "bg-green-600",
                 t.type === "error" && "bg-red-600",
-                t.type === "info" && "bg-white text-black",
+                t.type === "info" &&
+                  "bg-white text-black border border-accent/50",
               )}
             >
-              <p className="overflow-hidden overflow-ellipsis">{t.message}</p>
+              <p className="">{t.message}</p>
             </motion.div>
           ))}
         </AnimatePresence>
