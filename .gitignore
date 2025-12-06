@@ -29,6 +29,7 @@ dist-ssr
 __ignored*
 .repomix*
 repomix*
+avante.md
 
 # products/
 events/
