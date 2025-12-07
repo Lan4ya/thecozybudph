@@ -5,8 +5,8 @@
 
 export const allowedOrigins = [
   "http://localhost:5173", // local dev
-  "https://thecozybudph.com", // your production site
-  "https://www.thecozybudph.com",
+  "https://thecozybudph.com",
+  "https://thecozybudph.vercel.app",
 ];
 
 // Build headers dynamically per request
