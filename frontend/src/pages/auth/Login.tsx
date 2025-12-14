@@ -1,7 +1,7 @@
 import sign_up_pic from "@/assets/thecozybud/TCB_4.png";
 import LOGO from "@/assets/thecozybud/logo_transparent_oneline1.png";
 import { useState } from "react";
-import { supabase } from "@/lib/supabase/connect";
+import { supabase } from "@/lib/supabase/client";
 import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import {
@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/lib/ui/__shadcn__/card";
 import { Input } from "@/lib/ui/__shadcn__/input";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import googleIcon from "@/assets/icons/google.svg";
 import { useIsLargeScreen } from "@/hooks/useMediaQuery";
@@ -27,6 +27,8 @@ const Login = () => {
   const checkingAuth = useRedirectIfAuthed();
   const [loading, setLoading] = useState(false);
   const [passVisible, setPassVisible] = useState(false);
+
+  const navigate = useNavigate();
 
   const {
     register,
@@ -62,7 +64,7 @@ const Login = () => {
         options: {
           redirectTo: isDev
             ? "http://localhost:5173/"
-            : "https://thecozybud.vercel.app/",
+            : "https://thecozybud.vercel.app/", // NOTE: idk yet if im deploy to vercel or cloudflare
         },
       });
       if (error) throw error;
@@ -96,6 +98,7 @@ const Login = () => {
 
       sessionStorage.setItem("notifyLogInSuccess", "success");
       isDev && console.log({ data });
+      navigate(isDev ? "/" : "https://thecozybud.vercel.app/"); // NOTE: idk yet if im deploy to vercel or cloudflare
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : "Unknown error occurred";

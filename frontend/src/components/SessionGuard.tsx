@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router";
-import { supabase } from "@/lib/supabase/connect";
+import { supabase } from "@/lib/supabase/client";
 import {
   Card,
   CardHeader,

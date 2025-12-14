@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/lib/ui/__shadcn__/button";
-import { supabase } from "@/lib/supabase/connect";
+import { supabase } from "@/lib/supabase/client";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import isDev from "@/lib/utils/isDev";
 import { useNavigate } from "react-router";

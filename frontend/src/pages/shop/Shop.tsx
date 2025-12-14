@@ -12,6 +12,7 @@ import { ShopProductGridSkeleton } from "../../lib/ui/skeletons/ShopProductGridI
 import Tags from "./components/FilterTags";
 import { useIsExtraLargeScreen } from "@/hooks/useMediaQuery";
 import ShopProductGrid from "./components/ShopProductGrid";
+import { ErrorBoundary } from "react-error-boundary";
 
 const Shop = () => {
   const { productQuery, hasProductQueryFilters } = useProductQuery();
@@ -35,9 +36,16 @@ const Shop = () => {
           <div className="xl:flex xl:gap-6">
             <div className="grid grid-cols-2 md:grid-cols-4  gap-x-4 md:gap-x-6  gap-y-4">
               <Search />
+
               <PriceRange />
-              <Categories />
-              <Collections />
+
+              <ErrorBoundary fallback={null}>
+                <Categories />
+              </ErrorBoundary>
+
+              <ErrorBoundary fallback={null}>
+                <Collections />
+              </ErrorBoundary>
             </div>
 
             {isXLScreen && (
@@ -62,15 +70,17 @@ const Shop = () => {
           </div>
         </div>
 
-        <PersistSuspense
-          fallback={
-            <div className="grid gap-5 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6  xl:gap-8 2xl:gap-10 ">
-              <ShopProductGridSkeleton />
-            </div>
-          }
-        >
-          <ShopProductGrid />
-        </PersistSuspense>
+        <ErrorBoundary fallback={null}>
+          <PersistSuspense
+            fallback={
+              <div className="grid gap-5 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6  xl:gap-8 2xl:gap-10 ">
+                <ShopProductGridSkeleton />
+              </div>
+            }
+          >
+            <ShopProductGrid />
+          </PersistSuspense>
+        </ErrorBoundary>
       </main>
     </div>
   );

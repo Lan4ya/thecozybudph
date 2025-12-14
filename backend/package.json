@@ -3,13 +3,13 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "db": "pnpm dlx supabase",
-    "build": "tsc ."
-  },
-  "dependencies": {
-    "@supabase/supabase-js": "^2.75.1"
+    "build": "tsc .",
+    "gen-supabase-types": "pnpx supabase gen types typescript --local > ../packages/schema/src/db/supabase.types.ts && mkdir -p  ./supabase/functions/_shared/schema && rm -rf ./supabase/functions/_shared/schema/* && cp -r ../packages/schema/src/* ./supabase/functions/_shared/schema/"
   },
   "devDependencies": {
-    "@TheCozyBud/schema": "workspace:*"
+    "@TheCozyBud/schema": "workspace:*",
+    "dotenv": "^17.2.3",
+    "supabase": "^2.67.0",
+    "tsx": "^4.21.0"
   }
 }

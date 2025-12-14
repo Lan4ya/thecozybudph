@@ -12,7 +12,7 @@ import { useMemo } from "react";
 
 export const ProductCheckout = () => {
   return (
-    <div className="max-w-7xl flex flex-col items-center gap-8 mb-25 lg:grid lg:grid-cols-2 lg:gap-12 lg:items-start lg:mt-8 justify-center lg:mx-auto lg:px-6! max-[380px]:px-2!">
+    <div className="max-w-7xl flex flex-col items-center gap-8 mb-25 lg:grid lg:grid-cols-2 lg:gap-12 lg:items-start lg:mt-8 justify-center lg:mx-auto lg:px-6">
       <PersistSuspense fallback={<RouteLoaderSpinner />}>
         <ProductDetailContent />
       </PersistSuspense>

@@ -1,6 +1,6 @@
 import { Outlet, redirect } from "react-router";
 import AdminDashboardNavbar from "./components/DashboardNavBar";
-import { supabase } from "@/lib/supabase/connect";
+import { supabase } from "@/lib/supabase/client";
 import SessionGuard from "@/components/SessionGuard";
 import {
   getCachedIsAdminCheck,

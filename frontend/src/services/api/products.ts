@@ -1,4 +1,4 @@
-import { supabase } from "../../lib/supabase/connect";
+import { supabase } from "../../lib/supabase/client";
 import {
   type ProductDataWithJoins,
   type CreateProductData,
@@ -10,7 +10,7 @@ import {
 } from "@TheCozyBud/schema";
 import { snakeToCamel } from "../../lib/utils/caseConverter";
 import { apiClient } from "./interceptors/interceptors";
-import { unwrapResponse } from "./utils";
+import { unwrapAPIResponse } from "@/lib/utils/unwrapAPIResponse";
 import type { ProductQueryAPI } from "@/types";
 
 export const ProductAPI = {
@@ -33,10 +33,9 @@ export const ProductAPI = {
     if (noDummyProduct) {
       query = query.not("name", "ilike", "%dummy product%");
     }
+    // console.log("API Filters: ", filters);
 
-    // Apply filters
-    console.log("API Filters: ", filters);
-
+    // Handle filters
     if (filters?.search) {
       query = query.ilike("name", `%${filters.search}%`);
     }
@@ -49,30 +48,42 @@ export const ProductAPI = {
       query = query.in("product_collection_id", filters.collectionIds);
     }
 
-    const pr = filters?.priceRange;
-    if (pr) {
-      if (pr.max !== undefined) {
-        query = query.gte("price", pr.min).lte("price", pr.max);
-        // .order("price", { ascending: true });
+    const priceRange = filters?.priceRange;
+    if (priceRange) {
+      if (priceRange.max !== undefined) {
+        query = query.gte("price", priceRange.min).lte("price", priceRange.max);
       } else {
-        query = query.gte("price", pr.min).order("price", { ascending: true });
+        query = query
+          .gte("price", priceRange.min)
+          .order("price", { ascending: true });
       }
     }
 
-    // Apply sort
+    // Handle sort
     if (sort) {
       switch (sort) {
         case "Lowest Price":
-          query.order("price", { ascending: true });
+          query
+            .order("price", { ascending: true })
+            .order("id", { ascending: true });
           break;
+
         case "Highest Price":
-          query.order("price", { ascending: false });
+          query
+            .order("price", { ascending: false })
+            .order("id", { ascending: false });
           break;
+
         case "Most Recent":
-          query.order("created_at", { ascending: false });
+          query
+            .order("created_at", { ascending: false })
+            .order("id", { ascending: false });
           break;
+
         default:
-          query = query.order("created_at", { ascending: true });
+          query
+            .order("created_at", { ascending: true })
+            .order("id", { ascending: true });
       }
     }
 
@@ -99,20 +110,20 @@ export const ProductAPI = {
   },
 
   update: async (productFormData: FormData): Promise<UpdateProductData> => {
-    const res = await apiClient.patch("/patch-product", productFormData);
-    return unwrapResponse(res.data);
+    const res = await apiClient.patch("/products", productFormData);
+    return unwrapAPIResponse(res.data);
   },
 
   create: async (productFormData: FormData): Promise<CreateProductData> => {
-    const res = await apiClient.post("/add-product", productFormData);
-    return unwrapResponse(res.data);
+    const res = await apiClient.post("/products", productFormData);
+    return unwrapAPIResponse(res.data);
   },
 
-  deleteById: async (productId: string): Promise<DeleteProductData> => {
-    const res = await apiClient.delete("/delete-product", {
-      params: { productId },
+  delete: async (productIds: string[]): Promise<DeleteProductData> => {
+    const res = await apiClient.delete("/products", {
+      params: { productIds },
     });
-    return unwrapResponse(res.data);
+    return unwrapAPIResponse(res.data);
   },
 
   getCategories: async (): Promise<ProductsCategoryData[]> => {

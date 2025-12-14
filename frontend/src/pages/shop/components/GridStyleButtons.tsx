@@ -1,5 +1,5 @@
 import { Button } from "@/lib/ui/__shadcn__/button";
-import { Grid3x3, LayoutGrid, TableProperties } from "lucide-react";
+import { Grid3x3, LayoutGrid } from "lucide-react";
 
 const GridStyleButtons = () => {
   return (

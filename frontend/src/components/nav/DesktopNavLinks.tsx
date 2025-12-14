@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router";
 import { cn } from "@/lib/utils/cn";
-import { supabase } from "@/lib/supabase/connect";
+import { supabase } from "@/lib/supabase/client";
 
 const navItems = [
   { label: "Shop", href: "/shop" },
