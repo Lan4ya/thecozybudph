@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase/connect";
+import { supabase } from "@/lib/supabase/client";
 import isDev from "@/lib/utils/isDev";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";

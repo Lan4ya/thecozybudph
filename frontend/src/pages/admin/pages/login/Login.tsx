@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { supabase } from "@/lib/supabase/connect";
+import { supabase } from "@/lib/supabase/client";
 import { Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/lib/ui/__shadcn__/button";

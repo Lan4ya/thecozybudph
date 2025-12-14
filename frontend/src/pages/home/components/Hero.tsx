@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { Skeleton } from "@/lib/ui/__shadcn__/skeleton";
-import TCB_1 from "@/assets/thecozybud/TCB_1.png";
+import TCB_1 from "@/assets/thecozybud/TCB_1_C.png";
 import TCB_1_Cropped from "@/assets/thecozybud/TCB_1_Cropped.jpg";
 import TCB_3 from "@/assets/thecozybud/TCB_3.png";
 import TCB_5 from "@/assets/thecozybud/TCB_5.jpg";

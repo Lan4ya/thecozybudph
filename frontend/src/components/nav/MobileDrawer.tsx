@@ -43,15 +43,19 @@ import {
   DrawerTrigger,
 } from "@/lib/ui/__shadcn__/drawer";
 import { NavLink, useLocation } from "react-router";
-import { supabase } from "@/lib/supabase/connect";
+import { supabase } from "@/lib/supabase/client";
 import { useState } from "react";
 import { DialogTitle } from "@radix-ui/react-dialog";
+import isDev from "@/lib/utils/isDev";
 
 export const MobileDrawer = () => {
   const [hasSession, setHasSession] = useState(false);
 
   supabase.auth.getSession().then(({ data: { session } }) => {
-    if (session) setHasSession(true);
+    isDev && console.log("has session: ", session);
+    if (session) {
+      setHasSession(true);
+    }
   });
 
   const location = useLocation();

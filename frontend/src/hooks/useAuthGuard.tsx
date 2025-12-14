@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase/connect";
+import { supabase } from "@/lib/supabase/client";
 import { useNavigate } from "react-router";
 
 export function useAuthGuard(redirectTo = "/auth/login") {

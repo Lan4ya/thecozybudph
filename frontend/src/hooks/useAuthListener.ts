@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useToast } from "@/providers/ToastProvider";
-import { supabase } from "@/lib/supabase/connect";
+import { supabase } from "@/lib/supabase/client";
 
 export function useAuthListener() {
   const navigate = useNavigate();

@@ -1,7 +1,7 @@
 import LOGO from "@/assets/thecozybud/logo_transparent_oneline1.png";
 import sign_up_pic from "@/assets/thecozybud/TCB_4.png";
 import { useState } from "react";
-import { supabase } from "@/lib/supabase/connect";
+import { supabase } from "@/lib/supabase/client";
 import isDev from "@/lib/utils/isDev";
 
 import { ArrowLeft, Eye, EyeOff } from "lucide-react";
@@ -65,7 +65,7 @@ const Signup = () => {
         options: {
           redirectTo: isDev
             ? "http://localhost:5173/"
-            : "https://thecozybud.vercel.app/",
+            : "https://thecozybud.vercel.app/", // NOTE: idk yet if im deploy to vercel or cloudflare
         },
       });
       if (error) throw error;
@@ -98,11 +98,7 @@ const Signup = () => {
       } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          emailRedirectTo: isDev
-            ? "http://localhost:5173/"
-            : "https:thecozybud.vercel.app",
-        },
+        options: { emailRedirectTo: "/" },
       });
 
       if (error) {

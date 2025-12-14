@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { supabase } from "@/lib/supabase/connect";
+import { supabase } from "@/lib/supabase/client";
 import isDev from "@/lib/utils/isDev";
 
 type Timeout = ReturnType<typeof setTimeout>;

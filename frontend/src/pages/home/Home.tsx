@@ -1,12 +1,13 @@
 import PersistSuspense from "@/components/PersistSuspense";
 import Hero from "./components/Hero";
-import ProductRecommendations from "./components/Recommendations";
+import ProductRecommendations from "./components/ProductRecommendations";
 import HomeProductGridSkeleton from "@/lib/ui/skeletons/HomeProductGridSkeleton";
 import EventSection from "./components/EventSection";
 import { ReviewCarousel } from "./components/ReviewCarousel";
 import { useToast } from "@/providers/ToastProvider";
 import { useEffect } from "react";
-import { supabase } from "@/lib/supabase/connect";
+import { supabase } from "@/lib/supabase/client";
+import { ErrorBoundary } from "react-error-boundary";
 
 const Home = () => {
   const { addToast } = useToast();
@@ -40,9 +41,11 @@ const Home = () => {
       <EventSection />
       <ReviewCarousel />
 
-      <PersistSuspense fallback={<HomeProductGridSkeleton />}>
-        <ProductRecommendations />
-      </PersistSuspense>
+      <ErrorBoundary fallback={null}>
+        <PersistSuspense fallback={<HomeProductGridSkeleton />}>
+          <ProductRecommendations />
+        </PersistSuspense>
+      </ErrorBoundary>
 
       <section className="w-full bg-primary/5 rounded-2xl mb-20 py-12 px-6 lg:px-12 ">
         <div className="max-w-4xl mx-auto text-center space-y-4">
