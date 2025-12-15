@@ -60,7 +60,7 @@ schema_paths = []
 enabled = true
 # Specifies an ordered list of seed files to load during db reset.
 # Supports glob patterns relative to supabase directory: "./seeds/*.sql"
-sql_paths = ["./seed.sql"]
+sql_paths = ["./seeds/**/*.sql"]
 
 [db.network_restrictions]
 # Enable management of network restrictions.
@@ -109,16 +109,13 @@ file_size_limit = "50MiB"
 # enabled = true
 
 [storage.buckets.products]
-public = false
-file_size_limit = "50MiB"
+public = true
 allowed_mime_types = ["image/png", "image/webp", "image/jpeg"]
-objects_path = "./images"
 
 [storage.buckets.events]
-public = false
-file_size_limit = "50MiB"
+public = true
 allowed_mime_types = ["image/png", "image/webp", "image/jpeg"]
-objects_path = "./events"
+# objects_path = "./events"
 
 [auth]
 enabled = true

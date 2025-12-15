@@ -8,7 +8,12 @@
   },
   "devDependencies": {
     "@TheCozyBud/schema": "workspace:*",
+    "@faker-js/faker": "^10.1.0",
+    "@snaplet/copycat": "^6.0.0",
+    "@snaplet/seed": "^0.98.0",
+    "@types/pg": "^8.16.0",
     "dotenv": "^17.2.3",
+    "pg": "^8.16.3",
     "supabase": "^2.67.0",
     "tsx": "^4.21.0"
   }

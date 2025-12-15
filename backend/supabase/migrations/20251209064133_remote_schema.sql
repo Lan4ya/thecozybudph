@@ -63,9 +63,9 @@ CREATE OR REPLACE FUNCTION "public"."cleanup_orphaned_categories"() RETURNS "tri
     AS $$
 BEGIN
   -- Delete categories that have no products referencing them
-  DELETE FROM products_category c
+  DELETE FROM product_categories c
   WHERE NOT EXISTS (
-    SELECT 1 FROM products_metadata m
+    SELECT 1 FROM products m
     WHERE m.product_category_id = c.id
   );
 
@@ -82,9 +82,9 @@ CREATE OR REPLACE FUNCTION "public"."cleanup_orphaned_collections"() RETURNS "tr
     AS $$
 BEGIN
   -- Delete categories that have no products referencing them
-  DELETE FROM products_category c
+  DELETE FROM product_categories c
   WHERE NOT EXISTS (
-    SELECT 1 FROM products_metadata m
+    SELECT 1 FROM products m
     WHERE m.product_category_id = c.id
   );
 
@@ -218,25 +218,25 @@ CREATE TABLE IF NOT EXISTS "public"."payments" (
 ALTER TABLE "public"."payments" OWNER TO "postgres";
 
 
-CREATE TABLE IF NOT EXISTS "public"."products_category" (
+CREATE TABLE IF NOT EXISTS "public"."product_categories" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "name" "text" NOT NULL
 );
 
 
-ALTER TABLE "public"."products_category" OWNER TO "postgres";
+ALTER TABLE "public"."product_categories" OWNER TO "postgres";
 
 
-CREATE TABLE IF NOT EXISTS "public"."products_collection" (
+CREATE TABLE IF NOT EXISTS "public"."product_collections" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "name" "text" NOT NULL
 );
 
 
-ALTER TABLE "public"."products_collection" OWNER TO "postgres";
+ALTER TABLE "public"."product_collections" OWNER TO "postgres";
 
 
-CREATE TABLE IF NOT EXISTS "public"."products_metadata" (
+CREATE TABLE IF NOT EXISTS "public"."products" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "name" "text" NOT NULL,
     "price" numeric(10,2) NOT NULL,
@@ -248,11 +248,11 @@ CREATE TABLE IF NOT EXISTS "public"."products_metadata" (
     "primary_image_url" "text" NOT NULL,
     "description" "text" DEFAULT ''::"text",
     "product_category_id" "uuid",
-    CONSTRAINT "products_metadata_price_check" CHECK (("price" >= (0)::numeric))
+    CONSTRAINT "products_price_check" CHECK (("price" >= (0)::numeric))
 );
 
 
-ALTER TABLE "public"."products_metadata" OWNER TO "postgres";
+ALTER TABLE "public"."products" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "public"."profiles" (
@@ -321,28 +321,28 @@ ALTER TABLE ONLY "public"."payments"
 
 
 
-ALTER TABLE ONLY "public"."products_category"
-    ADD CONSTRAINT "products_category_name_key" UNIQUE ("name");
+ALTER TABLE ONLY "public"."product_categories"
+    ADD CONSTRAINT "product_categories_name_key" UNIQUE ("name");
 
 
 
-ALTER TABLE ONLY "public"."products_category"
-    ADD CONSTRAINT "products_category_pkey" PRIMARY KEY ("id");
+ALTER TABLE ONLY "public"."product_categories"
+    ADD CONSTRAINT "product_categories_pkey" PRIMARY KEY ("id");
 
 
 
-ALTER TABLE ONLY "public"."products_collection"
-    ADD CONSTRAINT "products_collection_name_key" UNIQUE ("name");
+ALTER TABLE ONLY "public"."product_collections"
+    ADD CONSTRAINT "product_collections_name_key" UNIQUE ("name");
 
 
 
-ALTER TABLE ONLY "public"."products_collection"
-    ADD CONSTRAINT "products_collection_pkey" PRIMARY KEY ("id");
+ALTER TABLE ONLY "public"."product_collections"
+    ADD CONSTRAINT "product_collections_pkey" PRIMARY KEY ("id");
 
 
 
-ALTER TABLE ONLY "public"."products_metadata"
-    ADD CONSTRAINT "products_metadata_pkey" PRIMARY KEY ("id");
+ALTER TABLE ONLY "public"."products"
+    ADD CONSTRAINT "products_pkey" PRIMARY KEY ("id");
 
 
 
@@ -375,15 +375,15 @@ CREATE INDEX "idx_profile_addresses" ON "public"."addresses" USING "btree" ("pro
 
 
 
-CREATE OR REPLACE TRIGGER "trigger_cleanup_categories" AFTER DELETE OR UPDATE ON "public"."products_metadata" FOR EACH STATEMENT EXECUTE FUNCTION "public"."cleanup_orphaned_categories"();
+CREATE OR REPLACE TRIGGER "trigger_cleanup_categories" AFTER DELETE OR UPDATE ON "public"."products" FOR EACH STATEMENT EXECUTE FUNCTION "public"."cleanup_orphaned_categories"();
 
 
 
-CREATE OR REPLACE TRIGGER "trigger_cleanup_collections" AFTER DELETE OR UPDATE ON "public"."products_metadata" FOR EACH STATEMENT EXECUTE FUNCTION "public"."cleanup_orphaned_collections"();
+CREATE OR REPLACE TRIGGER "trigger_cleanup_collections" AFTER DELETE OR UPDATE ON "public"."products" FOR EACH STATEMENT EXECUTE FUNCTION "public"."cleanup_orphaned_collections"();
 
 
 
-CREATE OR REPLACE TRIGGER "update_products_metadata_updated_at" BEFORE UPDATE ON "public"."products_metadata" FOR EACH ROW EXECUTE FUNCTION "public"."moddatetime"('updated_at');
+CREATE OR REPLACE TRIGGER "update_products_updated_at" BEFORE UPDATE ON "public"."products" FOR EACH ROW EXECUTE FUNCTION "public"."moddatetime"('updated_at');
 
 
 
@@ -398,7 +398,7 @@ ALTER TABLE ONLY "public"."cart_items"
 
 
 ALTER TABLE ONLY "public"."cart_items"
-    ADD CONSTRAINT "cart_items_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "public"."products_metadata"("id");
+    ADD CONSTRAINT "cart_items_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id");
 
 
 
@@ -413,7 +413,7 @@ ALTER TABLE ONLY "public"."order_items"
 
 
 ALTER TABLE ONLY "public"."order_items"
-    ADD CONSTRAINT "order_items_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "public"."products_metadata"("id");
+    ADD CONSTRAINT "order_items_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "public"."products"("id");
 
 
 
@@ -432,13 +432,13 @@ ALTER TABLE ONLY "public"."payments"
 
 
 
-ALTER TABLE ONLY "public"."products_metadata"
-    ADD CONSTRAINT "products_metadata_product_category_id_fkey" FOREIGN KEY ("product_category_id") REFERENCES "public"."products_category"("id") ON DELETE SET NULL;
+ALTER TABLE ONLY "public"."products"
+    ADD CONSTRAINT "products_product_category_id_fkey" FOREIGN KEY ("product_category_id") REFERENCES "public"."product_categories"("id") ON DELETE SET NULL;
 
 
 
-ALTER TABLE ONLY "public"."products_metadata"
-    ADD CONSTRAINT "products_metadata_product_collection_id_fkey" FOREIGN KEY ("product_collection_id") REFERENCES "public"."products_collection"("id") ON DELETE SET NULL;
+ALTER TABLE ONLY "public"."products"
+    ADD CONSTRAINT "products_product_collection_id_fkey" FOREIGN KEY ("product_collection_id") REFERENCES "public"."product_collections"("id") ON DELETE SET NULL;
 
 
 
@@ -458,15 +458,15 @@ CREATE POLICY "admins admin read" ON "public"."profiles" FOR SELECT TO "service_
 
 
 
-CREATE POLICY "allow public read" ON "public"."products_category" FOR SELECT USING (true);
-CREATE POLICY "allow public read" ON "public"."products_collection" FOR SELECT USING (true);
-CREATE POLICY "allow public read" ON "public"."products_metadata" FOR SELECT USING (true);
+CREATE POLICY "allow public read" ON "public"."product_categories" FOR SELECT USING (true);
+CREATE POLICY "allow public read" ON "public"."product_collections" FOR SELECT USING (true);
+CREATE POLICY "allow public read" ON "public"."products" FOR SELECT USING (true);
 
 
 
-ALTER TABLE "public"."products_category" ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "public"."products_collection" ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "public"."products_metadata" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."product_categories" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."product_collections" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."products" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."profiles" ENABLE ROW LEVEL SECURITY;
 
 
@@ -553,21 +553,21 @@ GRANT ALL ON TABLE "public"."payments" TO "service_role";
 
 
 
-GRANT ALL ON TABLE "public"."products_category" TO "anon";
-GRANT ALL ON TABLE "public"."products_category" TO "authenticated";
-GRANT ALL ON TABLE "public"."products_category" TO "service_role";
+GRANT ALL ON TABLE "public"."product_categories" TO "anon";
+GRANT ALL ON TABLE "public"."product_categories" TO "authenticated";
+GRANT ALL ON TABLE "public"."product_categories" TO "service_role";
 
 
 
-GRANT ALL ON TABLE "public"."products_collection" TO "anon";
-GRANT ALL ON TABLE "public"."products_collection" TO "authenticated";
-GRANT ALL ON TABLE "public"."products_collection" TO "service_role";
+GRANT ALL ON TABLE "public"."product_collections" TO "anon";
+GRANT ALL ON TABLE "public"."product_collections" TO "authenticated";
+GRANT ALL ON TABLE "public"."product_collections" TO "service_role";
 
 
 
-GRANT ALL ON TABLE "public"."products_metadata" TO "anon";
-GRANT ALL ON TABLE "public"."products_metadata" TO "authenticated";
-GRANT ALL ON TABLE "public"."products_metadata" TO "service_role";
+GRANT ALL ON TABLE "public"."products" TO "anon";
+GRANT ALL ON TABLE "public"."products" TO "authenticated";
+GRANT ALL ON TABLE "public"."products" TO "service_role";
 
 
 
