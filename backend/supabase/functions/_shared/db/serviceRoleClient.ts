@@ -2,6 +2,7 @@ import { createClient, SupabaseClient } from "supabase";
 import { isDev } from "../utils/isDev.ts";
 import { env } from "hono/adapter";
 import type { Context } from "hono";
+import type { Database } from "../schema/index.ts";
 
 // WARN: This supabase instance uses the SUPABASE_SERVICE_ROLE_KEY which bypasses all RLS security in Supabase DB.
 // DO NOT use this on routes that shoudn't execute admin previleges (use getSupabase() for such cases). And if
@@ -24,5 +25,5 @@ export const getSupabaseServiceRole = (c: Context): SupabaseClient => {
 
   console.log({ url, key });
 
-  return createClient(url, key);
+  return createClient<Database>(url, key);
 };

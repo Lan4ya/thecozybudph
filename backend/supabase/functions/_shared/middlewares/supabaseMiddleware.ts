@@ -2,6 +2,7 @@ import { createClient } from "supabase";
 import type { Context, MiddlewareHandler } from "hono";
 import { env } from "hono/adapter";
 import type { Next } from "hono";
+import { Database } from "../schema/index.ts";
 
 export const getSupabase = (c: Context) => c.get("supabase");
 
@@ -14,7 +15,7 @@ export const supabaseMiddleware = (): MiddlewareHandler => {
 
     const authHeader = c.req.header("Authorization");
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, {
       global: {
         headers: authHeader ? { Authorization: authHeader } : undefined,
       },
