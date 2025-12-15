@@ -26,8 +26,8 @@ export const ProductAPI = {
     console.log({ page });
 
     let query = supabase
-      .from("products_metadata")
-      .select("*, products_collection (*), products_category(*)")
+      .from("products")
+      .select("*, product_collections (*), product_categories(*)")
       .range(page * perPage, (page + 1) * perPage - 1);
 
     if (noDummyProduct) {
@@ -96,7 +96,7 @@ export const ProductAPI = {
 
   getById: async (productId: string): Promise<ProductData | null> => {
     const { data, error } = await supabase
-      .from("products_metadata")
+      .from("products")
       .select("*")
       .eq("id", productId)
       .maybeSingle();
@@ -128,7 +128,7 @@ export const ProductAPI = {
 
   getCategories: async (): Promise<ProductsCategoryData[]> => {
     const { data, error } = await supabase
-      .from("products_category")
+      .from("product_categories")
       .select("*");
 
     console.log("Fetching categories...");
@@ -139,7 +139,7 @@ export const ProductAPI = {
 
   getCollections: async (): Promise<ProductsCollectionData[]> => {
     const { data, error } = await supabase
-      .from("products_collection")
+      .from("product_collections")
       .select("*");
 
     console.log("Fetching collections...");

@@ -49,11 +49,10 @@ dev.get("/products", async (c) => {
 
   const supabase = getSupabase(c);
 
-  const { data: products, error } = await supabase.from("products_metadata")
-    .select(`
+  const { data: products, error } = await supabase.from("products").select(`
     *,
-    products_collection (name)
-    products_category (name)
+    product_collections (name)
+    product_categories (name)
   `);
 
   if (error) {

@@ -51,7 +51,7 @@ export const patchProduct = async (
 
   // Check product existence
   const { data: existingProduct, error: fetchError } = await supabase
-    .from("products_metadata")
+    .from("products")
     .select("id, image_urls, name")
     .eq("id", data.productId)
     .single();
@@ -64,7 +64,7 @@ export const patchProduct = async (
   let productCategory: { id: string; name: string } | null = null;
   if (data.category) {
     const { data: upsertProductCategory, error } = await supabase
-      .from("products_category")
+      .from("product_categories")
       .upsert({ name: data.category }, { onConflict: "name" })
       .select("id, name")
       .single();
@@ -79,7 +79,7 @@ export const patchProduct = async (
     productCollection = null;
   } else {
     const { data: upsertProductCollection, error } = await supabase
-      .from("products_collection")
+      .from("product_collections")
       .upsert({ name: data.collectionName }, { onConflict: "name" })
       .select("id, name")
       .single();
@@ -144,7 +144,7 @@ export const patchProduct = async (
   };
 
   const { data: updatedProduct, error: updateError } = await supabase
-    .from("products_metadata")
+    .from("products")
     .update(dbUpdates)
     .eq("id", data.productId)
     .select("*")

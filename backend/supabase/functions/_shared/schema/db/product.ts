@@ -1,5 +1,5 @@
 import type { Tables } from "./supabase.types.ts";
 
-export type ProductsMetadataRow = Tables<"products_metadata">;
-export type ProductsCollectionRow = Tables<"products_collection">;
-export type ProductsCategoryRow = Tables<"products_category">;
+export type ProductsMetadataRow = Tables<"products">;
+export type ProductCollectionsRow = Tables<"product_collections">;
+export type ProductCategoriesRow = Tables<"product_categories">;

@@ -1,5 +1,5 @@
 /*
-For local dev, this is example on how you'd make a GET request.
+For local dev, this is an example on how you'd make a GET request.
 
  curl -i -L --request GET 'http://127.0.0.1:54321/functions/v1/products' \
    --header 'Authorization: Bearer {token}' \

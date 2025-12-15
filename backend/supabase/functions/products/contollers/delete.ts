@@ -15,7 +15,7 @@ export const deleteProducts = async (supabase: SupabaseClient, c: Context) => {
   }
 
   const { data: products, error } = await supabase
-    .from("products_metadata")
+    .from("products")
     .select("id, image_urls")
     .in("id", productIds);
 
@@ -57,7 +57,7 @@ export const deleteProducts = async (supabase: SupabaseClient, c: Context) => {
 
   // Delete product from database
   const { data: deletedRows, error: deleteError } = await supabase
-    .from("products_metadata")
+    .from("products")
     .delete()
     .in("id", productIds)
     .select("id");

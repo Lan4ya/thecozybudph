@@ -115,7 +115,7 @@ export type Database = {
             foreignKeyName: "cart_items_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: "products_metadata"
+            referencedRelation: "products"
             referencedColumns: ["id"]
           },
         ]
@@ -216,7 +216,7 @@ export type Database = {
             foreignKeyName: "order_items_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: "products_metadata"
+            referencedRelation: "products"
             referencedColumns: ["id"]
           },
         ]
@@ -322,7 +322,7 @@ export type Database = {
           },
         ]
       }
-      products_category: {
+      product_categories: {
         Row: {
           id: string
           name: string
@@ -337,7 +337,7 @@ export type Database = {
         }
         Relationships: []
       }
-      products_collection: {
+      product_collections: {
         Row: {
           id: string
           name: string
@@ -352,7 +352,7 @@ export type Database = {
         }
         Relationships: []
       }
-      products_metadata: {
+      products: {
         Row: {
           color_variants: string[]
           created_at: string | null
@@ -394,17 +394,17 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "products_metadata_product_category_id_fkey"
+            foreignKeyName: "products_product_category_id_fkey"
             columns: ["product_category_id"]
             isOneToOne: false
-            referencedRelation: "products_category"
+            referencedRelation: "product_categories"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "products_metadata_product_collection_id_fkey"
+            foreignKeyName: "products_product_collection_id_fkey"
             columns: ["product_collection_id"]
             isOneToOne: false
-            referencedRelation: "products_collection"
+            referencedRelation: "product_collections"
             referencedColumns: ["id"]
           },
         ]

@@ -23,7 +23,7 @@ export const supabaseUploadImages = async (
 
     // Get the public URL for each image
     const { data: publicUrlData } = supabase.storage
-      .from("images")
+      .from(bucket)
       .getPublicUrl(filePath);
 
     return publicUrlData.publicUrl;

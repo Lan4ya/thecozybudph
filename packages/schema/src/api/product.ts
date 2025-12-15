@@ -1,6 +1,6 @@
 import type {
-  ProductsCategoryRow,
-  ProductsCollectionRow,
+  ProductCategoriesRow,
+  ProductCollectionsRow,
   ProductsMetadataRow,
 } from "../db/product.ts";
 import type { SnakeToCamel } from "../utils/snakeToCamelCase.ts";
@@ -18,34 +18,34 @@ export type DeleteProductRequest = { productIds: string[] };
 export type ProductData = SnakeToCamel<ProductsMetadataRow>;
 
 export type ProductDataWithJoins = ProductData & {
-  productsCollection: {
+  productCollection: {
     name: string;
   } | null;
 
-  productsCategory: {
+  productCategory: {
     name: string;
   } | null;
 };
 
 export type CreateProductData = ProductData & {
-  productsCollection: {
+  productCollection: {
     name: string;
   } | null;
 
-  productsCategory: {
+  productCategory: {
     name: string;
   } | null;
 };
 export type UpdateProductData = ProductData & {
-  productsCollection: {
+  productCollection: {
     name: string;
   } | null;
 
-  productsCategory: {
+  productCategory: {
     name: string;
   } | null;
 };
 export type DeleteProductData = string[];
 
-export type ProductsCollectionData = SnakeToCamel<ProductsCollectionRow>;
-export type ProductsCategoryData = SnakeToCamel<ProductsCategoryRow>;
+export type ProductsCollectionData = SnakeToCamel<ProductCollectionsRow>;
+export type ProductsCategoryData = SnakeToCamel<ProductCategoriesRow>;

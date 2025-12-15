@@ -9,6 +9,7 @@ import {
   ProductsMetadataRow,
   CreateProductRequest,
   CreateProductData,
+  ProductCollectionsRow,
 } from "@shared/schema/index.ts";
 import { Context } from "hono";
 import { SupabaseClient } from "supabase";
@@ -44,9 +45,9 @@ export const addProduct = async (supabase: SupabaseClient, c: Context) => {
 
   const data: CreateProductRequest = result.data;
 
-  // Handle products_category
+  // Handle product_categories
   const { data: productCategory, error: upsertCategoryError } = await supabase
-    .from("products_category")
+    .from("product_categories")
     .upsert({ name: data.category }, { onConflict: "name" })
     .select("id, name")
     .single();
@@ -54,12 +55,12 @@ export const addProduct = async (supabase: SupabaseClient, c: Context) => {
   if (upsertCategoryError)
     throw CustomError.internal(upsertCategoryError.message);
 
-  // Handle 'optional' products_collection
-  let productCollection: { id: string; name: string } | null = null;
+  // Handle 'optional' product_collections
+  let productCollection: ProductCollectionsRow | null = null;
   if (data.collectionName) {
     const { data: upsertProductCollection, error: upsertCollectionError } =
       await supabase
-        .from("products_collection")
+        .from("product_collections")
         .upsert({ name: data.collectionName }, { onConflict: "name" })
         .select("id, name")
         .single();
@@ -93,7 +94,7 @@ export const addProduct = async (supabase: SupabaseClient, c: Context) => {
   };
 
   const { data: createdProduct, error: insertError } = await supabase
-    .from("products_metadata")
+    .from("products")
     .insert(dbInserts)
     .select("*")
     .single();
