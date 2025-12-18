@@ -8,7 +8,7 @@ export const roleMiddleware = (...allowedRoles: [string, ...string[]]) => {
 
     if (!claims) {
       // Human error, authMiddleware is what sets claims in the Context
-      throw AppError.unauthorized(
+      throw AppError.internal(
         "Failed to use roleMiddleware: authMiddleware must be applied before using this middleware",
       );
     }
