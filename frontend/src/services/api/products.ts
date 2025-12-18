@@ -10,7 +10,7 @@ import {
 } from "@TheCozyBud/schema";
 import { snakeToCamel } from "../../lib/utils/caseConverter";
 import { apiClient } from "./interceptors/interceptors";
-import { unwrapAPIResponse } from "@/lib/utils/unwrapAPIResponse";
+import { unwrapAPIResponse } from "./unwrapAPIResponse";
 import type { ProductQueryAPI } from "@/types";
 
 export const ProductAPI = {
