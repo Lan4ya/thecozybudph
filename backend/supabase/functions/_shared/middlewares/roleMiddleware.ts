@@ -3,6 +3,9 @@ import { Context, Next } from "hono";
 import { AppError } from "../errors/Errors.ts";
 
 export const roleMiddleware = (...allowedRoles: [string, ...string[]]) => {
+  if (!allowedRoles.length)
+    throw AppError.internal("roleMiddleware requires roles");
+
   return async (c: Context, next: Next) => {
     const claims = c.get("claims");
 
