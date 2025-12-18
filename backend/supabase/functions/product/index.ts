@@ -52,7 +52,7 @@ app.use(
 
 app.route("/", product);
 
-app.notFound((c) => c.text("Not Found", 404));
 app.onError((err) => handleError(err));
+app.notFound((c) => c.text("Not Found", 404));
 
 Deno.serve(app.fetch);
