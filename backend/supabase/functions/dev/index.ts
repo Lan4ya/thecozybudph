@@ -1,4 +1,4 @@
-import { CustomError } from "@shared/errors/CustomError.ts";
+import { AppError } from "@shared/errors/Errors.ts";
 import { Context, Hono } from "hono";
 import { isDev } from "@shared/utils/isDev.ts";
 import { handleError } from "@shared/middlewares/errorHandler.ts";
@@ -56,10 +56,10 @@ dev.get("/products", async (c) => {
   `);
 
   if (error) {
-    throw CustomError.internal(error.message);
+    throw AppError.internal(error.message);
   }
 
-  if (!products) throw CustomError.notFound(`No Products found`);
+  if (!products) throw AppError.notFound(`No Products found`);
 
   return c.json(
     {

@@ -1,7 +1,7 @@
 import z, { ZodType } from "zod";
 import type { ValidationTargets } from "hono";
 import { zValidator as zv } from "@hono/zod-validator";
-import { CustomError } from "../errors/mod.ts";
+import { ValidationError } from "../errors/Errors.ts";
 
 export const zodValidatorMiddleware = <
   T extends ZodType,
@@ -30,6 +30,6 @@ export const zodValidatorMiddleware = <
         );
       }
 
-      throw CustomError.validation(errors);
+      throw new ValidationError(errors);
     }
   });

@@ -1,4 +1,4 @@
-import { CustomError } from "../errors/CustomError.ts";
+import { AppError } from "../errors/Errors.ts";
 import type { ApiResponseError } from "../schema/index.ts";
 
 export const handleError = (
@@ -6,7 +6,7 @@ export const handleError = (
   corsHeaders: Record<string, string> = {},
 ): Response => {
   const body: ApiResponseError =
-    err instanceof CustomError
+    err instanceof AppError
       ? { success: false, error: err.errors }
       : {
           success: false,
@@ -16,7 +16,7 @@ export const handleError = (
   console.error(err);
 
   return Response.json(body, {
-    status: err instanceof CustomError ? err.statusCode : 500,
+    status: err instanceof AppError ? err.statusCode : 500,
     headers: corsHeaders,
   });
 };

@@ -3,7 +3,7 @@ import {
   DeleteProductsRequest,
 } from "@shared/schema/index.ts";
 import { SupabaseClient } from "supabase";
-import { CustomError } from "@shared/errors/mod.ts";
+import { AppError } from "@shared/errors/Errors.ts";
 import { isDev } from "@shared/utils/isDev.ts";
 import { ProductRepository } from "../repository.ts";
 import { ProductStorage } from "../storage.ts";
@@ -20,7 +20,7 @@ export const deleteProducts = async (
   );
 
   if (error || !products) {
-    throw CustomError.internal(
+    throw AppError.internal(
       `Failed to delete products: ${error?.message ?? "Products not found"}`,
     );
   }
@@ -62,7 +62,7 @@ export const deleteProducts = async (
     await ProductRepository.deleteProductsByIds(supabase, productIds);
 
   if (deleteError) {
-    throw CustomError.internal(
+    throw AppError.internal(
       `Failed to delete product: ${deleteError?.message ?? "Products not found"}`,
     );
   }

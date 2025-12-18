@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "supabase";
-import { CustomError } from "../errors/CustomError.ts";
+import { AppError } from "../errors/Errors.ts";
 
 export const supabaseUploadImages = async (
   supabase: SupabaseClient,
@@ -13,7 +13,7 @@ export const supabaseUploadImages = async (
       .upload(filePath, file);
 
     if (uploadError) {
-      throw new CustomError(
+      throw new AppError(
         500,
         `Failed to upload ${file.name}: ${uploadError.message}`,
       );

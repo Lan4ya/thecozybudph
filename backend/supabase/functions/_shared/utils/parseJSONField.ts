@@ -1,4 +1,4 @@
-import { CustomError } from "../errors/mod.ts";
+import { AppError } from "../errors/Errors.ts";
 
 // util to properly handle JSON parsing with error handling.
 export const parseJSONField = <T = unknown>(
@@ -8,12 +8,12 @@ export const parseJSONField = <T = unknown>(
 ): T | undefined => {
   if (value == null || value === "") {
     if (options?.optional) return undefined;
-    throw new CustomError(400, `${fieldName} is required`);
+    throw new AppError(400, `${fieldName} is required`);
   }
 
   try {
     return JSON.parse(value) as T;
   } catch {
-    throw new CustomError(400, `${fieldName} must be valid JSON`);
+    throw new AppError(400, `${fieldName} must be valid JSON`);
   }
 };

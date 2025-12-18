@@ -1,6 +1,6 @@
 import { getSupabase } from "./supabaseMiddleware.ts";
 import { Context, Next } from "hono";
-import { CustomError } from "../errors/mod.ts";
+import { AppError } from "../errors/Errors.ts";
 
 export const roleMiddleware = (...allowedRoles: [string, ...string[]]) => {
   return async (c: Context, next: Next) => {
@@ -8,7 +8,7 @@ export const roleMiddleware = (...allowedRoles: [string, ...string[]]) => {
 
     if (!claims) {
       // Human error, authMiddleware is what sets claims in the Context
-      throw CustomError.unauthorized(
+      throw AppError.unauthorized(
         "Failed to use roleMiddleware: authMiddleware must be applied before using this middleware",
       );
     }
@@ -23,13 +23,13 @@ export const roleMiddleware = (...allowedRoles: [string, ...string[]]) => {
       .single();
 
     if (profileError) {
-      throw CustomError.internal(
+      throw AppError.internal(
         `Failed to get profile role: ${profileError.message}`,
       );
     }
 
     if (!allowedRoles.includes(profile.role)) {
-      throw CustomError.forbidden();
+      throw AppError.forbidden();
     }
 
     c.set("role", profile.role);

@@ -5,7 +5,7 @@
 import { Context } from "hono";
 import { Next } from "hono";
 import { getSupabase } from "./supabaseMiddleware.ts";
-import { CustomError } from "../errors/mod.ts";
+import { AppError } from "../errors/Errors.ts";
 import { isDev } from "../utils/isDev.ts";
 
 export const authMiddleware = () => {
@@ -21,13 +21,13 @@ export const authMiddleware = () => {
     isDev && console.log("claims: ", claims);
 
     if (error || !claims) {
-      throw CustomError.unauthorized(
+      throw AppError.unauthorized(
         error?.message ? error.message : "Invalid token",
       );
     }
 
     if (claims.exp && claims.exp < Date.now() / 1000) {
-      throw CustomError.unauthorized("Token expired");
+      throw AppError.unauthorized("Token expired");
     }
 
     c.set("claims", claims);

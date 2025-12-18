@@ -1,4 +1,4 @@
-import { CustomError } from "@shared/errors/mod.ts";
+import { AppError } from "@shared/errors/Errors.ts";
 import { ProductRepository } from "../repository.ts";
 import { SupabaseClient } from "supabase";
 import {
@@ -25,8 +25,7 @@ export const createProduct = async (
   // Upsert category
   const { data: productCategory, error: upsertCategoryError } =
     await ProductRepository.upsertCategory(supabase, category);
-  if (upsertCategoryError)
-    throw CustomError.internal(upsertCategoryError.message);
+  if (upsertCategoryError) throw AppError.internal(upsertCategoryError.message);
 
   // Upsert collection (optional)
   let productCollection = null;
@@ -35,7 +34,7 @@ export const createProduct = async (
       supabase,
       collectionName,
     );
-    if (error) throw CustomError.internal(error.message);
+    if (error) throw AppError.internal(error.message);
     productCollection = data;
   }
 
@@ -65,9 +64,7 @@ export const createProduct = async (
       console.error("Image cleanup failed after insert error", err);
     });
 
-    throw CustomError.internal(
-      `Failed to insert product: ${insertError.message}`,
-    );
+    throw AppError.internal(`Failed to insert product: ${insertError.message}`);
   }
 
   return {

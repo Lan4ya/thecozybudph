@@ -3,7 +3,7 @@ import {
   UpdateProductData,
   UpdateProductRequest,
 } from "@shared/schema/index.ts";
-import { CustomError } from "@shared/errors/CustomError.ts";
+import { AppError } from "@shared/errors/Errors.ts";
 import { SupabaseClient } from "supabase";
 import { ProductRepository } from "../repository.ts";
 import { ProductStorage } from "../storage.ts";
@@ -17,9 +17,9 @@ export const updateProduct = async (
     await ProductRepository.getProductById(supabase, payload.productId);
 
   if (fetchError)
-    throw CustomError.internal(`Failed to fetch product: ${fetchError}`);
+    throw AppError.internal(`Failed to fetch product: ${fetchError}`);
 
-  if (!existingProduct) throw CustomError.notFound("Product not found");
+  if (!existingProduct) throw AppError.notFound("Product not found");
 
   let updatedImageUrls = existingProduct.image_urls ?? [];
 
@@ -30,9 +30,9 @@ export const updateProduct = async (
     (payload.newProductImages?.length ?? 0);
 
   if (finalImageCount < 1)
-    throw CustomError.badRequest("Product must have at least one image");
+    throw AppError.badRequest("Product must have at least one image");
   else if (finalImageCount > 3)
-    throw CustomError.badRequest("You can upload up to 3 images only");
+    throw AppError.badRequest("You can upload up to 3 images only");
 
   // Upsert category if being updated
   let productCategory: { id: string; name: string } | null = null;
@@ -40,7 +40,7 @@ export const updateProduct = async (
     const { data, error: upsertCategoryError } =
       await ProductRepository.upsertCategory(supabase, payload.category);
     if (upsertCategoryError)
-      throw CustomError.internal(upsertCategoryError.message);
+      throw AppError.internal(upsertCategoryError.message);
     productCategory = data;
   }
 
@@ -53,7 +53,7 @@ export const updateProduct = async (
       supabase,
       payload.collectionName,
     );
-    if (error) throw CustomError.internal(error.message);
+    if (error) throw AppError.internal(error.message);
     productCollection = data;
   }
 
@@ -113,9 +113,7 @@ export const updateProduct = async (
       console.error("Image cleanup failed after update error", err);
     });
 
-    throw CustomError.internal(
-      `Failed to update product: ${updateError.message}`,
-    );
+    throw AppError.internal(`Failed to update product: ${updateError.message}`);
   }
 
   return {
