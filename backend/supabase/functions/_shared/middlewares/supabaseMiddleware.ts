@@ -20,7 +20,6 @@ export const supabaseMiddleware = (): MiddlewareHandler => {
         headers: authHeader ? { Authorization: authHeader } : undefined,
       },
     });
-    // const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     c.set("supabase", supabase);
     await next();

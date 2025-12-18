@@ -12,14 +12,20 @@ export const productBaseSchema = z.object({
     .min(0, "price can't be negative")
     .max(1000000, "price can't exceed 1,000,000"),
 
-  // this is optional so this accepts an empty arr: []
-  // what's being validated are the items inside if not empty.
-  colorVariants: z.array(
-    z
-      .string()
-      .trim()
-      .min(1, "color name must contain at least 1 character")
-      .max(100, "color name can't exceed 100 characters"),
+  // optional field: defaults to []
+  colorVariants: z.preprocess(
+    (val) => {
+      if (typeof val === "string") return [val];
+      if (Array.isArray(val)) return val;
+      return [];
+    },
+    z.array(
+      z
+        .string()
+        .trim()
+        .min(1, "color name must contain at least 1 character")
+        .max(100, "color name can't exceed 100 characters"),
+    ),
   ),
 
   category: z
@@ -59,29 +65,48 @@ export const imageFileSchema = z
   });
 
 export const createProductSchema = productBaseSchema.extend({
-  productImages: z
-    .array(imageFileSchema)
-    .min(1, "image is required")
-    .max(MAX_IMAGES, `you can upload up to ${MAX_IMAGES} images only`),
-  primaryImageIndex: z.coerce
-    .number()
-    .min(0, "primary image index is required"),
+  productImages: z.preprocess(
+    (val) => {
+      if (val instanceof File) return [val];
+      if (Array.isArray(val)) return val;
+      return [];
+    },
+    z
+      .array(imageFileSchema)
+      .min(1, "you must upload at least 1 image")
+      .max(MAX_IMAGES, `you can upload up to ${MAX_IMAGES} images only`),
+  ),
+  primaryImageIndex: z.coerce.number().min(0, "primaryImageIndex out of range"),
 });
 
 export const updateProductSchema = productBaseSchema.partial().extend({
   productId: z.string().min(1, "product ID is required"),
-  newProductImages: z
-    .array(imageFileSchema)
-    .max(MAX_IMAGES, `you can upload up to ${MAX_IMAGES} images only`)
-    .optional(),
+  newProductImages: z.preprocess(
+    (val) => {
+      if (val instanceof File) return [val];
+      if (Array.isArray(val)) return val;
+      return [];
+    },
+    z
+      .array(imageFileSchema)
+      .max(MAX_IMAGES, `you can upload up to ${MAX_IMAGES} images only`)
+      .optional(),
+  ),
   imageUrlsToDelete: z.array(z.url()).optional(),
   primaryImageIndex: z.coerce
     .number()
-    .min(0, "primary image index is required")
+    .min(0, "primaryImageIndex out of range")
     .optional(),
   productCollectionId: z.string().optional(),
+});
+
+export const deleteProductSchema = z.object({
+  productIds: z
+    .array(z.uuid("product ID must be a valid UUID"))
+    .min(1, "product Ids array can't be empty"),
 });
 
 export type ProductBase = z.infer<typeof productBaseSchema>;
 export type CreateProductForm = z.infer<typeof createProductSchema>;
 export type UpdateProductForm = z.infer<typeof updateProductSchema>;
+export type DeleteProducts = z.infer<typeof deleteProductSchema>;

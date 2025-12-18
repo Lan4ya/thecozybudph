@@ -10,14 +10,14 @@ it repeatedly while developing the app. In prod the token has 1hr TTl
 */
 
 import { Hono } from "hono";
-import products from "./routes/products.ts";
+import product from "./routes.ts";
 import { handleError } from "@shared/middlewares/errorHandler.ts";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { rateLimiter } from "hono-rate-limiter";
 import { secureHeaders } from "hono/secure-headers";
 
-const app = new Hono().basePath("products");
+const app = new Hono().basePath("product");
 
 app.use(logger());
 app.use(
@@ -50,7 +50,7 @@ app.use(
   }),
 );
 
-app.route("/", products);
+app.route("/", product);
 
 app.notFound((c) => c.text("Not Found", 404));
 app.onError((err) => handleError(err));

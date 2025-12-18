@@ -2,10 +2,9 @@
   "imports": {
     "@shared/": "./_shared/",
     "supabase": "npm:@supabase/supabase-js@2",
-    "file-type": "npm:file-type",
     "hono": "npm:hono",
+    "@hono/zod-validator": "npm:@hono/zod-validator",
     "zod": "npm:zod@^4.1.12",
-    "supabase-ssr": "npm:@supabase/ssr",
     "hono-rate-limiter": "npm:hono-rate-limiter"
   },
   "compilerOptions": {
