@@ -1,117 +1,176 @@
-### Frontend Codebase Guide
+### Codebase Guide
 ---
 
-#### Main tech stack:
+#### Tech Stack
 
+##### Frontend:
 - [Typescript](https://www.typescriptlang.org/) 
 - [React](https://react.dev/) 
 - [TailwindCSS](https://tailwindcss.com/) 
-- [React Router (Data Mode)](https://reactrouter.com/start/data/installation/) for routing  
-- [Lucide](https://lucide.dev/) for icons  
-- [ShadCN](https://ui.shadcn.com/) for base components
-- [Motion](https://motion.dev/) for reusable & quick animations
-- [Vite](https://vite.dev/) build tool
-- [Tanstack Query](https://tanstack.com/query/latest/docs/framework/react/overview) for fetching, caching, & synchronizing server states
+- [React Router (Data Mode)](https://reactrouter.com/start/data/installation/)
+- [Lucide](https://lucide.dev/) 
+- [ShadCN](https://ui.shadcn.com/) 
+- [Motion](https://motion.dev/) 
+- [Vite](https://vite.dev/) 
+- [Tanstack Query](https://tanstack.com/query/latest/docs/framework/react/overview) 
 
+##### Backend:
+- [ Supabase (Deno & PostgreSQL) ](https://supabase.com/) 
+- [ Hono ](https://hono.dev/) 
+- [ Node ](https://nodejs.org/en)
+- No ORM's or Query Builders used
 ---
 
 ### ⚙️ Local Setup 
 
 #### 1. Prerequisites
 Make sure you have:
-- **Node.js 18+** 
-- **pnpm** installed globally
-```bash
-# install pnpm using npm, or with other pkg managers, or manually on the internet.  
-npm install -g pnpm 
-```
+- **Node.js 24.12.0 +** 
+- **pnpm** installed globally (yes not npm)
+- **docker** 
+ 
 #### 2. Clone and install this repository (Skip this step if you already did this once)
 ```bash
-git clone https://github.com/isMaya404/thecozybudph && cd thecozybudph && pnpm install
+git clone https://github.com/isMaya404/thecozybudph 
+cd thecozybudph 
+pnpm i
 ```
 
-#### 3. Put the correct environment variables in frontend/.env
+#### 3. Put the correct environment variables in each given directories
 ```bash
-# add proper values
+# ./frontend/.env
 VITE_SUPABASE_URL=
 VITE_SUPABASE_ANON_KEY=
-VITE_ADMIN_ROUTE_HASH=
+```
+
+```bash
+# ./frontend/.env.local
+VITE_SUPABASE_URL=
+VITE_SUPABASE_ANON_KEY=
+```
+
+```bash
+# ./backend/.env
+SUPABASE_URL=http:
+SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+```
+
+```bash
+# ./backend/supabase/.env
+GOOGLE_CLIENT_ID=
+GOOGLE_SECRET=
+```
+
+```bash
+# ./backend/supabase/functions/.env
+ENV=
+SUPABASE_URL=
+SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
 ```
 
 #### 4. Run development server
-###### ⚠️ NOTE ⚠️: This cmd only runs the frontend dev server and does not include the backend dev server since that is not needed. When you're creating a feature that involves an api call to the backend (e.g. a button that pre-orders a flower 'api/v1/pre-order/...' or a submitting a form with user input details to schedule an event), just message me and I'll just provide an api endpoint that's already deployed so you won't have to touch the backend at all.
 ```bash
+## frontend dev server:
+
+# at root './' run: 
 pnpm dev:frontend
 ```
-#### 5. Open the website
+
+```bash
+# backend dev server:
+
+# In another terminal
+
+# On Linux, start docker with: 
+sudo systemctl start docker # command is different on other OS's.
+
+# Go inside backend dir
+cd backend # This is important since 'supabase start' will create another supabase dir in './' if you're not inside backend dir
+
+# Inside ./backend start supabase and serve edge functions locally:
+
+# If supabase is installed globally
+supabase start && supabase functions serve
+
+# If not then:
+pnpx supabase start && pnpx supabase functions serve
+```
+
+#### 5. Open Website
 ```bash
 http://localhost:5173
 ```
+
 ---
-### 📦 How to add a dependency
-General packages:
+
+### 📚 Backend (Supabase) Development Docs
+```bash 
+# If you're gonna develop on backend and not familiar with supabase, here are some docs to get you started:
+
+# Ecosystem
+https://supabase.com/docs/guides/database/overview
+https://supabase.com/docs/guides/functions
+https://supabase.com/docs/guides/auth
+https://supabase.com/docs/guides/storage
+
+# JS API's
+https://supabase.com/docs/reference/javascript/introduction
+
+# Supabase cli 
+https://supabase.com/docs/guides/local-development/cli/getting-started
+https://supabase.com/docs/reference/cli/introduction
+```
+---
+### 📦 How to add dependencies 
+
+#### On Frontend
+
 ```bash
+# General packages:
+
+# You must be at the root: ./
+
 # The usual "pnpm install <package-name>" won't work. You have to use:
- pnpm i <package-name> -F frontend # this installs the pkg inside frontend dir (folder) only
+ pnpm i <package-name> -F frontend # this installs the pkg inside frontend dir only
 ```
 <br>
 
-ShadCN components:
 ```bash
+# ShadCN components:
+
   pnpm dlx shadcn@latest add <component-name> --cwd frontend
 ```
 
-
----
-### Frontend Directory Tree
-- some guides on where you can put certain files (as the codebase grows this tree will get outdated, so think of this as a base structure)
-
+#### On Backend
 ```bash
-frontend
-├── components.json
-├── eslint.config.js
-├── index.html
-├── package.json
-├── public # static files
-│   └── init-theme.js
-├── src
-│   ├── assets # you can put logos, icons, fonts, images used in components in here (I'll put all the flower img's in here temporarily and put them later on the cloud)
-│   ├── components # dir for generic components 
-│   ├── lib
-│   │   ├── ui # you can add sub-dirs here for specific ui's (e.g ui/hero/some-hero-ui-file.tsx)
-│   │   │   └── __shadcn__ # this is where all the shadcn components will go to after installing them
-│   │   │       └── button.tsx # example shadcn component (use this button whenever you need a button)
-│   │   └── utils
-│   │       └── cn.ts # helper function when you needed logic inside classes
-│   ├── main.tsx # entry point for react
-│   ├── pages # you can add page components in here and export them to src/routes.ts after
-│   │   ├── About.tsx # about page
-│   │   ├── Home.tsx # home page 
-│   │   └── Root.tsx # root page (highest in the dom tree except html and body)
-│   ├── routes.ts # where you import page components 
-│   ├── styles # only add another css file here if you have a specific usecase otherwise use tailwind for everything
-│   │   └── index.css # contains base styles for tailwind
-│   ├── tests # test cases
-│   └── types # global ts types
+# For Supabase edge functions look inside "./backend/supabase/functions/import_map.json" 
+# and the package name there manually. after that it will be available on all edge functions
+# (assuming deno.json inside the functions dir references the import_map)
+
+# If only for Node scripts.
+ pnpm i <package-name> -F backend 
+
 ```
+
 ---
-### How To Contribute Code (Assumes Basic Git Knowledge)
 
-##### Before I give the step by step guide on how contribute code, here are the branches we're gonna use for the whole process of developing this project:
+### 🖥️ How To Contribute Code 
 
-### Branch Model 
+#### Branch Model 
 
 ![Branch Model](branch_model.png)
 
-#### main branch: production-ready features
+##### main branch: production-ready features
 - This is where the deployed website will source the code.  
 - ⚠️ **You should not push your commits in here, open a pr, or touch this branch at all. this is where I'll merge code from dev branch only if the feature is already stable (bug free). I won't give access to this branch for safety.** ⚠️ 
 
-#### dev branch: unstable features
+##### dev branch: unstable features
 - This is where you're gonna open a PR (Pull Request) - I'll explain later in the steps how.
 - You should also **not** push your commits in here.
 
-#### feature branch: feature development
+##### feature branch: feature development
 - This is the branch where we’ll be working on.
 - This is where you do the usual git add, commit, push commands.
 - You can create as many feature branch as you want after finishing a feature and doing a pull request.
@@ -121,9 +180,9 @@ frontend
 - Just a side note. If you make a git command mistake, just google or ask AI how to undo the mistake you did. 90% of the time it's reversible.
 - Tip: You can fork this repo and test/practice the steps below
 
-#### 0. Do the setup guide above if not done already.
+<br>
 
-#### 1. Sync your local repo to remote **dev** branch 
+##### 1. Sync your local repo to remote **dev** branch 
 ```bash
 # NOTE: you should run this regularly to detect and fix merge conflicts early (alteast 1x a day and before every git push)
 
@@ -135,7 +194,9 @@ frontend
 git pull --rebase origin dev 
 ```
 
-#### 2. Create a feature branch and switch to it
+<br>
+
+##### 2. Create a feature branch and switch to it
 ```bash
 git branch feature/{nameOfTheFeature} # e.g. feature/event-scheduling
 git switch feature/{nameOfTheFeature}
@@ -145,14 +206,18 @@ git switch feature/{nameOfTheFeature}
 git switch -c feature/{nameOfTheFeature} 
 ```
 
-#### 3. Work on your feature locally and do the usual git workflow 
+<br>
+
+##### 3. Work on your feature locally and do the usual git workflow 
 ```bash
 git add form.tsx someOtherFile.ts
 git commit -m "added form for event event-scheduling"
 # and other git cmd's you wanna do
 ```
 
-#### 4. Push your code to your own remote branch
+<br>
+
+##### 4. Push your code to your own remote branch
 ```bash
 # Sync before pushing. If there's a merge conflict fix it.
 git pull --rebase origin dev 
@@ -162,9 +227,11 @@ git push feature/{nameOfYourBranch}
 ```
 ⚠️ **AFTER PUSHING, IF THE FEATURE IS NOT YET 100% COMPLETE GO BACK TO STEP 3** ⚠️
 
-#### 5. Open a Pull Request (PR) 
+<br>
 
-##### METHOD 1 (Github Website):
+##### 5. Open a Pull Request (PR) 
+
+##### Method 1 (Github Website):
 - Go to the repo: https://github.com/isMaya404/thecozybudph  
 - If you successfully pushed, you should see a green button at the top right that says “Compare & pull request”. Click it.
 
@@ -177,10 +244,12 @@ git push feature/{nameOfYourBranch}
 
 - Finally, click the "Open Pull Request" button.
 
-##### METHOD 2: 
+##### Method 2: 
    - using gh (github cli tool) - faster but cli based
 
-#### 6. Code Review
+   <br>
+
+##### 6. Code Review
 - **Your code will be reviewed** (in this case, by me) and merged into the dev branch if no further changes are needed. Otherwise your code will be rejected and the reviewer will add a note as a guide on what you should improve or fix in your PR.
 
 - If your PR is **aprroved:** go back to step 1
@@ -206,31 +275,3 @@ git push feature/{nameOfYourBranch}
    # NOTE: Don't wait for the code review (baka busy ako or di ko pa nakita).  
    # After opening a PR and you wanna work on other features just go back to step 1 on the spot
    ```
-
----
-
- ### Commit Rules/Guidelines:
- **Follow Conventional Commits for clarity and automation.**  
-
-   - **Format** - {type}(optional scope): {short summary}
-   - Examples:
-      - feat: add user login form
-      - fix(navbar): correct navbar color in dark mode
-      - docs: update setup instructions in README
-      - refactor: simplify button component logic
-      - chore(config): bump dependencies
-
-- **✅ DO'S :**  
-  - Keep each commit focused — one logical change per commit.  
-  - Write clear, descriptive messages that explain what and why (avoid vague terms like “update things” or “fix stuff”).  
-  - Keep commits small and manageable — avoid dumping 1k+ line changes in one commit
-  - Clearly label commits that address review feedback, e.g.  
-
-    ```bash
-    fix: address PR feedback (form validation)
-    ```
-
-- **🚫 DON'T :**
-  - Open multiple PRs for the same feature  
-  - Push directly to dev or main  
-  - Force push on shared branches (in this case, dev or main)
