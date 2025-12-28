@@ -1,4 +1,4 @@
-import { AppError } from "../errors/Errors.ts";
+import { AppError, ValidationError } from "../errors/Errors.ts";
 import type { ApiResponseError } from "../schema/index.ts";
 
 export const handleError = (
@@ -7,16 +7,21 @@ export const handleError = (
 ): Response => {
   const body: ApiResponseError =
     err instanceof AppError
-      ? { success: false, error: err.errors }
-      : {
-          success: false,
-          error: `${err}`,
-        };
+      ? { success: false, error: err.message }
+      : err instanceof ValidationError
+        ? { success: false, error: err.errors }
+        : {
+            success: false,
+            error: `${err}`,
+          };
 
   console.error(err);
 
   return Response.json(body, {
-    status: err instanceof AppError ? err.statusCode : 500,
+    status:
+      err instanceof AppError || err instanceof ValidationError
+        ? err.statusCode
+        : 500,
     headers: corsHeaders,
   });
 };

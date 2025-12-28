@@ -1,34 +1,34 @@
-import { getSupabase } from "./supabaseMiddleware.ts";
-import { Context, Next } from "hono";
 import { AppError } from "../errors/Errors.ts";
+import { AppEnv } from "../types.d.ts";
+import { Context, Next } from "hono";
 
-export const roleMiddleware = (...allowedRoles: [string, ...string[]]) => {
-  if (!allowedRoles.length)
+export const roleMiddleware = (
+  ...allowedRoles: ["user" | "admin", ...("user" | "admin")[]]
+) => {
+  if (!allowedRoles.length) {
     throw AppError.internal("roleMiddleware requires roles");
+  }
 
-  return async (c: Context, next: Next) => {
+  return async (c: Context<AppEnv>, next: Next) => {
     const claims = c.get("claims");
 
     if (!claims) {
-      // Human error, authMiddleware is what sets claims in the Context
+      // authMiddleware contract violation
       throw AppError.internal(
-        "Failed to use roleMiddleware: authMiddleware must be applied before using this middleware",
+        "roleMiddleware requires authMiddleware to run first",
       );
     }
 
-    const supabase = getSupabase(c);
+    const supabase = c.get("supabase");
 
-    // NOTE: extract this logic using profiles repository later on
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error } = await supabase
       .from("profiles")
       .select("role")
       .eq("id", claims.sub)
       .single();
 
-    if (profileError) {
-      throw AppError.internal(
-        `Failed to get profile role: ${profileError.message}`,
-      );
+    if (error) {
+      throw AppError.internal(`Failed to get profile role: ${error.message}`);
     }
 
     if (!allowedRoles.includes(profile.role)) {

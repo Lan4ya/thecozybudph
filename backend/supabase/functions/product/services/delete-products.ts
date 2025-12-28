@@ -5,8 +5,8 @@ import {
 import { SupabaseClient } from "supabase";
 import { AppError } from "@shared/errors/Errors.ts";
 import { isDev } from "@shared/utils/isDev.ts";
-import { ProductRepository } from "../repository.ts";
-import { ProductStorage } from "../storage.ts";
+import { ProductRepository } from "../product-repository.ts";
+import { ProductStorage } from "../product-storage.ts";
 
 export const deleteProducts = async (
   supabase: SupabaseClient,

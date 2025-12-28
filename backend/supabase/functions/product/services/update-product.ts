@@ -5,8 +5,8 @@ import {
 } from "@shared/schema/index.ts";
 import { AppError } from "@shared/errors/Errors.ts";
 import { SupabaseClient } from "supabase";
-import { ProductRepository } from "../repository.ts";
-import { ProductStorage } from "../storage.ts";
+import { ProductRepository } from "../product-repository.ts";
+import { ProductStorage } from "../product-storage.ts";
 
 export const updateProduct = async (
   supabase: SupabaseClient,

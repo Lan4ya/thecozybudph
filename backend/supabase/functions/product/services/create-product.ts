@@ -1,11 +1,11 @@
 import { AppError } from "@shared/errors/Errors.ts";
-import { ProductRepository } from "../repository.ts";
 import { SupabaseClient } from "supabase";
 import {
   CreateProductData,
   CreateProductRequest,
 } from "@shared/schema/index.ts";
-import { ProductStorage } from "../storage.ts";
+import { ProductRepository } from "../product-repository.ts";
+import { ProductStorage } from "../product-storage.ts";
 
 export const createProduct = async (
   supabase: SupabaseClient,
@@ -25,6 +25,7 @@ export const createProduct = async (
   // Upsert category
   const { data: productCategory, error: upsertCategoryError } =
     await ProductRepository.upsertCategory(supabase, category);
+
   if (upsertCategoryError) throw AppError.internal(upsertCategoryError.message);
 
   // Upsert collection (optional)

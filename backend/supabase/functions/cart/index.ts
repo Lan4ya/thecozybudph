@@ -1,16 +1,5 @@
-/*
-For local dev, this is an example on how you'd make a GET request.
-
- curl -i -L --request GET 'http://127.0.0.1:54321/functions/v1/products' \
-   --header 'Authorization: Bearer {token}' \
-   --header 'Content-Type: application/json' \
-
-the token TTL is set to 1 week in config.toml, as to not worry about refreshing
-it repeatedly while developing the app. In prod the token has 1hr TTL
-*/
-
 import { Hono } from "hono";
-import product from "./product-routes.ts";
+import cart from "./cart-routes.ts";
 import { handleError } from "@shared/middlewares/errorHandler.ts";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
@@ -18,7 +7,7 @@ import { rateLimiter } from "hono-rate-limiter";
 import { secureHeaders } from "hono/secure-headers";
 import { AppEnv } from "@shared/types.d.ts";
 
-const app = new Hono<AppEnv>().basePath("product");
+const app = new Hono<AppEnv>().basePath("cart");
 
 app.use(logger());
 app.use(
@@ -51,7 +40,7 @@ app.use(
   }),
 );
 
-app.route("/", product);
+app.route("/", cart);
 
 app.onError((err) => handleError(err));
 app.notFound((c) => c.text("Not Found", 404));

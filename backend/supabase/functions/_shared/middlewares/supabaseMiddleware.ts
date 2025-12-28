@@ -4,10 +4,8 @@ import { env } from "hono/adapter";
 import type { Next } from "hono";
 import { Database } from "../schema/index.ts";
 
-export const getSupabase = (c: Context) => c.get("supabase");
-
-export const supabaseMiddleware = (): MiddlewareHandler => {
-  return async (c: Context, next: Next) => {
+export const supabaseMiddleware =
+  (): MiddlewareHandler => async (c: Context, next: Next) => {
     const { SUPABASE_URL, SUPABASE_ANON_KEY } = env(c);
 
     if (!SUPABASE_URL) throw new Error("Missing SUPABASE_URL");
@@ -24,4 +22,3 @@ export const supabaseMiddleware = (): MiddlewareHandler => {
     c.set("supabase", supabase);
     await next();
   };
-};

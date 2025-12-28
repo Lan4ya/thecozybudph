@@ -123,26 +123,29 @@ export type Database = {
       carts: {
         Row: {
           created_at: string | null
-          customer_id: string
           id: string
+          profile_id: string
+          status: string
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
-          customer_id: string
           id?: string
+          profile_id: string
+          status?: string
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
-          customer_id?: string
           id?: string
+          profile_id?: string
+          status?: string
           updated_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "fk_carts_profiles"
-            columns: ["customer_id"]
+            foreignKeyName: "carts_profile_fkey"
+            columns: ["profile_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -413,8 +416,9 @@ export type Database = {
         Row: {
           avatar_url: string | null
           email: string
-          full_name: string | null
+          first_name: string | null
           id: string
+          last_name: string | null
           phone: string | null
           primary_address_id: string | null
           role: string
@@ -422,8 +426,9 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           email: string
-          full_name?: string | null
+          first_name?: string | null
           id: string
+          last_name?: string | null
           phone?: string | null
           primary_address_id?: string | null
           role?: string
@@ -431,8 +436,9 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           email?: string
-          full_name?: string | null
+          first_name?: string | null
           id?: string
+          last_name?: string | null
           phone?: string | null
           primary_address_id?: string | null
           role?: string
@@ -473,7 +479,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      upsert_cart_item: {
+        Args: { p_cart_id: string; p_product_id: string; p_quantity: number }
+        Returns: {
+          cart_id: string
+          product_id: string
+          quantity: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

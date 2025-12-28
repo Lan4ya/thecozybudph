@@ -1,10 +1,21 @@
-import type { CartItemRow } from "../db/cart.ts";
-// import type { SnakeToCamel } from "../utils/snakeToCamelCase.ts";
+import { z } from "zod";
+import type { SnakeToCamel } from "../utils/snakeToCamelCase.ts";
 
 // REQUEST TYPES:
 
-type AddToCartRequest = Pick<CartItemRow, "product_id" | "quantity">;
-export type AddToCartRequestBatch = AddToCartRequest[];
-export type DeleteCartItemsRequest = { id: string[] };
+export const addCartItemsSchema = z.object({
+  productId: z.uuid(),
+  quantity: z.number().int().positive(),
+});
+
+export const patchCartItemsSchema = addCartItemsSchema.partial();
+
+export const deleteCartItemsSchema = z.object({
+  productIds: z.array(z.uuid()).min(1),
+});
+
+export type AddCartItemsRequest = z.infer<typeof addCartItemsSchema>;
+export type PatchCartItemsRequest = z.infer<typeof patchCartItemsSchema>;
+export type DeleteCartItemsRequest = z.infer<typeof deleteCartItemsSchema>;
 
 // RESPONSE TYPES:

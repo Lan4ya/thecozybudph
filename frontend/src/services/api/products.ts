@@ -91,7 +91,7 @@ export const ProductAPI = {
     console.log("Fetching products...");
 
     if (error) throw error;
-    return snakeToCamel(data ?? []) satisfies ProductDataWithJoins[];
+    return snakeToCamel(data ?? []) satisfies ProductDataWithJoins[]; // FIX:
   },
 
   getById: async (productId: string): Promise<ProductData | null> => {

@@ -10,10 +10,11 @@ export const zodValidatorMiddleware = <
   target: Target,
   schema: T,
 ) =>
-  zv(target, schema, (result, _c) => {
+  zv(target, schema, (result) => {
     if (!result.success) {
       const flattened = z.flattenError(result.error);
 
+      // Transform Errors
       const errors: { field?: string; message: string }[] = [];
 
       // Field errors
