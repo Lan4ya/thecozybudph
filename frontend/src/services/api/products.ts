@@ -91,7 +91,7 @@ export const ProductAPI = {
     console.log("Fetching products...");
 
     if (error) throw error;
-    return snakeToCamel(data ?? []) satisfies ProductDataWithJoins[]; // FIX:
+    return snakeToCamel(data ?? []);
   },
 
   getById: async (productId: string): Promise<ProductData | null> => {
@@ -106,7 +106,7 @@ export const ProductAPI = {
     if (error) throw error;
     if (!data) return null;
 
-    return snakeToCamel(data) satisfies ProductData;
+    return snakeToCamel(data);
   },
 
   update: async (productFormData: FormData): Promise<UpdateProductData> => {
@@ -134,7 +134,7 @@ export const ProductAPI = {
     console.log("Fetching categories...");
     console.log(data);
     if (error) throw error;
-    return snakeToCamel(data ?? []) satisfies ProductsCategoryData[];
+    return snakeToCamel(data ?? []);
   },
 
   getCollections: async (): Promise<ProductsCollectionData[]> => {
@@ -146,6 +146,6 @@ export const ProductAPI = {
     console.log(data);
 
     if (error) throw error;
-    return snakeToCamel(data ?? []) satisfies ProductsCollectionData[];
+    return snakeToCamel(data ?? []);
   },
 };
