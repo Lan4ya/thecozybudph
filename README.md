@@ -18,7 +18,9 @@
 - [ Supabase (Deno & PostgreSQL) ](https://supabase.com/) 
 - [ Hono ](https://hono.dev/) 
 - [ Node ](https://nodejs.org/en)
+- [PayMongo](https://www.paymongo.com/) 
 - No ORM's or Query Builders used
+
 ---
 
 ### ⚙️ Local Setup 
