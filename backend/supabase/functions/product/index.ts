@@ -1,13 +1,3 @@
-/*
-For local dev, this is an example on how you'd make a GET request.
-
- curl -i -L --request GET 'http://127.0.0.1:54321/functions/v1/products' \
-   --header 'Authorization: Bearer {token}' \
-   --header 'Content-Type: application/json' \
-
-the token TTL is set to 1 week in config.toml, as to not worry about refreshing
-it repeatedly while developing the app. In prod the token has 1hr TTL
-*/
 
 import { Hono } from "hono";
 import product from "./product-routes.ts";
