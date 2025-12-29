@@ -70,10 +70,10 @@ export const createProduct = async (
 
   return {
     ...createdProduct,
-    productCollection: productCollection
+    productCollections: productCollection
       ? { name: productCollection.name }
       : null,
-    productCategory: productCategory
+    productCategories: productCategory
       ? { name: productCategory.name, id: productCategory.id }
       : null,
   };

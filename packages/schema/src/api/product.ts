@@ -25,14 +25,13 @@ export type ProductsCollectionData = SnakeToCamel<ProductCollectionsRow>;
 
 export type ProductsCategoryData = SnakeToCamel<ProductCategoriesRow>;
 
-type ProductCategoryAndCollectionName = {
-  productCollection: {
-    name: string;
-  } | null;
+type ProductCategoryName = Pick<ProductCategoriesRow, "name">;
 
-  productCategory: {
-    name: string;
-  } | null;
+type ProductCollectionName = Pick<ProductCollectionsRow, "name">;
+
+type ProductCategoryAndCollectionName = {
+  productCollections: ProductCategoryName | null;
+  productCategories: ProductCollectionName | null;
 };
 
 export type ProductDataWithJoins = ProductData &

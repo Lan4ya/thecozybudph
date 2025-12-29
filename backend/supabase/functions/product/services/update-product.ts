@@ -118,9 +118,9 @@ export const updateProduct = async (
 
   return {
     ...updatedProduct,
-    productsCollection: productCollection
+    productCollections: productCollection
       ? { name: productCollection.name }
       : null,
-    productsCategory: productCategory ? { name: productCategory.name } : null,
-  };
+    productCategories: productCategory ? { name: productCategory.name } : null,
+  } satisfies UpdateProductData;
 };
