@@ -27,7 +27,7 @@ export const ProductAPI = {
 
     let query = supabase
       .from("products")
-      .select("*, product_collections (*), product_categories(*)")
+      .select("*, product_collections (name), product_categories(name)")
       .range(page * perPage, (page + 1) * perPage - 1);
 
     if (noDummyProduct) {
