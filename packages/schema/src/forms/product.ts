@@ -10,7 +10,7 @@ export const productBaseSchema = z.object({
   price: z.coerce
     .number("price is required")
     .min(0, "price can't be negative")
-    .max(1000000, "price can't exceed 1,000,000"),
+    .max(1_000_000, "price can't exceed 1,000,000"),
 
   // optional field: defaults to []
   colorVariants: z.preprocess(
