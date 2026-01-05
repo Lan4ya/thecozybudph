@@ -203,7 +203,7 @@ pnpx tsx seed.ts > supabase/seeds/products/seed.sql
 
 ##### 1. Sync your local repo to remote **dev** branch 
 ```bash
-# NOTE: you should run this regularly to detect and fix merge conflicts early (alteast 1x a day and before every git push)
+# you should run this regularly to detect and fix merge conflicts early (alteast 1x a day and before every git push)
 
 # Also notice that the cmd is pulling from dev and not main. 
 # That's important. Do not pull from main.
@@ -241,7 +241,7 @@ git commit -m "added form for event event-scheduling"
 # Sync before pushing. If there's a merge conflict fix it.
 git pull --rebase origin dev 
 
-# NOTE: push only to your own branch, not in dev nor main.
+# push only to your own branch, not in dev nor main.
 git push feature/{nameOfYourBranch} 
 ```
 ⚠️ **AFTER PUSHING, IF THE FEATURE IS NOT YET 100% COMPLETE GO BACK TO STEP 3** ⚠️
@@ -291,5 +291,5 @@ git push feature/{nameOfYourBranch}
 
    # After pushing, Comment on the PR to let the reviewer know it’s ready for re-review.
 
-   # NOTE: Don't wait for the code review. After opening a PR and you wanna work on other features just go back to step 1 on the spot
+   # Don't wait for the code review. After opening a PR and you wanna work on other features just go back to step 1 on the spot
    ```
