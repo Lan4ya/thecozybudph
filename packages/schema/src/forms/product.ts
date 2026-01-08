@@ -80,7 +80,6 @@ export const createProductSchema = productBaseSchema.extend({
 });
 
 export const updateProductSchema = productBaseSchema.partial().extend({
-  productId: z.string().min(1, "product ID is required"),
   newProductImages: z.preprocess(
     (val) => {
       if (val instanceof File) return [val];

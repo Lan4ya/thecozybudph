@@ -21,7 +21,7 @@ product.use("*", roleMiddleware("admin"));
 product.use("*", supabaseServiceMiddleware());
 
 product.post("/", ...createProductHandler);
-product.patch("/", ...patchProductHandler);
+product.patch("/:id", ...patchProductHandler);
 product.delete("/", ...deleteProductHandler);
 
 export default product;

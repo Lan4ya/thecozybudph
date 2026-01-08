@@ -4,6 +4,7 @@ import { handleSuccess } from "@shared/utils/mod.ts";
 import {
   createProductSchema,
   deleteProductSchema,
+  productIdSchema,
   updateProductSchema,
 } from "@shared/schema/index.ts";
 import { zodValidatorMiddleware } from "@shared/middlewares/zodValidatorMiddleware.ts";
@@ -25,11 +26,13 @@ export const deleteProductHandler = factory.createHandlers(
 );
 
 export const patchProductHandler = factory.createHandlers(
+  zodValidatorMiddleware("param", productIdSchema),
   zodValidatorMiddleware("form", updateProductSchema),
   async (c) => {
     const supabase = c.get("supabaseService");
+    const { id } = c.req.valid("param");
     const payload = c.req.valid("form");
-    const res = await ProductService.updateProduct(supabase, payload);
+    const res = await ProductService.updateProduct(supabase, id, payload);
     return handleSuccess(res);
   },
 );

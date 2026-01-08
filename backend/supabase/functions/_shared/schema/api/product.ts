@@ -13,6 +13,8 @@ import z from "zod";
 
 // REQUEST TYPES:
 
+export const productIdSchema = z.object({ id: z.uuid("invalid product id") });
+
 export type CreateProductRequest = z.infer<typeof createProductSchema>;
 export type UpdateProductRequest = z.infer<typeof updateProductSchema>;
 export type DeleteProductsRequest = z.infer<typeof deleteProductSchema>;

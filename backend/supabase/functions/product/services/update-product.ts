@@ -10,14 +10,14 @@ import { ProductStorage } from "../product-storage.ts";
 
 export const updateProduct = async (
   supabase: SupabaseClient,
+  id: string,
   payload: UpdateProductRequest,
 ): Promise<UpdateProductData> => {
   // Check product existence
   const { data: existingProduct, error: fetchError } =
-    await ProductRepository.getProductById(supabase, payload.productId);
+    await ProductRepository.getProductById(supabase, id);
 
-  if (fetchError)
-    throw AppError.internal(`Failed to fetch product: ${fetchError}`);
+  if (fetchError) throw AppError.internal();
 
   if (!existingProduct) throw AppError.notFound("Product not found");
 
@@ -53,7 +53,7 @@ export const updateProduct = async (
       supabase,
       payload.collectionName,
     );
-    if (error) throw AppError.internal(error.message);
+    if (error) throw AppError.internal();
     productCollection = data;
   }
 
@@ -102,18 +102,14 @@ export const updateProduct = async (
   };
 
   const { data: updatedProduct, error: updateError } =
-    await ProductRepository.updateProduct(
-      supabase,
-      payload.productId,
-      dbUpdates,
-    );
+    await ProductRepository.updateProduct(supabase, id, dbUpdates);
 
   if (updateError) {
     await cleanupUploads().catch((err) => {
       console.error("Image cleanup failed after update error", err);
     });
 
-    throw AppError.internal(`Failed to update product: ${updateError.message}`);
+    throw AppError.internal();
   }
 
   return {
