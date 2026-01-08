@@ -22,6 +22,6 @@ product.use("*", supabaseServiceMiddleware());
 
 product.post("/", ...createProductHandler);
 product.patch("/", ...patchProductHandler);
-product.patch("/", ...deleteProductHandler);
+product.delete("/", ...deleteProductHandler);
 
 export default product;
