@@ -1,0 +1,8 @@
+ALTER TABLE addresses
+    ALTER COLUMN full_name SET NOT NULL,
+    ALTER COLUMN province SET NOT NULL,
+    ALTER COLUMN barangay SET NOT NULL,
+    ALTER COLUMN postal_code SET NOT NULL,
+    ALTER COLUMN address_line SET NOT NULL,
+    ALTER COLUMN phone_number SET NOT NULL,
+    ALTER COLUMN region SET NOT NULL;
