@@ -1,4 +1,5 @@
 import { JwtPayload, SupabaseClient } from "supabase";
+import { Database } from "./schema/index.ts";
 
 type Bindings = {
   SUPABASE_URL: string;
@@ -8,8 +9,8 @@ type Bindings = {
 
 type Variables = {
   validatedPayload: unknown;
-  supabase: SupabaseClient;
-  supabaseService: SupabaseClient;
+  supabase: SupabaseClient<Database>;
+  supabaseService: SupabaseClient<Database>;
   role: "user" | "admin";
   claims: JwtPayload;
 };
@@ -18,3 +19,5 @@ export type AppEnv = {
   Bindings: Bindings;
   Variables: Variables;
 };
+
+export type SupabaseType = AppEnv["Variables"]["supabase"];
