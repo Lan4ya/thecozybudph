@@ -1,10 +1,10 @@
-import { SupabaseClient } from "supabase";
 import { CartRepository } from "../cart-repository.ts";
-import { AddCartItemsRequest } from "@shared/schema/api/cart.ts";
+import { AddCartItemsRequest } from "@shared/core/api/cart.ts";
 import { AppError } from "@shared/errors/Errors.ts";
+import { SupabaseType } from "@shared/types.d.ts";
 
 export const addCartItem = async (
-  supabase: SupabaseClient,
+  supabase: SupabaseType,
   payload: AddCartItemsRequest,
   profileId: string,
 ) => {
@@ -12,8 +12,7 @@ export const addCartItem = async (
     await CartRepository.getCartByProfileId(supabase, profileId);
 
   if (cartError) {
-    console.log(`Failed to get cart: ${cartError.message}`);
-    throw AppError.internal();
+    throw AppError.internal(cartError.message);
   }
 
   let cartId: string = cart?.id;
@@ -27,16 +26,12 @@ export const addCartItem = async (
           await CartRepository.getCartByProfileId(supabase, profileId);
 
         if (refetchError || !existingCart?.id) {
-          console.log(
-            `Failed to get cart after conflict: ${refetchError?.message}`,
-          );
-          throw AppError.internal();
+          throw AppError.internal(refetchError?.message);
         }
 
         cartId = existingCart.id;
       } else {
-        console.log(`Failed to insert cart: ${insertError?.message}`);
-        throw AppError.internal();
+        throw AppError.internal(insertError?.message);
       }
     } else {
       cartId = newCart.id;
@@ -51,8 +46,7 @@ export const addCartItem = async (
   );
 
   if (error) {
-    console.log(`Failed to upsert cart items: ${error.message}`);
-    throw AppError.internal;
+    throw AppError.internal(error.message);
   }
 
   return { data, error };

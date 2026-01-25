@@ -1,4 +1,5 @@
-import { SnakeToCamel } from "../schema/utils/snakeToCamelCase.ts";
+import { SnakeToCamel } from "../core/utils/snakeToCamelCase.ts";
+import { CamelToSnake } from "../core/utils/camelToSnakeCase.ts";
 
 export function snakeToCamel<T>(obj: T): SnakeToCamel<T> {
   if (obj == null) return obj as SnakeToCamel<T>;
@@ -19,4 +20,26 @@ export function snakeToCamel<T>(obj: T): SnakeToCamel<T> {
   }
 
   return obj as SnakeToCamel<T>;
+}
+
+export function camelToSnake<T>(obj: T): CamelToSnake<T> {
+  if (obj == null) return obj as CamelToSnake<T>;
+
+  if (Array.isArray(obj)) {
+    return obj.map((item) => camelToSnake(item)) as CamelToSnake<T>;
+  }
+
+  if (typeof obj === "object" && !(obj instanceof Date)) {
+    const newObj: any = {};
+
+    for (const [key, value] of Object.entries(obj)) {
+      const snakeKey = key.replace(/([A-Z])/g, "_$1").toLowerCase();
+
+      newObj[snakeKey] = camelToSnake(value);
+    }
+
+    return newObj as CamelToSnake<T>;
+  }
+
+  return obj as CamelToSnake<T>;
 }

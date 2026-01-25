@@ -1,16 +1,16 @@
 import { AppError } from "@shared/errors/Errors.ts";
-import { SupabaseClient } from "supabase";
+import { SupabaseType } from "@shared/types.d.ts";
 import {
-  CreateProductData,
-  CreateProductRequest,
-} from "@shared/schema/index.ts";
+  CreateProductInput,
+  CreateProductResponse,
+} from "@shared/core/index.ts";
 import { ProductRepository } from "../product-repository.ts";
 import { ProductStorage } from "../product-storage.ts";
 
 export const createProduct = async (
-  supabase: SupabaseClient,
-  payload: CreateProductRequest,
-): Promise<CreateProductData> => {
+  supabase: SupabaseType,
+  payload: CreateProductInput,
+): Promise<CreateProductResponse> => {
   const {
     name,
     price,
@@ -35,7 +35,8 @@ export const createProduct = async (
       supabase,
       collectionName,
     );
-    if (error) throw AppError.internal(error.message);
+    if (error)
+      throw AppError.internal(`Failed to upsert collection: ${error.message}`);
     productCollection = data;
   }
 

@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "build": "tsc .",
-    "gen-supabase-types": "pnpx supabase gen types typescript --local > ../packages/schema/src/db/supabase.types.ts && mkdir -p  ./supabase/functions/_shared/schema && rm -rf ./supabase/functions/_shared/schema/* && cp -r ../packages/schema/src/* ./supabase/functions/_shared/schema/"
+    "gen-supabase-types": "pnpx supabase gen types typescript --local > ../packages/core/src/db/supabase.types.ts && mkdir -p  ./supabase/functions/_shared/core && rm -rf ./supabase/functions/_shared/core/* && cp -r ../packages/core/src/* ./supabase/functions/_shared/core/"
   },
   "devDependencies": {
     "@TheCozyBud/schema": "workspace:*",

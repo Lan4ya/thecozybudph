@@ -1,8 +1,8 @@
-import type { SupabaseClient } from "supabase";
+import type { SupabaseType } from "../types.d.ts";
 import { AppError } from "../errors/Errors.ts";
 
 export const supabaseUploadImages = async (
-  supabase: SupabaseClient,
+  supabase: SupabaseType,
   bucket: string,
   images: File[],
 ): Promise<string[]> => {

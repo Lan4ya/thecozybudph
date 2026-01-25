@@ -1,9 +1,9 @@
-import type { SupabaseClient } from "supabase";
-import type { ProductsMetadataRow } from "@shared/schema/index.ts";
+import type { SupabaseType } from "@shared/types.d.ts";
+import type { ProductsMetadataRow } from "@shared/core/index.ts";
 
 export const ProductRepository = {
   insertProduct: async (
-    s: SupabaseClient,
+    s: SupabaseType,
     product: Omit<ProductsMetadataRow, "id" | "created_at" | "updated_at">,
   ) => {
     const { data, error } = await s
@@ -15,7 +15,7 @@ export const ProductRepository = {
   },
 
   updateProduct: async (
-    s: SupabaseClient,
+    s: SupabaseType,
     productId: string,
     updates: Partial<
       Omit<ProductsMetadataRow, "id" | "created_at" | "updated_at">
@@ -30,7 +30,7 @@ export const ProductRepository = {
     return { data, error };
   },
 
-  deleteProductsByIds: async (s: SupabaseClient, productIds: string[]) => {
+  deleteProductsByIds: async (s: SupabaseType, productIds: string[]) => {
     const { data, error } = await s
       .from("products")
       .delete()
@@ -39,7 +39,7 @@ export const ProductRepository = {
     return { data, error };
   },
 
-  getProductById: async (s: SupabaseClient, productId: string) => {
+  getProductById: async (s: SupabaseType, productId: string) => {
     const { data, error } = await s
       .from("products")
       .select("*")
@@ -48,7 +48,7 @@ export const ProductRepository = {
     return { data, error };
   },
 
-  getProductsByIds: async (s: SupabaseClient, productIds: string[]) => {
+  getProductsByIds: async (s: SupabaseType, productIds: string[]) => {
     const { data, error } = await s
       .from("products")
       .select("id, image_urls")
@@ -56,7 +56,7 @@ export const ProductRepository = {
     return { data, error };
   },
 
-  upsertCategory: async (s: SupabaseClient, name: string) => {
+  upsertCategory: async (s: SupabaseType, name: string) => {
     const { data, error } = await s
       .from("product_categories")
       .upsert({ name }, { onConflict: "name" })
@@ -65,7 +65,7 @@ export const ProductRepository = {
     return { data, error };
   },
 
-  upsertCollection: async (s: SupabaseClient, name: string) => {
+  upsertCollection: async (s: SupabaseType, name: string) => {
     const { data, error } = await s
       .from("product_collections")
       .upsert({ name }, { onConflict: "name" })

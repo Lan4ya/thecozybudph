@@ -4,3 +4,4 @@ export * from "./roleMiddleware.ts";
 export * from "./supabaseMiddleware.ts";
 export * from "./supabaseServiceMiddleware.ts";
 export * from "./zodValidatorMiddleware.ts";
+export * from "./defaultMiddleware.ts";

@@ -5,7 +5,9 @@
     "hono": "npm:hono",
     "@hono/zod-validator": "npm:@hono/zod-validator",
     "zod": "npm:zod@^4.1.12",
-    "hono-rate-limiter": "npm:hono-rate-limiter"
+    "hono-rate-limiter": "npm:hono-rate-limiter",
+    "axios": "npm:axios@^1.13.2",
+    "lalamove": "npm:@lalamove/lalamove-js@^1.1.0"
   },
   "compilerOptions": {
     "types": [

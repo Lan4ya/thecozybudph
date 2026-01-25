@@ -1,7 +1,7 @@
-import { SupabaseClient } from "supabase";
+import { SupabaseType } from "@shared/types.d.ts";
 
 export const CartRepository = {
-  getCartByProfileId: async (supabase: SupabaseClient, profileId: string) => {
+  getCartByProfileId: async (supabase: SupabaseType, profileId: string) => {
     const { data, error } = await supabase
       .from("carts")
       .select("id")
@@ -10,7 +10,7 @@ export const CartRepository = {
     return { data, error };
   },
 
-  getCartItems: async (supabase: SupabaseClient, cartId: string) => {
+  getCartItems: async (supabase: SupabaseType, cartId: string) => {
     const { data, error } = await supabase
       .from("cart_items")
       .select("*")
@@ -18,7 +18,7 @@ export const CartRepository = {
     return { data, error };
   },
 
-  insertCart: async (supabase: SupabaseClient, profileId: string) => {
+  insertCart: async (supabase: SupabaseType, profileId: string) => {
     const { data, error } = await supabase
       .from("carts")
       .insert({ profile_id: profileId })
@@ -28,7 +28,7 @@ export const CartRepository = {
   },
 
   upsertCartItem: (
-    supabase: SupabaseClient,
+    supabase: SupabaseType,
     cartId: string,
     productId: string,
     quantity: number,
@@ -41,7 +41,7 @@ export const CartRepository = {
   },
 
   deleteCartItems: async (
-    supabase: SupabaseClient,
+    supabase: SupabaseType,
     cartId: string,
     productIds: string[],
   ) => {

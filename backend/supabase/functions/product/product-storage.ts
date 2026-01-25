@@ -1,13 +1,13 @@
-import type { SupabaseClient } from "supabase";
+import type { SupabaseType } from "@shared/types.d.ts";
 
 export const ProductStorage = {
-  deleteImages: async (supabase: SupabaseClient, paths: string[]) => {
+  deleteImages: async (supabase: SupabaseType, paths: string[]) => {
     const { error } = await supabase.storage.from("products").remove(paths);
     return error;
   },
 
   uploadImages: async (
-    supabase: SupabaseClient,
+    supabase: SupabaseType,
     bucket: string,
     files: File[],
   ) => {

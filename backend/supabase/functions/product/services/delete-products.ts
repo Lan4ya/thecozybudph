@@ -1,17 +1,17 @@
 import {
-  DeleteProductData,
-  DeleteProductsRequest,
-} from "@shared/schema/index.ts";
-import { SupabaseClient } from "supabase";
+  DeleteProductResponse,
+  DeleteProductsInput,
+} from "@shared/core/index.ts";
+import { SupabaseType } from "@shared/types.d.ts";
 import { AppError } from "@shared/errors/Errors.ts";
 import { isDev } from "@shared/utils/isDev.ts";
 import { ProductRepository } from "../product-repository.ts";
 import { ProductStorage } from "../product-storage.ts";
 
 export const deleteProducts = async (
-  supabase: SupabaseClient,
-  payload: DeleteProductsRequest,
-): Promise<DeleteProductData> => {
+  supabase: SupabaseType,
+  payload: DeleteProductsInput,
+): Promise<DeleteProductResponse> => {
   const { productIds } = payload;
 
   const { data: products, error } = await ProductRepository.getProductsByIds(
@@ -20,9 +20,7 @@ export const deleteProducts = async (
   );
 
   if (error || !products) {
-    throw AppError.internal(
-      `Failed to delete products: ${error?.message ?? "Products not found"}`,
-    );
+    throw AppError.internal();
   }
 
   const imageUrls = products.flatMap((p) =>
@@ -62,9 +60,7 @@ export const deleteProducts = async (
     await ProductRepository.deleteProductsByIds(supabase, productIds);
 
   if (deleteError) {
-    throw AppError.internal(
-      `Failed to delete product: ${deleteError?.message ?? "Products not found"}`,
-    );
+    throw AppError.internal();
   }
 
   const deletedProductIds: string[] = data?.map((d) => String(d.id)) ?? [];

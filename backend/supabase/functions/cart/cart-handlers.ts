@@ -6,7 +6,7 @@ import { handleSuccess } from "@shared/utils/mod.ts";
 import {
   addCartItemsSchema,
   deleteCartItemsSchema,
-} from "@shared/schema/index.ts";
+} from "@shared/core/index.ts";
 
 const factory = createFactory<AppEnv>();
 const { createHandlers } = factory;

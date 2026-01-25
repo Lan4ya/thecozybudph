@@ -1,9 +1,8 @@
 import { createClient } from "supabase";
 import { env } from "hono/adapter";
 import type { Context, Next } from "hono";
-import type { Database } from "../schema/index.ts";
+import type { Database } from "../core/index.ts";
 import { AppError } from "../errors/Errors.ts";
-import { AppEnv } from "../types.d.ts";
 
 // WARN: This supabase instance/middleware uses the SUPABASE_SERVICE_ROLE_KEY which bypasses all RLS security in Supabase DB.
 // DO NOT use this on routes that shoudn't execute admin previleges (use getSupabase() for such cases). And if

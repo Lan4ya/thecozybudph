@@ -3,17 +3,17 @@ import { ProductService } from "./services/mod.ts";
 import { handleSuccess } from "@shared/utils/mod.ts";
 import {
   createProductSchema,
-  deleteProductSchema,
+  deleteProductsSchema,
   productIdSchema,
   updateProductSchema,
-} from "@shared/schema/index.ts";
+} from "@shared/core/index.ts";
 import { zodValidatorMiddleware } from "@shared/middlewares/zodValidatorMiddleware.ts";
 import { AppEnv } from "@shared/types.d.ts";
 
 const factory = createFactory<AppEnv>();
 
 export const deleteProductHandler = factory.createHandlers(
-  zodValidatorMiddleware("json", deleteProductSchema),
+  zodValidatorMiddleware("json", deleteProductsSchema),
   async (c) => {
     const supabase = c.get("supabaseService");
     const payload = c.req.valid("json");

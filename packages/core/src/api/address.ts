@@ -1,0 +1,29 @@
+import { z } from "zod";
+
+// REQUEST TYPES:
+
+const phMobileSchema = z
+  .string()
+  .regex(/^\+639\d{9}$/, "Invalid PH mobile number (use +639XXXXXXXXX)");
+
+export const createAddressSchema = z.object({
+  fullName: z.string().trim().min(1, "full name can't be empty"),
+  region: z.string().trim().min(1, "region can't be empty"),
+  city: z.string().trim().min(1, "city can't be empty"),
+  province: z.string().trim().min(1, "province can't be empty"),
+  postalCode: z.string().trim().min(1, "postal code can't be empty"),
+  barangay: z.string().trim().min(1, "barangay can't be empty"),
+  addressLine: z.string().trim().min(1, "address line can't be empty"),
+  phoneNumber: phMobileSchema,
+});
+
+export const updateAddressSchema = createAddressSchema.partial();
+
+export const addressIdSchema = z.object({
+  id: z.uuid("invalid address id"),
+});
+
+export type CreateAddressRequest = z.infer<typeof createAddressSchema>;
+export type UpdateAddressRequest = z.infer<typeof updateAddressSchema>;
+
+// RESPONSE TYPES:

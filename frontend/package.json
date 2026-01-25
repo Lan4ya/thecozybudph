@@ -56,6 +56,7 @@
     "@types/react-dom": "^19.2.2",
     "@types/react-portal": "^4.0.7",
     "@vitejs/plugin-react": "^5.0.4",
+    "baseline-browser-mapping": "^2.9.11",
     "eslint": "^9.38.0",
     "eslint-plugin-react-hooks": "^7.0.0",
     "eslint-plugin-react-refresh": "^0.4.24",

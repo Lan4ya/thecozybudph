@@ -1,18 +1,19 @@
 import {
   ProductsMetadataRow,
-  UpdateProductData,
-  UpdateProductRequest,
-} from "@shared/schema/index.ts";
+  UpdateProductResponse,
+  UpdateProductInput,
+} from "@shared/core/index.ts";
 import { AppError } from "@shared/errors/Errors.ts";
-import { SupabaseClient } from "supabase";
+import { SupabaseType } from "@shared/types.d.ts";
 import { ProductRepository } from "../product-repository.ts";
 import { ProductStorage } from "../product-storage.ts";
+import { snakeToCamel } from "@shared/utils/caseConverter.ts";
 
 export const updateProduct = async (
-  supabase: SupabaseClient,
+  supabase: SupabaseType,
   id: string,
-  payload: UpdateProductRequest,
-): Promise<UpdateProductData> => {
+  payload: UpdateProductInput,
+): Promise<UpdateProductResponse> => {
   // Check product existence
   const { data: existingProduct, error: fetchError } =
     await ProductRepository.getProductById(supabase, id);
@@ -88,7 +89,7 @@ export const updateProduct = async (
     }
   }
 
-  const dbUpdates: Partial<
+  const productUpdates: Partial<
     Omit<ProductsMetadataRow, "created_at" | "updated_at" | "id">
   > = {
     name: payload.name ?? existingProduct.name,
@@ -102,9 +103,9 @@ export const updateProduct = async (
   };
 
   const { data: updatedProduct, error: updateError } =
-    await ProductRepository.updateProduct(supabase, id, dbUpdates);
+    await ProductRepository.updateProduct(supabase, id, productUpdates);
 
-  if (updateError) {
+  if (updateError || !updatedProduct) {
     await cleanupUploads().catch((err) => {
       console.error("Image cleanup failed after update error", err);
     });
@@ -112,11 +113,13 @@ export const updateProduct = async (
     throw AppError.internal();
   }
 
+  const p = snakeToCamel(updatedProduct);
+
   return {
-    ...updatedProduct,
+    ...p,
     productCollections: productCollection
       ? { name: productCollection.name }
       : null,
     productCategories: productCategory ? { name: productCategory.name } : null,
-  } satisfies UpdateProductData;
+  };
 };

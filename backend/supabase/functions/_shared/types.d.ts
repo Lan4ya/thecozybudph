@@ -1,5 +1,5 @@
 import { JwtPayload, SupabaseClient } from "supabase";
-import { Database } from "./schema/index.ts";
+import { Database } from "./core/index.ts";
 
 type Bindings = {
   SUPABASE_URL: string;

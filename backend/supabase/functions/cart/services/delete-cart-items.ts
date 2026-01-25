@@ -1,10 +1,10 @@
-import { SupabaseClient } from "supabase";
-import { DeleteCartItemsRequest } from "@shared/schema/api/cart.ts";
+import { SupabaseType } from "@shared/types.d.ts";
+import { DeleteCartItemsRequest } from "@shared/core/api/cart.ts";
 import { CartRepository } from "../cart-repository.ts";
 import { AppError } from "@shared/errors/Errors.ts";
 
 export const deleteCartItems = async (
-  supabase: SupabaseClient,
+  supabase: SupabaseType,
   payload: DeleteCartItemsRequest,
   profileId: string,
 ) => {
@@ -12,10 +12,7 @@ export const deleteCartItems = async (
     await CartRepository.getCartByProfileId(supabase, profileId);
 
   if (getCartIdByProfileIdError || !cart?.id) {
-    console.log(
-      `Failed to get cartId by profileId: ${getCartIdByProfileIdError}`,
-    );
-    throw AppError.internal();
+    throw AppError.internal(getCartIdByProfileIdError?.message);
   }
 
   const { data, error } = await CartRepository.deleteCartItems(
@@ -25,8 +22,7 @@ export const deleteCartItems = async (
   );
 
   if (error || !data) {
-    console.log(`Failed to delete cart items: ${error}`);
-    throw AppError.internal();
+    throw AppError.internal(error?.message);
   }
 
   const deletedProductIds = data.map((item) => item.id);

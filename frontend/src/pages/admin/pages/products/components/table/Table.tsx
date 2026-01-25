@@ -155,9 +155,9 @@ function ProductTableItemInner({
             {product.name}
           </h3>
 
-          {product.productsCollection?.name && (
+          {product.productCollections?.name && (
             <p className="text-xs lg:text-sm mt-1 text-muted-foreground line-clamp-2">
-              Collection: {product.productsCollection.name}
+              Collection: {product.productCollections.name}
             </p>
           )}
 

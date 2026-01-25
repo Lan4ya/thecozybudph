@@ -3,9 +3,9 @@ import { motion } from "framer-motion";
 import { useForm, type FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  type CreateProductForm,
+  type CreateProductInput,
   type ProductDataWithJoins,
-  type UpdateProductForm,
+  type UpdateProductInput,
   createProductSchema,
   updateProductSchema,
 } from "@TheCozyBud/schema";
@@ -512,21 +512,21 @@ export default function ProductForm({
                     maxImages={MAX_IMAGES}
                   />
                   {formValues.mode === "create" &&
-                    (errors as FieldErrors<CreateProductForm>)?.productImages
+                    (errors as FieldErrors<CreateProductInput>)?.productImages
                       ?.message && (
                       <p className="absolute -bottom-1 text-xs text-red-500 mt-1">
                         {
-                          (errors as FieldErrors<CreateProductForm>)
+                          (errors as FieldErrors<CreateProductInput>)
                             .productImages?.message
                         }
                       </p>
                     )}
                   {formValues.mode === "update" &&
-                    (errors as FieldErrors<UpdateProductForm>)?.newProductImages
-                      ?.message && (
+                    (errors as FieldErrors<UpdateProductInput>)
+                      ?.newProductImages?.message && (
                       <p className="text-xs text-red-500 mt-1">
                         {
-                          (errors as FieldErrors<UpdateProductForm>)
+                          (errors as FieldErrors<UpdateProductInput>)
                             .newProductImages?.message
                         }
                       </p>
@@ -562,7 +562,7 @@ export default function ProductForm({
 
 // Helper for default values
 
-function getEmptyFormKV(): CreateProductForm {
+function getEmptyFormKV(): CreateProductInput {
   return {
     name: "",
     price: "" as unknown as number,
@@ -577,13 +577,13 @@ function getEmptyFormKV(): CreateProductForm {
 
 function getMappedUpdatingProductKV(
   updatingProduct: ProductDataWithJoins,
-): Omit<UpdateProductForm, "productId"> {
+): Omit<UpdateProductInput, "productId"> {
   return {
     name: updatingProduct.name,
     price: updatingProduct.price,
-    collectionName: updatingProduct.productsCollection?.name ?? "",
+    collectionName: updatingProduct.productCollection?.name ?? "",
     description: updatingProduct.description ?? "",
-    category: updatingProduct.productsCategory?.name ?? "",
+    category: updatingProduct.productCategory?.name ?? "",
     colorVariants: updatingProduct.colorVariants ?? [],
     newProductImages: [],
     imageUrlsToDelete: [],
