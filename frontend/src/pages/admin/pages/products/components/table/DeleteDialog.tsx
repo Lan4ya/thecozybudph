@@ -8,14 +8,14 @@ import {
 } from "@/lib/ui/__shadcn__/dialog";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { useState } from "react";
-import type { ProductData } from "@TheCozyBud/schema";
+import type { Product } from "@TheCozyBud/types";
 
 export function DeleteProductDialog({
   product,
   onConfirm,
   trigger,
 }: {
-  product: ProductData;
+  product: Product;
   onConfirm: () => void;
   trigger: React.ReactNode;
 }) {

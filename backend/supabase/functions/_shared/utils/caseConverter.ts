@@ -1,5 +1,5 @@
-import { SnakeToCamel } from "../core/utils/snakeToCamelCase.ts";
-import { CamelToSnake } from "../core/utils/camelToSnakeCase.ts";
+import { SnakeToCamel } from "../types/utils/snakeToCamelCase.ts";
+import { CamelToSnake } from "../types/utils/camelToSnakeCase.ts";
 
 export function snakeToCamel<T>(obj: T): SnakeToCamel<T> {
   if (obj == null) return obj as SnakeToCamel<T>;

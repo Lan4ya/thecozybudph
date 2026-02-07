@@ -1,5 +1,8 @@
 import { X, Tags as TagIcon } from "lucide-react";
-import type { FiltersDomain, PriceRangeOption } from "../../../types";
+import type {
+  ProductFiltersDomain,
+  ProductPriceRangeOption,
+} from "../../../types";
 import { useProductQuery } from "../hooks/useFilters";
 import { useIsExtraLargeScreen } from "@/hooks/useMediaQuery";
 import { Button } from "@/lib/ui/__shadcn__/button";
@@ -77,7 +80,7 @@ const Tags = () => {
                   <TagItem
                     key={`${key}-${val}`}
                     label={val}
-                    filterKey={key as keyof FiltersDomain}
+                    filterKey={key as keyof ProductFiltersDomain}
                     isXlScreen={isXlScreen}
                   />
                 ))}
@@ -103,7 +106,7 @@ const Tags = () => {
               <TagItem
                 key={`${key}-${String(val)}`}
                 label={String(val)}
-                filterKey={key as keyof FiltersDomain}
+                filterKey={key as keyof ProductFiltersDomain}
                 isXlScreen={isXlScreen}
               />
             ))}
@@ -120,7 +123,7 @@ const Tags = () => {
 
 type TagItemProps = {
   label: string;
-  filterKey?: keyof FiltersDomain;
+  filterKey?: keyof ProductFiltersDomain;
   isXlScreen: boolean;
 };
 
@@ -170,7 +173,7 @@ const TagItem = ({ label, filterKey, isXlScreen }: TagItemProps) => {
       }}
     >
       {filterKey === "priceRange"
-        ? formatPriceRange(label as PriceRangeOption)
+        ? formatPriceRange(label as ProductPriceRangeOption)
         : label}
       {isXlScreen ? (
         <span className="hidden group-hover:inline-block">{xIcon}</span>

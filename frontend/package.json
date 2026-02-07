@@ -11,7 +11,7 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@TheCozyBud/schema": "workspace:*",
+    "@TheCozyBud/types": "workspace:*",
     "@floating-ui/dom": "^1.7.4",
     "@floating-ui/react": "^0.27.16",
     "@hookform/resolvers": "^5.2.2",
@@ -46,7 +46,7 @@
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.14",
     "vaul": "^1.1.2",
-    "zod": "^4.1.12"
+    "zod": "workspace:*"
   },
   "devDependencies": {
     "@eslint/js": "^9.38.0",

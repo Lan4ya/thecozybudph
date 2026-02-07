@@ -1,5 +1,5 @@
 import { snakeToCamel } from "../utils/caseConverter.ts";
-import type { ApiResponseSuccess, SnakeToCamel } from "../core/index.ts";
+import type { ApiResponseSuccess, SnakeToCamel } from "../types/index.ts";
 
 export const handleSuccess = <T extends object>(
   payload: T,

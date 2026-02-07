@@ -2,8 +2,13 @@ export class AppError extends Error {
   statusCode: number;
   isOperational: boolean;
 
-  constructor(statusCode: number, message: string, isOperational = true) {
-    super(message);
+  constructor(
+    statusCode: number,
+    message: string,
+    cause?: unknown,
+    isOperational = true,
+  ) {
+    super(message, { cause });
     this.statusCode = statusCode;
     this.isOperational = isOperational;
     Error.captureStackTrace(this, this.constructor);
@@ -25,8 +30,12 @@ export class AppError extends Error {
     return new AppError(404, message);
   }
 
-  static internal(message: string = "Internal server error") {
-    return new AppError(500, message);
+  static conflict(message: string = "Conflict") {
+    return new AppError(409, message);
+  }
+
+  static internal(message: string = "Internal server error", cause?: unknown) {
+    return new AppError(500, message, cause, true);
   }
 }
 

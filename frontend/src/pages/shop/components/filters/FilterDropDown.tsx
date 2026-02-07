@@ -16,11 +16,17 @@ import PersistSuspense from "@/components/PersistSuspense";
 import { Skeleton } from "@/lib/ui/__shadcn__/skeleton";
 import { useProductQuery } from "../../hooks/useFilters";
 import { useIsSmallScreen, useMediaQuery } from "@/hooks/useMediaQuery";
-import type { FiltersDomain, PriceRangeOption } from "../../../../types";
+import type {
+  ProductFiltersDomain,
+  ProductPriceRangeOption,
+} from "../../../../types";
 import isDev from "@/lib/utils/isDev";
 import { formatPriceRange } from "./PriceRange";
 
-type DropdownFilterLabels = Exclude<keyof FiltersDomain, "search" | "sort">;
+type DropdownFilterLabels = Exclude<
+  keyof ProductFiltersDomain,
+  "search" | "sort"
+>;
 
 const filterLabels: Record<DropdownFilterLabels, string> = {
   priceRange: "Price range",
@@ -220,7 +226,7 @@ const DisplaySelectedFilters = ({
   const [first, ...rest] = vals;
   const normalizedFirst = useMemo(() => {
     if (dropdownType === "priceRange") {
-      return formatPriceRange(first as PriceRangeOption);
+      return formatPriceRange(first as ProductPriceRangeOption);
     }
     return first;
   }, [first, dropdownType]);

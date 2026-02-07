@@ -121,7 +121,7 @@ allowed_mime_types = ["image/png", "image/webp", "image/jpeg"]
 enabled = true
 # The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
 # in emails.
-site_url = "http:localhost:5173/"
+site_url = "http://localhost:5173/"
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
 additional_redirect_urls = ["https://localhost:5173/"]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
@@ -360,57 +360,58 @@ entrypoint = "./functions/dev-only/index.ts"
 # static_files = [ "./functions/auth/*.html" ]
 
 
-[functions.product]
+[functions.products]
 enabled = true
 verify_jwt = true
-import_map = "./functions/product/deno.json"
+import_map = "./functions/products/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
-entrypoint = "./functions/product/index.ts"
+entrypoint = "./functions/products/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/products/*.html" ]
 
-[functions.cart]
+[functions.carts]
 enabled = true
 verify_jwt = true
-import_map = "./functions/cart/deno.json"
+import_map = "./functions/carts/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
-entrypoint = "./functions/cart/index.ts"
+entrypoint = "./functions/carts/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
-# static_files = [ "./functions/cart/*.html" ]
+# static_files = [ "./functions/carts/*.html" ]
 
-[functions.order]
+[functions.checkouts]
 enabled = true
 verify_jwt = true
-import_map = "./functions/order/deno.json"
+import_map = "./functions/checkouts/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
-entrypoint = "./functions/order/index.ts"
+entrypoint = "./functions/checkouts/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
-# static_files = [ "./functions/order/*.html" ]
+# static_files = [ "./functions/checkouts/*.html" ]
 
-[functions.payment]
-enabled = true
-verify_jwt = true
-import_map = "./functions/payment/deno.json"
-# Uncomment to specify a custom file path to the entrypoint.
-# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
-entrypoint = "./functions/payment/index.ts"
-# Specifies static files to be bundled with the function. Supports glob patterns.
-# For example, if you want to serve static HTML pages in your function:
-# static_files = [ "./functions/payment/*.html" ]
 
-[functions.address]
+[functions.addresses]
 enabled = true
 verify_jwt = true
-import_map = "./functions/address/deno.json"
+import_map = "./functions/addresses/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
-entrypoint = "./functions/address/index.ts"
+entrypoint = "./functions/addresses/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
-# static_files = [ "./functions/address/*.html" ]
+# static_files = [ "./functions/addresses/*.html" ]
+
+[functions.webhooks]
+enabled = true
+verify_jwt = false
+import_map = "./functions/webhooks/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/webhooks/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/webhooks/*.html" ]

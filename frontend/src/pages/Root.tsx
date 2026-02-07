@@ -4,31 +4,36 @@ import Footer from "@/components/Footer";
 import { cn } from "@/lib/utils/cn";
 import { ScrollToTop } from "@/components/ScrollTop";
 import { ProductQueryProvider } from "@/providers/ProductQueryProvider";
+import SessionGuard from "@/components/SessionGuard";
 
 function Root() {
-  const pn = useLocation().pathname;
-  const hideNav = pn === "/auth/login" || pn === "/auth/signup";
-  const hideFooter = pn === "/auth/login" || pn === "/auth/signup";
+  const pathName = useLocation().pathname;
+  const hideNav = pathName === "/auth/login" || pathName === "/auth/signup";
+  const hideFooter = pathName === "/auth/login" || pathName === "/auth/signup";
 
   return (
-    <ProductQueryProvider>
-      <div
-        className={cn(
-          "flex flex-col min-h-screen",
-          pn !== "/" &&
-            pn !== "/auth/signup" &&
-            pn !== "/auth/login" &&
-            "pt-15 lg:pt-20",
-        )}
-      >
-        {/*  always scroll to top on route change */}
-        <ScrollToTop />
+    <>
+      <SessionGuard />
 
-        {!hideNav && <NavBar />}
-        <Outlet />
-        {!hideFooter && <Footer />}
-      </div>
-    </ProductQueryProvider>
+      <ProductQueryProvider>
+        <div
+          className={cn(
+            "flex flex-col min-h-screen",
+            pathName !== "/" &&
+              pathName !== "/auth/signup" &&
+              pathName !== "/auth/login" &&
+              "pt-15 lg:pt-20",
+          )}
+        >
+          {/*  always scroll to top on route change */}
+          <ScrollToTop />
+
+          {!hideNav && <NavBar />}
+          <Outlet />
+          {!hideFooter && <Footer />}
+        </div>
+      </ProductQueryProvider>
+    </>
   );
 }
 

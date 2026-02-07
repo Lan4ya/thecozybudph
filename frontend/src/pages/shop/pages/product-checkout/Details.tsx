@@ -4,10 +4,10 @@ import { Star, Heart, Shield, Truck, Clock, Gift } from "lucide-react";
 import { formatPrice } from "@/lib/utils/format";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Textarea } from "@/lib/ui/__shadcn__/textarea";
-import type { ProductData } from "@TheCozyBud/schema";
+import type { GetProductResponse } from "@TheCozyBud/types";
 
 interface ProductDetailsProps {
-  product: ProductData;
+  product: GetProductResponse;
 }
 
 const ProductDetails = ({ product }: ProductDetailsProps) => {

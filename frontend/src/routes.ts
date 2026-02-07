@@ -7,9 +7,8 @@ import About from "./pages/about/About.tsx";
 import Contact from "./pages/contact/Contact.tsx";
 import Events from "./pages/events/Events.tsx";
 import AdminDashboard, {
-  loader as AdminLoader,
+  AdminLoader as AdminLoader,
 } from "./pages/admin/Dashboard.tsx";
-import AdminLogin from "./pages/admin/pages/login/Login.tsx";
 import AdminDashboardProducts from "./pages/admin/pages/products/Products.tsx";
 import AdminDashboardOrders from "./pages/admin/pages/orders/Orders.tsx";
 import { CatchAllErrorPage } from "./pages/ErrorPage.tsx";
@@ -22,8 +21,6 @@ import TOS from "./pages/terms-of-service/TOS.tsx";
 import PrivacyPolicy from "./pages/privacy-policy/PrivacyPolicy.tsx";
 import { ConfirmEmail } from "./pages/auth/ConfirmEmail.tsx";
 
-const admin_route_hash = import.meta.env.VITE_ADMIN_ROUTE_HASH!;
-
 const router = createBrowserRouter([
   {
     path: "/",
@@ -31,11 +28,34 @@ const router = createBrowserRouter([
     ErrorBoundary: CatchAllErrorPage,
     children: [
       { index: true, Component: Home },
+
       { path: "auth/signup", Component: SignUp },
+
       { path: "auth/confirm-email", Component: ConfirmEmail },
+
       { path: "auth/login", Component: Login },
-      { path: "profile", Component: Profile },
-      { path: "about", Component: About },
+
+      {
+        path: "profile",
+        children: [
+          { index: true, Component: Profile },
+          {
+            path: "admin",
+            loader: AdminLoader,
+            HydrateFallback: RouteLoaderSpinner,
+            Component: AdminDashboard,
+            children: [
+              {
+                index: true,
+                loader: () => redirect("products"),
+              },
+              { path: "products", Component: AdminDashboardProducts },
+              { path: "orders", Component: AdminDashboardOrders },
+            ],
+          },
+        ],
+      },
+
       {
         path: "shop",
         children: [
@@ -46,31 +66,18 @@ const router = createBrowserRouter([
           },
         ],
       },
+
       { path: "events", Component: Events },
+
       { path: "cart", Component: Cart },
+
       { path: "contact", Component: Contact },
+
       { path: "terms-of-service", Component: TOS },
+
       { path: "privacy-policy", Component: PrivacyPolicy },
-    ],
-  },
-  {
-    path: `/admin-${admin_route_hash}/login`,
-    Component: AdminLogin,
-    ErrorBoundary: CatchAllErrorPage,
-  },
-  {
-    path: `/admin-${admin_route_hash}/dashboard`,
-    loader: AdminLoader,
-    HydrateFallback: RouteLoaderSpinner,
-    Component: AdminDashboard,
-    ErrorBoundary: CatchAllErrorPage,
-    children: [
-      {
-        index: true,
-        loader: () => redirect("products"),
-      },
-      { path: "products", Component: AdminDashboardProducts },
-      { path: "orders", Component: AdminDashboardOrders },
+
+      { path: "about", Component: About },
     ],
   },
 ]);

@@ -1,10 +1,10 @@
 import ProductCard from "@/components/products/ProductCard";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ProductAPI } from "@/services/api/products";
-import type { ProductData } from "@TheCozyBud/schema";
+import type { ProductWithRelations } from "@TheCozyBud/types";
 
 const ProductRecommendations = () => {
-  const { data, error, isFetching } = useSuspenseQuery<ProductData[]>({
+  const { data, error, isFetching } = useSuspenseQuery<ProductWithRelations[]>({
     queryKey: ["homepage-product-recommendations"],
     queryFn: () => ProductAPI.getAll({ perPage: 6, noDummyProduct: true }),
   });

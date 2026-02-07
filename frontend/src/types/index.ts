@@ -1,11 +1,11 @@
 export interface ProductQueryAPI {
-  filters?: FiltersAPI;
-  sort?: SortOption;
+  filters?: ProductFilters;
+  sort?: ProductSortOption;
   page?: number;
   perPage?: number;
 }
 
-export interface FiltersAPI {
+export interface ProductFilters {
   search?: string;
   categoryIds?: string[];
   collectionIds?: string[];
@@ -13,20 +13,20 @@ export interface FiltersAPI {
 }
 
 export interface ProductQueryDomain {
-  filters?: FiltersDomain;
-  sort?: SortOption;
+  filters?: ProductFiltersDomain;
+  sort?: ProductSortOption;
   page?: number;
   perPage?: number;
 }
 
-export interface FiltersDomain {
+export interface ProductFiltersDomain {
   search?: string;
   categories?: string[];
   collectionNames?: string[];
-  priceRange?: PriceRangeOption;
+  priceRange?: ProductPriceRangeOption;
 }
 
-export type PriceRangeOption =
+export type ProductPriceRangeOption =
   | "0-2000"
   | "2000-4000"
   | "4000-6000"
@@ -34,30 +34,30 @@ export type PriceRangeOption =
   | "8000-10000"
   | "10000+";
 
-export type SortOption =
+export type ProductSortOption =
   | "Popularity"
   | "Most Recent"
   | "Highest Price"
   | "Lowest Price";
 
 export type ObjectFilterKeys = keyof {
-  [K in keyof FiltersDomain as Exclude<
-    FiltersDomain[K],
+  [K in keyof ProductFiltersDomain as Exclude<
+    ProductFiltersDomain[K],
     undefined
   > extends object
-    ? Exclude<FiltersDomain[K], undefined> extends any[]
+    ? Exclude<ProductFiltersDomain[K], undefined> extends any[]
       ? never
       : K
-    : never]: FiltersDomain[K];
+    : never]: ProductFiltersDomain[K];
 };
 
 export type ArrayFilterKeys = keyof {
-  [K in keyof FiltersDomain as Exclude<
-    FiltersDomain[K],
+  [K in keyof ProductFiltersDomain as Exclude<
+    ProductFiltersDomain[K],
     undefined
   > extends unknown[]
     ? K
-    : never]: FiltersDomain[K];
+    : never]: ProductFiltersDomain[K];
 };
 
 export const arrayFiltersKeys: ArrayFilterKeys[] = [
@@ -65,4 +65,9 @@ export const arrayFiltersKeys: ArrayFilterKeys[] = [
   "categories",
 ] as const;
 
-export type NonArrayFilterKeys = Exclude<keyof FiltersDomain, ArrayFilterKeys>;
+export type NonArrayFilterKeys = Exclude<
+  keyof ProductFiltersDomain,
+  ArrayFilterKeys
+>;
+
+// --------------------------------------------------

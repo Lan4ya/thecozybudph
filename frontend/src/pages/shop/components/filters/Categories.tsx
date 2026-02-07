@@ -4,7 +4,7 @@ import { FilterDropdown } from "./FilterDropDown";
 import { FilterDropdownItem } from "./FilterDropdownItem";
 import { useQuery } from "@tanstack/react-query";
 import { ProductAPI } from "@/services/api/products";
-import type { ProductsCategoryData } from "@TheCozyBud/schema";
+import type { GetCategoryResponse } from "@TheCozyBud/types";
 
 const Categories = () => {
   const [inputValue, setInputValue] = useState("");
@@ -13,16 +13,26 @@ const Categories = () => {
     data: categories,
     error,
     isLoading,
-  } = useQuery<ProductsCategoryData[]>({
+  } = useQuery<GetCategoryResponse[]>({
     queryKey: ["product_categories"],
     queryFn: ProductAPI.getCategories,
   });
 
-  if (error && !isLoading) throw error;
-
   const filteredCategories = useMemo(() => {
     return searchSubstring(categories ?? [], inputValue, (item) => item.name);
   }, [inputValue, categories]);
+
+  if (error && !isLoading) {
+    return (
+      <FilterDropdown
+        dropdownType="categories"
+        inputValue={inputValue}
+        setInputValue={setInputValue}
+      >
+        <div></div>
+      </FilterDropdown>
+    );
+  }
 
   return (
     <FilterDropdown

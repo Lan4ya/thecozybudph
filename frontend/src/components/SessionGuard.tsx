@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { supabase } from "@/lib/supabase/client";
 import {
   Card,
@@ -14,23 +14,36 @@ import { Button } from "@/lib/ui/__shadcn__/button";
 export default function SessionGuard() {
   const [expired, setExpired] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const protectedPrefixes = ["/profile"];
+  const isProtectedRoute = protectedPrefixes.some((p) =>
+    location.pathname.startsWith(p),
+  );
+  const showModal = expired && isProtectedRoute;
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) setExpired(true);
+      setExpired(!session);
     });
 
     // Subscribe to real-time auth changes
-    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session) setExpired(true);
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setExpired(!session);
     });
 
-    return () => data.subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
-  const handleLoginRedirect = () => navigate("/auth/signup");
+  const handleLoginRedirect = () => {
+    navigate("/auth/signup");
+  };
 
-  if (!expired) return null;
+  if (!showModal) return null;
 
   return createPortal(
     <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/50 p-4">

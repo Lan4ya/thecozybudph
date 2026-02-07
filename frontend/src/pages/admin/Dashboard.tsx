@@ -1,54 +1,55 @@
-import { Outlet, redirect } from "react-router";
-import AdminDashboardNavbar from "./components/DashboardNavBar";
+import { Link, Outlet, redirect, useLocation } from "react-router";
 import { supabase } from "@/lib/supabase/client";
-import SessionGuard from "@/components/SessionGuard";
-import {
-  getCachedIsAdminCheck,
-  setCachedIsAdminCheck,
-} from "./utils/isAdminCheckCache";
-const admin_route_hash = import.meta.env.VITE_ADMIN_ROUTE_HASH!;
+import { ArrowLeft } from "lucide-react";
+import { DashboardSliderLinks } from "./components/DashboardSliderLinks";
 
-export const loader = async () => {
+export const AdminLoader = async () => {
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!session) return redirect(`/admin-${admin_route_hash}/login`);
-
-  // Check cache first
-  const cachedAdmin = getCachedIsAdminCheck(session.user.id);
-  if (cachedAdmin !== null) {
-    if (!cachedAdmin) return redirect("/", { status: 401 });
-    return { session, admin: cachedAdmin };
+  if (!user) {
+    throw redirect("/auth/login");
   }
 
-  // Fresh check
-  const { data: admin, error } = await supabase
-    .from("admins")
-    .select("*")
-    .eq("user_id", session.user.id)
-    .maybeSingle();
+  const isAdmin = user.app_metadata?.role === "admin";
 
-  if (error) throw new Response(`${error.message}`, { status: 500 });
+  if (!isAdmin) {
+    throw redirect("/", { status: 403 });
+  }
 
-  // Update cache
-  setCachedIsAdminCheck(session.user.id, admin);
-
-  if (!admin) return redirect("/", { status: 401 });
-  return { session, admin };
+  return null;
 };
 
 export default function AdminDashboard() {
-  return (
-    <>
-      <SessionGuard />
+  const location = useLocation();
 
-      <div className="pt-12 lg:pt-16 flex min-h-screen">
-        <AdminDashboardNavbar />
-        <main className="flex-1 custom-container">
-          <Outlet />
-        </main>
-      </div>
-    </>
+  const routeTitles: Record<string, string> = {
+    "/profile/admin/products": "Products",
+    "/profile/admin/orders": "Orders",
+    "/profile/admin/analytics": "Analytics",
+    "/profile/admin/events": "Events",
+    "/profile/admin/users": "Users",
+  };
+
+  const title = routeTitles[location.pathname] ?? "";
+
+  return (
+    <div className="pt-3 pb-6 lg:pt-5">
+      {/* <AdminDashboardNavbar /> */}
+
+      <h1 className="custom-container flex items-center gap-3 pb-12 text-lg md:text-xl lg:text-2xl font-medium">
+        <Link to="/profile">
+          <ArrowLeft />
+        </Link>
+        {title}
+      </h1>
+
+      <DashboardSliderLinks />
+
+      <main className="flex-1 custom-container">
+        <Outlet />
+      </main>
+    </div>
   );
 }

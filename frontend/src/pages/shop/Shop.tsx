@@ -43,9 +43,9 @@ const Shop = () => {
                 <Categories />
               </ErrorBoundary>
 
-              <ErrorBoundary fallback={null}>
-                <Collections />
-              </ErrorBoundary>
+              {/* <ErrorBoundary fallback={null}> */}
+              <Collections />
+              {/* </ErrorBoundary> */}
             </div>
 
             {isXLScreen && (

@@ -1,62 +1,44 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ProductAPI } from "@/services/api/products";
 import { useToast } from "@/providers/ToastProvider";
-import type { CreateProductData, UpdateProductData } from "@TheCozyBud/schema";
+import type { ProductWithRelationResponse } from "@TheCozyBud/types";
 
 type UpdateProductsQueryData = {
-  pages: UpdateProductData[][];
+  pages: ProductWithRelationResponse[][];
   pageParams?: number[];
 };
 
 type CreateProductsQueryData = {
-  pages: CreateProductData[][];
+  pages: ProductWithRelationResponse[][];
   pageParams?: number[];
 };
 
 export const useProductMutations = () => {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
-  const { deleteById, update, create } = ProductAPI;
 
   const deleteProductMutation = useMutation({
-    mutationFn: async (id: string) => await deleteById(id),
-    onMutate: () => {
-      addToast("Deleting product...", "info");
+    mutationFn: async (ids: string[]) => await ProductAPI.deleteMany(ids),
+    onMutate: (ids) => {
+      addToast(`Deleting product${ids.length > 1 ? "s" : ""}...`, "info");
     },
     onError: (err: Error) => {
       addToast(err.message || "Failed to delete product", "error");
     },
-    onSuccess: (deletedProduct) => {
+    onSuccess: ({ deletedProductIds }) => {
       queryClient.setQueryData<CreateProductsQueryData>(
         ["__admin__products__"],
         (oldData) => {
           if (!oldData?.pages) return oldData;
 
-          const productPositionMap = new Map<
-            string,
-            { pageIndex: number; productIndex: number }
-          >();
-          oldData.pages.forEach((page, pIdx) => {
-            page.forEach((product, prodIdx) => {
-              productPositionMap.set(product.id, {
-                pageIndex: pIdx,
-                productIndex: prodIdx,
-              });
-            });
-          });
+          const deletedSet = new Set(deletedProductIds);
 
-          const pos = productPositionMap.get(deletedProduct.productId);
-          if (!pos) return oldData; // product not found
-
-          const { pageIndex, productIndex } = pos;
+          // Filter out deleted products from each page
           const newPages = oldData.pages
-            .map((page, idx) => {
-              if (idx !== pageIndex) return page; // other pages unchanged
-              const newPage = [...page];
-              newPage.splice(productIndex, 1); // remove the product
-              return newPage;
-            })
-            .filter((page) => page.length > 0);
+            .map((page) =>
+              page.filter((product) => !deletedSet.has(product.id)),
+            )
+            .filter((page) => page.length > 0); // remove empty pages
 
           return { ...oldData, pages: newPages };
         },
@@ -66,15 +48,15 @@ export const useProductMutations = () => {
     },
   });
 
-  const addProductMutation = useMutation({
-    mutationFn: async (formData: FormData) => await create(formData),
+  const createProductMutation = useMutation({
+    mutationFn: async (formData: FormData) => await ProductAPI.create(formData),
     onMutate: () => {
       addToast("Creating new product...", "info");
     },
-    onError: (err: Error) => {
-      const message = err.message || "Failed to add product";
-      console.error("Backend error message:", message);
-      addToast(message, "error");
+    onError: function handleCreateProductError(err: Error) {
+      throw err.message;
+      // console.error("product error:", err.message);
+      // addToast(err.message, "error");
     },
     onSuccess: (product) => {
       queryClient.setQueryData<CreateProductsQueryData>(
@@ -99,14 +81,19 @@ export const useProductMutations = () => {
   });
 
   const updateProductMutation = useMutation({
-    mutationFn: async (formData: FormData) => await update(formData),
+    mutationFn: async ({
+      formData,
+      productId,
+    }: {
+      formData: FormData;
+      productId: string;
+    }) => await ProductAPI.update(formData, productId),
     onMutate: () => {
       addToast("Updating product data...", "info");
     },
     onError: (err: Error) => {
       const message = err.message || "Failed to update product";
-
-      // console.error("Backend error message:", message);
+      // console.error("error message:", message);
       addToast(message, "error");
     },
     onSuccess: (updatedProduct) => {
@@ -149,7 +136,7 @@ export const useProductMutations = () => {
   });
 
   return {
-    addProductMutation,
+    createProductMutation,
     deleteProductMutation,
     updateProductMutation,
   };
