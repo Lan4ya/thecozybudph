@@ -17,7 +17,7 @@ import { Link, useNavigate } from "react-router";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import googleIcon from "@/assets/icons/google.svg";
 import { useIsLargeScreen } from "@/hooks/useMediaQuery";
-import { signUpSchema, type SignUp } from "@TheCozyBud/schema/src/forms/auth";
+import { signUpSchema, type SignUp } from "@TheCozyBud/types/src/schema/auth";
 import { Input } from "@/lib/ui/__shadcn__/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRedirectIfAuthed } from "@/hooks/useRedirectIfAuthed";

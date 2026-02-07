@@ -2,7 +2,7 @@ import Carousel from "./Carousel";
 import { Link, useParams } from "react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ProductAPI } from "@/services/api/products";
-import type { ProductData } from "@TheCozyBud/schema";
+import type { GetProductResponse } from "@TheCozyBud/types";
 import PersistSuspense from "@/components/PersistSuspense";
 import { RouteLoaderSpinner } from "@/components/RouteLoaderSpinner";
 import ProductDetails from "./Details";
@@ -35,7 +35,7 @@ const ProductDetailContent = () => {
     data: product,
     isLoading,
     error,
-  } = useSuspenseQuery<ProductData | null>({
+  } = useSuspenseQuery<GetProductResponse | null>({
     queryKey: ["product", id],
     queryFn: () => {
       if (!isValidUUID || !id) return Promise.resolve(null);
@@ -63,7 +63,7 @@ const ProductDetailContent = () => {
           to="/shop"
           className="p-2 rounded-md text-lg bg-black/50 text-white flex-center gap-2 hover:bg-black/45 absolute top-18 left-4"
         >
-          <ArrowLeft className="size-5" />
+          <ArrowLeft />
         </Link>
       )}
     </>

@@ -16,7 +16,7 @@ import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import googleIcon from "@/assets/icons/google.svg";
 import { useIsLargeScreen } from "@/hooks/useMediaQuery";
 import { useRedirectIfAuthed } from "@/hooks/useRedirectIfAuthed";
-import { logInSchema, type LogIn } from "@TheCozyBud/schema/src/forms/auth";
+import { logInSchema, type LogIn } from "@TheCozyBud/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import isDev from "@/lib/utils/isDev";

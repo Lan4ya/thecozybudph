@@ -1,30 +1,24 @@
-import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { supabase } from "@/lib/supabase/client";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import isDev from "@/lib/utils/isDev";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router";
+import { Edit, ChevronRight } from "lucide-react";
+import DefaultAvatar from "@/assets/thecozybud/avatar.png";
+
+const ChevronRightIcon = <ChevronRight className="text-gray-500" />;
 
 const Profile = () => {
-  const loading = useAuthGuard();
-  const [user, setUser] = useState<any>(null);
+  const { user, loading, isAdmin } = useCurrentUser();
   const [signingOut, setSigningOut] = useState(false);
-  useEffect(() => {
-    const fetchUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      setUser(user);
-      console.log(user);
-    };
-
-    isDev && console.log({ user });
-    fetchUser();
-  }, []);
 
   const navigate = useNavigate();
+
+  const userName = user?.user_metadata?.name ?? user?.email?.split("@")[0];
+
+  console.log(user);
 
   const handleLogout = async () => {
     setSigningOut(true);
@@ -33,7 +27,6 @@ const Profile = () => {
       if (error) throw error;
 
       navigate("/auth/login", { replace: true });
-      setUser(null);
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Unknown error occurred";
@@ -45,16 +38,71 @@ const Profile = () => {
   if (loading) return null;
 
   return (
-    <div>
-      <p>Profile Page</p>
+    <div className="">
+      <div className="custom-container bg-sidebar border-b-4 flex items-center gap-2 py-8">
+        <div className=" mr-1 w-14 h-14 overflow-hidden rounded-full border-2">
+          <img
+            className="w-full h-full object-cover"
+            src={DefaultAvatar}
+            alt="avatar"
+          />
+        </div>
+
+        <h2 className="text-20-semibold">{userName}</h2>
+
+        <Button variant="outline" size="icon">
+          <Edit className="size-4" />
+        </Button>
+      </div>
+
       <Button
-        variant="destructive"
-        onClick={handleLogout}
-        disabled={signingOut}
+        variant="minimal"
+        size="auto"
+        className="custom-container flex justify-between border-b border-border/30 items-center gap-2 py-5"
       >
-        {signingOut ? <Spinner /> : null}
-        {signingOut ? "Logging out" : "Logout"}
+        My Purchases
+        {ChevronRightIcon}
       </Button>
+      <Button
+        variant="minimal"
+        size="auto"
+        className="custom-container flex justify-between border-b border-border/30 items-center gap-2 py-5"
+      >
+        Settings
+        {ChevronRightIcon}
+      </Button>
+      <Button
+        variant="minimal"
+        size="auto"
+        className="custom-container flex justify-between border-b border-border/30 items-center gap-2 py-5"
+      >
+        Voucher
+        {ChevronRightIcon}
+      </Button>
+
+      {isAdmin && (
+        <Button
+          variant="minimal"
+          size="auto"
+          className="custom-container flex justify-between border-b border-border/30 items-center gap-2 py-5"
+          onClick={() => navigate("/profile/admin")}
+        >
+          Admin Dashboard
+          {ChevronRightIcon}
+        </Button>
+      )}
+
+      <div className="custom-container">
+        <Button
+          variant="destructive"
+          onClick={handleLogout}
+          disabled={signingOut}
+          className="mt-60 mb-30 w-full"
+        >
+          {signingOut ? <Spinner /> : null}
+          {signingOut ? "Logging out" : "Logout"}
+        </Button>
+      </div>
     </div>
   );
 };

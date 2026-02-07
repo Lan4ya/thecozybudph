@@ -1,16 +1,12 @@
 import { supabase } from "../../lib/supabase/client";
 import {
-  type ProductDataWithJoins,
-  type CreateProductData,
-  type UpdateProductData,
-  type DeleteProductData,
-  type ProductData,
-  type ProductsCategoryData,
-  type ProductsCollectionData,
-} from "@TheCozyBud/schema";
+  type DeleteProductResponse,
+  type GetCollectionResponse,
+  type ProductResponse,
+  type ProductWithRelationResponse,
+} from "@TheCozyBud/types";
 import { snakeToCamel } from "../../lib/utils/caseConverter";
 import { apiClient } from "./interceptors/interceptors";
-import { unwrapAPIResponse } from "./unwrapAPIResponse";
 import type { ProductQueryAPI } from "@/types";
 
 export const ProductAPI = {
@@ -21,7 +17,7 @@ export const ProductAPI = {
     perPage = 12,
     noDummyProduct = false,
   }: ProductQueryAPI & { noDummyProduct?: boolean }): Promise<
-    ProductDataWithJoins[]
+    ProductWithRelationResponse[]
   > => {
     console.log({ page });
 
@@ -91,10 +87,11 @@ export const ProductAPI = {
     console.log("Fetching products...");
 
     if (error) throw error;
+
     return snakeToCamel(data ?? []);
   },
 
-  getById: async (productId: string): Promise<ProductData | null> => {
+  getById: async (productId: string): Promise<ProductResponse | null> => {
     const { data, error } = await supabase
       .from("products")
       .select("*")
@@ -106,27 +103,29 @@ export const ProductAPI = {
     if (error) throw error;
     if (!data) return null;
 
-    return snakeToCamel(data);
+    return snakeToCamel(data ?? []);
   },
 
-  update: async (productFormData: FormData): Promise<UpdateProductData> => {
-    const res = await apiClient.patch("/products", productFormData);
-    return unwrapAPIResponse(res.data);
+  update: async (
+    productFormData: FormData,
+    productId: string,
+  ): Promise<ProductWithRelationResponse> => {
+    return await apiClient.patch(`/products/${productId}`, productFormData);
   },
 
-  create: async (productFormData: FormData): Promise<CreateProductData> => {
-    const res = await apiClient.post("/products", productFormData);
-    return unwrapAPIResponse(res.data);
+  create: async (
+    productFormData: FormData,
+  ): Promise<ProductWithRelationResponse> => {
+    return await apiClient.post("/products", productFormData);
   },
 
-  delete: async (productIds: string[]): Promise<DeleteProductData> => {
-    const res = await apiClient.delete("/products", {
+  deleteMany: async (productIds: string[]): Promise<DeleteProductResponse> => {
+    return await apiClient.delete("/products", {
       params: { productIds },
     });
-    return unwrapAPIResponse(res.data);
   },
 
-  getCategories: async (): Promise<ProductsCategoryData[]> => {
+  getCategories: async (): Promise<GetCollectionResponse[]> => {
     const { data, error } = await supabase
       .from("product_categories")
       .select("*");
@@ -137,7 +136,7 @@ export const ProductAPI = {
     return snakeToCamel(data ?? []);
   },
 
-  getCollections: async (): Promise<ProductsCollectionData[]> => {
+  getCollections: async (): Promise<GetCollectionResponse[]> => {
     const { data, error } = await supabase
       .from("product_collections")
       .select("*");

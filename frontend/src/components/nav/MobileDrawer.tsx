@@ -52,7 +52,7 @@ export const MobileDrawer = () => {
   const [hasSession, setHasSession] = useState(false);
 
   supabase.auth.getSession().then(({ data: { session } }) => {
-    isDev && console.log("has session: ", session);
+    // isDev && console.log("has session: ", session);
     if (session) {
       setHasSession(true);
     }

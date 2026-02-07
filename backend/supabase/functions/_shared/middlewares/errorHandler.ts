@@ -1,5 +1,5 @@
 import { AppError, ValidationError } from "../errors/Errors.ts";
-import type { ApiResponseError } from "../core/index.ts";
+import type { ApiResponseError } from "../types/index.ts";
 
 export const handleError = (
   err: unknown,
@@ -12,19 +12,16 @@ export const handleError = (
 
   if (err instanceof ValidationError) {
     body = {
-      success: false,
       error: err.errors,
     };
     status = err.statusCode;
   } else if (err instanceof AppError && err.statusCode < 500) {
     body = {
-      success: false,
       error: err.message,
     };
     status = err.statusCode;
   } else {
     body = {
-      success: false,
       error: "Internal Server Error",
     };
   }

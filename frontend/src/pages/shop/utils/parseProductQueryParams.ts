@@ -1,4 +1,8 @@
-import type { ProductQueryDomain, PriceRangeOption, SortOption } from "@/types";
+import type {
+  ProductQueryDomain,
+  ProductPriceRangeOption,
+  ProductSortOption,
+} from "@/types";
 
 export function getProductQueryParams(
   params: URLSearchParams,
@@ -15,9 +19,9 @@ export function getProductQueryParams(
   if (collectionName.length) filters.collectionNames = collectionName;
 
   const priceRange = params.get("priceRange");
-  if (priceRange) filters.priceRange = priceRange as PriceRangeOption;
+  if (priceRange) filters.priceRange = priceRange as ProductPriceRangeOption;
 
-  const sort = params.get("sort") as SortOption | null;
+  const sort = params.get("sort") as ProductSortOption | null;
 
   return {
     filters: Object.keys(filters).length > 0 ? filters : undefined,

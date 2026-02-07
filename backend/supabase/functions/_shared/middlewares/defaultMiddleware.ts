@@ -4,9 +4,15 @@ import { secureHeaders } from "hono/secure-headers";
 import { rateLimiter } from "hono-rate-limiter";
 import type { Hono } from "hono";
 import { AppEnv } from "../types.d.ts";
+import { isDev } from "../utils/isDev.ts";
+import { devRequestLogger } from "./logger.ts";
 
 // Apply sane default middlewares on all edge functions
 export function applyDefaultMiddlewares(app: Hono<AppEnv>) {
+  if (isDev) {
+    app.use("*", devRequestLogger());
+  }
+
   app.use(logger());
 
   app.use(

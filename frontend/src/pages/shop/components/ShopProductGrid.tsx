@@ -4,7 +4,7 @@ import {
   type QueryFunctionContext,
 } from "@tanstack/react-query";
 import { useRef, useEffect, useMemo, useCallback } from "react";
-import type { ProductDataWithJoins } from "@TheCozyBud/schema";
+import type { ProductWithRelations } from "@TheCozyBud/types";
 import { ProductAPI } from "@/services/api/products";
 import ProductCard from "@/components/products/ProductCard";
 import { useProductQuery } from "../hooks/useFilters";
@@ -13,7 +13,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { ShopProductGridError } from "@/lib/ui/errors/ShopProductGridError";
 import { useCategoryNameToId } from "../hooks/useCategoryNameToId";
 import { useCollectionNameToId } from "../hooks/useCollectionNameToId";
-import type { FiltersAPI } from "@/types";
+import type { ProductFilters } from "@/types";
 import { useNavigate } from "react-router";
 
 const ShopProductGrid = () => {
@@ -38,7 +38,7 @@ const ShopProductGrid = () => {
     async ({ pageParam = 0 }: QueryFunctionContext) => {
       const filtersDomain = productQuery.filters;
 
-      let filtersAPI: FiltersAPI = {};
+      let filtersAPI: ProductFilters = {};
 
       if (filtersDomain?.search) {
         filtersAPI.search = filtersDomain.search;
@@ -67,12 +67,17 @@ const ShopProductGrid = () => {
           .filter((id): id is string => id !== undefined);
       }
 
-      return ProductAPI.getAll({
-        page: pageParam as number,
-        perPage,
-        sort: productQuery?.sort ?? "Popularity",
-        filters: filtersAPI,
-      });
+      try {
+        return await ProductAPI.getAll({
+          page: pageParam as number,
+          perPage,
+          sort: productQuery?.sort ?? "Popularity",
+          filters: filtersAPI,
+        });
+      } catch (err) {
+        console.error("Products fetch failed:", err);
+        return [];
+      }
     },
     [productQuery, categoryNameToId, collectionNameToId],
   );
@@ -86,7 +91,7 @@ const ShopProductGrid = () => {
     isFetchingNextPage,
     isFetching,
     error,
-  } = useSuspenseInfiniteQuery<ProductDataWithJoins[]>({
+  } = useSuspenseInfiniteQuery<ProductWithRelations[]>({
     queryKey,
     queryFn,
     initialPageParam: 0,

@@ -2,7 +2,7 @@ import { createClient } from "supabase";
 import type { Context, MiddlewareHandler } from "hono";
 import { env } from "hono/adapter";
 import type { Next } from "hono";
-import { Database } from "../core/index.ts";
+import { Database } from "../types/index.ts";
 
 export const supabaseMiddleware =
   (): MiddlewareHandler => async (c: Context, next: Next) => {

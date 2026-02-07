@@ -2,8 +2,8 @@ import PersistSuspense from "@/components/PersistSuspense";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Input } from "@/lib/ui/__shadcn__/input";
-import ProductTable from "./components/table/Table";
-import ProductForm from "./components/form/Form";
+import ProductTable from "./components/table/ProductTable";
+import ProductForm from "./components/form/ProductForm";
 import {
   Plus,
   Search,
@@ -12,14 +12,14 @@ import {
   LayoutGrid,
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
-import type { ProductDataWithJoins } from "@TheCozyBud/schema";
+import type { ProductWithRelationResponse } from "@TheCozyBud/types";
 import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 import ProductTableItemsSkeleton from "../../../../lib/ui/skeletons/AdminProductTableItemSkeleton";
 
 export default function AdminDashboardProducts() {
   const [formOpen, setFormOpen] = useState(false);
   const [updatingProduct, setUpdatingProduct] =
-    useState<ProductDataWithJoins | null>(null);
+    useState<ProductWithRelationResponse | null>(null);
 
   const [isSearchOpen, setSearchOpen] = useState<boolean>(false);
   const [searchInputVal, setSearchInputVal] = useState("");
@@ -43,19 +43,15 @@ export default function AdminDashboardProducts() {
     setFormOpen(true);
   }
 
-  function openEditForm(product: ProductDataWithJoins) {
+  function openUpdateForm(product: ProductWithRelationResponse) {
     setUpdatingProduct(product);
     setFormOpen(true);
   }
 
   return (
-    <div className="py-6 max-w-[1550px] mx-auto">
+    <div className="max-w-[1550px] mx-auto">
       <div className="flex flex-col gap-5">
-        <h1 className="text-lg md:text-xl lg:text-2xl font-semibold">
-          Products
-        </h1>
-
-        <div className="flex items-center justify-between mb-9">
+        <div className="flex items-center border rounded-lg p-2 justify-between mb-9">
           <div className="flex-center gap-2">
             <Button size="sm" variant="outline" className="">
               <TableProperties />
@@ -112,7 +108,13 @@ export default function AdminDashboardProducts() {
           </div>
         }
       >
-        <ProductTable onEdit={openEditForm} />
+        <ProductTable onEdit={openUpdateForm} />
+
+        {/* <UpdateProductForm */}
+        {/*   open={formOpen} */}
+        {/*   updatingProduct={updatingProduct} */}
+        {/*   onToggle={setFormOpen} */}
+        {/* /> */}
 
         <ProductForm
           open={formOpen}

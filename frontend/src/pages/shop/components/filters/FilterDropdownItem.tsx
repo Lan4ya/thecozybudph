@@ -5,21 +5,21 @@ import { useProductQuery } from "../../hooks/useFilters";
 import toggleArrItem from "@/lib/utils/toggleArrItem";
 import {
   type ArrayFilterKeys,
-  type FiltersDomain,
+  type ProductFiltersDomain,
   type NonArrayFilterKeys,
-  type PriceRangeOption,
+  type ProductPriceRangeOption,
 } from "../../../../types";
 import { arrayFiltersKeys } from "../../../../types";
 import { formatPriceRange } from "./PriceRange";
 
 type ArrayFilterProps<K extends ArrayFilterKeys> = {
   filterKey: K;
-  filterVal: Extract<FiltersDomain[K], readonly unknown[]>[number];
+  filterVal: Extract<ProductFiltersDomain[K], readonly unknown[]>[number];
 };
 
 type NonArrayFilterProps<K extends NonArrayFilterKeys> = {
   filterKey: K;
-  filterVal: FiltersDomain[K];
+  filterVal: ProductFiltersDomain[K];
 };
 
 type FilterDropdownItemProps =
@@ -81,7 +81,7 @@ export const FilterDropdownItem = ({
       onSelect={handleToggle}
     >
       {filterKey === "priceRange"
-        ? formatPriceRange(filterVal as PriceRangeOption)
+        ? formatPriceRange(filterVal as ProductPriceRangeOption)
         : filterVal}
       {isItemActive && (
         <div className="grid place-items-center bg-accent rounded-full p-[1.2px] pr-[2.4px]">

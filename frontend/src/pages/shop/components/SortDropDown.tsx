@@ -9,18 +9,18 @@ import {
 } from "@/lib/ui/__shadcn__/dropdown-menu";
 import { ArrowUpDown } from "lucide-react";
 import { useProductQuery } from "../hooks/useFilters";
-import type { SortOption } from "../../../types";
+import type { ProductSortOption } from "../../../types";
 import { DropdownMenuRadioGroup } from "@radix-ui/react-dropdown-menu";
 
 export function SortDropdownMenu() {
   const { productQuery, setProductQuery } = useProductQuery();
-  const [sortOpt, setSortOpt] = React.useState<SortOption>(
+  const [sortOpt, setSortOpt] = React.useState<ProductSortOption>(
     productQuery.sort ?? "Popularity",
   );
   const focusStyle = "focus:bg-input/30 focus:text-accent-foreground";
 
   const handleToggle = React.useCallback(
-    (value: SortOption) => {
+    (value: ProductSortOption) => {
       setSortOpt(value);
 
       setProductQuery((prev) => {

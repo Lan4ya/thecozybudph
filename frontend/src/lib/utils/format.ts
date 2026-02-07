@@ -21,3 +21,14 @@ export const capitalizeFirstLetterOfEachWord = (str: string) => {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(" ");
 };
+
+export const parseDateString = (dateString: string | null): Date | null => {
+  if (!dateString) return null;
+  return new Date(dateString);
+};
+
+export const getUnknownErrMsg = (error: unknown): string => {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "string") return error;
+  return String(error);
+};
