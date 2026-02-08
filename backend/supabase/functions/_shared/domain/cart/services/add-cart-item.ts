@@ -1,13 +1,14 @@
 import { CartRepository } from "../cart-repository.ts";
-import { AddCartItemsInput } from "@shared/types/index.ts";
+import { AddCartItemsInput, CartItem } from "@shared/types/index.ts";
 import { AppError } from "@shared/errors/Errors.ts";
 import { SupabaseType } from "@shared/types.d.ts";
+import { snakeToCamel } from "../../../utils/caseConverter.ts";
 
 export const addCartItems = async (
   supabase: SupabaseType,
   payload: AddCartItemsInput,
   profileId: string,
-) => {
+): Promise<CartItem> => {
   const { data: cart, error: cartError } =
     await CartRepository.getCartByProfileId(supabase, profileId);
 
@@ -24,12 +25,14 @@ export const addCartItems = async (
     );
   }
 
-  const { data: cartItem, error } = await CartRepository.upsertCartItem(
+  const { data, error } = await CartRepository.upsertCartItem(
     supabase,
     cart.id,
     payload.productId,
     payload.quantity,
   );
+
+  const cartItem = data?.[0] ?? null;
 
   if (error) {
     throw AppError.internal(error.message);
@@ -41,5 +44,5 @@ export const addCartItems = async (
     );
   }
 
-  return cartItem;
+  return snakeToCamel(cartItem);
 };

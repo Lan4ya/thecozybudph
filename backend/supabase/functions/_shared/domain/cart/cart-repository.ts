@@ -22,7 +22,7 @@ export const CartRepository = {
   getCartItems: async (supabase: SupabaseType, cartId: string) => {
     const { data, error } = await supabase
       .from("cart_items")
-      .select("*")
+      .select("product_id, quantity")
       .eq("cart_id", cartId);
     return { data, error };
   },
@@ -33,7 +33,7 @@ export const CartRepository = {
     productId: string,
     quantity: number,
   ) => {
-    // function details: supabase/migrations/20251226132736_add_cart_items_unique_constraint_and_upsert_function
+    // This postgres function handles both item insertion and updating quantity.
     return supabase.rpc("upsert_cart_item", {
       p_cart_id: cartId,
       p_product_id: productId,

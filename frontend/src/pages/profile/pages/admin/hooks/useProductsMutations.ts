@@ -18,7 +18,8 @@ export const useProductMutations = () => {
   const { addToast } = useToast();
 
   const deleteProductMutation = useMutation({
-    mutationFn: async (ids: string[]) => await ProductAPI.deleteMany(ids),
+    mutationFn: async (ids: string[]) =>
+      await ProductAPI.deleteMany({ productIds: ids }),
     onMutate: (ids) => {
       addToast(`Deleting product${ids.length > 1 ? "s" : ""}...`, "info");
     },
