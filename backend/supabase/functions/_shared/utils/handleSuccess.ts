@@ -6,7 +6,6 @@ export const handleSuccess = <T extends object>(
   status = 200,
 ): Response => {
   const body: ApiResponseSuccess<SnakeToCamel<T>> = {
-    success: true,
     data: snakeToCamel(payload),
   };
 
