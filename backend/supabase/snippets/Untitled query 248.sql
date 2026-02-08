@@ -3,14 +3,6 @@ select
 from
   auth.user;
 
-update auth.users
-set raw_app_meta_data = jsonb_set(
-  raw_app_meta_data,
-  '{role}',
-  '"admin"',
-  true
-);
-where id = '4d55a868-0cdf-4134-8fe8-ea537a1a8571';
 
 select * from profiles;
 

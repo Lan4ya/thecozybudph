@@ -1,27 +1,12 @@
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1
-        FROM pg_constraint
-        WHERE conname = 'cart_items_unique_cart_product'
-    ) THEN
-        ALTER TABLE cart_items
-        ADD CONSTRAINT cart_items_unique_cart_product
-        UNIQUE (cart_id, product_id);
-    END IF;
-END $$;
+DROP FUNCTION IF EXISTS upsert_cart_item(uuid, uuid, int);
 
-
-
-
-
+-- Only return product_id and quantity
 CREATE OR REPLACE FUNCTION upsert_cart_item(
   p_cart_id uuid,
   p_product_id uuid,
   p_quantity int
 )
 RETURNS TABLE (
-  cart_id uuid,
   product_id uuid,
   quantity int
 )
@@ -32,5 +17,5 @@ AS $$
   ON CONFLICT (cart_id, product_id)
   DO UPDATE
     SET quantity = cart_items.quantity + EXCLUDED.quantity
-  RETURNING cart_items.cart_id, cart_items.product_id, cart_items.quantity;
+  RETURNING cart_items.product_id, cart_items.quantity;
 $$;

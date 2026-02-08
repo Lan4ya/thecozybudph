@@ -441,7 +441,6 @@ export type Database = {
       upsert_cart_item: {
         Args: { p_cart_id: string; p_product_id: string; p_quantity: number }
         Returns: {
-          cart_id: string
           product_id: string
           quantity: number
         }[]

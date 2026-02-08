@@ -5,6 +5,7 @@ import {
   type ProductCollection,
   type Product,
   type ProductWithRelations,
+  type DeleteProductsInput,
 } from "@TheCozyBud/types";
 import { snakeToCamel } from "@/lib/utils/caseConverter";
 import type { ProductQueryAPI } from "@/types";
@@ -128,9 +129,11 @@ export const ProductAPI = {
     return await apiClient.post("/product", productFormData);
   },
 
-  deleteMany: async (productIds: string[]): Promise<DeleteProducts> => {
+  deleteMany: async (
+    productIds: DeleteProductsInput,
+  ): Promise<DeleteProducts> => {
     return apiClient.delete("/product", {
-      data: { productIds },
+      data: productIds,
     });
   },
 

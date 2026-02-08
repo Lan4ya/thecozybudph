@@ -1,11 +1,14 @@
 import { SupabaseType } from "@shared/types.d.ts";
 import { CartRepository } from "../cart-repository.ts";
+
+import { CartItem } from "@shared/types/index.ts";
 import { AppError } from "@shared/errors/Errors.ts";
+import { snakeToCamel } from "../../../utils/caseConverter.ts";
 
 export const getCartItems = async (
   supabase: SupabaseType,
   profileId: string,
-) => {
+): Promise<CartItem[]> => {
   const { data: cart, error: getCartIdByProfileIdError } =
     await CartRepository.getCartByProfileId(supabase, profileId);
 
@@ -15,9 +18,15 @@ export const getCartItems = async (
 
   const { data, error } = await CartRepository.getCartItems(supabase, cart.id);
 
-  if (error || !data) {
+  if (error) {
     throw AppError.internal(error?.message);
   }
 
-  return data;
+  if (!data) {
+    throw AppError.internal(
+      "Invariant violation: getCartItems returned no data without error",
+    );
+  }
+
+  return snakeToCamel(data);
 };
