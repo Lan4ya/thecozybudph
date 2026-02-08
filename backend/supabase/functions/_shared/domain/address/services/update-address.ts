@@ -1,6 +1,6 @@
 import { AddressRepository } from "../address-repository.ts";
-import { UpdateAddressInput } from "@shared/types/index.ts";
-import { camelToSnake } from "@shared/utils/caseConverter.ts";
+import { Address, UpdateAddressInput } from "@shared/types/index.ts";
+import { camelToSnake, snakeToCamel } from "@shared/utils/caseConverter.ts";
 import { AppError } from "@shared/errors/Errors.ts";
 import { SupabaseType } from "@shared/types.d.ts";
 
@@ -8,25 +8,25 @@ export const updateAddress = async (
   supabase: SupabaseType,
   id: string,
   payload: UpdateAddressInput,
-) => {
-  const address = camelToSnake({
+): Promise<Address> => {
+  const addressDBInput = camelToSnake({
     ...payload,
   });
 
-  const { data, error } = await AddressRepository.updateAddress(
+  const { data: address, error } = await AddressRepository.updateAddress(
     supabase,
     id,
-    address,
+    addressDBInput,
   );
 
   if (error)
     throw AppError.internal(`Failed to update address: ${error.message}`);
 
-  if (!data) {
+  if (!address) {
     throw AppError.internal(
       "Invariant Violation: address update returned null data",
     );
   }
 
-  return data;
+  return snakeToCamel(address);
 };

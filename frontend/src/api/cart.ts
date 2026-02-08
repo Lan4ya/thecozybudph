@@ -12,13 +12,13 @@ export const CartAPI = {
     return apiClient.get("/cart/items");
   },
 
-  addCartItem: async (cartItem: AddCartItemsInput): Promise<CartItem> => {
-    return apiClient.post("/cart/items", cartItem);
+  addCartItem: async (payload: AddCartItemsInput): Promise<CartItem> => {
+    return apiClient.post("/cart/items", payload);
   },
 
   deleteCartItems: async (
-    deleteCartItems: DeleteCartItemsInput,
+    payload: DeleteCartItemsInput,
   ): Promise<CartItemsDeletionResult> => {
-    return apiClient.delete("/cart/items", { data: deleteCartItems });
+    return apiClient.delete("/cart/items", { data: payload });
   },
 };
