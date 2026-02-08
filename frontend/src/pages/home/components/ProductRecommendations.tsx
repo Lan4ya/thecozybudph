@@ -1,6 +1,6 @@
 import ProductCard from "@/components/products/ProductCard";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { ProductAPI } from "@/services/api/products";
+import { ProductAPI } from "@/api/product";
 import type { ProductWithRelations } from "@TheCozyBud/types";
 
 const ProductRecommendations = () => {

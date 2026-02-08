@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { FilterDropdown } from "./FilterDropDown";
 import { FilterDropdownItem } from "./FilterDropdownItem";
 import { useQuery } from "@tanstack/react-query";
-import { ProductAPI } from "@/services/api/products";
+import { ProductAPI } from "@/api/product";
 import type { GetCategoryResponse } from "@TheCozyBud/types";
 
 const Categories = () => {

@@ -2,7 +2,7 @@ import searchSubstring from "@/lib/utils/searchSubstring";
 import { useMemo, useState } from "react";
 import { FilterDropdown } from "./FilterDropDown";
 import { FilterDropdownItem } from "./FilterDropdownItem";
-import { ProductAPI } from "@/services/api/products";
+import { ProductAPI } from "@/api/product";
 import { useQuery } from "@tanstack/react-query";
 import type { GetCollectionResponse } from "@TheCozyBud/types";
 

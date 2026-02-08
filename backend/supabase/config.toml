@@ -360,58 +360,58 @@ entrypoint = "./functions/dev-only/index.ts"
 # static_files = [ "./functions/auth/*.html" ]
 
 
-[functions.products]
+[functions.product]
 enabled = true
 verify_jwt = true
-import_map = "./functions/products/deno.json"
+import_map = "./functions/product/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
-entrypoint = "./functions/products/index.ts"
+entrypoint = "./functions/product/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
-# static_files = [ "./functions/products/*.html" ]
+# static_files = [ "./functions/product/*.html" ]
 
-[functions.carts]
+[functions.cart]
 enabled = true
 verify_jwt = true
-import_map = "./functions/carts/deno.json"
+import_map = "./functions/cart/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
-entrypoint = "./functions/carts/index.ts"
+entrypoint = "./functions/cart/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
-# static_files = [ "./functions/carts/*.html" ]
+# static_files = [ "./functions/cart/*.html" ]
 
-[functions.checkouts]
+[functions.checkout]
 enabled = true
 verify_jwt = true
-import_map = "./functions/checkouts/deno.json"
+import_map = "./functions/checkout/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
-entrypoint = "./functions/checkouts/index.ts"
+entrypoint = "./functions/checkout/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
-# static_files = [ "./functions/checkouts/*.html" ]
+# static_files = [ "./functions/checkout/*.html" ]
 
 
-[functions.addresses]
+[functions.address]
 enabled = true
 verify_jwt = true
-import_map = "./functions/addresses/deno.json"
+import_map = "./functions/address/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
-entrypoint = "./functions/addresses/index.ts"
+entrypoint = "./functions/address/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
-# static_files = [ "./functions/addresses/*.html" ]
+# static_files = [ "./functions/address/*.html" ]
 
-[functions.webhooks]
+[functions.webhook]
 enabled = true
 verify_jwt = false
-import_map = "./functions/webhooks/deno.json"
+import_map = "./functions/webhook/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
-entrypoint = "./functions/webhooks/index.ts"
+entrypoint = "./functions/webhook/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
-# static_files = [ "./functions/webhooks/*.html" ]
+# static_files = [ "./functions/webhook/*.html" ]
