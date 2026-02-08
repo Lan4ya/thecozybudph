@@ -5,6 +5,9 @@ import {
 import { SupabaseType } from "@shared/types.d.ts";
 import { AppError } from "../../errors/Errors.ts";
 
+const addressSelects =
+  "id, address_line, barangay, city, full_name, phone_number, postal_code, profile_id, province, region";
+
 export const AddressRepository = {
   insertAddress: async (
     supabase: SupabaseType,
@@ -13,7 +16,7 @@ export const AddressRepository = {
     const { data, error } = await supabase
       .from("addresses")
       .insert(address)
-      .select("*")
+      .select(addressSelects)
       .single();
     return { data, error };
   },
@@ -26,7 +29,7 @@ export const AddressRepository = {
     const { data, error } = await supabase
       .from("addresses")
       .update(address)
-      .select("*")
+      .select(addressSelects)
       .eq("id", id)
       .single();
     return { data, error };
@@ -35,7 +38,7 @@ export const AddressRepository = {
   getAddressByProfileId: async (supabase: SupabaseType, profileId: string) => {
     const { data, error } = await supabase
       .from("profiles")
-      .select("addresses(*)")
+      .select(`addresses(${addressSelects})`) // Left Join
       .eq("id", profileId)
       .single();
     return { data, error };
