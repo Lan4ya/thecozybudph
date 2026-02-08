@@ -4,6 +4,10 @@ import { coerceNumber } from "../utils/coerceNumber.ts";
 export const createOrderSchema = z.object({
   addressId: z.uuid("not a valid address id"),
 
+  // If null means the user ordered directly from the shop, not from cart items.
+  // this is needed to properly remove cart items from cart once checked out
+  cartId: z.uuid("not a valid cart id").nullable(),
+
   subtotalCents: coerceNumber(
     z
       .number("subtotal must be a number")

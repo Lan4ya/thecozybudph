@@ -5,7 +5,7 @@ import {
 } from "@tanstack/react-query";
 import { useRef, useEffect, useMemo, useCallback } from "react";
 import type { ProductWithRelations } from "@TheCozyBud/types";
-import { ProductAPI } from "@/services/api/products";
+import { ProductAPI } from "@/api/product";
 import ProductCard from "@/components/products/ProductCard";
 import { useProductQuery } from "../hooks/useFilters";
 import { ShopProductGridSkeleton } from "@/lib/ui/skeletons/ShopProductGridItemsSkeleton";

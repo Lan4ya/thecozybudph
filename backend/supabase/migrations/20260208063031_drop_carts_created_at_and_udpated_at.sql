@@ -1,0 +1,7 @@
+ALTER TABLE cart_items
+DROP COLUMN IF EXISTS created_at,
+DROP COLUMN IF EXISTS updated_at;
+
+ALTER TABLE carts
+DROP COLUMN IF EXISTS created_at,
+DROP COLUMN IF EXISTS updated_at;

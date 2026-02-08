@@ -2,12 +2,27 @@ export interface Product {
   id: string;
   name: string;
   colorVariants: string[];
-  description?: string;
+  description: string | null;
   imageUrls: string[];
   price: number;
   primaryImageUrl: string;
-  categoryName?: string;
-  collectionName?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string | null;
+  updatedAt: string | null;
 }
+
+export type ProductWithRelations = Product & {
+  categoryName: string | null;
+  collectionName: string | null;
+};
+
+export type DeleteProducts = { deletedProductIds: string[] };
+
+export type ProductCategory = {
+  id: string;
+  name: string;
+};
+
+export type ProductCollection = {
+  id: string;
+  name: string;
+};

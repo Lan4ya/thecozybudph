@@ -8,12 +8,12 @@ import Contact from "./pages/contact/Contact.tsx";
 import Events from "./pages/events/Events.tsx";
 import AdminDashboard, {
   AdminLoader as AdminLoader,
-} from "./pages/admin/Dashboard.tsx";
-import AdminDashboardProducts from "./pages/admin/pages/products/Products.tsx";
-import AdminDashboardOrders from "./pages/admin/pages/orders/Orders.tsx";
+} from "./pages/profile/pages/admin/Dashboard.tsx";
+import AdminDashboardProducts from "./pages/profile/pages/admin/pages/products/Products.tsx";
+import AdminDashboardOrders from "./pages/profile/pages/admin/pages/orders/Orders.tsx";
 import { CatchAllErrorPage } from "./pages/ErrorPage.tsx";
 import { RouteLoaderSpinner } from "./components/RouteLoaderSpinner.tsx";
-import { ProductCheckout } from "./pages/shop/pages/product-checkout/Checkout.tsx";
+import { ProductCheckout } from "./pages/checkout/Checkout.tsx";
 import Login from "./pages/auth/Login.tsx";
 import Profile from "./pages/profile/Profile.tsx";
 import SignUp from "./pages/auth/Signup.tsx";

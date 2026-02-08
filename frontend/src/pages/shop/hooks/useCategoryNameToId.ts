@@ -1,4 +1,4 @@
-import { ProductAPI } from "@/services/api/products";
+import { ProductAPI } from "@/api/product";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
