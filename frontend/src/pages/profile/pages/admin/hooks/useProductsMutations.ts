@@ -18,10 +18,12 @@ export const useProductMutations = () => {
   const { addToast } = useToast();
 
   const deleteProductMutation = useMutation({
-    mutationFn: async (ids: string[]) =>
-      await ProductAPI.deleteMany({ productIds: ids }),
-    onMutate: (ids) => {
-      addToast(`Deleting product${ids.length > 1 ? "s" : ""}...`, "info");
+    mutationFn: ProductAPI.deleteMany,
+    onMutate: ({ productIds }) => {
+      addToast(
+        `Deleting product${productIds.length > 1 ? "s" : ""}...`,
+        "info",
+      );
     },
     onError: (err: Error) => {
       addToast(err.message || "Failed to delete product", "error");
@@ -50,7 +52,7 @@ export const useProductMutations = () => {
   });
 
   const createProductMutation = useMutation({
-    mutationFn: async (formData: FormData) => await ProductAPI.create(formData),
+    mutationFn: ProductAPI.create,
     onMutate: () => {
       addToast("Creating new product...", "info");
     },
@@ -82,13 +84,13 @@ export const useProductMutations = () => {
   });
 
   const updateProductMutation = useMutation({
-    mutationFn: async ({
+    mutationFn: ({
       formData,
       productId,
     }: {
       formData: FormData;
       productId: string;
-    }) => await ProductAPI.update(formData, productId),
+    }) => ProductAPI.update(formData, productId),
     onMutate: () => {
       addToast("Updating product data...", "info");
     },
