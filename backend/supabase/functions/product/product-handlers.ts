@@ -25,14 +25,18 @@ export const deleteProductHandler = factory.createHandlers(
   },
 );
 
-export const patchProductHandler = factory.createHandlers(
+export const updateProductHandler = factory.createHandlers(
   zodValidatorMiddleware("param", productIdSchema),
   zodValidatorMiddleware("form", updateProductSchema),
   async (c) => {
     const supabase = c.get("supabaseService");
-    const { id } = c.req.valid("param");
+    const { id: productId } = c.req.valid("param");
     const payload = c.req.valid("form");
-    const res = await ProductService.updateProduct(supabase, id, payload);
+    const res = await ProductService.updateProduct(
+      supabase,
+      productId,
+      payload,
+    );
     return handleSuccess(res);
   },
 );
