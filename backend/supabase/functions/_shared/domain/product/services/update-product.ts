@@ -11,12 +11,12 @@ import { snakeToCamel } from "@shared/utils/caseConverter.ts";
 
 export const updateProduct = async (
   supabase: SupabaseType,
-  id: string,
+  productId: string,
   payload: UpdateProductInput,
 ): Promise<ProductWithRelations> => {
   // Check product existence
   const { data: existingProduct, error: fetchError } =
-    await ProductRepository.getProductById(supabase, id);
+    await ProductRepository.getProductById(supabase, productId);
 
   if (fetchError) throw AppError.internal();
 
@@ -103,7 +103,7 @@ export const updateProduct = async (
   };
 
   const { data: updatedProduct, error: updateError } =
-    await ProductRepository.updateProduct(supabase, id, productUpdates);
+    await ProductRepository.updateProduct(supabase, productId, productUpdates);
 
   if (updateError || !updatedProduct) {
     await cleanupUploads().catch((err) => {

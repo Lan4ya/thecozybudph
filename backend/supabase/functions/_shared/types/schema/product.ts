@@ -6,7 +6,7 @@ export const productBaseSchema = z.object({
     .string()
     .trim()
     .min(1, "name is required")
-    .max(250, "name can't exceed 250 characters"),
+    .max(255, "name can't exceed 255 characters"),
 
   price: coerceNumber(
     z

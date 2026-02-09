@@ -2,7 +2,7 @@ import { Hono, Env } from "hono";
 import {
   createProductHandler,
   deleteProductHandler,
-  patchProductHandler,
+  updateProductHandler,
 } from "./product-handlers.ts";
 import {
   supabaseMiddleware,
@@ -21,7 +21,7 @@ products.use("*", supabaseServiceMiddleware());
 // ------------------- ADMIN ONLY API's -------------------
 
 products.post("/", ...createProductHandler);
-products.patch("/:id", ...patchProductHandler);
+products.patch("/:id", ...updateProductHandler);
 products.delete("/", ...deleteProductHandler);
 
 // ------------------- ADMIN ONLY API's -------------------
