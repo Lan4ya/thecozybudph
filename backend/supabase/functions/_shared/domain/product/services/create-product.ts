@@ -1,4 +1,5 @@
 import { AppError } from "@shared/errors/Errors.ts";
+import { formatPrice } from "@shared/utils/mod.ts";
 import { SupabaseType } from "@shared/types.d.ts";
 import {
   CreateProductInput,
@@ -85,6 +86,7 @@ export const createProduct = async (
 
   return {
     ...product,
+    formattedPrice: formatPrice(product.price),
     collectionName: productCollection ? productCollection.name : null,
     categoryName: productCategory ? productCategory.name : null,
   };

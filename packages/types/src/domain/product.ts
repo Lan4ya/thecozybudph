@@ -5,6 +5,7 @@ export interface Product {
   description: string | null;
   imageUrls: string[];
   price: number;
+  formattedPrice: string;
   primaryImageUrl: string;
   createdAt: string | null;
   updatedAt: string | null;
