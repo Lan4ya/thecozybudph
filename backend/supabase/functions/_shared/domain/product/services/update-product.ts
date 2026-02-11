@@ -8,6 +8,7 @@ import { SupabaseType } from "@shared/types.d.ts";
 import { ProductRepository } from "../product-repository.ts";
 import { ProductStorage } from "../product-storage.ts";
 import { snakeToCamel } from "@shared/utils/caseConverter.ts";
+import { formatPrice } from "../../../utils/format.ts";
 
 export const updateProduct = async (
   supabase: SupabaseType,
@@ -123,6 +124,7 @@ export const updateProduct = async (
 
   return {
     ...product,
+    formattedPrice: formatPrice(product.price),
     collectionName: productCollection ? productCollection.name : null,
     categoryName: productCategory ? productCategory.name : null,
   };
