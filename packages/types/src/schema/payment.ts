@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { coerceNumber } from "../utils/coerceNumber.ts";
+import { coerceNumber } from "../utils/coerce.ts";
 
 export const createPaymentSchema = z.object({
   orderId: z.uuid("not a valid order id"),

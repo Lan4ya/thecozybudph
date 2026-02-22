@@ -46,7 +46,6 @@ import { NavLink, useLocation } from "react-router";
 import { supabase } from "@/lib/supabase/client";
 import { useState } from "react";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import isDev from "@/lib/utils/isDev";
 
 export const MobileDrawer = () => {
   const [hasSession, setHasSession] = useState(false);
@@ -79,7 +78,7 @@ export const MobileDrawer = () => {
 
       <DrawerContent
         aria-describedby={undefined}
-        className="custom-container w-full h-[400px] rounded-t-2xl shadow-xl border border-border/50 pb-40"
+        className="z-999 custom-container w-full h-[400px] rounded-t-2xl shadow-xl border border-border/50 pb-40"
       >
         {/* <div className="-top-2 translate-x-1/2 right-[50%] w-[100px] h-2 rounded-full absolute bg-input/30 z-5"></div> */}
 

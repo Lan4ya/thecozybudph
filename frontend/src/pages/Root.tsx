@@ -8,8 +8,15 @@ import SessionGuard from "@/components/SessionGuard";
 
 function Root() {
   const pathName = useLocation().pathname;
-  const hideNav = pathName === "/auth/login" || pathName === "/auth/signup";
-  const hideFooter = pathName === "/auth/login" || pathName === "/auth/signup";
+
+  const NAV_HIDDEN_PATHS = ["/auth/login", "/auth/signup"];
+  const FOOTER_HIDDEN_PATHS = [...NAV_HIDDEN_PATHS, "/cart", "/shop/products"];
+
+  const matchesPath = (pathname: string, paths: string[]) =>
+    paths.some((p) => pathname.startsWith(p));
+
+  const hideNav = matchesPath(pathName, NAV_HIDDEN_PATHS);
+  const hideFooter = matchesPath(pathName, FOOTER_HIDDEN_PATHS);
 
   return (
     <>

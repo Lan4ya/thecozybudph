@@ -13,7 +13,7 @@ import AdminDashboardProducts from "./pages/profile/pages/admin/pages/products/P
 import AdminDashboardOrders from "./pages/profile/pages/admin/pages/orders/Orders.tsx";
 import { CatchAllErrorPage } from "./pages/ErrorPage.tsx";
 import { RouteLoaderSpinner } from "./components/RouteLoaderSpinner.tsx";
-import { ProductCheckout } from "./pages/checkout/Checkout.tsx";
+import { ProductDetails } from "./pages/shop/pages/selected-product-details/ProductDetails.tsx";
 import Login from "./pages/auth/Login.tsx";
 import Profile from "./pages/profile/Profile.tsx";
 import SignUp from "./pages/auth/Signup.tsx";
@@ -62,7 +62,7 @@ const router = createBrowserRouter([
           { index: true, Component: Shop },
           {
             path: "products/:id",
-            Component: ProductCheckout,
+            Component: ProductDetails,
           },
         ],
       },

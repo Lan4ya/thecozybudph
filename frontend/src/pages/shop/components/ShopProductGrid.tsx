@@ -4,7 +4,6 @@ import {
   type QueryFunctionContext,
 } from "@tanstack/react-query";
 import { useRef, useEffect, useMemo, useCallback } from "react";
-import type { ProductWithRelations } from "@TheCozyBud/types";
 import { ProductAPI } from "@/api/product";
 import ProductCard from "@/components/products/ProductCard";
 import { useProductQuery } from "../hooks/useFilters";
@@ -68,7 +67,7 @@ const ShopProductGrid = () => {
       }
 
       try {
-        return await ProductAPI.getAll({
+        return await ProductAPI.queryListItems({
           page: pageParam as number,
           perPage,
           sort: productQuery?.sort ?? "Popularity",
@@ -91,7 +90,7 @@ const ShopProductGrid = () => {
     isFetchingNextPage,
     isFetching,
     error,
-  } = useSuspenseInfiniteQuery<ProductWithRelations[]>({
+  } = useSuspenseInfiniteQuery({
     queryKey,
     queryFn,
     initialPageParam: 0,
@@ -143,8 +142,8 @@ const ShopProductGrid = () => {
             key={p.id}
             productId={p.id}
             name={p.name}
-            imageUrl={p.imageUrls[0]}
-            price={p.price}
+            imageUrl={p.primaryImageUrl}
+            price={p.minPriceCents}
           />
         ))}
 

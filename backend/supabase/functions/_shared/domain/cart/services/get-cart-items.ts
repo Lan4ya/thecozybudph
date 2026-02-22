@@ -28,5 +28,5 @@ export const getCartItems = async (
     );
   }
 
-  return snakeToCamel(data);
+  return snakeToCamel(data as unknown as CartItem[]);
 };

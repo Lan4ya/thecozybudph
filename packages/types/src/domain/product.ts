@@ -1,20 +1,40 @@
 export interface Product {
   id: string;
   name: string;
-  colorVariants: string[];
   description: string | null;
   imageUrls: string[];
-  price: number;
-  formattedPrice: string;
   primaryImageUrl: string;
-  createdAt: string | null;
-  updatedAt: string | null;
+  options: ProductOption[];
+  variants: ProductVariant[];
+  minPriceCents: number;
+  maxPriceCents: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type ProductOption = {
+  name: string;
+  values: string[];
+};
+
+export interface ProductVariant {
+  sku: string;
+  priceCents: number;
+  options: Record<string, string>;
 }
 
 export type ProductWithRelations = Product & {
   categoryName: string | null;
   collectionName: string | null;
 };
+
+export interface ProductListItem {
+  id: string;
+  name: string;
+  primaryImageUrl: string;
+  minPriceCents: number;
+  maxPriceCents: number;
+}
 
 export type DeleteProducts = { deletedProductIds: string[] };
 

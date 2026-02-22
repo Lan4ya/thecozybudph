@@ -36,7 +36,8 @@ const TanstackQueryProvider = ({ children }: PropsWithChildren) => {
       }}
     >
       {children}
-      <ReactQueryDevtools initialIsOpen={false} />
+
+      <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-left" />
     </PersistQueryClientProvider>
   );
 };

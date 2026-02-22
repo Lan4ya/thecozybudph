@@ -30,7 +30,6 @@ import z from "zod";
 import { formHasChanges } from "./helpers/formHasChanges";
 import { useProductMutations } from "@/pages/profile/pages/admin/hooks/useProductsMutations";
 import { useImageCompressor } from "@/pages/profile/pages/admin/hooks/useImageConverter";
-import { getUnknownErrMsg } from "@/lib/utils/format";
 import isDev from "@/lib/utils/isDev";
 import {
   getEmptyFormKV,
@@ -360,10 +359,8 @@ export default function ProductForm({
 
         await createProductMutation.mutateAsync(formData);
       }
-    } catch (error) {
-      const msg = getUnknownErrMsg(error);
-      console.error("error: ", msg);
-      addToast(msg as string, "error");
+    } catch (_error) {
+      // just so that dev tools doesn't complain
     } finally {
       setSubmitting(false);
     }

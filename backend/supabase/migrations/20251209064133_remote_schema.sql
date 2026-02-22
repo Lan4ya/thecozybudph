@@ -321,28 +321,28 @@ ALTER TABLE ONLY "public"."payments"
 
 
 
-ALTER TABLE ONLY "public"."product_categories"
-    ADD CONSTRAINT "product_categories_name_key" UNIQUE ("name");
+-- ALTER TABLE ONLY "public"."product_categories"
+--     ADD CONSTRAINT "product_categories_name_key" UNIQUE ("name");
 
 
 
-ALTER TABLE ONLY "public"."product_categories"
-    ADD CONSTRAINT "product_categories_pkey" PRIMARY KEY ("id");
+-- ALTER TABLE ONLY "public"."product_categories"
+--     ADD CONSTRAINT "product_categories_pkey" PRIMARY KEY ("id");
 
 
 
-ALTER TABLE ONLY "public"."product_collections"
-    ADD CONSTRAINT "product_collections_name_key" UNIQUE ("name");
+-- ALTER TABLE ONLY "public"."product_collections"
+--     ADD CONSTRAINT "product_collections_name_key" UNIQUE ("name");
 
 
 
-ALTER TABLE ONLY "public"."product_collections"
-    ADD CONSTRAINT "product_collections_pkey" PRIMARY KEY ("id");
+-- ALTER TABLE ONLY "public"."product_collections"
+--     ADD CONSTRAINT "product_collections_pkey" PRIMARY KEY ("id");
 
 
 
-ALTER TABLE ONLY "public"."products"
-    ADD CONSTRAINT "products_pkey" PRIMARY KEY ("id");
+-- ALTER TABLE ONLY "public"."products"
+--     ADD CONSTRAINT "products_pkey" PRIMARY KEY ("id");
 
 
 
@@ -432,13 +432,13 @@ ALTER TABLE ONLY "public"."payments"
 
 
 
-ALTER TABLE ONLY "public"."products"
-    ADD CONSTRAINT "products_product_category_id_fkey" FOREIGN KEY ("product_category_id") REFERENCES "public"."product_categories"("id") ON DELETE SET NULL;
+-- ALTER TABLE ONLY "public"."products"
+--     ADD CONSTRAINT "products_product_category_id_fkey" FOREIGN KEY ("product_category_id") REFERENCES "public"."product_categories"("id") ON DELETE SET NULL;
 
 
 
-ALTER TABLE ONLY "public"."products"
-    ADD CONSTRAINT "products_product_collection_id_fkey" FOREIGN KEY ("product_collection_id") REFERENCES "public"."product_collections"("id") ON DELETE SET NULL;
+-- ALTER TABLE ONLY "public"."products"
+--     ADD CONSTRAINT "products_product_collection_id_fkey" FOREIGN KEY ("product_collection_id") REFERENCES "public"."product_collections"("id") ON DELETE SET NULL;
 
 
 

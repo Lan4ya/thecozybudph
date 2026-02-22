@@ -12,16 +12,13 @@ import { AppEnv } from "@shared/types.d.ts";
 
 const factory = createFactory<AppEnv>();
 
-export const deleteProductHandler = factory.createHandlers(
-  zodValidatorMiddleware("json", deleteProductsSchema),
+export const createProductHandler = factory.createHandlers(
+  zodValidatorMiddleware("form", createProductSchema),
   async (c) => {
     const supabase = c.get("supabaseService");
-    const payload = c.req.valid("json");
-    const deletedProductIds = await ProductService.deleteProducts(
-      supabase,
-      payload,
-    );
-    return handleSuccess(deletedProductIds);
+    const payload = c.req.valid("form");
+    const res = await ProductService.createProduct(supabase, payload);
+    return handleSuccess(res);
   },
 );
 
@@ -41,12 +38,15 @@ export const updateProductHandler = factory.createHandlers(
   },
 );
 
-export const createProductHandler = factory.createHandlers(
-  zodValidatorMiddleware("form", createProductSchema),
+export const deleteProductHandler = factory.createHandlers(
+  zodValidatorMiddleware("json", deleteProductsSchema),
   async (c) => {
     const supabase = c.get("supabaseService");
-    const payload = c.req.valid("form");
-    const res = await ProductService.createProduct(supabase, payload);
-    return handleSuccess(res);
+    const payload = c.req.valid("json");
+    const deletedProductIds = await ProductService.deleteProducts(
+      supabase,
+      payload,
+    );
+    return handleSuccess(deletedProductIds);
   },
 );

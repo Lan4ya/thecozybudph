@@ -1,8 +1,17 @@
 import { CartRepository } from "../cart-repository.ts";
-import { AddCartItemsInput, CartItem } from "@shared/types/index.ts";
+import {
+  AddCartItemsInput,
+  CartItem,
+  ProductVariant,
+} from "@shared/types/index.ts";
 import { AppError } from "@shared/errors/Errors.ts";
 import { SupabaseType } from "@shared/types.d.ts";
 import { snakeToCamel } from "../../../utils/caseConverter.ts";
+
+// TODO: add validation (in client side) for user cart and checkout:
+// Does variant still exist?
+// Is it still purchasable?
+// Has price changed?
 
 export const addCartItems = async (
   supabase: SupabaseType,
@@ -17,7 +26,7 @@ export const addCartItems = async (
   }
 
   // A cart for the user is automatically created after user signup via a
-  // postgres trigger 'on_auth_user_created' so cart.id should always exist.
+  // postgres trigger named 'on_auth_user_created' so cart.id should always exist.
   // Meaning this should NEVER happen. If it does, something is broken.
   if (!cart?.id) {
     throw AppError.internal(
@@ -30,19 +39,25 @@ export const addCartItems = async (
     cart.id,
     payload.productId,
     payload.quantity,
+    payload.productVariant,
   );
-
-  const cartItem = data?.[0] ?? null;
 
   if (error) {
     throw AppError.internal(error.message);
   }
 
-  if (!cartItem) {
+  const cartItemRaw = data?.[0];
+
+  if (!cartItemRaw) {
     throw AppError.internal(
       "Invariant violation: upsert cart item returned no data",
     );
   }
 
-  return snakeToCamel(cartItem);
+  const cartItem: CartItem = {
+    ...snakeToCamel(cartItemRaw),
+    productVariant: cartItemRaw.product_variant as unknown as ProductVariant,
+  };
+
+  return cartItem;
 };

@@ -1,54 +1,83 @@
-import OrderSummary from "./components/OrderSummary";
+import type {
+  CartItem as CartItemType,
+  Product,
+  ProductVariant,
+} from "@TheCozyBud/types";
 import CartItem from "./components/CartItem";
-import { Check } from "lucide-react";
+import { ArrowLeft, Check } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Button } from "@/lib/ui/__shadcn__/button";
+import { formatPrice } from "@/lib/utils/format";
+import { CartAPI } from "@/api/cart";
+import { ProductAPI } from "@/api/product";
+import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router";
 
-// Dummy cart data
-const dummyCartItems = [
-  {
-    productId: "1",
-    name: "Eternal Blossom Bouquet",
-    price: 2500,
-    imageUrl: "/api/placeholder/300/300",
-    quantity: 2,
-    selected: true,
-    giftMessage: "Happy Birthday! Hope you love these flowers.",
-  },
-  {
-    productId: "2",
-    name: "Moonlight Roses",
-    price: 1800,
-    imageUrl: "/api/placeholder/300/300",
-    quantity: 1,
-    selected: true,
-    giftMessage: "",
-  },
-  {
-    productId: "3",
-    name: "Spring Garden Vase",
-    price: 3200,
-    imageUrl: "/api/placeholder/300/300",
-    quantity: 1,
-    selected: false,
-    giftMessage: "Congratulations on your new home!",
-  },
-];
+export type CartItemUI = CartItemType & {
+  name: string;
+  imageUrl: string;
+  selected: boolean;
+  cardMessage: string;
+};
 
 const Cart = () => {
-  const [cartItems, setCartItems] = useState(dummyCartItems);
+  const navigate = useNavigate();
+
+  const cartItemsQuery = useQuery<CartItemType[]>({
+    queryKey: ["cart"],
+    queryFn: CartAPI.getCartItems,
+  });
+
+  const productIds = cartItemsQuery.data?.map((i) => i.productId) ?? [];
+
+  const productsQuery = useQuery({
+    queryKey: ["products", productIds],
+    queryFn: () => ProductAPI.getByIds(productIds),
+  });
+
+  useEffect(() => {
+    console.log("Cart Items:", cartItemsQuery.data);
+    console.log("Products:", productsQuery.data);
+  }, [cartItemsQuery.data, productsQuery.data]);
+
+  const productMap = new Map(productsQuery.data?.map((p) => [p.id, p]));
+
+  const hydrateCartItems = (): CartItemUI[] => {
+    return (
+      cartItemsQuery.data?.map((c) => {
+        const product = productMap.get(c.productId);
+        return {
+          name: product?.name ?? "Unknown",
+          productId: c.productId,
+          imageUrl: product?.primaryImageUrl ?? "",
+          quantity: c.quantity,
+          productVariant: c.productVariant,
+          selected: false,
+          cardMessage: "",
+        };
+      }) ?? []
+    );
+  };
+
+  const [cartItems, setCartItems] = useState<CartItemUI[]>([]);
+
+  useEffect(() => {
+    if (cartItemsQuery.data && productsQuery.data) {
+      setCartItems(hydrateCartItems());
+    }
+  }, [cartItemsQuery.data, productsQuery.data]);
 
   // Calculate totals only for selected items
   const selectedItems = cartItems.filter((item) => item.selected);
   const subtotal = selectedItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+    (sum, item) => sum + item.productVariant.priceCents * item.quantity,
     0,
   );
   const shipping = selectedItems.length > 0 ? 150 : 0;
   const tax = subtotal * 0.12;
   const total = subtotal + shipping + tax;
 
-  // Toggle selection for individual item
   const toggleItemSelection = (productId: string) => {
     setCartItems((items) =>
       items.map((item) =>
@@ -59,7 +88,6 @@ const Cart = () => {
     );
   };
 
-  // Toggle all items selection
   const toggleAllSelection = () => {
     const allSelected = cartItems.every((item) => item.selected);
     setCartItems((items) =>
@@ -67,16 +95,14 @@ const Cart = () => {
     );
   };
 
-  // Update gift message for an item
-  const updateGiftMessage = (productId: string, message: string) => {
+  const updateCardMessage = (productId: string, message: string) => {
     setCartItems((items) =>
       items.map((item) =>
-        item.productId === productId ? { ...item, giftMessage: message } : item,
+        item.productId === productId ? { ...item, cardMessage: message } : item,
       ),
     );
   };
 
-  // Update quantity for an item
   const updateQuantity = (productId: string, newQuantity: number) => {
     if (newQuantity < 1) return;
     setCartItems((items) =>
@@ -88,7 +114,6 @@ const Cart = () => {
     );
   };
 
-  // Remove item from cart
   const removeItem = (productId: string) => {
     setCartItems((items) =>
       items.filter((item) => item.productId !== productId),
@@ -99,20 +124,54 @@ const Cart = () => {
   const someSelected = cartItems.some((item) => item.selected) && !allSelected;
 
   return (
-    <div className="custom-container py-8 max-w-7xl mx-auto">
-      <div className="space-y-8">
-        {/* Header */}
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl lg:text-4xl font-bold text-foreground">
-            Your Cart
-          </h1>
-          <p className="text-muted-foreground">
-            Select items you want to checkout
-          </p>
-        </div>
+    <>
+      <div className="custom-container pt-4 pb-25 max-w-7xl mx-auto">
+        <div className="space-y-8">
+          {/* Header */}
+          <div className="flex justify-between items-center">
+            <Button variant="minimal" size="auto" onClick={() => navigate(-1)}>
+              <ArrowLeft />
+            </Button>
 
-        {/* Select All Toggle */}
-        <div className="flex items-center gap-3 p-4 bg-card border border-border rounded-lg">
+            <h1 className="text-xl lg:text-2xl font-bold text-foreground">
+              Your Cart
+            </h1>
+
+            <Button
+              variant="minimal"
+              size="auto"
+              className="text-foreground"
+              onClick={() => null}
+            >
+              Edit
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Cart Items */}
+            <div className="lg:col-span-2 space-y-6">
+              {cartItems.map((item) => (
+                <CartItem
+                  key={`${item.productId}-${item.productVariant.sku}`}
+                  {...item}
+                  onToggleSelection={() => toggleItemSelection(item.productId)}
+                  onUpdateCardMessage={(message) =>
+                    updateCardMessage(item.productId, message)
+                  }
+                  onUpdateQuantity={(quantity) =>
+                    updateQuantity(item.productId, quantity)
+                  }
+                  onRemove={() => removeItem(item.productId)}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Select All Toggle */}
+      <div className="fixed left-0 bottom-0 w-full z-10 flex items-center justify-between gap-3 p-4 bg-card border">
+        <div className="flex gap-2">
           <div
             onClick={toggleAllSelection}
             className={cn(
@@ -131,42 +190,22 @@ const Cart = () => {
             className="text-sm font-medium cursor-pointer select-none"
             onClick={toggleAllSelection}
           >
-            Select all items ({selectedItems.length}/{cartItems.length})
+            Select all ({selectedItems.length}/{cartItems.length})
           </span>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Cart Items */}
-          <div className="lg:col-span-2 space-y-6">
-            {cartItems.map((item) => (
-              <CartItem
-                key={item.productId}
-                {...item}
-                onToggleSelection={() => toggleItemSelection(item.productId)}
-                onUpdateGiftMessage={(message) =>
-                  updateGiftMessage(item.productId, message)
-                }
-                onUpdateQuantity={(quantity) =>
-                  updateQuantity(item.productId, quantity)
-                }
-                onRemove={() => removeItem(item.productId)}
-              />
-            ))}
-          </div>
+        <div className="flex gap-2 items-center">
+          <span className="text-sm">{formatPrice(subtotal)}</span>
 
-          {/* Order Summary */}
-          <div>
-            <OrderSummary
-              subtotal={subtotal}
-              shipping={shipping}
-              tax={tax}
-              total={total}
-              selectedCount={selectedItems.length}
-            />
-          </div>
+          <Button
+            // size=""
+            className=" bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
+          >
+            Check Out
+          </Button>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

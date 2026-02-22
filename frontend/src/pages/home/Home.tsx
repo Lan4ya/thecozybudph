@@ -47,7 +47,7 @@ const Home = () => {
         </PersistSuspense>
       </ErrorBoundary>
 
-      <section className="w-full bg-primary/5 rounded-2xl mb-20 py-12 px-6 lg:px-12 ">
+      <section className="w-full bg-primary/5 rounded-2xl py-12 px-6 lg:px-12 ">
         <div className="max-w-4xl mx-auto text-center space-y-4">
           <h2 className="text-3xl lg:text-4xl font-semibold">
             Unlock Exclusive Vouchers

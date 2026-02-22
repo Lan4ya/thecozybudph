@@ -1,8 +1,5 @@
 import { z } from "zod";
-
-const phMobileSchema = z
-  .string()
-  .regex(/^\+639\d{9}$/, "Invalid PH mobile number (use +639XXXXXXXXX)");
+import { phMobileSchema } from "./common.ts";
 
 export const createAddressSchema = z.object({
   fullName: z.string().trim().min(1, "full name can't be empty"),

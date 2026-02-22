@@ -1,14 +1,12 @@
 import {
-  ProductsMetadataRow,
   ProductWithRelations,
+  UpdateProductDBInput,
   UpdateProductInput,
 } from "@shared/types/index.ts";
 import { AppError } from "@shared/errors/Errors.ts";
 import { SupabaseType } from "@shared/types.d.ts";
 import { ProductRepository } from "../product-repository.ts";
 import { ProductStorage } from "../product-storage.ts";
-import { snakeToCamel } from "@shared/utils/caseConverter.ts";
-import { formatPrice } from "../../../utils/format.ts";
 
 export const updateProduct = async (
   supabase: SupabaseType,
@@ -19,7 +17,8 @@ export const updateProduct = async (
   const { data: existingProduct, error: fetchError } =
     await ProductRepository.getProductById(supabase, productId);
 
-  if (fetchError) throw AppError.internal();
+  if (fetchError)
+    throw AppError.internal("Failed to get product", { cause: fetchError });
 
   if (!existingProduct) throw AppError.notFound("Product not found");
 
@@ -36,36 +35,16 @@ export const updateProduct = async (
   else if (finalImageCount > 3)
     throw AppError.badRequest("You can upload up to 3 images only");
 
-  // Upsert category if being updated
-  let productCategory: { id: string; name: string } | null = null;
-  if (payload.category) {
-    const { data, error: upsertCategoryError } =
-      await ProductRepository.upsertCategory(supabase, payload.category);
-    if (upsertCategoryError)
-      throw AppError.internal(upsertCategoryError.message);
-    productCategory = data;
-  }
-
-  // Upsert collection if being updated
-  let productCollection: { id: string; name: string } | null = null;
-  if (!payload.collectionName) {
-    productCollection = null;
-  } else {
-    const { data, error } = await ProductRepository.upsertCollection(
-      supabase,
-      payload.collectionName,
-    );
-    if (error) throw AppError.internal();
-    productCollection = data;
-  }
+  const { primaryImageIndex, imageUrlsToDelete, newProductImages, ...rest } =
+    payload;
 
   // Handle image uploads
   let cleanupUploads = async () => {};
-  if (payload.newProductImages?.length) {
+  if (newProductImages?.length) {
     const { urls, cleanup } = await ProductStorage.uploadImages(
       supabase,
       "products",
-      payload.newProductImages,
+      newProductImages,
     );
     updatedImageUrls = [...updatedImageUrls, ...urls];
     cleanupUploads = async () => {
@@ -74,12 +53,12 @@ export const updateProduct = async (
   }
 
   // Handle image deletions
-  if (payload.imageUrlsToDelete?.length) {
+  if (imageUrlsToDelete?.length) {
     updatedImageUrls = updatedImageUrls.filter(
       (url: string) => !payload.imageUrlsToDelete!.includes(url),
     );
 
-    const filePaths = payload.imageUrlsToDelete
+    const filePaths = imageUrlsToDelete
       .map((url: string) => url.match(/\/products\/([^?]+)/)?.[1])
       .filter(Boolean) as string[];
 
@@ -90,42 +69,25 @@ export const updateProduct = async (
     }
   }
 
-  const productUpdates: Partial<
-    Omit<ProductsMetadataRow, "created_at" | "updated_at" | "id">
-  > = {
-    name: payload.name ?? existingProduct.name,
-    price: payload.price ?? 0,
-    color_variants: payload.colorVariants ?? [],
-    description: payload.description ?? null,
-    product_collection_id: productCollection?.id ?? null,
-    product_category_id: productCategory?.id ?? null,
-    image_urls: updatedImageUrls,
-    primary_image_url: updatedImageUrls[payload.primaryImageIndex ?? 0],
+  const productUpdates: UpdateProductDBInput = {
+    ...rest,
+    imageUrls: updatedImageUrls,
+    primaryImageUrl: updatedImageUrls[primaryImageIndex ?? 0],
   };
 
-  const { data: updatedProduct, error: updateError } =
-    await ProductRepository.updateProduct(supabase, productId, productUpdates);
-
-  if (updateError || !updatedProduct) {
+  let updatedProductWithRelations;
+  try {
+    updatedProductWithRelations = await ProductRepository.updateProduct(
+      productId,
+      productUpdates,
+    );
+  } catch (error) {
     await cleanupUploads().catch((err) => {
       console.error("Image cleanup failed after update error", err);
     });
 
-    throw AppError.internal();
+    throw AppError.internal("Failed to update product", { cause: error });
   }
 
-  if (!updatedProduct) {
-    throw AppError.internal(
-      "Invariant Violation: product update returned null data",
-    );
-  }
-
-  const product = snakeToCamel(updatedProduct);
-
-  return {
-    ...product,
-    formattedPrice: formatPrice(product.price),
-    collectionName: productCollection ? productCollection.name : null,
-    categoryName: productCategory ? productCategory.name : null,
-  };
+  return updatedProductWithRelations;
 };
