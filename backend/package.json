@@ -4,16 +4,20 @@
   "version": "0.0.0",
   "scripts": {
     "build": "tsc .",
-    "gen-supabase-types": "pnpx supabase gen types typescript --local > ../packages/types/src/db/supabase.types.ts && mkdir -p  ./supabase/functions/_shared/types && rm -rf ./supabase/functions/_shared/types/* && cp -r ../packages/types/src/* ./supabase/functions/_shared/types/"
+    "db:generate-types": "supabase gen types typescript --local > ../packages/types/src/db/supabase.types.ts && mkdir -p  ./supabase/functions/_shared/types && rm -rf ./supabase/functions/_shared/types/* && cp -r ../packages/types/src/* ./supabase/functions/_shared/types/",
+    "db:apply-schemas": "pnpm exec drizzle-kit generate && mkdir -p ./supabase/functions/_shared/db/schema/ && rm -rf ./supabase/functions/_shared/db/schema/* && cp -r ./drizzle/schema/. ./supabase/functions/_shared/db/schema/ && supabase migrations up --include-all"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.1",
+    "postgres": "^3.4.8"
   },
   "devDependencies": {
-    "@TheCozyBud/types": "workspace:*",
     "@faker-js/faker": "^10.1.0",
     "@snaplet/copycat": "^6.0.0",
     "@snaplet/seed": "^0.98.0",
     "@types/pg": "^8.16.0",
     "dotenv": "^17.2.3",
-    "pg": "^8.16.3",
+    "drizzle-kit": "^0.31.9",
     "tsx": "^4.21.0"
   }
 }

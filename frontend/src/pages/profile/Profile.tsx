@@ -97,7 +97,7 @@ const Profile = () => {
           variant="destructive"
           onClick={handleLogout}
           disabled={signingOut}
-          className="mt-60 mb-30 w-full"
+          className="mt-60 w-full"
         >
           {signingOut ? <Spinner /> : null}
           {signingOut ? "Logging out" : "Logout"}

@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ProductAPI } from "@/api/product";
 import { useToast } from "@/providers/ToastProvider";
 import type { ProductWithRelations } from "@TheCozyBud/types";
+import isDev from "@/lib/utils/isDev";
 
 type UpdateProductsQueryData = {
   pages: ProductWithRelations[][];
@@ -26,6 +27,7 @@ export const useProductMutations = () => {
       );
     },
     onError: (err: Error) => {
+      isDev && console.error(err.message);
       addToast(err.message || "Failed to delete product", "error");
     },
     onSuccess: ({ deletedProductIds }) => {
@@ -57,9 +59,9 @@ export const useProductMutations = () => {
       addToast("Creating new product...", "info");
     },
     onError: function handleCreateProductError(err: Error) {
+      isDev && console.error("product error:", err.message);
+      addToast(err.message, "error");
       throw err.message;
-      // console.error("product error:", err.message);
-      // addToast(err.message, "error");
     },
     onSuccess: (product) => {
       queryClient.setQueryData<CreateProductsQueryData>(
@@ -96,7 +98,7 @@ export const useProductMutations = () => {
     },
     onError: (err: Error) => {
       const message = err.message || "Failed to update product";
-      // console.error("error message:", message);
+      isDev && console.error("error message:", message);
       addToast(message, "error");
     },
     onSuccess: (updatedProduct) => {

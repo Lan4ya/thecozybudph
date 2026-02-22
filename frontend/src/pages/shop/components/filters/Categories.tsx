@@ -4,7 +4,7 @@ import { FilterDropdown } from "./FilterDropDown";
 import { FilterDropdownItem } from "./FilterDropdownItem";
 import { useQuery } from "@tanstack/react-query";
 import { ProductAPI } from "@/api/product";
-import type { GetCategoryResponse } from "@TheCozyBud/types";
+import type { ProductCategory } from "@TheCozyBud/types";
 
 const Categories = () => {
   const [inputValue, setInputValue] = useState("");
@@ -13,7 +13,7 @@ const Categories = () => {
     data: categories,
     error,
     isLoading,
-  } = useQuery<GetCategoryResponse[]>({
+  } = useQuery<ProductCategory[]>({
     queryKey: ["product_categories"],
     queryFn: ProductAPI.getCategories,
   });

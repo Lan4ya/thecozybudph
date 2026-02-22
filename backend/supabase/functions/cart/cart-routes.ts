@@ -12,7 +12,7 @@ cart.use("*", supabaseMiddleware());
 cart.use("*", authMiddleware());
 
 cart.get("/items", ...getCartItemsHandler);
-cart.post("/item", ...addCartItemsHandler);
+cart.post("/items", ...addCartItemsHandler);
 cart.delete("/items", ...deleteCartItemsHandler);
 
 export default cart;

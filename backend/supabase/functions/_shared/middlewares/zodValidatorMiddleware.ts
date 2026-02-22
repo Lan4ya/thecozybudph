@@ -1,6 +1,6 @@
 import z, { ZodType } from "zod";
 import type { ValidationTargets } from "hono";
-import { zValidator as zv } from "@hono/zod-validator";
+import { zValidator } from "@hono/zod-validator";
 import { ValidationError } from "../errors/Errors.ts";
 
 export const zodValidatorMiddleware = <
@@ -10,7 +10,7 @@ export const zodValidatorMiddleware = <
   target: Target,
   schema: T,
 ) =>
-  zv(target, schema, (result) => {
+  zValidator(target, schema, (result) => {
     if (!result.success) {
       const flattened = z.flattenError(result.error);
 

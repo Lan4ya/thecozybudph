@@ -1,8 +1,13 @@
-export const formatPrice = (price = 0) =>
-  price.toLocaleString("en-PH", {
+export const formatPrice = (price = 0) => {
+  const hasCentavos = !Number.isInteger(price);
+
+  return price.toLocaleString("en-PH", {
     style: "currency",
     currency: "PHP",
+    minimumFractionDigits: hasCentavos ? 2 : 0,
+    maximumFractionDigits: hasCentavos ? 2 : 0,
   });
+};
 
 export function formatFileSize(n: number) {
   return n < 1024
@@ -22,8 +27,7 @@ export const capitalizeFirstLetterOfEachWord = (str: string) => {
     .join(" ");
 };
 
-export const parseDateString = (dateString: string | null): Date | null => {
-  if (!dateString) return null;
+export const parseDateString = (dateString: string): Date => {
   return new Date(dateString);
 };
 

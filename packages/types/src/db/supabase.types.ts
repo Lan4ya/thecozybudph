@@ -89,18 +89,21 @@ export type Database = {
           cart_id: string
           id: string
           product_id: string
+          product_variant: Json
           quantity: number
         }
         Insert: {
           cart_id: string
           id?: string
           product_id: string
+          product_variant?: Json
           quantity: number
         }
         Update: {
           cart_id?: string
           id?: string
           product_id?: string
+          product_variant?: Json
           quantity?: number
         }
         Relationships: [
@@ -324,54 +327,60 @@ export type Database = {
       }
       products: {
         Row: {
-          color_variants: string[]
-          created_at: string | null
+          created_at: string
           description: string | null
           id: string
           image_urls: string[]
+          max_price_cents: number
+          min_price_cents: number
           name: string
-          price: number
+          options: Json
           primary_image_url: string
           product_category_id: string | null
           product_collection_id: string | null
-          updated_at: string | null
+          updated_at: string
+          variants: Json
         }
         Insert: {
-          color_variants?: string[]
-          created_at?: string | null
+          created_at?: string
           description?: string | null
           id?: string
           image_urls: string[]
+          max_price_cents: number
+          min_price_cents: number
           name: string
-          price: number
+          options: Json
           primary_image_url: string
           product_category_id?: string | null
           product_collection_id?: string | null
-          updated_at?: string | null
+          updated_at?: string
+          variants: Json
         }
         Update: {
-          color_variants?: string[]
-          created_at?: string | null
+          created_at?: string
           description?: string | null
           id?: string
           image_urls?: string[]
+          max_price_cents?: number
+          min_price_cents?: number
           name?: string
-          price?: number
+          options?: Json
           primary_image_url?: string
           product_category_id?: string | null
           product_collection_id?: string | null
-          updated_at?: string | null
+          updated_at?: string
+          variants?: Json
         }
         Relationships: [
           {
-            foreignKeyName: "products_product_category_id_fkey"
+            foreignKeyName: "products_product_category_id_product_categories_id_fk"
             columns: ["product_category_id"]
             isOneToOne: false
             referencedRelation: "product_categories"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "products_product_collection_id_fkey"
+            foreignKeyName: "products_product_collection_id_product_collections_id_fk"
             columns: ["product_collection_id"]
             isOneToOne: false
             referencedRelation: "product_collections"
@@ -381,31 +390,22 @@ export type Database = {
       }
       profiles: {
         Row: {
-          avatar_url: string | null
           email: string
-          first_name: string | null
           id: string
-          last_name: string | null
+          name: string | null
           phone: string | null
-          role: string
         }
         Insert: {
-          avatar_url?: string | null
           email: string
-          first_name?: string | null
           id: string
-          last_name?: string | null
+          name?: string | null
           phone?: string | null
-          role?: string
         }
         Update: {
-          avatar_url?: string | null
           email?: string
-          first_name?: string | null
           id?: string
-          last_name?: string | null
+          name?: string | null
           phone?: string | null
-          role?: string
         }
         Relationships: []
       }
@@ -439,9 +439,15 @@ export type Database = {
     }
     Functions: {
       upsert_cart_item: {
-        Args: { p_cart_id: string; p_product_id: string; p_quantity: number }
+        Args: {
+          cart_id: string
+          product_id: string
+          product_variant: Json
+          quantity: number
+        }
         Returns: {
           product_id: string
+          product_variant: Json
           quantity: number
         }[]
       }

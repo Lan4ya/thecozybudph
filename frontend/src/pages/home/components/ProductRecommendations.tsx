@@ -1,12 +1,11 @@
 import ProductCard from "@/components/products/ProductCard";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ProductAPI } from "@/api/product";
-import type { ProductWithRelations } from "@TheCozyBud/types";
 
 const ProductRecommendations = () => {
-  const { data, error, isFetching } = useSuspenseQuery<ProductWithRelations[]>({
+  const { data, error, isFetching } = useSuspenseQuery({
     queryKey: ["homepage-product-recommendations"],
-    queryFn: () => ProductAPI.getAll({ perPage: 6, noDummyProduct: true }),
+    queryFn: () => ProductAPI.queryListItems({ perPage: 6 }),
   });
 
   if (error && !isFetching) throw error;
@@ -32,8 +31,8 @@ const ProductRecommendations = () => {
             key={d.id}
             productId={d.id}
             name={d.name}
-            imageUrl={d.imageUrls[0]}
-            price={d.price}
+            imageUrl={d.primaryImageUrl}
+            price={d.minPriceCents}
           />
         ))}
       </div>

@@ -1,4 +1,5 @@
 import { SupabaseType } from "@shared/types.d.ts";
+import { Json } from "../../types/index.ts";
 
 export const CartRepository = {
   insertCart: async (supabase: SupabaseType, profileId: string) => {
@@ -22,7 +23,7 @@ export const CartRepository = {
   getCartItems: async (supabase: SupabaseType, cartId: string) => {
     const { data, error } = await supabase
       .from("cart_items")
-      .select("product_id, quantity")
+      .select("product_id, quantity, product_variant")
       .eq("cart_id", cartId);
     return { data, error };
   },
@@ -32,12 +33,16 @@ export const CartRepository = {
     cartId: string,
     productId: string,
     quantity: number,
+    productVariant: Json,
   ) => {
-    // This postgres function handles both item insertion and updating quantity.
+    // This postgres function handles both item insertion and updating quantity
+    // both increase and decrease as long as the final quantity is >= 1.
+    // If quantity === 0, delete API should be called from the client instead.
     return supabase.rpc("upsert_cart_item", {
-      p_cart_id: cartId,
-      p_product_id: productId,
-      p_quantity: quantity,
+      cart_id: cartId,
+      product_id: productId,
+      quantity: quantity,
+      product_variant: productVariant,
     });
   },
 

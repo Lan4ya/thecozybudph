@@ -37,7 +37,7 @@ export default function ProductTable({
   } = useSuspenseInfiniteQuery<ProductWithRelations[]>({
     queryKey: ["__admin__products__"],
     queryFn: ({ pageParam }) =>
-      ProductAPI.getAll({
+      ProductAPI.queryListItems({
         page: pageParam as number,
         perPage,
       }),
@@ -124,15 +124,18 @@ function ProductTableItemInner({
   const handleDelete = useCallback(async () => {
     setDeletingIds((prev) => new Set(prev).add(product.id));
 
-    deleteProductMutation.mutate([product.id], {
-      onSettled: () => {
-        setDeletingIds((prev) => {
-          const next = new Set(prev);
-          next.delete(product.id);
-          return next;
-        });
+    deleteProductMutation.mutate(
+      { productIds: [product.id] },
+      {
+        onSettled: () => {
+          setDeletingIds((prev) => {
+            const next = new Set(prev);
+            next.delete(product.id);
+            return next;
+          });
+        },
       },
-    });
+    );
   }, [deleteProductMutation, product.id]);
 
   return (

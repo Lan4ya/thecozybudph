@@ -6,31 +6,33 @@ import {
   type Product,
   type ProductWithRelations,
   type DeleteProductsInput,
+  type ProductListItem,
+  type ProductRow,
 } from "@TheCozyBud/types";
-import { snakeToCamel } from "@/lib/utils/caseConverter";
+import { snakeToCamel } from "@/lib/utils/caseConverter.ts";
 import type { ProductQueryAPI } from "@/types";
 import { apiClient } from "@/lib/axios/client";
+import { parseDateString } from "@/lib/utils/format";
+import { mapProductRowToProduct } from "@/lib/utils/mappers";
 
 export const ProductAPI = {
-  getAll: async ({
+  queryListItems: async ({
     filters,
     sort,
     page = 0,
     perPage = 12,
-    noDummyProduct = false,
   }: ProductQueryAPI & { noDummyProduct?: boolean }): Promise<
-    ProductWithRelations[]
+    ProductListItem[]
   > => {
     console.log({ page });
 
     let query = supabase
       .from("products")
-      .select("*, product_collections (name), product_categories(name)")
+      .select(
+        `id, name, primary_image_url, min_price_cents, max_price_cents, product_collections ( name), product_categories ( name )`,
+      )
       .range(page * perPage, (page + 1) * perPage - 1);
 
-    if (noDummyProduct) {
-      query = query.not("name", "ilike", "%dummy product%");
-    }
     // console.log("API Filters: ", filters);
 
     // Handle filters
@@ -47,13 +49,17 @@ export const ProductAPI = {
     }
 
     const priceRange = filters?.priceRange;
+
     if (priceRange) {
       if (priceRange.max !== undefined) {
-        query = query.gte("price", priceRange.min).lte("price", priceRange.max);
+        query = query
+          .gte("max_price_cents", priceRange.min)
+          .lte("min_price_cents", priceRange.max)
+          .order("min_price_cents", { ascending: true });
       } else {
         query = query
-          .gte("price", priceRange.min)
-          .order("price", { ascending: true });
+          .gte("max_price_cents", priceRange.min)
+          .order("min_price_cents", { ascending: true });
       }
     }
 
@@ -62,13 +68,13 @@ export const ProductAPI = {
       switch (sort) {
         case "Lowest Price":
           query
-            .order("price", { ascending: true })
+            .order("min_price_cents", { ascending: true })
             .order("id", { ascending: true });
           break;
 
         case "Highest Price":
           query
-            .order("price", { ascending: false })
+            .order("max_price_cents", { ascending: false })
             .order("id", { ascending: false });
           break;
 
@@ -78,6 +84,8 @@ export const ProductAPI = {
             .order("id", { ascending: false });
           break;
 
+        // Usually the default should be Popularity, but since there's no data for what's popular yet,
+        // this'll do for now. We'll change this later on.
         default:
           query
             .order("created_at", { ascending: true })
@@ -90,17 +98,8 @@ export const ProductAPI = {
 
     if (error) throw error;
 
-    const productsWithRelations = (data ?? []).map(
-      ({ product_categories, product_collections, ...rest }) => {
-        return {
-          ...rest,
-          categoryName: product_categories?.name ?? null,
-          collectionName: product_collections?.name ?? null,
-        };
-      },
-    );
-
-    return snakeToCamel(productsWithRelations ?? []);
+    const productListItems = snakeToCamel(data);
+    return productListItems;
   },
 
   getById: async (productId: string): Promise<Product | null> => {
@@ -108,14 +107,28 @@ export const ProductAPI = {
       .from("products")
       .select("*")
       .eq("id", productId)
-      .maybeSingle();
+      .maybeSingle<ProductRow>();
 
-    console.log("Fetching product id");
+    // console.log("Fetching product id");
+    if (error) throw error;
+    if (!data) return null;
+    console.log({ data });
+
+    return mapProductRowToProduct(data);
+  },
+
+  getByIds: async (productIds: string[]): Promise<Product[] | null> => {
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .in("id", productIds);
+
+    console.log("Fetching products by ids...", data);
 
     if (error) throw error;
     if (!data) return null;
 
-    return snakeToCamel(data ?? []);
+    return (data ?? []).map(mapProductRowToProduct);
   },
 
   update: async (

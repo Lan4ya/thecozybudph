@@ -1,0 +1,2 @@
+ALTER TABLE "product_categories" ADD CONSTRAINT "product_categories_name_unique" UNIQUE("name");--> statement-breakpoint
+ALTER TABLE "product_collections" ADD CONSTRAINT "product_collections_name_unique" UNIQUE("name");

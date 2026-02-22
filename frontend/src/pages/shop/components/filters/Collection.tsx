@@ -4,7 +4,7 @@ import { FilterDropdown } from "./FilterDropDown";
 import { FilterDropdownItem } from "./FilterDropdownItem";
 import { ProductAPI } from "@/api/product";
 import { useQuery } from "@tanstack/react-query";
-import type { GetCollectionResponse } from "@TheCozyBud/types";
+import type { ProductCollection } from "@TheCozyBud/types";
 
 const Collections = () => {
   const [inputValue, setInputValue] = useState("");
@@ -12,8 +12,8 @@ const Collections = () => {
     data: collections,
     error,
     isLoading,
-  } = useQuery<GetCollectionResponse[]>({
-    queryKey: ["product_colletions"],
+  } = useQuery<ProductCollection[]>({
+    queryKey: ["product_collections"],
     queryFn: ProductAPI.getCollections,
   });
 

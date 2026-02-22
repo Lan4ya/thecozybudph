@@ -7,11 +7,15 @@
     "zod": "npm:zod@^4.1.12",
     "hono-rate-limiter": "npm:hono-rate-limiter",
     "axios": "npm:axios@^1.13.2",
-    "lalamove": "npm:@lalamove/lalamove-js@^1.1.0"
+    "lalamove": "npm:@lalamove/lalamove-js@^1.1.0",
+    "drizzle-orm": "npm:drizzle-orm",
+    "drizzle-kit": "npm:drizzle-kit",
+    "postgres": "npm:postgres"
   },
   "compilerOptions": {
     "types": [
-      "jsr:@supabase/functions-js@2.5.0/edge-runtime.d.ts"
+      "jsr:@supabase/functions-js@2.5.0/edge-runtime.d.ts",
+      "npm:@types/pg"
     ]
   }
 }
