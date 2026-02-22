@@ -39,11 +39,11 @@ pnpm i
 ```
 
 #### 3. Put the correct environment variables in each given directories
-```bash
-# ./frontend/.env
-VITE_SUPABASE_URL=
-VITE_SUPABASE_ANON_KEY=
-```
+<!-- ```bash -->
+<!-- # ./frontend/.env -->
+<!-- VITE_SUPABASE_URL= -->
+<!-- VITE_SUPABASE_ANON_KEY= -->
+<!-- ``` -->
 
 ```bash
 # ./frontend/.env.local
@@ -51,12 +51,12 @@ VITE_SUPABASE_URL=
 VITE_SUPABASE_ANON_KEY=
 ```
 
-```bash
-# ./backend/.env
-SUPABASE_URL=http:
-SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-```
+<!-- ```bash -->
+<!-- # ./backend/.env -->
+<!-- SUPABASE_URL=http: -->
+<!-- SUPABASE_ANON_KEY= -->
+<!-- SUPABASE_SERVICE_ROLE_KEY= -->
+<!-- ``` -->
 
 ```bash
 # ./backend/supabase/.env
@@ -74,30 +74,28 @@ SUPABASE_SERVICE_ROLE_KEY=
 
 #### 4. Run development server
 ```bash
-## frontend dev server:
+# backend dev server (this should be set up properly first for the frontend to work):
 
-# at root './' run: 
-pnpm dev:frontend
+# On Windows Powershell, start docker with:
+Start-Process "Docker Desktop"
+
+# On Linux, start docker with: 
+sudo systemctl start docker 
+
+# After docker runs, if supabase is installed globally (recommended) run:
+cd backend && supabase start && supabase functions serve --no-verify-jwt  # make sure you're inside ./backend dir
+
+# If not then run:
+cd backend && pnpx supabase start && pnpx supabase functions serve --no-verify-jwt
 ```
 
 ```bash
-# backend dev server:
+## frontend dev server:
 
-# In another terminal
+# After setting up backend server, in another terminal run:
 
-# On Linux, start docker with: 
-sudo systemctl start docker # command is different on other OS's.
-
-# Go inside backend dir
-cd backend # This is important since 'supabase start' will create another supabase dir in './' if you're not inside backend dir
-
-# Inside ./backend start supabase and serve edge functions locally:
-
-# If supabase is installed globally
-supabase start && supabase functions serve
-
-# If not then:
-pnpx supabase start && pnpx supabase functions serve
+# inside root './': 
+pnpm dev:frontend
 ```
 
 #### 5. Open Website
