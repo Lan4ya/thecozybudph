@@ -2,12 +2,16 @@ import Carousel from "./components/Carousel";
 import { Link, useParams } from "react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ProductAPI } from "@/api/product";
-import { uuidSchema, type Product } from "@TheCozyBud/types";
+import {
+  uuidSchema,
+  type Product,
+  addCartItemsSchema,
+} from "@TheCozyBud/types";
 import PersistSuspense from "@/components/PersistSuspense";
 import { RouteLoaderSpinner } from "@/components/RouteLoaderSpinner";
 import { ArrowLeft } from "lucide-react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Star, Heart, Shield } from "lucide-react";
 import { CartAPI } from "@/api/cart";
@@ -16,7 +20,9 @@ import { useToast } from "@/providers/ToastProvider";
 import { cn } from "@/lib/utils/cn";
 import CustomizeFlower from "./components/CustomizeFlower";
 import { BottomBar } from "./components/BottomBar";
-import { formatPrice } from "@/lib/utils/format";
+import { formatPriceCents } from "@/lib/utils/format";
+import z from "zod";
+import { useProductSelectionStore } from "@/store/useProductSelectionStore";
 
 export const ProductDetails = () => {
   return (
@@ -55,36 +61,27 @@ const ProductDetailsInner = () => {
   });
 
   const smScreenAndBelow = useMediaQuery("(max-width: 518px)");
+  const { addToast } = useToast();
 
-  const [quantity, setQuantity] = useState(1);
-  // const [selectedVoucher, setSelectedVoucher] = useState<string>("");
-  const [cardMessage, setCardMessage] = useState("");
   const [hearted, setHearted] = useState(false);
 
-  const [selectedOptions, setSelectedOptions] = useState<
-    Record<string, string>
-  >(() => {
+  const setSelectedOptions = useProductSelectionStore(
+    (s) => s.setSelectedOptions,
+  );
+
+  useEffect(() => {
+    if (!product) return;
+
     const initial: Record<string, string> = {};
 
-    product?.options.forEach((opt) => {
+    product.options.forEach((opt) => {
       if (opt.values.length > 0) {
         initial[opt.name] = opt.values[0];
       }
     });
 
-    return initial;
-  });
-
-  const { addToast } = useToast();
-
-  // const vouchers = [
-  //   { id: "voucher1", name: "Birthday Special - 10% Off", discount: "10%" },
-  //   { id: "voucher2", name: "First Order - 15% Off", discount: "15%" },
-  //   { id: "voucher3", name: "Seasonal Offer - 20% Off", discount: "20%" },
-  // ];
-
-  const incrementQuantity = () => setQuantity((prev) => prev + 1);
-  const decrementQuantity = () => setQuantity((prev) => Math.max(1, prev - 1));
+    setSelectedOptions(initial);
+  }, [product, setSelectedOptions]);
 
   const addToCartMutation = useMutation({
     mutationFn: CartAPI.addCartItem,
@@ -97,13 +94,24 @@ const ProductDetailsInner = () => {
   });
 
   const handleAddToCart = async () => {
-    if (!product?.id) return null;
+    if (!product) return;
 
-    addToCartMutation.mutateAsync({
+    const { quantity, selectedVariant, cardMessages } =
+      useProductSelectionStore.getState();
+
+    const result = addCartItemsSchema.safeParse({
       productId: product.id,
-      // color_variant
+      productVariant: selectedVariant,
       quantity,
+      cardMessages,
     });
+
+    if (!result.success) {
+      console.error(z.flattenError(result.error));
+      return;
+    }
+
+    await addToCartMutation.mutateAsync(result.data);
   };
 
   const handleHeartClick = async () => {
@@ -169,7 +177,7 @@ const ProductDetailsInner = () => {
           <div>
             <div className="flex items-baseline gap-3">
               <span className="text-xl lg:text-2xl font-bold text-primary">
-                {formatPrice(product.minPriceCents)}
+                {formatPriceCents(product.minPriceCents)}
               </span>
             </div>
             <p className="text-sm text-muted-foreground">
@@ -177,16 +185,6 @@ const ProductDetailsInner = () => {
             </p>
           </div>
         </div>
-
-        {/* Customize Arrangement */}
-        <CustomizeFlower
-          options={product.options}
-          selectedOptions={selectedOptions}
-          onChange={setSelectedOptions}
-          cardMessage={cardMessage}
-          setCardMessage={setCardMessage}
-          maxSelectPerOption={1}
-        />
 
         {/* Features */}
         <motion.div
@@ -247,12 +245,7 @@ const ProductDetailsInner = () => {
       </motion.div>
 
       {/* CTA */}
-      <BottomBar
-        product={product}
-        selectedOptions={selectedOptions}
-        cardMessage={cardMessage}
-        quantity={quantity}
-      />
+      <BottomBar product={product} onAddToCart={handleAddToCart} />
     </>
   );
 };

@@ -8,7 +8,7 @@ import { ArrowLeft, Check } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { useEffect, useState } from "react";
 import { Button } from "@/lib/ui/__shadcn__/button";
-import { formatPrice } from "@/lib/utils/format";
+import { formatPriceCents } from "@/lib/utils/format";
 import { CartAPI } from "@/api/cart";
 import { ProductAPI } from "@/api/product";
 import { useQuery } from "@tanstack/react-query";
@@ -195,7 +195,7 @@ const Cart = () => {
         </div>
 
         <div className="flex gap-2 items-center">
-          <span className="text-sm">{formatPrice(subtotal)}</span>
+          <span className="text-sm">{formatPriceCents(subtotal)}</span>
 
           <Button
             // size=""

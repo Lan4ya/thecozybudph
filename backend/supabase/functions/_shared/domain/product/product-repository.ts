@@ -2,7 +2,6 @@ import type { SupabaseType } from "@shared/types.d.ts";
 import type {
   CreateProductDBInput,
   UpdateProductDBInput,
-  ProductsMetadataRow,
   ProductWithRelations,
 } from "@shared/types/index.ts";
 import {

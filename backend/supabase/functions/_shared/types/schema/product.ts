@@ -33,9 +33,8 @@ export const productBaseSchema = z.object({
   options: z.preprocess(
     (val) => {
       if (typeof val === "string") return JSON.parse(val);
-      return [];
+      return val;
     },
-
     z
       .array(
         z.object({
@@ -66,12 +65,11 @@ export const productBaseSchema = z.object({
   variants: z.preprocess(
     (val) => {
       if (typeof val === "string") return JSON.parse(val);
-      return [];
+      return val;
     },
     z
       .array(
         z.object({
-          sku: z.string().trim().toLowerCase().nonempty(),
           priceCents: coerceNumber(
             z
               .number("price must be a number")
@@ -101,41 +99,20 @@ export const imageFileSchema = z
     message: "image must be under 50MB",
   });
 
-export const createProductSchema = productBaseSchema
-  .extend({
-    productImages: z.preprocess(
-      (val) => {
-        if (!val) return [];
-        return Array.isArray(val) ? val : [val];
-      },
-      z
-        .array(imageFileSchema)
-        .min(1, "you must upload at least 1 image")
-        .max(MAX_IMAGES, `you can upload up to ${MAX_IMAGES} images only`),
-    ),
+export const createProductSchema = productBaseSchema.extend({
+  productImages: z.preprocess(
+    (val) => {
+      if (!val) return [];
+      return Array.isArray(val) ? val : [val];
+    },
+    z
+      .array(imageFileSchema)
+      .min(1, "you must upload at least 1 image")
+      .max(MAX_IMAGES, `you can upload up to ${MAX_IMAGES} images only`),
+  ),
 
-    primaryImageIndex: z.coerce
-      .number()
-      .min(0, "primaryImageIndex out of range"),
-  })
-  .superRefine((data, ctx) => {
-    const seen = new Map<string, number>();
-
-    // Ensure unique sku's
-    data.variants.forEach((variant, index) => {
-      const sku = variant.sku;
-
-      if (seen.has(sku)) {
-        ctx.addIssue({
-          code: "custom",
-          message: `Duplicate SKU: ${sku}`,
-          path: ["variants", index, "sku"],
-        });
-      } else {
-        seen.set(sku, index);
-      }
-    });
-  });
+  primaryImageIndex: z.coerce.number().min(0, "primaryImageIndex out of range"),
+});
 
 export const updateProductSchema = productBaseSchema.partial().extend({
   newProductImages: z

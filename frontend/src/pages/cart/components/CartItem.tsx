@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/lib/ui/__shadcn__/card";
 import { Textarea } from "@/lib/ui/__shadcn__/textarea";
 import { Trash2, Plus, Minus, Gift, Check, XIcon } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
-import { formatPrice } from "@/lib/utils/format";
+import { formatPriceCents } from "@/lib/utils/format";
 import ProductCard from "@/components/products/ProductCard";
 import { useState } from "react";
 import type { CartItemUI } from "../Cart";
@@ -73,7 +73,7 @@ const CartItem = ({
                 {name}
               </h3>
               <p className={cn("text-primary font-semibold")}>
-                {formatPrice(productVariant.priceCents * quantity)}
+                {formatPriceCents(productVariant.priceCents * quantity)}
               </p>
             </div>
 

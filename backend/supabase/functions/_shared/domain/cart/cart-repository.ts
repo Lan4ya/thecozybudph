@@ -34,6 +34,7 @@ export const CartRepository = {
     productId: string,
     quantity: number,
     productVariant: Json,
+    cardMessage: string | undefined,
   ) => {
     // This postgres function handles both item insertion and updating quantity
     // both increase and decrease as long as the final quantity is >= 1.
@@ -43,6 +44,7 @@ export const CartRepository = {
       product_id: productId,
       quantity: quantity,
       product_variant: productVariant,
+      card_message: cardMessage,
     });
   },
 
