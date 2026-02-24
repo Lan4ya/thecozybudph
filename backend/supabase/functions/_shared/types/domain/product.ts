@@ -4,10 +4,7 @@ export interface Product {
   description: string | null;
   imageUrls: string[];
   primaryImageUrl: string;
-  options: {
-    name: string;
-    values: string[];
-  }[];
+  options: ProductOption[];
   variants: ProductVariant[];
   minPriceCents: number;
   maxPriceCents: number;
@@ -15,8 +12,12 @@ export interface Product {
   updatedAt: Date;
 }
 
+export type ProductOption = {
+  name: string;
+  values: string[];
+};
+
 export interface ProductVariant {
-  sku: string;
   priceCents: number;
   options: Record<string, string>;
 }

@@ -86,6 +86,7 @@ export type Database = {
       }
       cart_items: {
         Row: {
+          card_message: string | null
           cart_id: string
           id: string
           product_id: string
@@ -93,6 +94,7 @@ export type Database = {
           quantity: number
         }
         Insert: {
+          card_message?: string | null
           cart_id: string
           id?: string
           product_id: string
@@ -100,6 +102,7 @@ export type Database = {
           quantity: number
         }
         Update: {
+          card_message?: string | null
           cart_id?: string
           id?: string
           product_id?: string
@@ -440,12 +443,14 @@ export type Database = {
     Functions: {
       upsert_cart_item: {
         Args: {
+          card_message?: string
           cart_id: string
           product_id: string
           product_variant: Json
           quantity: number
         }
         Returns: {
+          card_message: string
           product_id: string
           product_variant: Json
           quantity: number

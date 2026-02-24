@@ -3,7 +3,7 @@ import { ProductImage } from "@/components/products/ProductImage";
 import { ProductAPI } from "@/api/product";
 import type { ProductWithRelations } from "@TheCozyBud/types";
 import { Button } from "@/lib/ui/__shadcn__/button";
-import { formatPrice } from "@/lib/utils/format";
+import { formatPriceCents } from "@/lib/utils/format";
 import { useProductMutations } from "@/pages/profile/pages/admin/hooks/useProductsMutations";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { Edit } from "lucide-react";
@@ -168,7 +168,9 @@ function ProductTableItemInner({
               />
             </div>
           )}
-          <p className="text-primary text-md">{formatPrice(product.price)}</p>
+          <p className="text-primary text-md">
+            {formatPriceCents(product.price)}
+          </p>
         </div>
       </div>
 

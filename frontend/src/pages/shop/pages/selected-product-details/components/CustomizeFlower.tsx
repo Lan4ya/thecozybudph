@@ -3,29 +3,25 @@ import { Textarea } from "@/lib/ui/__shadcn__/textarea";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { useState } from "react";
 import type { Product } from "@TheCozyBud/types";
+import { useProductSelectionStore } from "@/store/useProductSelectionStore";
 
 type Props = {
-  options: Product["options"];
-  selectedOptions: Record<string, string>;
-  onChange: (value: Record<string, string>) => void;
-  cardMessage: string;
-  setCardMessage: (msg: string) => void;
-  maxSelectPerOption?: number;
+  productOptions: Product["options"];
 };
 
-export default function CustomizeFlower({
-  options,
-  selectedOptions,
-  onChange,
-  cardMessage,
-  setCardMessage,
-}: Props) {
-  const selectValue = (optionName: string, value: string) => {
+export default function CustomizeFlower({ productOptions }: Props) {
+  const selectedOptions = useProductSelectionStore((s) => s.selectedOptions);
+
+  const setSelectedOptions = useProductSelectionStore(
+    (s) => s.setSelectedOptions,
+  );
+
+  const selectOption = (optionName: string, value: string) => {
     const currentValue = selectedOptions[optionName];
 
     if (value === currentValue) return;
 
-    onChange({
+    setSelectedOptions({
       ...selectedOptions,
       [optionName]: value,
     });
@@ -36,7 +32,7 @@ export default function CustomizeFlower({
       <h3 className="font-semibold">Customize Arrangement</h3>
 
       <div className="space-y-6 p-4 border rounded-md">
-        {options.map((option) => {
+        {productOptions.map((option) => {
           const selectedValues = selectedOptions[option.name] ?? [];
 
           return (
@@ -53,7 +49,7 @@ export default function CustomizeFlower({
                     <Button
                       variant={isSelected ? "default" : "outline"}
                       key={value}
-                      onClick={() => selectValue(option.name, value)}
+                      onClick={() => selectOption(option.name, value)}
                     >
                       {value}
                     </Button>
@@ -71,27 +67,18 @@ export default function CustomizeFlower({
             Add a card message (optional)
           </label>
 
-          <CardMessageInput
-            cardMessage={cardMessage}
-            setCardMessage={setCardMessage}
-          />
+          <CardMessageInput />
         </div>
       </div>
     </div>
   );
 }
 
-type CardMessageInputProps = {
-  cardMessage: string;
-  setCardMessage: (value: string) => void;
-};
+const CardMessageInput = () => {
+  const cardMessages = useProductSelectionStore((s) => s.cardMessages);
+  const setCardMessage = useProductSelectionStore((s) => s.setCardMessage);
 
-const CardMessageInput = ({
-  cardMessage,
-  setCardMessage,
-}: CardMessageInputProps) => {
   const [isFocused, setIsFocused] = useState(false);
-  const [draft, setDraft] = useState(cardMessage);
 
   return (
     <div
@@ -100,7 +87,7 @@ const CardMessageInput = ({
       onBlur={(e) => {
         if (!e.currentTarget.contains(e.relatedTarget as Node)) {
           setIsFocused(false);
-          setDraft(cardMessage);
+          setCardMessage(0, cardMessages[0]);
         }
       }}
     >
@@ -108,13 +95,13 @@ const CardMessageInput = ({
         placeholder="Write your heartfelt message here..."
         className="min-h-20 resize-none focus:border-primary transition-colors text-sm"
         maxLength={600}
-        value={draft}
-        onChange={(e) => setDraft(e.target.value)}
+        value={cardMessages[0]}
+        onChange={(e) => setCardMessage(0, e.target.value)}
       />
 
-      <div className="flex justify-between text-xs text-muted-foreground">
+      <div className="mt-1 flex justify-between text-xs text-muted-foreground">
         <span>Included free with your flowers</span>
-        <span>{draft.length}/600</span>
+        <span>{cardMessages[0].length}/600</span>
       </div>
 
       {isFocused && (
@@ -122,7 +109,7 @@ const CardMessageInput = ({
           <Button
             variant="outline"
             onClick={() => {
-              setDraft(cardMessage);
+              setCardMessage(0, cardMessages[0]);
               setIsFocused(false);
             }}
           >
@@ -131,7 +118,7 @@ const CardMessageInput = ({
 
           <Button
             onClick={() => {
-              setCardMessage(draft);
+              setCardMessage(0, cardMessages[0]);
               setIsFocused(false);
             }}
           >

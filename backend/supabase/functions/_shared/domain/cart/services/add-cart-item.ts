@@ -40,6 +40,7 @@ export const addCartItems = async (
     payload.productId,
     payload.quantity,
     payload.productVariant,
+    payload.cardMessage,
   );
 
   if (error) {

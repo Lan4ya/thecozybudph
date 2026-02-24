@@ -18,7 +18,6 @@ export type ProductOption = {
 };
 
 export interface ProductVariant {
-  sku: string;
   priceCents: number;
   options: Record<string, string>;
 }

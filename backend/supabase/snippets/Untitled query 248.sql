@@ -1,10 +1,12 @@
-fselect
+select
   *
 from
   auth.user;
 
 
 ;
+
+truncate table products cascade;
 
 truncate table product_collections cascade;
 select * from products;
@@ -15,10 +17,9 @@ FROM pg_class
 WHERE relname = 'profiles';
 
 SELECT * FROM profiles WHERE id = 'af3ce14c-a7db-466a-b6de-402562768f39';
+g
 
-select * from cart_items;
 
-L
 SELECT
   conname,
   contype,
@@ -73,4 +74,4 @@ set raw_app_meta_data = jsonb_set(
   '"admin"',
   true
 )
-where id = 'd63ec195-6a98-4bf4-a5a1-9174d65d3c34'; -- profile.id of the user
+where id = '49a76796-bb3c-4677-83c9-7b7bea235a26'; -- profile.id of the user

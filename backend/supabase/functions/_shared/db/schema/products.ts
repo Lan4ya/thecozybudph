@@ -51,8 +51,8 @@ export const products = pgTable("products", {
   /*
     Example:
     [
-      { sku: "flower-red-6", price_cents: 50000, options: { Color: "Red", "Stem Count": "6" } },
-      { sku: "flower-red-12", price_cents: 100000, options: { Color: "Red", "Stem Count": "12" } }
+      { price_cents: 50000, options: { Color: "Red", "Stem Count": "6" } },
+      { price_cents: 100000, options: { Color: "Red", "Stem Count": "12" } }
     ]
   */
 

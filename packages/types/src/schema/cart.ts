@@ -7,15 +7,15 @@ export const addCartItemsSchema = z.object({
     z.number("quantity must be a number").positive("quantity can't be 0"),
   ),
   productVariant: z.object({
-    sku: z.string().trim().nonempty(),
     priceCents: coerceNumber(
-      z.number("price must be a number").positive("price can't be 0"),
+      z.number("price must be a number").nonnegative("price can't be negative"),
     ),
     options: z.record(
       z.string().trim().nonempty(),
       z.string().trim().nonempty(),
     ),
   }),
+  cardMessage: z.string().trim().optional(),
 });
 
 export const deleteCartItemsSchema = z.object({

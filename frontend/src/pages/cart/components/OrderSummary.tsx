@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/lib/ui/__shadcn__/card";
-import { formatPrice } from "@/lib/utils/format";
+import { formatPriceCents } from "@/lib/utils/format";
 
 interface OrderSummaryProps {
   subtotal: number;
@@ -35,20 +35,20 @@ const OrderSummary = ({
             <div className="space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Subtotal</span>
-                <span>{formatPrice(subtotal)}</span>
+                <span>{formatPriceCents(subtotal)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Shipping</span>
-                <span>{formatPrice(shipping)}</span>
+                <span>{formatPriceCents(shipping)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Tax</span>
-                <span>{formatPrice(tax)}</span>
+                <span>{formatPriceCents(tax)}</span>
               </div>
               <div className="border-t pt-3">
                 <div className="flex justify-between font-semibold text-foreground">
                   <span>Total</span>
-                  <span>{formatPrice(total)}</span>
+                  <span>{formatPriceCents(total)}</span>
                 </div>
               </div>
             </div>

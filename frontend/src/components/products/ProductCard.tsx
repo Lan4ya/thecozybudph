@@ -1,4 +1,4 @@
-import { formatPrice } from "@/lib/utils/format";
+import { formatPriceCents } from "@/lib/utils/format";
 import { useNavigate } from "react-router";
 import { ProductImage } from "./ProductImage";
 
@@ -34,7 +34,7 @@ const ProductCard = ({ productId, name, imageUrl, price }: Props) => {
           </h3>
 
           <div className="font-medium lg:text-lg text-primary">
-            {formatPrice(price)}
+            {formatPriceCents(price)}
           </div>
         </div>
       </div>
