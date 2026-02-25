@@ -4,6 +4,7 @@ export type CartItem = {
   productId: string;
   quantity: number;
   productVariant: ProductVariant;
+  cardMessages: string[];
 };
 
 export type Cart = {

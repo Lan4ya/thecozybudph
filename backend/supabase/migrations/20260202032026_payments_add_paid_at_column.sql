@@ -1,2 +1,0 @@
-ALTER TABLE payments 
-ADD COLUMN paid_at TIMESTAMPTZ;

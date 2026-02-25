@@ -10,7 +10,6 @@ import {
   productCollections,
 } from "../../db/schema/products.ts";
 import { db } from "../../db/client.ts";
-import { snakeToCamel } from "../../utils/caseConverter.ts";
 import { eq } from "drizzle-orm";
 
 export const ProductRepository = {
@@ -47,16 +46,14 @@ export const ProductRepository = {
         productCategoryId = category?.id ?? null;
       }
 
-      const productInserts = {
-        ...product,
-        productCategoryId,
-        productCollectionId,
-      };
-
-      // Insert product with denormalized JSON
       const [updatedProduct] = await tx
         .insert(products)
-        .values(productInserts)
+        .values({
+          ...product,
+          productCategoryId,
+          productCollectionId,
+        })
+
         .returning({
           id: products.id,
           name: products.name,
@@ -74,7 +71,7 @@ export const ProductRepository = {
       const productWithRelations = {
         ...updatedProduct,
         options: payload.options,
-        variants: snakeToCamel(payload.variants),
+        variants: payload.variants,
         categoryName: categoryName ?? null,
         collectionName: collectionName ?? null,
       };

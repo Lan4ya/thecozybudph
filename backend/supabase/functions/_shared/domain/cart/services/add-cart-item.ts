@@ -6,12 +6,6 @@ import {
 } from "@shared/types/index.ts";
 import { AppError } from "@shared/errors/Errors.ts";
 import { SupabaseType } from "@shared/types.d.ts";
-import { snakeToCamel } from "../../../utils/caseConverter.ts";
-
-// TODO: add validation (in client side) for user cart and checkout:
-// Does variant still exist?
-// Is it still purchasable?
-// Has price changed?
 
 export const addCartItems = async (
   supabase: SupabaseType,
@@ -34,20 +28,19 @@ export const addCartItems = async (
     );
   }
 
-  const { data, error } = await CartRepository.upsertCartItem(
-    supabase,
-    cart.id,
-    payload.productId,
-    payload.quantity,
-    payload.productVariant,
-    payload.cardMessage,
-  );
-
-  if (error) {
-    throw AppError.internal(error.message);
+  let cartItemRaw;
+  try {
+    cartItemRaw = await CartRepository.upsertCartItem(
+      cart.id,
+      payload.productId,
+      payload.quantity,
+      payload.productVariant,
+      payload.cardMessages,
+    );
+  } catch (error) {
+    const msg = error instanceof AppError ? error.message : error;
+    throw AppError.internal("Failed adding product to cart", { cause: msg });
   }
-
-  const cartItemRaw = data?.[0];
 
   if (!cartItemRaw) {
     throw AppError.internal(
@@ -56,8 +49,8 @@ export const addCartItems = async (
   }
 
   const cartItem: CartItem = {
-    ...snakeToCamel(cartItemRaw),
-    productVariant: cartItemRaw.product_variant as unknown as ProductVariant,
+    ...cartItemRaw,
+    productVariant: cartItemRaw.productVariant as unknown as ProductVariant,
   };
 
   return cartItem;

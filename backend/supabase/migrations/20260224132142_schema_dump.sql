@@ -91,17 +91,6 @@ DECLARE
   v_new_messages varchar(600)[];
 BEGIN
 
-  -- Basic validation
-  IF p_quantity <= 0 THEN
-    RAISE EXCEPTION 'Quantity must be greater than 0';
-  END IF;
-
-  IF array_length(p_card_messages, 1) > p_quantity THEN
-    RAISE EXCEPTION
-      'Incoming messages (%) exceed incoming quantity (%)',
-      array_length(p_card_messages, 1),
-      p_quantity;
-  END IF;
 
   -- Fetch existing row with lock
   SELECT ci.quantity, ci.card_messages

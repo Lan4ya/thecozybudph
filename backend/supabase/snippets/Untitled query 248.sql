@@ -4,12 +4,14 @@ from
   auth.user;
 
 
-;
+SELECT event_object_table AS table_name, trigger_name, event_manipulation AS event_type, action_timing AS timing
+FROM information_schema.triggers
+ORDER BY table_name, trigger_name;
+
 
 truncate table products cascade;
 
 truncate table product_collections cascade;
-select * from products;
 
 select * from carts;
 SELECT relrowsecurity
@@ -65,7 +67,12 @@ WHERE pv.product_id = 'e4e47f0c-c69e-5bcf-861d-9e7bcbf297ec'
 GROUP BY pv.id;
 
 
-select * from products;
+select * from profiles;
+
+SELECT event_object_table AS table_name, trigger_name, event_manipulation AS event, action_timing AS timing, action_statement AS definition
+FROM information_schema.triggers
+ORDER BY table_name, trigger_name;
+
 
 update auth.users
 set raw_app_meta_data = jsonb_set(
@@ -74,4 +81,4 @@ set raw_app_meta_data = jsonb_set(
   '"admin"',
   true
 )
-where id = '49a76796-bb3c-4677-83c9-7b7bea235a26'; -- profile.id of the user
+where id = '85cf0303-e64d-4e93-9198-bc3fd948acdf'; -- profile.id of the user

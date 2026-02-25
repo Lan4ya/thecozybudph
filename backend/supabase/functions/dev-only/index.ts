@@ -15,7 +15,7 @@ dev.use(logger());
 dev.use("*", supabaseMiddleware());
 
 dev.post("/auth/signup", async (c: Context) => {
-  // if (!isDev) throw new Error("Dev ednpoint only");
+  if (!isDev) throw new Error("Dev ednpoint only");
 
   const s = c.get("supabase");
   const { email, password } = await c.req.json();
@@ -35,7 +35,7 @@ dev.post("/auth/login", async (c: Context) => {
 });
 
 dev.get("/products", async (c: Context) => {
-  // if (!isDev) throw new Error("dev endpoint only");
+  if (!isDev) throw new Error("dev endpoint only");
 
   const s = c.get("supabase");
   const { data: products, error } = await s.from("products").select(`
