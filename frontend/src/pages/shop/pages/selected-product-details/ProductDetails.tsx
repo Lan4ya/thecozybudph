@@ -18,7 +18,6 @@ import { CartAPI } from "@/api/cart";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/providers/ToastProvider";
 import { cn } from "@/lib/utils/cn";
-import CustomizeFlower from "./components/CustomizeFlower";
 import { BottomBar } from "./components/BottomBar";
 import { formatPriceCents } from "@/lib/utils/format";
 import z from "zod";

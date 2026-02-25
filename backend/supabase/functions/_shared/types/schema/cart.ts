@@ -1,6 +1,11 @@
 import { z } from "zod";
 import { coerceNumber } from "../utils/coerce.ts";
 
+// TODO: add validation (in client side) for user cart and checkout:
+// Does variant still exist?
+// Is it still purchasable?
+// Has price changed?
+
 export const addCartItemsSchema = z.object({
   productId: z.uuid("productId is not a valid UUID"),
   quantity: coerceNumber(
@@ -15,7 +20,14 @@ export const addCartItemsSchema = z.object({
       z.string().trim().nonempty(),
     ),
   }),
-  cardMessage: z.string().trim().optional(),
+  cardMessages: z
+    .array(
+      z
+        .string()
+        .trim()
+        .nonempty("one or more card message can't be an empty string"),
+    )
+    .default([]),
 });
 
 export const deleteCartItemsSchema = z.object({

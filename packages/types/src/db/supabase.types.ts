@@ -36,48 +36,33 @@ export type Database = {
     Tables: {
       addresses: {
         Row: {
-          address_line: string
-          barangay: string
-          city: string
-          created_at: string | null
           full_name: string
           id: string
           phone_number: string
           postal_code: string
-          profile_id: string
-          province: string
+          product_collection_id: string | null
           region: string
         }
         Insert: {
-          address_line: string
-          barangay: string
-          city: string
-          created_at?: string | null
           full_name: string
           id?: string
           phone_number: string
           postal_code: string
-          profile_id: string
-          province: string
+          product_collection_id?: string | null
           region: string
         }
         Update: {
-          address_line?: string
-          barangay?: string
-          city?: string
-          created_at?: string | null
           full_name?: string
           id?: string
           phone_number?: string
           postal_code?: string
-          profile_id?: string
-          province?: string
+          product_collection_id?: string | null
           region?: string
         }
         Relationships: [
           {
-            foreignKeyName: "addresses_profile_id_fkey"
-            columns: ["profile_id"]
+            foreignKeyName: "addresses_product_collection_id_profiles_id_fk"
+            columns: ["product_collection_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -86,24 +71,24 @@ export type Database = {
       }
       cart_items: {
         Row: {
-          card_message: string | null
-          cart_id: string
+          card_messages: string[]
+          cart_id: string | null
           id: string
           product_id: string
           product_variant: Json
           quantity: number
         }
         Insert: {
-          card_message?: string | null
-          cart_id: string
+          card_messages?: string[]
+          cart_id?: string | null
           id?: string
           product_id: string
           product_variant?: Json
           quantity: number
         }
         Update: {
-          card_message?: string | null
-          cart_id?: string
+          card_messages?: string[]
+          cart_id?: string | null
           id?: string
           product_id?: string
           product_variant?: Json
@@ -111,17 +96,10 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "cart_items_cart_id_fkey"
+            foreignKeyName: "cart_items_cart_id_carts_id_fk"
             columns: ["cart_id"]
             isOneToOne: false
             referencedRelation: "carts"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "cart_items_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
             referencedColumns: ["id"]
           },
         ]
@@ -129,19 +107,19 @@ export type Database = {
       carts: {
         Row: {
           id: string
-          profile_id: string
+          profile_id: string | null
         }
         Insert: {
           id?: string
-          profile_id: string
+          profile_id?: string | null
         }
         Update: {
           id?: string
-          profile_id?: string
+          profile_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "carts_profile_fkey"
+            foreignKeyName: "carts_profile_id_profiles_id_fk"
             columns: ["profile_id"]
             isOneToOne: true
             referencedRelation: "profiles"
@@ -151,45 +129,49 @@ export type Database = {
       }
       order_items: {
         Row: {
-          created_at: string | null
           id: string
           name: string
           order_id: string
           price_cents: number
-          product_id: string
+          product_id: string | null
           quantity: number
         }
         Insert: {
-          created_at?: string | null
           id?: string
           name: string
           order_id: string
           price_cents: number
-          product_id: string
+          product_id?: string | null
           quantity: number
         }
         Update: {
-          created_at?: string | null
           id?: string
           name?: string
           order_id?: string
           price_cents?: number
-          product_id?: string
+          product_id?: string | null
           quantity?: number
         }
         Relationships: [
           {
-            foreignKeyName: "order_items_order_id_fkey"
+            foreignKeyName: "order_items_order_id_orders_id_fk"
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_products_id_fk"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
             referencedColumns: ["id"]
           },
         ]
       }
       orders: {
         Row: {
-          address_id: string
+          address_id: string | null
           cart_id: string | null
           created_at: string | null
           discount_cents: number
@@ -201,7 +183,7 @@ export type Database = {
           total_cents: number
         }
         Insert: {
-          address_id?: string
+          address_id?: string | null
           cart_id?: string | null
           created_at?: string | null
           discount_cents?: number
@@ -213,7 +195,7 @@ export type Database = {
           total_cents: number
         }
         Update: {
-          address_id?: string
+          address_id?: string | null
           cart_id?: string | null
           created_at?: string | null
           discount_cents?: number
@@ -226,21 +208,21 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "fk_shipping_address"
+            foreignKeyName: "orders_address_id_addresses_id_fk"
             columns: ["address_id"]
             isOneToOne: false
             referencedRelation: "addresses"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "orders_cart_id_fkey"
+            foreignKeyName: "orders_cart_id_carts_id_fk"
             columns: ["cart_id"]
             isOneToOne: false
             referencedRelation: "carts"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "orders_profile_id_fkey"
+            foreignKeyName: "orders_profile_id_profiles_id_fk"
             columns: ["profile_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -290,7 +272,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "payments_order_id_fkey"
+            foreignKeyName: "payments_order_id_orders_id_fk"
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
@@ -443,14 +425,14 @@ export type Database = {
     Functions: {
       upsert_cart_item: {
         Args: {
-          card_message?: string
-          cart_id: string
-          product_id: string
-          product_variant: Json
-          quantity: number
+          p_card_messages?: string[]
+          p_cart_id: string
+          p_product_id: string
+          p_product_variant: Json
+          p_quantity: number
         }
         Returns: {
-          card_message: string
+          card_messages: string[]
           product_id: string
           product_variant: Json
           quantity: number

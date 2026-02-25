@@ -47,7 +47,8 @@ export const createProduct = async (
       console.error("Image cleanup failed after insert error", err);
     });
 
-    throw AppError.internal("Failed to create product", { cause: error });
+    const msg = error instanceof AppError ? error.message : error;
+    throw AppError.internal("Failed to create product", { cause: msg });
   }
 
   return createdProductWithRelations;

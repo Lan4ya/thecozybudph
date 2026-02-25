@@ -39,7 +39,7 @@ export const cartItems = pgTable(
     cardMessages: varchar("card_messages", { length: 600 })
       .array()
       .notNull()
-      .default(sql`'{}'::varchar[]`),
+      .default(sql`ARRAY[]::varchar[]`),
   },
   (table) => [
     uniqueIndex("cart_items_unique_variant").on(
@@ -48,10 +48,10 @@ export const cartItems = pgTable(
       table.productVariant,
     ),
 
-    check("quantity_min_1", sql`${table.quantity} >= 1`),
+    check("cart_items_quantity_min_1", sql`${table.quantity} >= 1`),
 
     check(
-      "messages_not_exceed_quantity",
+      "cart_items_messages_not_exceed_quantity",
       sql`card_messages IS NULL OR array_length(${table.cardMessages}, 1) <= ${table.quantity}`,
     ),
   ],

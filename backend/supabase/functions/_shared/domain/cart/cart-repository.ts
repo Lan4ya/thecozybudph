@@ -1,5 +1,8 @@
 import { SupabaseType } from "@shared/types.d.ts";
-import { Json } from "../../types/index.ts";
+import { ProductVariant } from "../../types/index.ts";
+import { db } from "../../db/client.ts";
+import { cartItems } from "../../db/schema/carts.ts";
+import { sql } from "drizzle-orm";
 
 export const CartRepository = {
   insertCart: async (supabase: SupabaseType, profileId: string) => {
@@ -28,23 +31,42 @@ export const CartRepository = {
     return { data, error };
   },
 
-  upsertCartItem: (
-    supabase: SupabaseType,
+  upsertCartItem: async (
     cartId: string,
     productId: string,
     quantity: number,
-    productVariant: Json,
-    cardMessage: string | undefined,
+    productVariant: ProductVariant,
+    cardMessages: string[] = [],
   ) => {
-    // This postgres function handles both item insertion and updating quantity
-    // both increase and decrease as long as the final quantity is >= 1.
-    // If quantity === 0, delete API should be called from the client instead.
-    return supabase.rpc("upsert_cart_item", {
-      cart_id: cartId,
-      product_id: productId,
-      quantity: quantity,
-      product_variant: productVariant,
-      card_message: cardMessage,
+    return await db.transaction(async (tx) => {
+      const [result] = await tx
+        .insert(cartItems)
+        .values({
+          cartId,
+          productId,
+          productVariant,
+          quantity,
+          cardMessages,
+        })
+        .onConflictDoUpdate({
+          target: [
+            cartItems.cartId,
+            cartItems.productId,
+            cartItems.productVariant,
+          ],
+          set: {
+            quantity: sql`${cartItems.quantity} + ${quantity}`,
+            cardMessages: sql`array_append(${cartItems.cardMessages}, ${cardMessages})`,
+          },
+        })
+        .returning({
+          productId: cartItems.productId,
+          quantity: cartItems.quantity,
+          productVariant: cartItems.productVariant,
+          cardMessages: cartItems.cardMessages,
+        });
+
+      return result;
     });
   },
 

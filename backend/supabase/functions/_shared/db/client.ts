@@ -1,10 +1,6 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import {
-  productCategories,
-  productCollections,
-  products,
-} from "./schema/products.ts";
+import * as schema from "./schema/mod.ts";
 
 const connectionString = Deno.env.get("SUPABASE_DB_URL")!;
 
@@ -13,6 +9,5 @@ const client = postgres(connectionString, {
 });
 
 export const db = drizzle(client, {
-  schema: { products, productCategories, productCollections },
-  // casing: "snake_case",
+  schema, // casing: "snake_case",
 });
