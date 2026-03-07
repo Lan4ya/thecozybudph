@@ -7,13 +7,11 @@ import {
   type ProductWithRelations,
   type DeleteProductsInput,
   type ProductListItem,
-  type ProductRow,
 } from "@TheCozyBud/types";
 import { snakeToCamel } from "@/lib/utils/caseConverter.ts";
 import type { ProductQueryAPI } from "@/types";
 import { apiClient } from "@/lib/axios/client";
-import { parseDateString } from "@/lib/utils/format";
-import { mapProductRowToProduct } from "@/lib/utils/mappers";
+import { mapProductAndVariantsRowToProductDomain } from "@/lib/utils/mappers";
 
 export const ProductAPI = {
   queryListItems: async ({
@@ -28,9 +26,7 @@ export const ProductAPI = {
 
     let query = supabase
       .from("products")
-      .select(
-        `id, name, primary_image_url, min_price_cents, max_price_cents, product_collections ( name), product_categories ( name )`,
-      )
+      .select(`id, name, primary_image_url, min_price_cents, max_price_cents`)
       .range(page * perPage, (page + 1) * perPage - 1);
 
     // console.log("API Filters: ", filters);
@@ -49,16 +45,23 @@ export const ProductAPI = {
     }
 
     const priceRange = filters?.priceRange;
+    console.log("Price Range Filter: ", priceRange);
 
     if (priceRange) {
-      if (priceRange.max !== undefined) {
+      // convert to cents for comparison
+      const min = priceRange.min * 100;
+      const max =
+        priceRange.max !== undefined ? priceRange.max * 100 : undefined;
+      console.log("Price Range in cents: ", { min, max });
+
+      if (max !== undefined) {
         query = query
-          .gte("max_price_cents", priceRange.min)
-          .lte("min_price_cents", priceRange.max)
+          .gte("min_price_cents", min)
+          .lte("min_price_cents", max)
           .order("min_price_cents", { ascending: true });
       } else {
         query = query
-          .gte("max_price_cents", priceRange.min)
+          .gte("min_price_cents", min)
           .order("min_price_cents", { ascending: true });
       }
     }
@@ -99,28 +102,29 @@ export const ProductAPI = {
     if (error) throw error;
 
     const productListItems = snakeToCamel(data);
+
+    console.log("products: ", productListItems);
     return productListItems;
   },
 
   getById: async (productId: string): Promise<Product | null> => {
     const { data, error } = await supabase
       .from("products")
-      .select("*")
+      .select("*, product_variants(id, attributes, price_cents)")
       .eq("id", productId)
-      .maybeSingle<ProductRow>();
+      .maybeSingle();
 
-    // console.log("Fetching product id");
+    // isDev && console.log("product: ", data);
     if (error) throw error;
     if (!data) return null;
-    console.log({ data });
 
-    return mapProductRowToProduct(data);
+    return mapProductAndVariantsRowToProductDomain(data);
   },
 
   getByIds: async (productIds: string[]): Promise<Product[] | null> => {
     const { data, error } = await supabase
       .from("products")
-      .select("*")
+      .select("*, product_variants(id, attributes, price_cents)")
       .in("id", productIds);
 
     console.log("Fetching products by ids...", data);
@@ -128,7 +132,7 @@ export const ProductAPI = {
     if (error) throw error;
     if (!data) return null;
 
-    return (data ?? []).map(mapProductRowToProduct);
+    return (data ?? []).map(mapProductAndVariantsRowToProductDomain);
   },
 
   update: async (

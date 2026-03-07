@@ -4,8 +4,10 @@ import { createFactory } from "hono/factory";
 import { CartService } from "@shared/domain/cart/mod.ts";
 import { handleSuccess } from "@shared/utils/mod.ts";
 import {
-  addCartItemsSchema,
+  addCartItemSchema,
+  cartItemIdSchema,
   deleteCartItemsSchema,
+  updateCartItemSchema,
 } from "@shared/types/index.ts";
 
 const factory = createFactory<AppEnv>();
@@ -20,13 +22,24 @@ export const getCartItemsHandler = createHandlers(async (c) => {
 });
 
 export const addCartItemsHandler = createHandlers(
-  zodValidatorMiddleware("json", addCartItemsSchema),
+  zodValidatorMiddleware("json", addCartItemSchema),
   async (c) => {
     const supabase = c.get("supabase");
     const { sub } = c.get("claims");
     const profileId = sub;
     const payload = c.req.valid("json");
-    const res = await CartService.addCartItems(supabase, payload, profileId);
+    const res = await CartService.addCartItem(supabase, payload, profileId);
+    return handleSuccess(res);
+  },
+);
+
+export const updateCartItemsVariantHandler = createHandlers(
+  zodValidatorMiddleware("param", cartItemIdSchema),
+  zodValidatorMiddleware("json", updateCartItemSchema),
+  async (c) => {
+    const { id: cartItemId } = c.req.valid("param");
+    const payload = c.req.valid("json");
+    const res = await CartService.updateCartItem(cartItemId, payload);
     return handleSuccess(res);
   },
 );

@@ -1,0 +1,1 @@
+ALTER TABLE "cart_items" RENAME COLUMN "name" TO "product_name_snapshot";

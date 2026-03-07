@@ -4,6 +4,7 @@ import {
   addCartItemsHandler,
   getCartItemsHandler,
   deleteCartItemsHandler,
+  updateCartItemsVariantHandler,
 } from "./cart-handlers.ts";
 
 const cart = new Hono<Env>();
@@ -13,6 +14,7 @@ cart.use("*", authMiddleware());
 
 cart.get("/items", ...getCartItemsHandler);
 cart.post("/items", ...addCartItemsHandler);
+cart.patch("/items/:id", ...updateCartItemsVariantHandler);
 cart.delete("/items", ...deleteCartItemsHandler);
 
 export default cart;

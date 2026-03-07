@@ -2,6 +2,7 @@ import { ProductOption, ProductVariant } from "../domain/product.ts";
 import type { Tables } from "./supabase.types.ts";
 
 export type ProductRow = Tables<"products">;
+export type ProductVariantRow = Tables<"product_variants">;
 export type ProductCollectionRow = Tables<"product_collections">;
 export type ProductCategoyRow = Tables<"product_categories">;
 
@@ -15,7 +16,7 @@ export type CreateProductDBInput = {
   minPriceCents: number;
   maxPriceCents: number;
   options: ProductOption[];
-  variants: ProductVariant[];
+  variants: Omit<ProductVariant, "id">[];
 };
 
 export type UpdateProductDBInput = Partial<CreateProductDBInput>;

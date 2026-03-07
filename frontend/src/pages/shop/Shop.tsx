@@ -1,6 +1,6 @@
 import GridStyleButtons from "./components/GridStyleButtons";
 import { ShoppingBag } from "lucide-react";
-import { useProductQuery } from "./hooks/useFilters";
+import { useProductQuery } from "../../features/shop/hooks/useFilters";
 import { useEffect } from "react";
 import { SortDropdownMenu } from "./components/SortDropDown";
 import Search from "./components/filters/Search";

@@ -8,6 +8,7 @@ import { NavLink, useLocation } from "react-router";
 import { useAnimateOnView } from "@/hooks/useAnimateOnView";
 import { MobileDrawer } from "./MobileDrawer";
 import { DesktopNavLinks } from "./DesktopNavLinks";
+import { useCartQuery } from "@/features/cart/hooks/useCartQuery";
 // import logo_mini_transparent from "@/assets/thecozybud/logo_mini_transparent.png";
 
 const NavBar = () => {
@@ -15,6 +16,7 @@ const NavBar = () => {
   const [isBackgroundShown, setShowBackground] = useState(false);
   const pathname = useLocation().pathname;
   const { registerSentinel, visibleMap } = useAnimateOnView();
+  const { data: cartItems } = useCartQuery();
 
   useEffect(() => {
     if (pathname !== "/" || isMediumScreenAndBelow) {
@@ -76,7 +78,7 @@ const NavBar = () => {
         <div className="flex-center gap-6">
           <div className="relative">
             <div className="absolute -right-3.5 -top-[9px] flex-center text-secondary-foreground text-[9px] font-medium bg-secondary size-5 rounded-full select-none">
-              0
+              {cartItems?.length ?? 0}
             </div>
 
             <NavLink

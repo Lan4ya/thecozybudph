@@ -1,3 +1,3 @@
 const isDev = import.meta.env.MODE === "development";
-console.log({ isDev });
+// console.log({ isDev });
 export default isDev;

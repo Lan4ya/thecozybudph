@@ -1,12 +1,18 @@
 import type {
+  ProductRow,
+  ProductVariantRow,
   Product,
   ProductOption,
-  ProductRow,
-  ProductVariant,
 } from "@TheCozyBud/types";
 import { parseDateString } from "./format";
 
-export const mapProductRowToProduct = (row: ProductRow): Product => {
+type ProductWithVariants = ProductRow & {
+  product_variants: Omit<ProductVariantRow, "product_id">[];
+};
+
+export const mapProductAndVariantsRowToProductDomain = (
+  row: ProductWithVariants,
+): Product => {
   return {
     id: row.id,
     name: row.name,
@@ -18,6 +24,11 @@ export const mapProductRowToProduct = (row: ProductRow): Product => {
     createdAt: parseDateString(row.created_at),
     updatedAt: parseDateString(row.updated_at),
     options: (row.options ?? []) as ProductOption[],
-    variants: (row.variants ?? []) as ProductVariant[],
+    variants:
+      row.product_variants?.map((v) => ({
+        id: v.id,
+        priceCents: v.price_cents,
+        attributes: v.attributes as Record<string, string>,
+      })) ?? [],
   };
 };

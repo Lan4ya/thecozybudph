@@ -28,8 +28,8 @@ import {
 import { ColorTagsInput } from "./ColorVariantsField";
 import z from "zod";
 import { formHasChanges } from "./helpers/formHasChanges";
-import { useProductMutations } from "@/pages/profile/pages/admin/hooks/useProductsMutations";
-import { useImageCompressor } from "@/pages/profile/pages/admin/hooks/useImageConverter";
+import { useProductMutations } from "@/features/admin/hooks/useProductsMutations";
+import { useImageCompressor } from "@/features/admin/hooks/useImageConverter";
 import isDev from "@/lib/utils/isDev";
 import {
   getEmptyFormKV,

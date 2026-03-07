@@ -14,7 +14,7 @@ import { Button } from "@/lib/ui/__shadcn__/button";
 import { ChevronDown } from "lucide-react";
 import PersistSuspense from "@/components/PersistSuspense";
 import { Skeleton } from "@/lib/ui/__shadcn__/skeleton";
-import { useProductQuery } from "../../hooks/useFilters";
+import { useProductQuery } from "../../../../features/shop/hooks/useFilters";
 import { useIsSmallScreen, useMediaQuery } from "@/hooks/useMediaQuery";
 import type {
   ProductFiltersDomain,

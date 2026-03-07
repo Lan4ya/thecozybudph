@@ -1,16 +1,20 @@
-import { ProductVariant } from "./product.ts";
+import { ProductOption, ProductVariant } from "./product.ts";
 
 export type CartItem = {
-  productId: string;
+  id: string;
   quantity: number;
-  productVariant: ProductVariant;
   cardMessages: string[];
+  isAvailable: boolean; // false is product or variant is deleted
+  product: {
+    id: string | null;
+    options: ProductOption[];
+    name: string;
+    primaryImageUrl: string;
+    variant: ProductVariant;
+  };
+  // createdAt: Date;
 };
 
 export type Cart = {
   items: CartItem[];
-};
-
-export type CartItemsDeletionResult = {
-  deletedProductIds: string[];
 };

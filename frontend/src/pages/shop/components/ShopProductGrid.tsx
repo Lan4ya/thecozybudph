@@ -6,12 +6,12 @@ import {
 import { useRef, useEffect, useMemo, useCallback } from "react";
 import { ProductAPI } from "@/api/product";
 import ProductCard from "@/components/products/ProductCard";
-import { useProductQuery } from "../hooks/useFilters";
+import { useProductQuery } from "../../../features/shop/hooks/useFilters";
 import { ShopProductGridSkeleton } from "@/lib/ui/skeletons/ShopProductGridItemsSkeleton";
 import { ErrorBoundary } from "react-error-boundary";
 import { ShopProductGridError } from "@/lib/ui/errors/ShopProductGridError";
-import { useCategoryNameToId } from "../hooks/useCategoryNameToId";
-import { useCollectionNameToId } from "../hooks/useCollectionNameToId";
+import { useCategoryNameToId } from "../../../features/shop/hooks/useCategoryNameToId";
+import { useCollectionNameToId } from "../../../features/shop/hooks/useCollectionNameToId";
 import type { ProductFilters } from "@/types";
 import { useNavigate } from "react-router";
 

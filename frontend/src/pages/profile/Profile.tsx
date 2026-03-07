@@ -1,4 +1,3 @@
-import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { supabase } from "@/lib/supabase/client";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
@@ -7,18 +6,18 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Edit, ChevronRight } from "lucide-react";
 import DefaultAvatar from "@/assets/thecozybud/avatar.png";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const ChevronRightIcon = <ChevronRight className="text-gray-500" />;
 
 const Profile = () => {
-  const { user, loading, isAdmin } = useCurrentUser();
+  const { session, loading, isAdmin } = useAuthStore();
   const [signingOut, setSigningOut] = useState(false);
 
   const navigate = useNavigate();
 
-  const userName = user?.user_metadata?.name ?? user?.email?.split("@")[0];
-
-  console.log(user);
+  const userName =
+    session?.user?.user_metadata?.name ?? session?.user?.email?.split("@")[0];
 
   const handleLogout = async () => {
     setSigningOut(true);

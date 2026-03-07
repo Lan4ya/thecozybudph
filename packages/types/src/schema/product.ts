@@ -74,9 +74,9 @@ export const productBaseSchema = z.object({
             z
               .number("price must be a number")
               .nonnegative("price can't be negative")
-              .max(100_000_000, "price can't exceed 1,000,000"), // err message is converted to 1M (Peso) since it'll be displayed in UI.
+              .max(100_000_000, "price can't exceed 1,000,000"), // err message is converted to 1M (Peso) since it'll maybe be displayed in UI.
           ),
-          options: z.record(
+          attributes: z.record(
             z.string().trim().nonempty(),
             z.string().trim().nonempty(),
           ),

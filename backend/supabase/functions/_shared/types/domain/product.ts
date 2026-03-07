@@ -18,8 +18,9 @@ export type ProductOption = {
 };
 
 export interface ProductVariant {
+  id: string;
   priceCents: number;
-  options: Record<string, string>;
+  attributes: Record<string, string>;
 }
 
 export type ProductWithRelations = Product & {

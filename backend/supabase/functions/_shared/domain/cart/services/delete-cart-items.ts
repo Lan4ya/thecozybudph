@@ -1,6 +1,6 @@
 import { SupabaseType } from "@shared/types.d.ts";
 import {
-  CartItemsDeletionResult,
+  DeleteCartItemsRes,
   DeleteCartItemsInput,
 } from "@shared/types/index.ts";
 import { CartRepository } from "../cart-repository.ts";
@@ -10,7 +10,7 @@ export const deleteCartItems = async (
   supabase: SupabaseType,
   payload: DeleteCartItemsInput,
   profileId: string,
-): Promise<CartItemsDeletionResult> => {
+): Promise<DeleteCartItemsRes> => {
   const { data: cart, error: cartErr } =
     await CartRepository.getCartByProfileId(supabase, profileId);
 
@@ -21,16 +21,16 @@ export const deleteCartItems = async (
   const { data, error } = await CartRepository.deleteCartItems(
     supabase,
     cart.id,
-    payload.productIds,
+    payload.cartItemIds,
   );
 
   if (error || !data) {
     throw AppError.internal(error?.message);
   }
 
-  const deletedProductIds = data.map((item) => item.id);
+  const deletedItemIds = data.map((item) => item.id);
 
   return {
-    deletedProductIds,
+    deletedItemIds,
   };
 };

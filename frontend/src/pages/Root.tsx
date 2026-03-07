@@ -2,9 +2,11 @@ import { Outlet, useLocation } from "react-router";
 import NavBar from "@/components/nav/NavBar";
 import Footer from "@/components/Footer";
 import { cn } from "@/lib/utils/cn";
-import { ScrollToTop } from "@/components/ScrollTop";
+import { ScrollToTop } from "@/components/ScrollToTop";
 import { ProductQueryProvider } from "@/providers/ProductQueryProvider";
 import SessionGuard from "@/components/SessionGuard";
+import { initAuthStore } from "@/store/useAuthStore";
+import { useEffect } from "react";
 
 function Root() {
   const pathName = useLocation().pathname;
@@ -17,6 +19,11 @@ function Root() {
 
   const hideNav = matchesPath(pathName, NAV_HIDDEN_PATHS);
   const hideFooter = matchesPath(pathName, FOOTER_HIDDEN_PATHS);
+
+  useEffect(() => {
+    const cleanup = initAuthStore();
+    return cleanup;
+  }, []);
 
   return (
     <>

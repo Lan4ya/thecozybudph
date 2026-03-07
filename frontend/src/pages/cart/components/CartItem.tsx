@@ -1,47 +1,107 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Card, CardContent } from "@/lib/ui/__shadcn__/card";
-import { Textarea } from "@/lib/ui/__shadcn__/textarea";
-import { Trash2, Plus, Minus, Gift, Check, XIcon } from "lucide-react";
+import { Trash2, Plus, Minus, Check, XIcon } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { formatPriceCents } from "@/lib/utils/format";
-import ProductCard from "@/components/products/ProductCard";
-import { useState } from "react";
-import type { CartItemUI } from "../Cart";
+import { useRef, useState } from "react";
+import "swiper/swiper.css";
+import { CartItemOptionsDrawer } from "./CartItemOptionsDrawer";
+import { useCartStore } from "@/features/cart/store/useCartStore";
+import { ProductImage } from "@/components/products/ProductImage";
+import { useNavigate } from "react-router";
+import { useShallow } from "zustand/react/shallow";
 
-type CartItemProps = CartItemUI & {
+type CartItemProps = {
+  cartItemId: string;
   onToggleSelection: () => void;
-  onUpdateCardMessage: (message: string) => void;
-  onUpdateQuantity: (quantity: number) => void;
-  onRemove: () => void;
+  onRequestRemove: () => void;
+  onUpdateCartItem: (
+    cardMessages?: string[],
+    quantity?: number,
+    newVariantId?: string,
+  ) => Promise<void>;
 };
 
 const CartItem = ({
-  productId,
-  name,
-  productVariant,
-  imageUrl,
-  quantity,
-  selected,
-  cardMessage,
+  cartItemId,
   onToggleSelection,
-  onUpdateCardMessage: onUpdateGiftMessage,
-  onUpdateQuantity,
-  onRemove,
+  onUpdateCartItem,
+  onRequestRemove,
 }: CartItemProps) => {
-  const [showGiftMessage, setShowGiftMessage] = useState(!!cardMessage);
+  const navigate = useNavigate();
+
   const [isEditing, setIsEditing] = useState(false);
 
+  const { getCartItem, increment, decrement } = useCartStore(
+    useShallow((s) => ({
+      getCartItem: s.getCartItem,
+      increment: s.increment,
+      decrement: s.decrement,
+    })),
+  );
+
+  const cartItem = getCartItem(cartItemId);
+
+  if (!cartItem) return null;
+
+  const { quantity, selected, product, isAvailable } = cartItem;
+  const price = formatPriceCents(product.variant.priceCents * quantity);
+
+  const isItemAvailable = isAvailable && product.id && product.variant.id;
+
+  const debounceTimeout = useRef<number | null>(null);
+
+  const debouncedUpdateQuantity = (newQuantity: number) => {
+    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+    debounceTimeout.current = setTimeout(() => {
+      onUpdateCartItem(undefined, newQuantity);
+    }, 750);
+  };
+
+  const handleIncrement = () => {
+    const newQuantity = quantity + 1;
+    increment(cartItemId);
+    debouncedUpdateQuantity(newQuantity);
+  };
+
+  const handleDecrement = () => {
+    if (quantity === 1) {
+      onRequestRemove();
+      return;
+    }
+    const newQuantity = quantity - 1;
+    decrement(cartItemId);
+    debouncedUpdateQuantity(newQuantity);
+  };
+
+  // TODO: disable btns if item is not avail
   return (
-    <Card className={cn("hover:shadow-md transition-shadow pb-4")}>
-      <CardContent className="px-4">
-        <div className="flex gap-4">
+    <Card className={cn("hover:shadow-md transition-shadow relative")}>
+      {!isItemAvailable && (
+        <div className="absolute inset-0 bg-black/50 z-50 flex-center rounded-xl pointer-events-none">
+          <span className="text-white text-sm font-semibold bg-black/50 px-3 py-1 rounded">
+            Product Not Available
+          </span>
+        </div>
+      )}
+
+      <CardContent className="px-3">
+        <div
+          className="flex gap-3 cursor-default"
+          onClick={() =>
+            isItemAvailable && navigate(`/shop/products/${product.id}`)
+          }
+        >
           {/* Selection Toggle */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center">
             <div
-              onClick={onToggleSelection}
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleSelection();
+              }}
               className={cn(
-                "flex items-center justify-center w-5 h-5 border-2 rounded cursor-pointer transition-all mt-2",
+                "flex items-center justify-center size-5 border-2 rounded cursor-pointer transition-all mt-2",
                 selected
                   ? "bg-primary border-primary text-primary-foreground"
                   : "border-muted-foreground hover:border-primary",
@@ -49,141 +109,135 @@ const CartItem = ({
             >
               {selected && <Check className="size-3" />}
             </div>
-
-            {/* Product Image */}
-            <div className="w-20 h-20 md:w-24 md:h-24 rounded-lg overflow-hidden">
-              <ProductCard
-                productId={productId}
-                name={name}
-                price={productVariant.priceCents}
-                imageUrl={imageUrl}
-              />
-            </div>
           </div>
 
           {/* Product Details */}
-          <div className="flex-1 min-w-0 flex flex-col justify-between gap-2">
-            <div>
-              <h3
-                className={cn(
-                  "font-medium line-clamp-2",
-                  selected ? "text-foreground" : "text-muted-foreground",
-                )}
-              >
-                {name}
-              </h3>
-              <p className={cn("text-primary font-semibold")}>
-                {formatPriceCents(productVariant.priceCents * quantity)}
-              </p>
-            </div>
+          <div className="flex flex-col flex-1">
+            <div className="flex gap-2">
+              <ProductImage
+                src={product.primaryImageUrl}
+                className="size-20"
+                roundedSize="md"
+              />
 
-            {/* Quantity Controls */}
-            <div className="flex justify-between items-center gap-3">
-              <div className="flex items-center border border-border rounded-lg">
-                <Button
-                  variant="minimal"
-                  size="icon-sm"
-                  className="hover:bg-accent"
-                  onClick={() => onUpdateQuantity(quantity - 1)}
-                >
-                  <Minus className="size-3" />
-                </Button>
+              <div className="flex-1 min-w-0 flex flex-col">
+                <div className="flex items-center justify-between">
+                  <h3 className={"font-medium line-clamp-2 "}>
+                    {product.name}
+                  </h3>
 
-                <span className="py-1 text-sm font-medium min-w-3 text-center">
-                  {quantity}
-                </span>
+                  {/* Edit / Trash Buttons */}
+                  <div className="flex tems-center">
+                    <AnimatePresence mode="wait">
+                      {!isEditing ? (
+                        <motion.div
+                          key="edit"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.18, ease: "easeOut" }}
+                        >
+                          <Button
+                            size="sm"
+                            variant="minimal"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setIsEditing(true);
+                            }}
+                          >
+                            Edit
+                          </Button>
+                        </motion.div>
+                      ) : (
+                        <motion.div
+                          key="actions"
+                          className="flex gap-2.5"
+                          initial={{ opacity: 0, x: 12 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: 12 }}
+                          transition={{ duration: 0.18, ease: "easeOut" }}
+                        >
+                          <Button
+                            size="icon-sm"
+                            variant="destructive"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onRequestRemove();
+                            }}
+                          >
+                            <Trash2 className="size-4" />
+                          </Button>
+                          <Button
+                            size="icon-sm"
+                            variant="minimal"
+                            className="border"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setIsEditing(false);
+                            }}
+                          >
+                            <XIcon className="size-4" />
+                          </Button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </div>
 
-                <Button
-                  variant="minimal"
-                  size="icon-sm"
-                  className="hover:bg-accent"
-                  onClick={() => onUpdateQuantity(quantity + 1)}
-                >
-                  <Plus className="size-3" />
-                </Button>
-              </div>
+                {/* Price */}
+                <div className="-mt-1">
+                  <p className={cn("text-primary font-semibold")}>{price}</p>
+                </div>
 
-              <div className="flex items-center">
-                <AnimatePresence mode="wait">
-                  {!isEditing ? (
-                    <motion.div
-                      key="edit"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.18, ease: "easeOut" }}
-                    >
+                <div className="flex justify-between">
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <CartItemOptionsDrawer
+                      cartItemId={cartItemId}
+                      onUpdateCartItem={onUpdateCartItem}
+                    />
+                  </div>
+
+                  {/* Controls */}
+                  <div className="flex justify-between items-center">
+                    {/* Quantity */}
+                    <div className="flex items-center">
                       <Button
-                        size="sm"
                         variant="minimal"
-                        onClick={() => setIsEditing(true)}
-                      >
-                        Edit
-                      </Button>
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="actions"
-                      className="flex gap-2.5"
-                      initial={{ opacity: 0, x: 12 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 12 }}
-                      transition={{ duration: 0.18, ease: "easeOut" }}
-                    >
-                      <Button
                         size="icon-sm"
-                        variant="destructive"
-                        onClick={onRemove}
+                        className=""
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (quantity === 1) {
+                            onRequestRemove();
+                            return;
+                          }
+                          handleDecrement();
+                        }}
                       >
-                        <Trash2 className="size-4" />
+                        <Minus className="size-3" />
                       </Button>
+
+                      <span className="text-sm font-medium bg-sidebar rounded-sm min-w-6 text-center">
+                        {quantity}
+                      </span>
+
                       <Button
-                        size="icon-sm"
                         variant="minimal"
-                        className="border"
-                        onClick={() => setIsEditing(false)}
+                        size="icon-sm"
+                        className=""
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleIncrement();
+                        }}
                       >
-                        <XIcon className="size-4" />
+                        <Plus className="size-3" />
                       </Button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-
-        <div className="mt-4 pt-3 border-t border-border/30">
-          {/* Gift Message Toggle */}
-          <Button
-            variant="minimal"
-            size="sm"
-            className={cn(
-              "flex items-center gap-2 text-xs h-auto",
-              showGiftMessage ? "text-primary" : "text-muted-foreground",
-            )}
-            onClick={() => setShowGiftMessage(!showGiftMessage)}
-          >
-            <Gift className="size-4" />
-            {showGiftMessage ? "Hide Card Message" : "Add Card Message"}
-          </Button>
-
-          {/* Gift Message Input */}
-          {showGiftMessage && (
-            <div className="space-y-2 mt-2">
-              <Textarea
-                placeholder="Write a special message for this gift..."
-                value={cardMessage}
-                onChange={(e) => onUpdateGiftMessage(e.target.value)}
-                className="min-h-20 resize-none border-border/50 focus:border-primary transition-colors text-sm"
-                maxLength={200}
-              />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>This message will be included with the product</span>
-                <span>{cardMessage.length}/200</span>
-              </div>
-            </div>
-          )}
         </div>
       </CardContent>
     </Card>

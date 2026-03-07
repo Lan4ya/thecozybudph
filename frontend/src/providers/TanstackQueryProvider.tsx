@@ -24,7 +24,8 @@ const TanstackQueryProvider = ({ children }: PropsWithChildren) => {
       client={queryClient}
       persistOptions={{
         persister: asyncStoragePersister,
-        // 👁️‍🗨️ Below is an example usage 'Per Query' to disable persistence...
+        // 👁️‍🗨️ Below is an example usage 'Per Query' to disable persistence (saving to localStorage)...
+
         // const { data, error, isFetching } =ruseSuspenseQuery<Product[]>({
         //   queryKey: ["foo"],
         //   queryFn: () => bar(),

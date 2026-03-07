@@ -1,127 +1,152 @@
-import type {
-  CartItem as CartItemType,
-  Product,
-  ProductVariant,
-} from "@TheCozyBud/types";
+import { deleteCartItemsSchema, updateCartItemSchema } from "@TheCozyBud/types";
 import CartItem from "./components/CartItem";
+import { DeleteCartItemDialog } from "./components/DeleteDialog";
 import { ArrowLeft, Check } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { useEffect, useState } from "react";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { formatPriceCents } from "@/lib/utils/format";
-import { CartAPI } from "@/api/cart";
-import { ProductAPI } from "@/api/product";
-import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
+import { useCartItemMutations } from "@/features/cart/hooks/useCartMutations";
+import {
+  useCartStore,
+  type CartItemUI,
+} from "@/features/cart/store/useCartStore";
+import isDev from "@/lib/utils/isDev";
+import z from "zod";
+import { useToast } from "@/providers/ToastProvider";
+import { useShallow } from "zustand/react/shallow";
+import { useCartQuery } from "@/features/cart/hooks/useCartQuery";
 
-export type CartItemUI = CartItemType & {
-  name: string;
-  imageUrl: string;
-  selected: boolean;
-  cardMessage: string;
-};
-
+// TODO:
+// add created_at in db for most recent display sorting
+// add UI for !isAvailable
 const Cart = () => {
   const navigate = useNavigate();
+  const { addToast } = useToast();
 
-  const cartItemsQuery = useQuery<CartItemType[]>({
-    queryKey: ["cart"],
-    queryFn: CartAPI.getCartItems,
-  });
+  const { data: cartQueryData, error, isFetching } = useCartQuery();
 
-  const productIds = cartItemsQuery.data?.map((i) => i.productId) ?? [];
+  const {
+    getCartItem,
+    setCartItems,
+    cartItems,
+    toggleItemSelection,
+    toggleAllSelection,
+    allItemsSelected,
+    isEditingCart,
+    setIsEditingCart,
+  } = useCartStore(
+    useShallow((s) => ({
+      cartItems: s.cartItems,
+      setCartItems: s.setCartItems,
+      getCartItem: s.getCartItem,
+      toggleAllSelection: s.toggleAllSelection,
+      toggleItemSelection: s.toggleItemSelection,
+      allItemsSelected: s.allItemsSelected,
+      isEditingCart: s.isEditingCart,
+      setIsEditingCart: s.setIsEditingCart,
+    })),
+  );
 
-  const productsQuery = useQuery({
-    queryKey: ["products", productIds],
-    queryFn: () => ProductAPI.getByIds(productIds),
-  });
-
+  // DEV:
   useEffect(() => {
-    console.log("Cart Items:", cartItemsQuery.data);
-    console.log("Products:", productsQuery.data);
-  }, [cartItemsQuery.data, productsQuery.data]);
-
-  const productMap = new Map(productsQuery.data?.map((p) => [p.id, p]));
+    console.log("Cart Items:", cartQueryData);
+  }, [cartQueryData]);
 
   const hydrateCartItems = (): CartItemUI[] => {
     return (
-      cartItemsQuery.data?.map((c) => {
-        const product = productMap.get(c.productId);
+      cartQueryData?.map((c) => {
+        const existingItem = getCartItem(c.id);
+
+        // Fill the cardMessages array with empty strings so its length always matches the item’s quantity.
+        // Needed to render extra empty TextArea's so the user can add more messages if wanted.
+        const cardMessages =
+          c.cardMessages.length < c.quantity
+            ? [
+                ...c.cardMessages,
+                ...Array(Math.max(0, c.quantity - c.cardMessages.length)).fill(
+                  "",
+                ),
+              ]
+            : c.cardMessages;
+
         return {
-          name: product?.name ?? "Unknown",
-          productId: c.productId,
-          imageUrl: product?.primaryImageUrl ?? "",
-          quantity: c.quantity,
-          productVariant: c.productVariant,
-          selected: false,
-          cardMessage: "",
+          ...c,
+          cardMessages,
+          selected: existingItem?.selected ?? false,
         };
       }) ?? []
     );
   };
 
-  const [cartItems, setCartItems] = useState<CartItemUI[]>([]);
+  const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
 
   useEffect(() => {
-    if (cartItemsQuery.data && productsQuery.data) {
+    if (cartQueryData) {
       setCartItems(hydrateCartItems());
     }
-  }, [cartItemsQuery.data, productsQuery.data]);
+  }, [cartQueryData]);
 
   // Calculate totals only for selected items
   const selectedItems = cartItems.filter((item) => item.selected);
   const subtotal = selectedItems.reduce(
-    (sum, item) => sum + item.productVariant.priceCents * item.quantity,
+    (sum, item) => sum + item.product.variant.priceCents * item.quantity,
     0,
   );
-  const shipping = selectedItems.length > 0 ? 150 : 0;
-  const tax = subtotal * 0.12;
-  const total = subtotal + shipping + tax;
 
-  const toggleItemSelection = (productId: string) => {
-    setCartItems((items) =>
-      items.map((item) =>
-        item.productId === productId
-          ? { ...item, selected: !item.selected }
-          : item,
-      ),
-    );
+  // const shipping = selectedItems.length > 0 ? 150 : 0;
+  // const tax = subtotal * 0.12;
+  // const total = subtotal + shipping + tax;
+
+  const { updateCartItemMutation, deleteCartItemsMutation } =
+    useCartItemMutations();
+  const deleteCartItemLoading = deleteCartItemsMutation.isPending;
+
+  const updateCartItem = async (
+    cartItemId: string,
+    cardMessages?: string[],
+    quantity?: number,
+    newVariantId?: string,
+  ) => {
+    const cartItem = getCartItem(cartItemId);
+    if (!cartItem) return;
+
+    const result = updateCartItemSchema.safeParse({
+      newVariantId,
+      quantity,
+      cardMessages,
+    });
+
+    if (!result.success) {
+      isDev && console.error(z.flattenError(result.error));
+      addToast("Something wen't wrong. Please try again later.", "error");
+      return;
+    }
+
+    await updateCartItemMutation.mutateAsync({
+      cartItemId,
+      newVariantId: result.data.newVariantId,
+      quantity: result.data.quantity,
+      cardMessages: result.data.cardMessages,
+    });
   };
 
-  const toggleAllSelection = () => {
-    const allSelected = cartItems.every((item) => item.selected);
-    setCartItems((items) =>
-      items.map((item) => ({ ...item, selected: !allSelected })),
-    );
+  const deleteCartItems = async (cartItemIds: string[]) => {
+    const result = deleteCartItemsSchema.safeParse({
+      cartItemIds,
+    });
+
+    if (!result.success) {
+      isDev && console.error(z.flattenError(result.error));
+      addToast("Something wen't wrong. Please try again later.", "error");
+      return;
+    }
+
+    await deleteCartItemsMutation.mutateAsync({ cartItemIds });
   };
 
-  const updateCardMessage = (productId: string, message: string) => {
-    setCartItems((items) =>
-      items.map((item) =>
-        item.productId === productId ? { ...item, cardMessage: message } : item,
-      ),
-    );
-  };
-
-  const updateQuantity = (productId: string, newQuantity: number) => {
-    if (newQuantity < 1) return;
-    setCartItems((items) =>
-      items.map((item) =>
-        item.productId === productId
-          ? { ...item, quantity: newQuantity }
-          : item,
-      ),
-    );
-  };
-
-  const removeItem = (productId: string) => {
-    setCartItems((items) =>
-      items.filter((item) => item.productId !== productId),
-    );
-  };
-
-  const allSelected = cartItems.every((item) => item.selected);
-  const someSelected = cartItems.some((item) => item.selected) && !allSelected;
+  if (error && !isFetching) throw error;
 
   return (
     <>
@@ -141,9 +166,9 @@ const Cart = () => {
               variant="minimal"
               size="auto"
               className="text-foreground"
-              onClick={() => null}
+              onClick={() => setIsEditingCart(!isEditingCart)}
             >
-              Edit
+              <span className="w-8">{isEditingCart ? "Done" : "Edit"}</span>
             </Button>
           </div>
 
@@ -152,39 +177,51 @@ const Cart = () => {
             <div className="lg:col-span-2 space-y-6">
               {cartItems.map((item) => (
                 <CartItem
-                  key={`${item.productId}-${item.productVariant.sku}`}
-                  {...item}
-                  onToggleSelection={() => toggleItemSelection(item.productId)}
-                  onUpdateCardMessage={(message) =>
-                    updateCardMessage(item.productId, message)
+                  key={item.id}
+                  cartItemId={item.id}
+                  onToggleSelection={() => toggleItemSelection(item.id!)}
+                  onRequestRemove={() =>
+                    setPendingDeleteIds((p) => [...p, item.id])
                   }
-                  onUpdateQuantity={(quantity) =>
-                    updateQuantity(item.productId, quantity)
+                  onUpdateCartItem={(cardMessages, quantity, newVariantId) =>
+                    updateCartItem(
+                      item.id,
+                      cardMessages,
+                      quantity,
+                      newVariantId,
+                    )
                   }
-                  onRemove={() => removeItem(item.productId)}
                 />
               ))}
+
+              <DeleteCartItemDialog
+                open={pendingDeleteIds.length > 0}
+                onCancel={() => setPendingDeleteIds([])}
+                onConfirm={() => {
+                  deleteCartItems(pendingDeleteIds);
+                  setPendingDeleteIds([]);
+                }}
+                isDeleting={deleteCartItemLoading}
+                deletingItemCount={pendingDeleteIds.length}
+              />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Select All Toggle */}
+      {/* Bottom Bar */}
       <div className="fixed left-0 bottom-0 w-full z-10 flex items-center justify-between gap-3 p-4 bg-card border">
         <div className="flex gap-2">
           <div
             onClick={toggleAllSelection}
             className={cn(
               "flex items-center justify-center w-5 h-5 border-2 rounded cursor-pointer transition-all",
-              allSelected
+              allItemsSelected
                 ? "bg-primary border-primary text-primary-foreground"
-                : someSelected
-                  ? "bg-primary/50 border-primary text-primary-foreground"
-                  : "border-muted-foreground hover:border-primary",
+                : "border-muted-foreground hover:border-primary",
             )}
           >
-            {allSelected && <Check className="size-3" />}
-            {someSelected && <Check className="size-3" />}
+            {allItemsSelected && <Check className="size-3" />}
           </div>
           <span
             className="text-sm font-medium cursor-pointer select-none"
@@ -194,16 +231,43 @@ const Cart = () => {
           </span>
         </div>
 
-        <div className="flex gap-2 items-center">
-          <span className="text-sm">{formatPriceCents(subtotal)}</span>
-
+        {isEditingCart ? (
           <Button
-            // size=""
-            className=" bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
+            variant={"destructive"}
+            className=""
+            onClick={() => {
+              if (selectedItems.length === 0) {
+                addToast("Please select item(s).", "info");
+                return;
+              }
+
+              setPendingDeleteIds(
+                cartItems.reduce<string[]>((acc, i) => {
+                  if (i.selected) acc.push(i.id);
+                  return acc;
+                }, []),
+              );
+            }}
           >
-            Check Out
+            Delete
           </Button>
-        </div>
+        ) : (
+          <div className="flex gap-2 items-center">
+            <span className="text-sm">{formatPriceCents(subtotal)}</span>
+
+            <Button
+              onClick={() => {
+                if (selectedItems.length === 0) {
+                  addToast("Please select item(s).", "info");
+                  return;
+                }
+              }}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
+            >
+              Check Out
+            </Button>
+          </div>
+        )}
       </div>
     </>
   );

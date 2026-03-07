@@ -4,7 +4,7 @@ import { ProductAPI } from "@/api/product";
 import type { ProductWithRelations } from "@TheCozyBud/types";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { formatPriceCents } from "@/lib/utils/format";
-import { useProductMutations } from "@/pages/profile/pages/admin/hooks/useProductsMutations";
+import { useProductMutations } from "@/features/admin/hooks/useProductsMutations";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { Edit } from "lucide-react";
 import {
