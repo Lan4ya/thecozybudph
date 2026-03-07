@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { ProductVariant } from "@TheCozyBud/types";
+import type { ProductOption, ProductVariant } from "@TheCozyBud/types";
 
 type SelectedOptions = Record<string, string>;
 
@@ -7,7 +7,8 @@ type ProductSelectionState = {
   quantity: number;
   selectedOptions: SelectedOptions;
   selectedVariant: ProductVariant | null;
-  cardMessages: string[]; // now an array
+  cardMessages: string[];
+  drawerOpen: boolean;
 
   increment: () => void;
   decrement: () => void;
@@ -20,7 +21,9 @@ type ProductSelectionState = {
 
   setCardMessage: (index: number, message: string) => void;
 
-  reset: () => void;
+  reset: (options: ProductOption[]) => void;
+
+  setDrawerOpen: (open: boolean) => void;
 };
 
 export const useProductSelectionStore = create<ProductSelectionState>(
@@ -29,23 +32,22 @@ export const useProductSelectionStore = create<ProductSelectionState>(
     selectedOptions: {},
     selectedVariant: null,
     cardMessages: [""],
+    drawerOpen: false,
 
-    increment: () => {
-      set((state) => {
-        const newQuantity = state.quantity + 1;
-        const newMessages = [...state.cardMessages];
-        while (newMessages.length < newQuantity) newMessages.push("");
-        return { quantity: newQuantity, cardMessages: newMessages };
-      });
-    },
+    increment: () =>
+      set((state) => ({
+        quantity: state.quantity + 1,
+        cardMessages: [...state.cardMessages, ""],
+      })),
 
-    decrement: () => {
+    decrement: () =>
       set((state) => {
-        const newQuantity = Math.max(1, state.quantity - 1);
-        const newMessages = state.cardMessages.slice(0, newQuantity);
-        return { quantity: newQuantity, cardMessages: newMessages };
-      });
-    },
+        if (state.quantity <= 1) return state;
+        return {
+          quantity: state.quantity - 1,
+          cardMessages: state.cardMessages.slice(0, -1),
+        };
+      }),
 
     setQuantity: (value) => {
       const qty = value < 1 ? 1 : value;
@@ -72,12 +74,24 @@ export const useProductSelectionStore = create<ProductSelectionState>(
         return { cardMessages: newMessages };
       }),
 
-    reset: () =>
-      set({
-        quantity: 1,
-        selectedOptions: {},
-        selectedVariant: null,
-        cardMessages: [""],
+    reset: (options) =>
+      set(() => {
+        const initial: Record<string, string> = {};
+
+        for (const opt of options) {
+          if (opt.values.length > 0) {
+            initial[opt.name] = opt.values[0];
+          }
+        }
+
+        return {
+          quantity: 1,
+          selectedOptions: initial,
+          selectedVariant: null,
+          cardMessages: [""],
+        };
       }),
+
+    setDrawerOpen: (open: boolean) => set({ drawerOpen: open }),
   }),
 );

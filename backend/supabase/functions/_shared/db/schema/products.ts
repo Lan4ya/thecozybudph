@@ -1,9 +1,12 @@
+import { sql } from "drizzle-orm";
 import {
   pgTable,
   uuid,
   text,
   jsonb,
+  uniqueIndex,
   timestamp,
+  check,
   integer,
 } from "drizzle-orm/pg-core";
 
@@ -46,16 +49,6 @@ export const products = pgTable("products", {
     ]
   */
 
-  // store all variants as JSONB
-  variants: jsonb("variants").notNull(),
-  /*
-    Example:
-    [
-      { price_cents: 50000, options: { Color: "Red", "Stem Count": "6" } },
-      { price_cents: 100000, options: { Color: "Red", "Stem Count": "12" } }
-    ]
-  */
-
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -63,3 +56,22 @@ export const products = pgTable("products", {
     .defaultNow()
     .notNull(),
 });
+
+export const productVariants = pgTable(
+  "product_variants",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    productId: uuid("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "cascade" }),
+    priceCents: integer("price_cents").notNull().default(0),
+    // e.g: { Color: "Red", "Stem Count": "6" },
+    // variants can have different prices depending on configuration. say stem
+    // count is 12, then price probably is double the price of stem count 6.
+    attributes: jsonb("attributes").notNull(),
+  },
+  (table) => [
+    uniqueIndex("product_variant_unique").on(table.productId, table.attributes),
+    check("payments_amount_cents_check", sql`${table.priceCents} >= 0`),
+  ],
+);

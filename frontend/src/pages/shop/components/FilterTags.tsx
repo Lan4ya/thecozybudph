@@ -3,7 +3,7 @@ import type {
   ProductFiltersDomain,
   ProductPriceRangeOption,
 } from "../../../types";
-import { useProductQuery } from "../hooks/useFilters";
+import { useProductQuery } from "../../../features/shop/hooks/useFilters";
 import { useIsExtraLargeScreen } from "@/hooks/useMediaQuery";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import toggleArrItem from "@/lib/utils/toggleArrItem";

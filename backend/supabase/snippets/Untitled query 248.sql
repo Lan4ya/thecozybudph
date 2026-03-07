@@ -12,8 +12,7 @@ ORDER BY table_name, trigger_name;
 truncate table products cascade;
 
 truncate table product_collections cascade;
-
-select * from carts;
+gi
 SELECT relrowsecurity
 FROM pg_class
 WHERE relname = 'profiles';
@@ -46,10 +45,9 @@ ON CONFLICT DO NOTHING;
 select * from product_option_values;
 
 
-select * from product_options;
 
 
-select * from product_variant_option_values;
+select * from cart_items;
 
 SELECT
     pv.id,
@@ -74,11 +72,9 @@ FROM information_schema.triggers
 ORDER BY table_name, trigger_name;
 
 
-update auth.users
-set raw_app_meta_data = jsonb_set(
-  raw_app_meta_data,
-  '{role}',
-  '"admin"',
-  true
-)
-where id = '85cf0303-e64d-4e93-9198-bc3fd948acdf'; -- profile.id of the user
+select * from products;
+select * from carts;
+select * from profiles;
+
+select * from carts
+where profile_id = '4fd833ae-3f7b-4dca-9730-de7be9e18f2b';

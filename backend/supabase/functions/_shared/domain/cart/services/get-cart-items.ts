@@ -3,23 +3,32 @@ import { CartRepository } from "../cart-repository.ts";
 
 import { CartItem } from "@shared/types/index.ts";
 import { AppError } from "@shared/errors/Errors.ts";
-import { snakeToCamel } from "../../../utils/caseConverter.ts";
 
 export const getCartItems = async (
   supabase: SupabaseType,
   profileId: string,
 ): Promise<CartItem[]> => {
-  const { data: cart, error: getCartIdByProfileIdError } =
-    await CartRepository.getCartByProfileId(supabase, profileId);
+  const { data: cart, error } = await CartRepository.getCartByProfileId(
+    supabase,
+    profileId,
+  );
 
-  if (getCartIdByProfileIdError || !cart?.id) {
-    throw AppError.internal();
-  }
+  if (error) throw AppError.internal("Failed to get cart", { cause: error });
 
-  const { data, error } = await CartRepository.getCartItems(supabase, cart.id);
+  if (!cart?.id)
+    throw AppError.notFound(`Cart for profile ${profileId} not found`);
 
-  if (error) {
-    throw AppError.internal(error?.message);
+  let data: CartItem[];
+  try {
+    data = await CartRepository.getCartItems(cart.id);
+  } catch (error) {
+    if (error instanceof AppError) {
+      throw error;
+    }
+
+    throw AppError.internal("Failed adding product to cart", {
+      cause: error,
+    });
   }
 
   if (!data) {
@@ -28,5 +37,5 @@ export const getCartItems = async (
     );
   }
 
-  return snakeToCamel(data as unknown as CartItem[]);
+  return data;
 };

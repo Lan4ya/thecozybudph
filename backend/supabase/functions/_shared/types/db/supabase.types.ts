@@ -73,25 +73,31 @@ export type Database = {
         Row: {
           card_messages: string[]
           cart_id: string | null
+          created_at: string
           id: string
-          product_id: string
-          product_variant: Json
+          is_available: boolean
+          product_id: string | null
+          product_variant_id: string | null
           quantity: number
         }
         Insert: {
           card_messages?: string[]
           cart_id?: string | null
+          created_at?: string
           id?: string
-          product_id: string
-          product_variant?: Json
+          is_available?: boolean
+          product_id?: string | null
+          product_variant_id?: string | null
           quantity: number
         }
         Update: {
           card_messages?: string[]
           cart_id?: string | null
+          created_at?: string
           id?: string
-          product_id?: string
-          product_variant?: Json
+          is_available?: boolean
+          product_id?: string | null
+          product_variant_id?: string | null
           quantity?: number
         }
         Relationships: [
@@ -100,6 +106,20 @@ export type Database = {
             columns: ["cart_id"]
             isOneToOne: false
             referencedRelation: "carts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cart_items_product_id_products_id_fk"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cart_items_product_variant_id_product_variants_id_fk"
+            columns: ["product_variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
             referencedColumns: ["id"]
           },
         ]
@@ -310,6 +330,35 @@ export type Database = {
         }
         Relationships: []
       }
+      product_variants: {
+        Row: {
+          attributes: Json
+          id: string
+          price_cents: number
+          product_id: string
+        }
+        Insert: {
+          attributes: Json
+          id?: string
+          price_cents?: number
+          product_id: string
+        }
+        Update: {
+          attributes?: Json
+          id?: string
+          price_cents?: number
+          product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_variants_product_id_products_id_fk"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           created_at: string
@@ -324,7 +373,6 @@ export type Database = {
           product_category_id: string | null
           product_collection_id: string | null
           updated_at: string
-          variants: Json
         }
         Insert: {
           created_at?: string
@@ -339,7 +387,6 @@ export type Database = {
           product_category_id?: string | null
           product_collection_id?: string | null
           updated_at?: string
-          variants: Json
         }
         Update: {
           created_at?: string
@@ -354,7 +401,6 @@ export type Database = {
           product_category_id?: string | null
           product_collection_id?: string | null
           updated_at?: string
-          variants?: Json
         }
         Relationships: [
           {

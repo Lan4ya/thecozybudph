@@ -5,7 +5,7 @@
 import { Context } from "hono";
 import { Next } from "hono";
 import { AppError } from "../errors/Errors.ts";
-import { isDev } from "../utils/isDev.ts";
+// import { isDev } from "../utils/isDev.ts";
 
 export const authMiddleware = () => async (c: Context, next: Next) => {
   const authHeader = c.req.header("Authorization");
@@ -16,7 +16,7 @@ export const authMiddleware = () => async (c: Context, next: Next) => {
   const { data, error } = await supabase.auth.getClaims(token);
   const claims = data?.claims;
 
-  isDev && console.log("claims: ", claims);
+  // isDev && console.log("claims: ", claims);
 
   if (error || !claims) {
     throw AppError.unauthorized(

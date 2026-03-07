@@ -1,12 +1,8 @@
-import Carousel from "./components/Carousel";
+import Carousel from "./components/Carousel.tsx";
 import { Link, useParams } from "react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { ProductAPI } from "@/api/product";
-import {
-  uuidSchema,
-  type Product,
-  addCartItemsSchema,
-} from "@TheCozyBud/types";
+import { ProductAPI } from "@/api/product.ts";
+import { type Product, addCartItemSchema } from "@TheCozyBud/types";
 import PersistSuspense from "@/components/PersistSuspense";
 import { RouteLoaderSpinner } from "@/components/RouteLoaderSpinner";
 import { ArrowLeft } from "lucide-react";
@@ -14,14 +10,15 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Star, Heart, Shield } from "lucide-react";
-import { CartAPI } from "@/api/cart";
-import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/providers/ToastProvider";
 import { cn } from "@/lib/utils/cn";
-import { BottomBar } from "./components/BottomBar";
+import { BottomBar } from "./components/BottomBar.tsx";
 import { formatPriceCents } from "@/lib/utils/format";
 import z from "zod";
-import { useProductSelectionStore } from "@/store/useProductSelectionStore";
+import { useProductSelectionStore } from "@/features/shop/store/useProductSelectionStore.tsx";
+import isDev from "@/lib/utils/isDev";
+import { useCartItemMutations } from "@/features/cart/hooks/useCartMutations.ts";
+import { useAuthStore } from "@/store/useAuthStore.tsx";
 
 export const ProductDetails = () => {
   return (
@@ -39,7 +36,7 @@ const ProductDetailsInner = () => {
   const isValidUUID = useMemo(() => {
     if (!id) return false;
 
-    const parsedId = uuidSchema.safeParse(id);
+    const parsedId = z.uuid().safeParse(id);
     if (!parsedId.success) return false;
 
     return true;
@@ -47,7 +44,7 @@ const ProductDetailsInner = () => {
 
   const {
     data: product,
-    isLoading,
+    isLoading: getProductLoading,
     error,
   } = useSuspenseQuery<Product | null>({
     queryKey: ["product", id],
@@ -60,13 +57,17 @@ const ProductDetailsInner = () => {
   });
 
   const smScreenAndBelow = useMediaQuery("(max-width: 518px)");
+
   const { addToast } = useToast();
+  const session = useAuthStore((s) => s.session);
 
   const [hearted, setHearted] = useState(false);
 
   const setSelectedOptions = useProductSelectionStore(
     (s) => s.setSelectedOptions,
   );
+
+  const reset = useProductSelectionStore((s) => s.reset);
 
   useEffect(() => {
     if (!product) return;
@@ -82,35 +83,35 @@ const ProductDetailsInner = () => {
     setSelectedOptions(initial);
   }, [product, setSelectedOptions]);
 
-  const addToCartMutation = useMutation({
-    mutationFn: CartAPI.addCartItem,
-    onError: (err: Error) => {
-      throw err.message;
-    },
-    onSuccess: () => {
-      addToast("Product added to cart", "success");
-    },
-  });
+  const { addToCartMutation } = useCartItemMutations();
+  const addToCartLoading = addToCartMutation.isPending;
 
   const handleAddToCart = async () => {
     if (!product) return;
 
+    if (!session) {
+      addToast("Please log in first to continue.", "error");
+      return;
+    }
+
     const { quantity, selectedVariant, cardMessages } =
       useProductSelectionStore.getState();
 
-    const result = addCartItemsSchema.safeParse({
+    const result = addCartItemSchema.safeParse({
       productId: product.id,
-      productVariant: selectedVariant,
+      variantId: selectedVariant?.id,
       quantity,
       cardMessages,
     });
 
     if (!result.success) {
-      console.error(z.flattenError(result.error));
+      isDev && console.error(z.flattenError(result.error));
+      addToast("Something wen't wrong. Please try again later.", "error");
       return;
     }
 
     await addToCartMutation.mutateAsync(result.data);
+    reset(product.options);
   };
 
   const handleHeartClick = async () => {
@@ -124,7 +125,7 @@ const ProductDetailsInner = () => {
       </div>
     );
 
-  if (error && !isLoading) throw error;
+  if (error && !getProductLoading) throw error;
 
   return (
     <>
@@ -244,7 +245,11 @@ const ProductDetailsInner = () => {
       </motion.div>
 
       {/* CTA */}
-      <BottomBar product={product} onAddToCart={handleAddToCart} />
+      <BottomBar
+        product={product}
+        onAddToCart={handleAddToCart}
+        addToCartLoading={addToCartLoading}
+      />
     </>
   );
 };

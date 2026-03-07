@@ -1,40 +1,39 @@
 import { z } from "zod";
 import { coerceNumber } from "../utils/coerce.ts";
 
-// TODO: add validation (in client side) for user cart and checkout:
-// Does variant still exist?
-// Is it still purchasable?
-// Has price changed?
-
-export const addCartItemsSchema = z.object({
-  productId: z.uuid("productId is not a valid UUID"),
+export const addCartItemSchema = z.object({
   quantity: coerceNumber(
     z.number("quantity must be a number").positive("quantity can't be 0"),
   ),
-  productVariant: z.object({
-    priceCents: coerceNumber(
-      z.number("price must be a number").nonnegative("price can't be negative"),
-    ),
-    options: z.record(
-      z.string().trim().nonempty(),
-      z.string().trim().nonempty(),
-    ),
-  }),
-  cardMessages: z
-    .array(
-      z
-        .string()
-        .trim()
-        .nonempty("one or more card message can't be an empty string"),
-    )
-    .default([]),
+  productId: z.uuid("productId is not a valid UUID"),
+  variantId: z.uuid("variantId is not a valid UUID"),
+  cardMessages: z.preprocess((val) => {
+    if (!Array.isArray(val)) return [];
+    return val.filter(Boolean);
+  }, z.array(z.string().trim()).default([])),
+});
+
+export const updateCartItemSchema = z.object({
+  newVariantId: z.uuid("variantId is not a valid UUID").optional(),
+  quantity: coerceNumber(
+    z.number("quantity must be a number").positive("quantity can't be 0"),
+  ).optional(),
+  cardMessages: z.preprocess((val) => {
+    if (!Array.isArray(val)) return [];
+    return val.filter(Boolean);
+  }, z.array(z.string().trim()).default([])),
+});
+
+export const cartItemIdSchema = z.object({
+  id: z.uuid("cartItemId is not a valid UUID"),
 });
 
 export const deleteCartItemsSchema = z.object({
-  productIds: z
-    .array(z.uuid("one or more productIds have an invalid UUID"))
+  cartItemIds: z
+    .array(z.uuid("one or more cartItemIds have an invalid UUID"))
     .min(1, "at least one productId is required"),
 });
 
-export type AddCartItemsInput = z.infer<typeof addCartItemsSchema>;
+export type AddCartItemInput = z.infer<typeof addCartItemSchema>;
+export type UpdateCartItemInput = z.infer<typeof updateCartItemSchema>;
 export type DeleteCartItemsInput = z.infer<typeof deleteCartItemsSchema>;

@@ -13,7 +13,7 @@ import AdminDashboardProducts from "./pages/profile/pages/admin/pages/products/P
 import AdminDashboardOrders from "./pages/profile/pages/admin/pages/orders/Orders.tsx";
 import { CatchAllErrorPage } from "./pages/ErrorPage.tsx";
 import { RouteLoaderSpinner } from "./components/RouteLoaderSpinner.tsx";
-import { ProductDetails } from "./pages/shop/pages/selected-product-details/ProductDetails.tsx";
+import { ProductDetails } from "./pages/shop/pages/product-details/ProductDetails.tsx";
 import Login from "./pages/auth/Login.tsx";
 import Profile from "./pages/profile/Profile.tsx";
 import SignUp from "./pages/auth/Signup.tsx";

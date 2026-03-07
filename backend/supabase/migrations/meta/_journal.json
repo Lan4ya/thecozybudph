@@ -85,6 +85,97 @@
       "when": 1772001462936,
       "tag": "0011_yellow_maelstrom",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1772261842673,
+      "tag": "0012_clean_shen",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1772262341067,
+      "tag": "0013_rapid_warstar",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1772275905214,
+      "tag": "0014_remarkable_slayback",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1772276921047,
+      "tag": "0015_unique_alex_wilder",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1772277203023,
+      "tag": "0016_smart_shotgun",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1772277260570,
+      "tag": "0017_dark_rumiko_fujikawa",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1772279041949,
+      "tag": "0018_fuzzy_alex_wilder",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1772285937530,
+      "tag": "0019_noisy_cyclops",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1772286107579,
+      "tag": "0020_wakeful_warpath",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1772289233095,
+      "tag": "0021_purple_lila_cheney",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1772289309050,
+      "tag": "0022_free_spencer_smythe",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1772332765065,
+      "tag": "0023_busy_stephen_strange",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1772860722578,
+      "tag": "0024_past_eternals",
+      "breakpoints": true
     }
   ]
 }

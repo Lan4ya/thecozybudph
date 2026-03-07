@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/lib/ui/__shadcn__/dropdown-menu";
 import { ArrowUpDown } from "lucide-react";
-import { useProductQuery } from "../hooks/useFilters";
+import { useProductQuery } from "../../../features/shop/hooks/useFilters";
 import type { ProductSortOption } from "../../../types";
 import { DropdownMenuRadioGroup } from "@radix-ui/react-dropdown-menu";
 

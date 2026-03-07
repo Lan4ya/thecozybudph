@@ -4,12 +4,7 @@ import { useToast } from "@/providers/ToastProvider";
 import type { ProductWithRelations } from "@TheCozyBud/types";
 import isDev from "@/lib/utils/isDev";
 
-type UpdateProductsQueryData = {
-  pages: ProductWithRelations[][];
-  pageParams?: number[];
-};
-
-type CreateProductsQueryData = {
+type ProductsQueryData = {
   pages: ProductWithRelations[][];
   pageParams?: number[];
 };
@@ -31,7 +26,7 @@ export const useProductMutations = () => {
       addToast(err.message || "Failed to delete product", "error");
     },
     onSuccess: ({ deletedProductIds }) => {
-      queryClient.setQueryData<CreateProductsQueryData>(
+      queryClient.setQueryData<ProductsQueryData>(
         ["__admin__products__"],
         (oldData) => {
           if (!oldData?.pages) return oldData;
@@ -64,7 +59,7 @@ export const useProductMutations = () => {
       throw err.message;
     },
     onSuccess: (product) => {
-      queryClient.setQueryData<CreateProductsQueryData>(
+      queryClient.setQueryData<ProductsQueryData>(
         ["__admin__products__"],
         (oldData) => {
           if (!oldData) return oldData;
@@ -102,16 +97,17 @@ export const useProductMutations = () => {
       addToast(message, "error");
     },
     onSuccess: (updatedProduct) => {
-      queryClient.setQueryData<UpdateProductsQueryData>(
+      queryClient.setQueryData<ProductsQueryData>(
         ["__admin__products__"],
         (oldData) => {
           if (!oldData?.pages) return oldData;
 
-          // Build lookup once
+          // Build lookup
           const productPositionMap = new Map<
             string,
             { pageIndex: number; productIndex: number }
           >();
+
           oldData.pages.forEach((page, pIdx) => {
             page.forEach((prod, prodIdx) => {
               productPositionMap.set(prod.id, {
@@ -125,6 +121,7 @@ export const useProductMutations = () => {
           if (!pos) return oldData;
 
           const { pageIndex, productIndex } = pos;
+
           const newPages = oldData.pages.map((page, idx) => {
             if (idx !== pageIndex) return page;
             const newPage = [...page];

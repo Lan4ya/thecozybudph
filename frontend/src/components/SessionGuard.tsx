@@ -1,7 +1,5 @@
-import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router";
-import { supabase } from "@/lib/supabase/client";
 import {
   Card,
   CardHeader,
@@ -10,9 +8,10 @@ import {
   CardFooter,
 } from "@/lib/ui/__shadcn__/card";
 import { Button } from "@/lib/ui/__shadcn__/button";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export default function SessionGuard() {
-  const [expired, setExpired] = useState(false);
+  const session = useAuthStore((s) => s.session);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -20,24 +19,7 @@ export default function SessionGuard() {
   const isProtectedRoute = protectedPrefixes.some((p) =>
     location.pathname.startsWith(p),
   );
-  const showModal = expired && isProtectedRoute;
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setExpired(!session);
-    });
-
-    // Subscribe to real-time auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setExpired(!session);
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
+  const showModal = !session && isProtectedRoute;
 
   const handleLoginRedirect = () => {
     navigate("/auth/signup");

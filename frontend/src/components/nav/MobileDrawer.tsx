@@ -78,7 +78,7 @@ export const MobileDrawer = () => {
 
       <DrawerContent
         aria-describedby={undefined}
-        className="z-999 custom-container w-full h-[400px] rounded-t-2xl shadow-xl border border-border/50 pb-40"
+        className="z-998 custom-container w-full h-[400px] rounded-t-2xl shadow-xl border border-border/50 pb-40"
       >
         {/* <div className="-top-2 translate-x-1/2 right-[50%] w-[100px] h-2 rounded-full absolute bg-input/30 z-5"></div> */}
 

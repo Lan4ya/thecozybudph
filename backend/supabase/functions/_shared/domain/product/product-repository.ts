@@ -3,11 +3,13 @@ import type {
   CreateProductDBInput,
   UpdateProductDBInput,
   ProductWithRelations,
+  ProductVariant,
 } from "@shared/types/index.ts";
 import {
   products,
   productCategories,
   productCollections,
+  productVariants,
 } from "../../db/schema/products.ts";
 import { db } from "../../db/client.ts";
 import { eq } from "drizzle-orm";
@@ -17,6 +19,7 @@ export const ProductRepository = {
     payload: CreateProductDBInput,
   ): Promise<ProductWithRelations> => {
     const { categoryName, collectionName, ...product } = payload;
+
     return await db.transaction(async (tx) => {
       // Insert or get collection
       let productCollectionId: string | null = null;
@@ -46,14 +49,13 @@ export const ProductRepository = {
         productCategoryId = category?.id ?? null;
       }
 
-      const [updatedProduct] = await tx
+      const [createdProduct] = await tx
         .insert(products)
         .values({
           ...product,
           productCategoryId,
           productCollectionId,
         })
-
         .returning({
           id: products.id,
           name: products.name,
@@ -61,17 +63,32 @@ export const ProductRepository = {
           imageUrls: products.imageUrls,
           primaryImageUrl: products.primaryImageUrl,
           options: products.options,
-          variants: products.variants,
           minPriceCents: products.minPriceCents,
           maxPriceCents: products.maxPriceCents,
           createdAt: products.createdAt,
           updatedAt: products.updatedAt,
         });
 
+      const variantRows = product.variants.map((v) => ({
+        productId: createdProduct.id,
+        priceCents: v.priceCents,
+        attributes: v.attributes,
+      }));
+
+      // Insert product variant
+      const variants = await tx
+        .insert(productVariants)
+        .values(variantRows)
+        .returning({
+          id: productVariants.id,
+          priceCents: productVariants.priceCents,
+          attributes: productVariants.attributes,
+        });
+
       const productWithRelations = {
-        ...updatedProduct,
+        ...createdProduct,
         options: payload.options,
-        variants: payload.variants,
+        variants: variants as unknown as ProductVariant[],
         categoryName: categoryName ?? null,
         collectionName: collectionName ?? null,
       };
@@ -82,6 +99,7 @@ export const ProductRepository = {
 
   updateProduct: async (
     productId: string,
+    variantId: string,
     payload: UpdateProductDBInput,
   ): Promise<ProductWithRelations> => {
     const { categoryName, collectionName, ...product } = payload;
@@ -120,6 +138,7 @@ export const ProductRepository = {
         productCollectionId,
       };
 
+      // update products
       const [updatedProduct] = await tx
         .update(products)
         .set(productUpdates)
@@ -131,17 +150,39 @@ export const ProductRepository = {
           imageUrls: products.imageUrls,
           primaryImageUrl: products.primaryImageUrl,
           options: products.options,
-          variants: products.variants,
           minPriceCents: products.minPriceCents,
           maxPriceCents: products.maxPriceCents,
           createdAt: products.createdAt,
           updatedAt: products.updatedAt,
         });
 
+      // Update product variants
+      const updatedProductVariants: ProductVariant[] = [];
+      if (product.variants) {
+        for (const v of product.variants) {
+          const [updatedVariant] = await tx
+            .update(productVariants)
+            .set({
+              priceCents: v.priceCents,
+              attributes: v.attributes,
+            })
+            .where(eq(productVariants.id, variantId))
+            .returning({
+              id: productVariants.id,
+              priceCents: productVariants.priceCents,
+              attributes: productVariants.attributes,
+            });
+
+          updatedProductVariants.push(
+            updatedVariant as unknown as ProductVariant,
+          );
+        }
+      }
+
       const productWithRelations = {
         ...updatedProduct,
         options: payload.options ?? [],
-        variants: payload.variants ?? [],
+        variants: updatedProductVariants,
         categoryName: categoryName ?? null,
         collectionName: collectionName ?? null,
       };

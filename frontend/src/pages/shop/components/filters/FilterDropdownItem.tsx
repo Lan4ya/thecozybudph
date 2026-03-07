@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { DropdownMenuItem } from "../dropdown";
 import { Check } from "lucide-react";
-import { useProductQuery } from "../../hooks/useFilters";
+import { useProductQuery } from "../../../../features/shop/hooks/useFilters";
 import toggleArrItem from "@/lib/utils/toggleArrItem";
 import {
   type ArrayFilterKeys,
@@ -74,7 +74,6 @@ export const FilterDropdownItem = ({
     });
   }, [filterKey, filterVal, isArr]);
 
-  // Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quia, omnis perferendis aspernatur qui, assumenda reprehenderit possimus fugit debitis officiis, odit veritatis aliquam totam corrupti. Mollitia sunt cum et neque sequi?
   return (
     <DropdownMenuItem
       className="flex-between filter-dropdown-item-spacing focus:bg-input/30"

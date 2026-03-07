@@ -1,15 +1,11 @@
 import { CartRepository } from "../cart-repository.ts";
-import {
-  AddCartItemsInput,
-  CartItem,
-  ProductVariant,
-} from "@shared/types/index.ts";
+import { AddCartItemInput, CartItem } from "@shared/types/index.ts";
 import { AppError } from "@shared/errors/Errors.ts";
 import { SupabaseType } from "@shared/types.d.ts";
 
-export const addCartItems = async (
+export const addCartItem = async (
   supabase: SupabaseType,
-  payload: AddCartItemsInput,
+  payload: AddCartItemInput,
   profileId: string,
 ): Promise<CartItem> => {
   const { data: cart, error: cartError } =
@@ -28,30 +24,24 @@ export const addCartItems = async (
     );
   }
 
-  let cartItemRaw;
+  let cartItem;
   try {
-    cartItemRaw = await CartRepository.upsertCartItem(
-      cart.id,
-      payload.productId,
-      payload.quantity,
-      payload.productVariant,
-      payload.cardMessages,
-    );
+    cartItem = await CartRepository.upsertCartItem(cart.id, payload);
   } catch (error) {
-    const msg = error instanceof AppError ? error.message : error;
-    throw AppError.internal("Failed adding product to cart", { cause: msg });
+    if (error instanceof AppError) {
+      throw error;
+    }
+
+    throw AppError.internal("Failed adding product to cart", {
+      cause: error,
+    });
   }
 
-  if (!cartItemRaw) {
+  if (!cartItem) {
     throw AppError.internal(
       "Invariant violation: upsert cart item returned no data",
     );
   }
-
-  const cartItem: CartItem = {
-    ...cartItemRaw,
-    productVariant: cartItemRaw.productVariant as unknown as ProductVariant,
-  };
 
   return cartItem;
 };

@@ -3,13 +3,14 @@ import type { Product } from "@TheCozyBud/types";
 import { MessageCircle } from "lucide-react";
 import { useEffect } from "react";
 import { AddToCartDrawer } from "./AddToCartDrawer";
-import { useProductSelectionStore } from "@/store/useProductSelectionStore";
+import { useProductSelectionStore } from "@/features/shop/store/useProductSelectionStore";
 
 type BottomBarProps = {
   product: Product;
-  onAddToCart: () => void;
+  onAddToCart: () => Promise<void>;
   onChatNow?: () => void;
   onBuyNow?: () => void;
+  addToCartLoading: boolean;
 };
 
 export const BottomBar = ({
@@ -17,6 +18,7 @@ export const BottomBar = ({
   onAddToCart,
   onChatNow,
   onBuyNow,
+  addToCartLoading,
 }: BottomBarProps) => {
   const selectedOptions = useProductSelectionStore((s) => s.selectedOptions);
   const setSelectedVariant = useProductSelectionStore(
@@ -27,12 +29,13 @@ export const BottomBar = ({
   useEffect(() => {
     const variant = product.variants.find((variant) =>
       Object.entries(selectedOptions).every(
-        ([key, value]) => variant.options[key] === value,
+        ([key, value]) => variant.attributes[key] === value,
       ),
     );
 
     setSelectedVariant(variant ?? null);
   }, [product.variants, selectedOptions]);
+
   return (
     <div className="fixed z-10 left-0 bottom-0 w-full bg-card flex border-t border-border">
       {/* Chat Now */}
@@ -49,6 +52,7 @@ export const BottomBar = ({
       <AddToCartDrawer
         onAddToCart={onAddToCart}
         productOptions={product.options}
+        addToCartLoading={addToCartLoading}
       />
 
       {/* Buy Now */}

@@ -1,5 +1,6 @@
-// tells ts compiler that this file is a Web Worker, not a normal window/browser context so it doens't comaplain.
-/// <reference lib="webworker" />
+// Tells ts compiler that this file is a Web Worker, not a normal
+// window/browser context so it doens't comaplain:
+// <reference lib="webworker" />
 
 interface WorkerInput {
   id: string;

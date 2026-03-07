@@ -1,4 +1,4 @@
-import { useProductQuery } from "../../hooks/useFilters";
+import { useProductQuery } from "../../../../features/shop/hooks/useFilters";
 import { Search as SearchIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 

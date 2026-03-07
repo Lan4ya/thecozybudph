@@ -31,7 +31,7 @@ const EventSection = () => {
       </div>
 
       {/* Main Carousel */}
-      <div className=" overflow-hidden relative w-full  bg-background group active:cursor-grabbing">
+      <div className="overflow-hidden relative w-full  bg-background group active:cursor-grabbing">
         <Swiper
           modules={[Thumbs, Navigation, A11y]}
           spaceBetween={0}
