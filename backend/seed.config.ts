@@ -11,5 +11,11 @@ export default defineConfig({
     await client.connect();
     return new SeedPg(client);
   },
-  // select: ["public.*"], // only public schema
+  select: [
+    "!*",
+    "public.*",
+    // "auth.users",
+    // "auth.identities",
+    // "auth.sessions",
+  ],
 });
