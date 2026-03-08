@@ -19,7 +19,7 @@
 - [ Hono ](https://hono.dev/) 
 - [ Node ](https://nodejs.org/en)
 - [PayMongo](https://www.paymongo.com/) 
-- [Drizzle]
+- [Drizzle](https://orm.drizzle.team/docs/get-started) 
 
 ---
 
@@ -152,23 +152,6 @@ https://supabase.com/docs/reference/cli/introduction
 # If only for Node scripts.
  pnpm i <package-name> -F backend 
 
-```
-
----
-
-### Seeding the database with Snaplet
-```bash
-# Make sure you're in ./backend
-cd backend 
-
-# Whenever your database structure changes, you will need to regenerate @snaplet/seed to keep it in sync with the new structure. You can do this by running:
-pnpx @snaplet/seed sync
-
-# Seed db:
-pnpx tsx seed.ts 
-
-# Or generate the output into supabase/seeds/**/* so it's automatically executed when you run 'supabase db reset'
-pnpx tsx seed.ts > supabase/seeds/products/seed.sql
 ```
 
 ---

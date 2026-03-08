@@ -31,6 +31,8 @@ __ignored*
 repomix*
 avante.md
 
+*.tsbuildinfo
+
 # This just for me. neovim things
 ;
 ;w
