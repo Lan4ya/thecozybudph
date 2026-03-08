@@ -1,4 +1,9 @@
 packages:
-  - "frontend"
-  - "backend"
-  - "packages/*"
+  - frontend
+  - backend
+  - packages/*
+
+onlyBuiltDependencies:
+  - '@prisma/engines'
+  - '@snaplet/seed'
+  - esbuild
