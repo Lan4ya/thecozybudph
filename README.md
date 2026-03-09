@@ -51,12 +51,13 @@ VITE_SUPABASE_URL=
 VITE_SUPABASE_ANON_KEY=
 ```
 
-<!-- ```bash -->
-<!-- # ./backend/.env -->
-<!-- SUPABASE_URL=http: -->
-<!-- SUPABASE_ANON_KEY= -->
-<!-- SUPABASE_SERVICE_ROLE_KEY= -->
-<!-- ``` -->
+```bash
+# ./backend/.env
+SUPABASE_URL=http:
+SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+SUPABASE_DB_URL=
+```
 
 ```bash
 # ./backend/supabase/.env
@@ -146,8 +147,8 @@ https://supabase.com/docs/reference/cli/introduction
 #### On Backend
 ```bash
 # For Supabase edge functions look inside "./backend/supabase/functions/import_map.json" 
-# and the package name there manually. after that it will be available on all edge functions
-# (assuming deno.json inside the functions dir references the import_map)
+# and add the package name there manually. after that it will be available on all edge functions
+# (assuming deno.json inside given function dir references the import_map)
 
 # If only for Node scripts.
  pnpm i <package-name> -F backend 
@@ -162,15 +163,15 @@ https://supabase.com/docs/reference/cli/introduction
 
 ![Branch Model](branch_model.png)
 
-##### main branch: production-ready features
+#### main branch: production-ready features
 - This is where the deployed website will source the code.  
 - ⚠️ **You should not push your commits in here, open a pr, or touch this branch at all. this is where I'll merge code from dev branch only if the feature is already stable (bug free). I won't give access to this branch for safety.** ⚠️ 
 
-##### dev branch: unstable features
+#### dev branch: unstable features
 - This is where you're gonna open a PR (Pull Request) - I'll explain later in the steps how.
 - You should also **not** push your commits in here.
 
-##### feature branch: feature development
+#### feature branch: feature development
 - This is the branch where we’ll be working on.
 - This is where you do the usual git add, commit, push commands.
 - You can create as many feature branch as you want after finishing a feature and doing a pull request.
