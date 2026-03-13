@@ -40,7 +40,8 @@ dev.get("/products", async (c: Context) => {
   const s = c.get("supabase");
   const { data: products, error } = await s.from("products").select(`
     *,
-    product_collections (name)
+    product_variants(*),
+    product_collections (name),
     product_categories (name)
   `);
   if (error) throw error;
