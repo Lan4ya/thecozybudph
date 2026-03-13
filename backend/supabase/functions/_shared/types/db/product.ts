@@ -19,4 +19,15 @@ export type CreateProductDBInput = {
   variants: Omit<ProductVariant, "id">[];
 };
 
-export type UpdateProductDBInput = Partial<CreateProductDBInput>;
+export type UpdateProductDBInput = {
+  name?: string;
+  description?: string | null;
+  imageUrls?: string[];
+  primaryImageUrl?: string;
+  collectionName?: string | null;
+  categoryName?: string | null;
+  minPriceCents?: number;
+  maxPriceCents?: number;
+  options?: ProductOption[];
+  variants?: ProductVariant[];
+};

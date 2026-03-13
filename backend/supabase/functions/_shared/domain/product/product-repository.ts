@@ -99,12 +99,11 @@ export const ProductRepository = {
 
   updateProduct: async (
     productId: string,
-    variantId: string,
     payload: UpdateProductDBInput,
   ): Promise<ProductWithRelations> => {
     const { categoryName, collectionName, ...product } = payload;
     return await db.transaction(async (tx) => {
-      // upsert collection
+      // Upsert collection
       let productCollectionId: string | null = null;
       if (payload.collectionName) {
         const [collection] = await tx
@@ -118,7 +117,7 @@ export const ProductRepository = {
         productCollectionId = collection.id;
       }
 
-      // upsert category
+      // Upsert category
       let productCategoryId: string | null = null;
       if (payload.categoryName) {
         const [category] = await tx
@@ -132,16 +131,14 @@ export const ProductRepository = {
         productCategoryId = category?.id ?? null;
       }
 
-      const productUpdates = {
-        ...product,
-        productCategoryId,
-        productCollectionId,
-      };
-
-      // update products
+      // Update products
       const [updatedProduct] = await tx
         .update(products)
-        .set(productUpdates)
+        .set({
+          ...product,
+          productCategoryId,
+          productCollectionId,
+        })
         .where(eq(products.id, productId))
         .returning({
           id: products.id,
@@ -166,7 +163,7 @@ export const ProductRepository = {
               priceCents: v.priceCents,
               attributes: v.attributes,
             })
-            .where(eq(productVariants.id, variantId))
+            .where(eq(productVariants.id, v.id))
             .returning({
               id: productVariants.id,
               priceCents: productVariants.priceCents,
@@ -263,3 +260,14 @@ export const ProductRepository = {
     return { data, error };
   },
 };
+
+[
+  {
+    id: "476bfa54-94f8-4d46-a9af-b2fb6468b665",
+    priceCents: 150000,
+    attributes: {
+      Color: "Red",
+      "Stem Count": "12",
+    },
+  },
+];
