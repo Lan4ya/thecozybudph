@@ -1,6 +1,19 @@
 import z from "zod";
 import { coerceNumber } from "../utils/coerce.ts";
 
+const MAX_FILE_SIZE = 50 * 1024 * 1024;
+const MAX_IMAGES = 3;
+const ACCEPTED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];
+
+export const imageFileSchema = z
+  .instanceof(File)
+  .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), {
+    message: "only png, jpeg, and webp files are allowed",
+  })
+  .refine((file) => file.size <= MAX_FILE_SIZE, {
+    message: "image must be under 50MB",
+  });
+
 export const productBaseSchema = z.object({
   name: z
     .string()
@@ -28,8 +41,6 @@ export const productBaseSchema = z.object({
     .optional()
     .nullable(),
 
-  // Product option: what customers can choose from when checking out a product
-  // e.g. [{name: "Color", values: ["Red", "Green"], {name: "Stem Count", values: ["6", "12"]}]
   options: z.preprocess(
     (val) => {
       if (typeof val === "string") return JSON.parse(val);
@@ -38,66 +49,39 @@ export const productBaseSchema = z.object({
     z
       .array(
         z.object({
-          name: z.string().trim().nonempty(),
-          values: z.array(z.string().trim().nonempty()).nonempty(),
+          name: z
+            .string()
+            .trim()
+            .nonempty("option name is required")
+            .max(255, "name can't exceed 255 characters"),
+          values: z
+            .array(z.string().trim().nonempty("option value is required"))
+            .nonempty(),
         }),
       )
       .default([]),
   ),
+});
 
-  /* Product variants: all possible combinations of product options
-  e.g.:
-     variants: [
-       { 
-          price_cents: 50_000
-          options: [
-          {"Color": "Red"}
-          {"Stem Count": "6"}
-        }, 
-       { 
-          price_cents: 100_000 // double the price since this flower has double the Stem Count.
-          options: [
-          {"Color": "Red"}
-          {"Stem Count": "12"}
-        } 
-     ]
-  */
-  variants: z.preprocess(
-    (val) => {
-      if (typeof val === "string") return JSON.parse(val);
-      return val;
-    },
+const variantBaseSchema = z.object({
+  priceCents: coerceNumber(
     z
-      .array(
-        z.object({
-          priceCents: coerceNumber(
-            z
-              .number("price must be a number")
-              .nonnegative("price can't be negative")
-              .max(100_000_000, "price can't exceed 1,000,000"), // err message is converted to 1M (Peso) since it'll maybe be displayed in UI.
-          ),
-          attributes: z.record(
-            z.string().trim().nonempty(),
-            z.string().trim().nonempty(),
-          ),
-        }),
-      )
-      .nonempty("prooduct variant can't be empty"),
+      .number("price must be a number")
+      .nonnegative("price can't be negative")
+      .max(100_000_000, "price can't exceed 1,000,000"),
+  ),
+
+  attributes: z.record(
+    z.string().trim().nonempty(),
+    z.string().trim().nonempty(),
   ),
 });
 
-const MAX_FILE_SIZE = 50 * 1024 * 1024;
-const MAX_IMAGES = 3;
-const ACCEPTED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];
+const createVariantSchema = variantBaseSchema;
 
-export const imageFileSchema = z
-  .instanceof(File)
-  .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), {
-    message: "only png, jpeg, and webp files are allowed",
-  })
-  .refine((file) => file.size <= MAX_FILE_SIZE, {
-    message: "image must be under 50MB",
-  });
+const updateVariantSchema = variantBaseSchema.extend({
+  id: z.uuid("product variant id is not a valid UUID"),
+});
 
 export const createProductSchema = productBaseSchema.extend({
   productImages: z.preprocess(
@@ -112,6 +96,11 @@ export const createProductSchema = productBaseSchema.extend({
   ),
 
   primaryImageIndex: z.coerce.number().min(0, "primaryImageIndex out of range"),
+
+  variants: z.preprocess(
+    (val) => (typeof val === "string" ? JSON.parse(val) : val),
+    z.array(createVariantSchema).nonempty("product variants can't be empty"),
+  ),
 });
 
 export const updateProductSchema = productBaseSchema.partial().extend({
@@ -127,7 +116,13 @@ export const updateProductSchema = productBaseSchema.partial().extend({
     .min(0, "primaryImageIndex out of range")
     .optional(),
 
-  // productCollectionId: z.string().optional(),
+  variants: z.preprocess(
+    (val) => (typeof val === "string" ? JSON.parse(val) : val),
+    z
+      .array(updateVariantSchema)
+      .nonempty("product variants can't be empty")
+      .optional(),
+  ),
 });
 
 export const deleteProductsSchema = z.object({
@@ -145,3 +140,36 @@ export type ProductBase = z.infer<typeof productBaseSchema>;
 export type CreateProductInput = z.infer<typeof createProductSchema>;
 export type UpdateProductInput = z.infer<typeof updateProductSchema>;
 export type DeleteProductsInput = z.infer<typeof deleteProductsSchema>;
+
+// ---------------------------------------------------
+
+// PRODUCT FORM
+
+const createProductFormSchema = createProductSchema.extend({
+  // in peso NOT cents since this is for form input
+  basePrice: coerceNumber(
+    z
+      .number("base price is required")
+      .nonnegative("price can't be negative")
+      .max(1_000_000, "price can't exceed 1,000,000"),
+  ),
+  mode: z.literal("create"),
+});
+
+const updateProductFormSchema = updateProductSchema.extend({
+  // in peso NOT cents since this is for form input
+  basePrice: coerceNumber(
+    z
+      .number("base price is required")
+      .nonnegative("price can't be negative")
+      .max(1_000_000, "price can't exceed 1,000,000"),
+  ),
+  mode: z.literal("update"),
+});
+
+export const productFormSchema = z.discriminatedUnion("mode", [
+  createProductFormSchema,
+  updateProductFormSchema,
+]);
+
+export type ProductFormInput = z.infer<typeof productFormSchema>;
