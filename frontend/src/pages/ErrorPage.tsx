@@ -4,6 +4,7 @@ import { useRouteError, isRouteErrorResponse } from "react-router";
 import { motion } from "framer-motion";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { useNavigate } from "react-router";
+import { devLog } from "@/lib/utils/logger";
 
 type ErrorPageProps = {
   status?: number;
@@ -19,7 +20,14 @@ const messages: Record<number, string> = {
 
 export const ErrorPage = ({ status, title, message }: ErrorPageProps) => {
   const navigate = useNavigate();
-  const finalMessage = message || (status ? messages[status] : null);
+
+  const finalMessage =
+    message || (status ? messages[status] : "Something went wrong.");
+
+  if (status === 401) {
+    devLog("error: ", finalMessage);
+    navigate("/home");
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background text-center px-6">
@@ -29,16 +37,17 @@ export const ErrorPage = ({ status, title, message }: ErrorPageProps) => {
         transition={{ duration: 0.5 }}
         className="space-y-6"
       >
+        {/* Error Title */}
         <h1 className="font-back-to-black text-primary text-6xl md:text-7xl">
           {title || "Error"}
         </h1>
 
-        {/* Message fallback */}
+        {/* Error Message */}
         <p className="text-muted-foreground text-lg md:text-xl max-w-md mx-auto">
-          {finalMessage || "Something went wrong. Please try again later."}
+          {finalMessage}
         </p>
 
-        {/* CTA button */}
+        {/* CTA */}
         <div className="mt-8">
           {status === 500 ? (
             <Button
@@ -59,16 +68,7 @@ export const ErrorPage = ({ status, title, message }: ErrorPageProps) => {
             >
               Back to Home
             </Button>
-          ) : (
-            <Button
-              onClick={() => navigate(-1)}
-              variant="secondary"
-              size="lg"
-              className="rounded-2xl"
-            >
-              Go Back
-            </Button>
-          )}
+          ) : null}
         </div>
       </motion.div>
     </div>
