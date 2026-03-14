@@ -63,7 +63,8 @@ export const productBaseSchema = z.object({
   ),
 });
 
-const variantBaseSchema = z.object({
+const productVariantSchema = z.object({
+  id: z.uuid("product variant id is not a valid UUID").optional(),
   priceCents: coerceNumber(
     z
       .number("price must be a number")
@@ -75,12 +76,6 @@ const variantBaseSchema = z.object({
     z.string().trim().nonempty(),
     z.string().trim().nonempty(),
   ),
-});
-
-const createVariantSchema = variantBaseSchema;
-
-const updateVariantSchema = variantBaseSchema.extend({
-  id: z.uuid("product variant id is not a valid UUID"),
 });
 
 export const createProductSchema = productBaseSchema.extend({
@@ -99,7 +94,7 @@ export const createProductSchema = productBaseSchema.extend({
 
   variants: z.preprocess(
     (val) => (typeof val === "string" ? JSON.parse(val) : val),
-    z.array(createVariantSchema).nonempty("product variants can't be empty"),
+    z.array(productVariantSchema).nonempty("product variants can't be empty"),
   ),
 });
 
@@ -119,7 +114,7 @@ export const updateProductSchema = productBaseSchema.partial().extend({
   variants: z.preprocess(
     (val) => (typeof val === "string" ? JSON.parse(val) : val),
     z
-      .array(updateVariantSchema)
+      .array(productVariantSchema)
       .nonempty("product variants can't be empty")
       .optional(),
   ),
@@ -146,7 +141,6 @@ export type DeleteProductsInput = z.infer<typeof deleteProductsSchema>;
 // PRODUCT FORM
 
 const createProductFormSchema = createProductSchema.extend({
-  // in peso NOT cents since this is for form input
   basePrice: coerceNumber(
     z
       .number("base price is required")
@@ -157,13 +151,6 @@ const createProductFormSchema = createProductSchema.extend({
 });
 
 const updateProductFormSchema = updateProductSchema.extend({
-  // in peso NOT cents since this is for form input
-  basePrice: coerceNumber(
-    z
-      .number("base price is required")
-      .nonnegative("price can't be negative")
-      .max(1_000_000, "price can't exceed 1,000,000"),
-  ),
   mode: z.literal("update"),
 });
 
@@ -172,4 +159,6 @@ export const productFormSchema = z.discriminatedUnion("mode", [
   updateProductFormSchema,
 ]);
 
+export type CreateProductFormInput = z.infer<typeof createProductFormSchema>;
+export type UpdateProductFormInput = z.infer<typeof updateProductFormSchema>;
 export type ProductFormInput = z.infer<typeof productFormSchema>;

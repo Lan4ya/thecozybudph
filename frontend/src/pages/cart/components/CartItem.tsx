@@ -77,7 +77,7 @@ const CartItem = ({
 
   // TODO: disable btns if item is not avail
   return (
-    <Card className={cn("hover:shadow-md transition-shadow relative")}>
+    <Card className="hover:shadow-sm transition-shadow relative py-4">
       {!isItemAvailable && (
         <div className="absolute inset-0 bg-black/50 z-50 flex-center rounded-xl pointer-events-none">
           <span className="text-white text-sm font-semibold bg-black/50 px-3 py-1 rounded">
@@ -86,7 +86,7 @@ const CartItem = ({
         </div>
       )}
 
-      <CardContent className="px-3">
+      <CardContent className="px-2">
         <div
           className="flex gap-3 cursor-default"
           onClick={() =>
@@ -101,7 +101,7 @@ const CartItem = ({
                 onToggleSelection();
               }}
               className={cn(
-                "flex items-center justify-center size-5 border-2 rounded cursor-pointer transition-all mt-2",
+                "flex-center size-5 border-2 rounded cursor-pointer transition-all",
                 selected
                   ? "bg-primary border-primary text-primary-foreground"
                   : "border-muted-foreground hover:border-primary",

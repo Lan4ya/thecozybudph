@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useToast } from "@/providers/ToastProvider";
+
+// import { useToast } from "@/providers/ToastProvider";
 import { motion } from "framer-motion";
-import { useForm, type FieldErrors } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  type CreateProductInput,
+  type ProductFormInput,
   type ProductWithRelations,
-  type UpdateProductInput,
-  createProductSchema,
-  updateProductSchema,
+  productFormSchema,
 } from "@TheCozyBud/types";
 import {
   Card,
@@ -16,40 +15,26 @@ import {
   CardTitle,
   CardContent,
 } from "@/lib/ui/__shadcn__/card";
-import { Input } from "@/lib/ui/__shadcn__/input";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import { X } from "lucide-react";
-import ImageUploadInput from "./ImageUploadField";
 import {
   buildUpdateProductFormData,
   buildCreateProductFormData,
 } from "./helpers/buildProductFormData";
-import { ColorTagsInput } from "./ColorVariantsField";
 import z from "zod";
 import { formHasChanges } from "./helpers/formHasChanges";
 import { useProductMutations } from "@/features/admin/hooks/useProductsMutations";
 import { useImageCompressor } from "@/features/admin/hooks/useImageConverter";
-import isDev from "@/lib/utils/isDev";
 import {
-  getEmptyFormKV,
-  getMappedUpdatingProductKV,
+  getCreateFormDefaultValues,
+  getUpdateFormDefaultValues,
 } from "./helpers/defaultFormValues";
-
-const createProductFormSchema = createProductSchema.extend({
-  mode: z.literal("create"),
-});
-
-const updateProductFormSchema = updateProductSchema.extend({
-  mode: z.literal("update"),
-});
-
-const productFormSchema = z.discriminatedUnion("mode", [
-  createProductFormSchema,
-  updateProductFormSchema,
-]);
-
-export type ProductFormValues = z.infer<typeof productFormSchema>;
+import ProductDetails from "./ProductDetails";
+import { formatFileSize } from "@/lib/utils/format";
+import { devLog } from "@/lib/utils/logger";
+import { ProductOptions } from "./ProductOptions";
+import ProductVariants from "./ProductVariants";
 
 type ProductFormProps = {
   open: boolean;
@@ -57,12 +42,15 @@ type ProductFormProps = {
   onToggle: (t: boolean) => void;
 };
 
+const MAX_IMAGES = 3;
+
 export default function ProductForm({
   open,
   updatingProduct,
   onToggle,
 }: ProductFormProps) {
-  const [submitting, setSubmitting] = useState(false);
+  // const { addToast } = useToast();
+
   const [newSelectedFiles, setNewSelectedFiles] = useState<
     { file: File; url: string }[]
   >([]);
@@ -75,35 +63,21 @@ export default function ProductForm({
   const { createProductMutation, updateProductMutation } =
     useProductMutations();
 
-  const { addToast } = useToast();
-
-  const MAX_IMAGES = 3;
   const fileFieldName = updatingProduct ? "newProductImages" : "productImages";
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-    reset,
-    setValue,
-    setError,
-    clearErrors,
-  } = useForm<
+  const form = useForm<
     z.input<typeof productFormSchema>,
     any,
     z.output<typeof productFormSchema>
   >({
     resolver: zodResolver(productFormSchema),
     defaultValues: updatingProduct
-      ? { mode: "update", ...getMappedUpdatingProductKV(updatingProduct) }
-      : { mode: "create", ...getEmptyFormKV() },
+      ? { ...getUpdateFormDefaultValues(updatingProduct) }
+      : { ...getCreateFormDefaultValues() },
   });
 
-  const formValues = watch();
-
   const hasChanges = formHasChanges(
-    formValues as ProductFormValues,
+    form.watch() as ProductFormInput,
     updatingProduct,
     {
       imagesToDelete: imageUrlsToDelete,
@@ -111,6 +85,89 @@ export default function ProductForm({
       primaryImageIndex,
     },
   );
+
+  const formSteps = [
+    () => (
+      <ProductDetails
+        displayImages={displayImages}
+        handleSelectFiles={handleSelectFiles}
+        handleRemoveImage={handleRemoveImage}
+        primaryImageIndex={primaryImageIndex}
+        setPrimaryImageIndex={setPrimaryImageIndex}
+        MAX_IMAGES={MAX_IMAGES}
+      />
+    ),
+    () => <ProductOptions />,
+    () => <ProductVariants updatingProduct={updatingProduct} />,
+  ];
+
+  const [currentFormStep, setCurrentFormStep] = useState(0);
+
+  const isLastFormStep = currentFormStep === formSteps.length - 1;
+
+  const FormStep = formSteps[currentFormStep];
+
+  const nextStep = async () => {
+    if (isLastFormStep) return;
+
+    if (!updatingProduct) {
+      switch (currentFormStep) {
+        case 0: {
+          const valid = await form.trigger([
+            "name",
+            "description",
+            "categoryName",
+            "collectionName",
+            "productImages",
+            "primaryImageIndex",
+            "basePrice",
+          ]);
+          if (!valid) {
+            devLog("Step 1 error:", form.formState.errors);
+            return;
+          }
+
+          if (displayImages.length === 0) {
+            form.setError("newProductImages", {
+              type: "manual",
+              message: "Product must retain at least one image",
+            });
+            return;
+          }
+          break;
+        }
+        case 1: {
+          const valid = await form.trigger(["options"]);
+          if (!valid) {
+            devLog("Step 2 error:", form.formState.errors.options);
+            return;
+          }
+          break;
+        }
+        case 2: {
+          const valid = await form.trigger(["variants"]);
+          if (!valid) {
+            devLog("Step 3 error:", form.formState.errors.variants);
+            return;
+          }
+          break;
+        }
+        default:
+          break;
+      }
+    }
+
+    setCurrentFormStep((s) => s + 1);
+  };
+
+  const prevStep = () => {
+    if (currentFormStep > 0) setCurrentFormStep((s) => s - 1);
+  };
+
+  // useEffect(() => {
+  //   console.log("current step: ", currentFormStep);
+  //   devLog({ isLastFormStep });
+  // }, [currentFormStep]);
 
   // Derive image display: existing minus deletions plus selected blob urls
   const displayImages = useMemo(() => {
@@ -122,18 +179,19 @@ export default function ProductForm({
     return [...filteredExisting, ...newUrls];
   }, [updatingProduct, imageUrlsToDelete, newSelectedFiles]);
 
-  // Reset component state & form when modal opens
+  // Reset on form open
   useEffect(() => {
     if (!open) return;
 
     newSelectedFiles.forEach((s) => URL.revokeObjectURL(s.url)); // cleanup previous blobs
     setNewSelectedFiles([]);
     setImageUrlsToDelete([]);
+    setCurrentFormStep(0);
 
-    reset(
+    form.reset(
       updatingProduct
-        ? { mode: "update", ...getMappedUpdatingProductKV(updatingProduct) }
-        : { mode: "create", ...getEmptyFormKV() },
+        ? { ...getUpdateFormDefaultValues(updatingProduct) }
+        : { ...getCreateFormDefaultValues() },
     );
 
     // Set initial primary index:
@@ -147,7 +205,7 @@ export default function ProductForm({
     } else {
       setPrimaryImageIndex(0);
     }
-  }, [open, updatingProduct, reset]);
+  }, [open, updatingProduct, form.reset]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -158,14 +216,14 @@ export default function ProductForm({
 
   const handleSelectFiles = useCallback(
     (files: File[]) => {
-      clearErrors(fileFieldName);
+      form.clearErrors(fileFieldName);
 
       const existingCount = (updatingProduct?.imageUrls ?? []).filter(
         (u: string) => !imageUrlsToDelete.includes(u),
       ).length;
       const currentSelectedCount = newSelectedFiles.length;
       if (existingCount + currentSelectedCount + files.length > MAX_IMAGES) {
-        setError(fileFieldName, {
+        form.setError(fileFieldName, {
           type: "manual",
           message: `You can upload up to ${MAX_IMAGES} images only`,
         });
@@ -192,7 +250,7 @@ export default function ProductForm({
         const next = [...prev, ...created];
 
         // sync RHF file field so validation can see selected files
-        setValue(
+        form.setValue(
           fileFieldName,
           next.map((n) => n.file),
           { shouldValidate: true },
@@ -216,10 +274,10 @@ export default function ProductForm({
       MAX_IMAGES,
       primaryImageIndex,
       newSelectedFiles.length,
-      setError,
-      setValue,
+      form.setError,
+      form.setValue,
       updatingProduct,
-      clearErrors,
+      form.clearErrors,
     ],
   );
 
@@ -250,7 +308,7 @@ export default function ProductForm({
           }
 
           // sync form field for server
-          setValue("imageUrlsToDelete", next, { shouldValidate: false });
+          form.setValue("imageUrlsToDelete", next, { shouldValidate: false });
           return next;
         });
 
@@ -268,7 +326,7 @@ export default function ProductForm({
         });
 
         // sync RHF file field
-        setValue(
+        form.setValue(
           fileFieldName,
           remaining.map((n) => n.file),
           { shouldValidate: true },
@@ -302,22 +360,15 @@ export default function ProductForm({
       imageUrlsToDelete,
       primaryImageIndex,
       newSelectedFiles,
-      setValue,
+      form.setValue,
       updatingProduct,
     ],
   );
 
-  const onSubmit = async (fieldData: ProductFormValues) => {
-    if (displayImages.length === 0) {
-      setError("newProductImages", {
-        type: "manual",
-        message: "Product must retain at least one image",
-      });
-      return;
-    }
-
-    setSubmitting(true);
-    onToggle(false); // close form
+  const onSubmit = async (fieldData: ProductFormInput) => {
+    console.log("submit trigger");
+    // setSubmitting(true);
+    onToggle(false); // close form immediately
 
     const files = newSelectedFiles.map((s) => s.file);
     console.log({ files });
@@ -330,39 +381,33 @@ export default function ProductForm({
       compressedFiles =
         largeFiles.length > 0 ? await compressImages(largeFiles) : [];
 
-      // console.log(largeFiles.map((f) => formatFileSize(f.size)));
-      // console.log(compressedFiles.map((f) => formatFileSize(f.size)));
+      devLog(largeFiles.map((f) => formatFileSize(f.size)));
+      devLog(compressedFiles.map((f) => formatFileSize(f.size)));
 
       compressedFiles = [...compressedFiles, ...smallFiles];
 
-      console.log({ compressedFiles });
+      devLog({ compressedFiles });
     }
 
-    try {
-      if (fieldData.mode === "update" && updatingProduct) {
-        const formData = buildUpdateProductFormData({
-          ...fieldData,
-          imageUrlsToDelete,
-        });
-        await updateProductMutation.mutateAsync({
-          formData,
-          productId: updatingProduct.id,
-        });
-      }
+    if (fieldData.mode === "update" && updatingProduct) {
+      const formData = buildUpdateProductFormData({
+        ...fieldData,
+        imageUrlsToDelete,
+      });
+      await updateProductMutation.mutateAsync({
+        formData,
+        productId: updatingProduct.id,
+      });
+    }
 
-      if (fieldData.mode === "create") {
-        const formData = buildCreateProductFormData({
-          ...fieldData,
-          productImages: compressedFiles,
-          primaryImageIndex,
-        });
+    if (fieldData.mode === "create") {
+      const formData = buildCreateProductFormData({
+        ...fieldData,
+        productImages: compressedFiles,
+        primaryImageIndex,
+      });
 
-        await createProductMutation.mutateAsync(formData);
-      }
-    } catch (_error) {
-      // just so that dev tools doesn't complain
-    } finally {
-      setSubmitting(false);
+      await createProductMutation.mutateAsync(formData);
     }
   };
 
@@ -375,7 +420,7 @@ export default function ProductForm({
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-1000 flex items-center justify-center bg-black/50 p-4"
     >
-      <Card className="w-full max-w-2xl relative">
+      <Card className="w-full max-w-2xl relative ">
         <button
           onClick={() => onToggle(false)}
           className="absolute top-3 right-3 p-1 rounded-md"
@@ -384,199 +429,83 @@ export default function ProductForm({
           <X />
         </button>
 
-        <CardHeader>
+        <CardHeader className="custom-container">
           <CardTitle className="">
-            {updatingProduct ? "Edit Product" : "Create Product"}
+            <div className="flex items-center gap-4">
+              {updatingProduct ? (
+                <span>Update Product</span>
+              ) : (
+                <>
+                  <span>Create Product</span>
+                  <span className="text-muted-foreground text-sm">
+                    {currentFormStep + 1}/3
+                  </span>
+                </>
+              )}
+            </div>
           </CardTitle>
         </CardHeader>
 
-        <CardContent className="px-0!">
-          <form
-            onSubmit={handleSubmit(
-              onSubmit,
-              (err) => isDev && console.log("Form validation errors:", err),
-            )}
-          >
-            <div className="max-h-[70dvh] px-6 overflow-x-visible overflow-y-auto">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 ">
-                {/* Name */}
-                <div>
-                  <label className="block text-sm mb-1 text-muted-foreground">
-                    Name
-                  </label>
-                  <Input {...register("name")} />
-                  {errors.name && (
-                    <p className="text-xs text-red-500 mt-1">
-                      {errors.name.message}
-                    </p>
-                  )}
-                </div>
-
-                {/* Price */}
-                <div>
-                  <label className="block text-sm mb-1 text-muted-foreground">
-                    Price (PHP)
-                  </label>
-                  <Input
-                    min={0}
-                    inputMode="decimal"
-                    type="number"
-                    step="any"
-                    {...register("price")}
-                    onPaste={(e) => {
-                      const text = e.clipboardData.getData("text");
-                      if (!/^\d*\.?\d*$/.test(text)) e.preventDefault();
-                    }}
-                    onKeyDown={(e) => {
-                      if (
-                        !/[0-9.]$/.test(e.key) &&
-                        ![
-                          "Backspace",
-                          "Tab",
-                          "ArrowLeft",
-                          "ArrowRight",
-                          "Delete",
-                          "Enter",
-                        ].includes(e.key)
-                      ) {
-                        e.preventDefault();
-                      }
-                    }}
-                  />
-                  {errors.price && (
-                    <p className="text-xs text-red-500 mt-1">
-                      {errors.price.message}
-                    </p>
-                  )}
-                </div>
-
-                {/* Category */}
-                <div className="md:col-span-2">
-                  <label className="block text-sm mb-1 text-muted-foreground">
-                    Category
-                  </label>
-                  <Input
-                    placeholder="bouquet, vase, mugs, etc."
-                    {...register("category")}
-                  />
-                  {errors.category && (
-                    <p className="text-xs text-red-500 mt-1">
-                      {errors.category.message}
-                    </p>
-                  )}
-                </div>
-
-                {/* Collection */}
-                <div className="md:col-span-2">
-                  <label className="block text-sm mb-1 text-muted-foreground">
-                    Collection Name (optional)
-                  </label>
-                  <Input {...register("collectionName")} />
-                  {errors.collectionName && (
-                    <p className="text-xs text-red-500 mt-1">
-                      {errors.collectionName.message}
-                    </p>
-                  )}
-                </div>
-
-                {/* Color Variants */}
-                <div className="md:col-span-2">
-                  <label className="block text-sm mb-1 text-muted-foreground">
-                    Color Variants (optional)
-                  </label>
-                  <ColorTagsInput
-                    colorVals={(watch("colorVariants") as string[]) ?? []}
-                    onChange={(colors) => setValue("colorVariants", colors)}
-                  />
-                  {errors.colorVariants && (
-                    <p className="text-xs text-red-500 mt-1">
-                      {errors.colorVariants.message}
-                    </p>
-                  )}
-                </div>
-
-                {/* Description */}
-                <div className="md:col-span-2">
-                  <label className="block text-sm mb-1 text-muted-foreground">
-                    Description (optional)
-                  </label>
-                  <textarea
-                    {...register("description")}
-                    className="w-full min-h-[100px] max-h-32 rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 resize-y"
-                  />
-
-                  <div className="flex-between">
-                    {errors.description && (
-                      <p className="text-xs text-red-500 mt-1">
-                        {errors.description.message}
-                      </p>
-                    )}
-
-                    <span
-                      className={`ml-auto text-xs ${
-                        (formValues.description?.length ?? 0) > 600
-                          ? "text-red-500"
-                          : "text-muted-foreground"
-                      }`}
-                    >
-                      {formValues.description?.length ?? 0}/600
-                    </span>
-                  </div>
-                </div>
-
-                {/* Image Upload */}
-                <div className="relative md:col-span-2">
-                  <ImageUploadInput
-                    images={displayImages}
-                    onSelectFiles={handleSelectFiles}
-                    onRemoveImage={handleRemoveImage}
-                    primaryImageIndex={primaryImageIndex}
-                    setPrimaryImageIndex={setPrimaryImageIndex}
-                    maxImages={MAX_IMAGES}
-                  />
-                  {formValues.mode === "create" &&
-                    (errors as FieldErrors<CreateProductInput>)?.productImages
-                      ?.message && (
-                      <p className="absolute -bottom-1 text-xs text-red-500 mt-1">
-                        {
-                          (errors as FieldErrors<CreateProductInput>)
-                            .productImages?.message
-                        }
-                      </p>
-                    )}
-                  {formValues.mode === "update" &&
-                    (errors as FieldErrors<UpdateProductInput>)
-                      ?.newProductImages?.message && (
-                      <p className="text-xs text-red-500 mt-1">
-                        {
-                          (errors as FieldErrors<UpdateProductInput>)
-                            .newProductImages?.message
-                        }
-                      </p>
-                    )}
-                </div>
+        <CardContent className="px-0">
+          <FormProvider {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit, (err) =>
+                devLog("Form validation errors:", err),
+              )}
+            >
+              <div className="max-h-[70dvh] overflow-y-auto custom-container overflow-x-visible">
+                {/* 3 Main Form Step Components */}
+                {FormStep()}
               </div>
+
               {/* Actions */}
-              <div className="mt-5 flex justify-end gap-3">
+              <div className="custom-container border-t border-black/10 pt-4 flex gap-3">
+                {/* Cancel */}
                 <Button
                   variant="outline"
                   type="button"
                   onClick={() => onToggle(false)}
+                  className="mr-auto"
                 >
                   Cancel
                 </Button>
 
+                {/* Prev */}
                 <Button
-                  type="submit"
-                  disabled={!hasChanges || submitting}
-                  className="bg-secondary hover:bg-secondary/90"
+                  variant="outline"
+                  type="button"
+                  disabled={currentFormStep === 0}
+                  onClick={prevStep}
                 >
-                  {submitting && <Spinner className="mr-2" />}
-                  {updatingProduct ? "Update" : "Create"}
+                  Prev
                 </Button>
+
+                {/* Next */}
+                {!isLastFormStep && (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    disabled={!updatingProduct && !hasChanges}
+                    onClick={nextStep}
+                  >
+                    Next
+                  </Button>
+                )}
+
+                {/* Submit */}
+                {isLastFormStep && (
+                  <Button
+                    type="submit"
+                    disabled={!hasChanges || form.formState.isSubmitting}
+                    variant="secondary"
+                  >
+                    {form.formState.isSubmitting && <Spinner />}
+                    {updatingProduct ? "Update" : "Create"}
+                  </Button>
+                )}
               </div>
-            </div>
-          </form>
+            </form>
+          </FormProvider>
         </CardContent>
       </Card>
     </motion.div>

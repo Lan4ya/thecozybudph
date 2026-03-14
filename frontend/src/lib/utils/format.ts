@@ -31,7 +31,7 @@ export const parseDateString = (dateString: string): Date => {
   return new Date(dateString);
 };
 
-export const getUnknownErrMsg = (error: unknown): string => {
+export const handleError = (error: unknown): string => {
   if (error instanceof Error) return error.message;
   if (typeof error === "string") return error;
   return String(error);

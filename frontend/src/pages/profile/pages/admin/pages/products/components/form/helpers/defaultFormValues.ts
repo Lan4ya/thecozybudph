@@ -1,36 +1,39 @@
 import type {
-  CreateProductInput,
+  CreateProductFormInput,
   ProductWithRelations,
-  UpdateProductInput,
+  UpdateProductFormInput,
 } from "@TheCozyBud/types";
 
-export function getEmptyFormKV(): CreateProductInput {
+export function getCreateFormDefaultValues(): CreateProductFormInput {
   return {
+    mode: "create",
     name: "",
-    price: "" as unknown as number,
-    category: "",
+    categoryName: "",
     collectionName: "",
     description: "",
-    colorVariants: [],
     productImages: [],
+    basePrice: "" as unknown as number,
     primaryImageIndex: 0,
+    options: [{ name: "", values: ["", ""] }],
+    variants: [],
   };
 }
 
-export function getMappedUpdatingProductKV(
+export function getUpdateFormDefaultValues(
   updatingProduct: ProductWithRelations,
-): Omit<UpdateProductInput, "productId"> {
+): Omit<UpdateProductFormInput, "productId"> {
   return {
+    mode: "update",
     name: updatingProduct.name,
-    price: updatingProduct.price,
     collectionName: updatingProduct.collectionName ?? "",
     description: updatingProduct.description ?? "",
-    category: updatingProduct.categoryName ?? "",
-    colorVariants: updatingProduct.colorVariants ?? [],
+    categoryName: updatingProduct.categoryName ?? "",
     newProductImages: [],
     imageUrlsToDelete: [],
     primaryImageIndex: updatingProduct.imageUrls.indexOf(
       updatingProduct.primaryImageUrl,
     ),
+    options: updatingProduct.options,
+    variants: updatingProduct.variants,
   };
 }

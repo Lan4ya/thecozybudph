@@ -9,13 +9,13 @@ export function buildCreateProductFormData(fields: CreateProductInput) {
 
   fd.append("name", fields.name);
 
-  fd.append("price", String(fields.price));
-
-  fd.append("category", fields.category);
-
-  fields.colorVariants.forEach((c) => fd.append("colorVariants", c));
+  fd.append("categoryName", fields.categoryName);
 
   fields.productImages.forEach((p) => fd.append("productImages", p));
+
+  fd.append("options", JSON.stringify(fields.options));
+
+  fd.append("variants", JSON.stringify(fields.variants));
 
   fd.append("primaryImageIndex", String(fields.primaryImageIndex));
 
@@ -32,12 +32,11 @@ export function buildCreateProductFormData(fields: CreateProductInput) {
       capitalizeFirstLetterOfEachWord(fields.collectionName),
   );
 
-  for (const pair of fd.entries()) {
-    console.log(pair[0], pair[1]);
-  }
+  // for (const pair of fd.entries()) {
+  //   console.log(pair[0], pair[1]);
+  // }
 
   console.log({ fd });
-
   return fd;
 }
 
@@ -46,7 +45,9 @@ export function buildUpdateProductFormData(fields: UpdateProductInput) {
 
   appendIfDefined(fd, "name", fields.name);
 
-  appendIfDefined(fd, "price", fields.price);
+  fd.append("options", JSON.stringify(fields.options));
+
+  fd.append("variants", JSON.stringify(fields.variants));
 
   appendIfDefined(
     fd,
@@ -56,8 +57,8 @@ export function buildUpdateProductFormData(fields: UpdateProductInput) {
 
   appendIfDefined(
     fd,
-    "category",
-    fields.category && capitalizeFirstLetterOfEachWord(fields.category),
+    "categoryName",
+    fields.categoryName && capitalizeFirstLetterOfEachWord(fields.categoryName),
   );
 
   appendIfDefined(
@@ -68,8 +69,6 @@ export function buildUpdateProductFormData(fields: UpdateProductInput) {
   );
 
   appendIfDefined(fd, "primaryImageIndex", fields.primaryImageIndex);
-
-  fields.colorVariants?.forEach((c) => fd.append("colorVariants", c));
 
   fields.imageUrlsToDelete?.forEach((url) =>
     fd.append("imageUrlsToDelete[]", url),

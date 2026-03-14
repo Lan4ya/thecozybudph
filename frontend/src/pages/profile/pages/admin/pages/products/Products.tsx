@@ -8,8 +8,9 @@ import {
   Plus,
   Search,
   TableProperties,
-  Grid3x3,
+  // Grid3x3,
   LayoutGrid,
+  Edit,
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import type { ProductWithRelations } from "@TheCozyBud/types";
@@ -53,15 +54,15 @@ export default function AdminDashboardProducts() {
       <div className="flex flex-col gap-5">
         <div className="flex items-center border rounded-lg p-2 justify-between mb-9">
           <div className="flex-center gap-2">
-            <Button size="sm" variant="outline" className="">
+            <Button size="icon" variant="outline" className="">
               <TableProperties />
             </Button>
-            <Button size="sm" variant="outline">
+            <Button size="icon" variant="outline">
               <LayoutGrid />
             </Button>
-            <Button size="sm" variant="outline">
-              <Grid3x3 />
-            </Button>
+            {/* <Button size="sm" variant="outline"> */}
+            {/*   <Grid3x3 /> */}
+            {/* </Button> */}
           </div>
 
           <div className="flex-center gap-3">
@@ -92,6 +93,11 @@ export default function AdminDashboardProducts() {
                 <Search />
               </Button>
             </div>
+
+            {/* Edit Products */}
+            <Button size="icon" variant="outline">
+              <Edit />
+            </Button>
 
             {/* Add Product */}
             <Button variant="outline" size="sm" onClick={openCreateForm}>

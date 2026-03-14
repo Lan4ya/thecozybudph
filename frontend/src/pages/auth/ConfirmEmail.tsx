@@ -68,7 +68,7 @@ export const ConfirmEmail = () => {
           onClick={handleResend}
           disabled={resending}
         >
-          {resending && <Spinner className="size-4 mr-2" />}
+          {resending && <Spinner />}
           Resend Email
         </Button>
       )}

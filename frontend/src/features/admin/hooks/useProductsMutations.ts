@@ -3,6 +3,7 @@ import { ProductAPI } from "@/api/product";
 import { useToast } from "@/providers/ToastProvider";
 import type { ProductWithRelations } from "@TheCozyBud/types";
 import isDev from "@/lib/utils/isDev";
+import { devLog } from "@/lib/utils/logger";
 
 type ProductsQueryData = {
   pages: ProductWithRelations[][];
@@ -13,50 +14,14 @@ export const useProductMutations = () => {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
 
-  const deleteProductMutation = useMutation({
-    mutationFn: ProductAPI.deleteMany,
-    onMutate: ({ productIds }) => {
-      addToast(
-        `Deleting product${productIds.length > 1 ? "s" : ""}...`,
-        "info",
-      );
-    },
-    onError: (err: Error) => {
-      isDev && console.error(err.message);
-      addToast(err.message || "Failed to delete product", "error");
-    },
-    onSuccess: ({ deletedProductIds }) => {
-      queryClient.setQueryData<ProductsQueryData>(
-        ["__admin__products__"],
-        (oldData) => {
-          if (!oldData?.pages) return oldData;
-
-          const deletedSet = new Set(deletedProductIds);
-
-          // Filter out deleted products from each page
-          const newPages = oldData.pages
-            .map((page) =>
-              page.filter((product) => !deletedSet.has(product.id)),
-            )
-            .filter((page) => page.length > 0); // remove empty pages
-
-          return { ...oldData, pages: newPages };
-        },
-      );
-
-      addToast("Product deleted successfully", "success");
-    },
-  });
-
   const createProductMutation = useMutation({
     mutationFn: ProductAPI.create,
     onMutate: () => {
       addToast("Creating new product...", "info");
     },
     onError: function handleCreateProductError(err: Error) {
-      isDev && console.error("product error:", err.message);
+      devLog("product error:", err.message);
       addToast(err.message, "error");
-      throw err.message;
     },
     onSuccess: (product) => {
       queryClient.setQueryData<ProductsQueryData>(
@@ -134,6 +99,41 @@ export const useProductMutations = () => {
       );
 
       addToast("Product updated successfully", "success");
+    },
+  });
+
+  const deleteProductMutation = useMutation({
+    mutationFn: ProductAPI.deleteMany,
+    onMutate: ({ productIds }) => {
+      addToast(
+        `Deleting product${productIds.length > 1 ? "s" : ""}...`,
+        "info",
+      );
+    },
+    onError: (err: Error) => {
+      isDev && console.error(err.message);
+      addToast(err.message || "Failed to delete product", "error");
+    },
+    onSuccess: ({ deletedProductIds }) => {
+      queryClient.setQueryData<ProductsQueryData>(
+        ["__admin__products__"],
+        (oldData) => {
+          if (!oldData?.pages) return oldData;
+
+          const deletedSet = new Set(deletedProductIds);
+
+          // Filter out deleted products from each page
+          const newPages = oldData.pages
+            .map((page) =>
+              page.filter((product) => !deletedSet.has(product.id)),
+            )
+            .filter((page) => page.length > 0); // remove empty pages
+
+          return { ...oldData, pages: newPages };
+        },
+      );
+
+      addToast("Product deleted successfully", "success");
     },
   });
 

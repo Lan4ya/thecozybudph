@@ -220,7 +220,7 @@ const Login = () => {
                   className="border w-full"
                   disabled={loading || disabled}
                 >
-                  {loading ? <Spinner className="mr-1" /> : null}
+                  {loading ? <Spinner /> : null}
                   {loading ? "Logging in..." : "Log in"}
                 </Button>
 

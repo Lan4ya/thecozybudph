@@ -12,7 +12,7 @@ import {
   productVariants,
 } from "../../db/schema/products.ts";
 import { db } from "../../db/client.ts";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 
 export const ProductRepository = {
   createProduct: async (
@@ -97,18 +97,116 @@ export const ProductRepository = {
     });
   },
 
+  // updateProduct: async (
+  //   productId: string,
+  //   payload: UpdateProductDBInput,
+  // ): Promise<ProductWithRelations> => {
+  //   const { categoryName, collectionName, ...product } = payload;
+  //   return await db.transaction(async (tx) => {
+  //     // Upsert collection
+  //     let productCollectionId: string | null = null;
+  //     if (payload.collectionName) {
+  //       const [collection] = await tx
+  //         .insert(productCollections)
+  //         .values({ name: payload.collectionName })
+  //         .onConflictDoUpdate({
+  //           target: productCollections.name,
+  //           set: { name: productCollections.name },
+  //         })
+  //         .returning();
+  //       productCollectionId = collection.id;
+  //     }
+  //
+  //     // Upsert category
+  //     let productCategoryId: string | null = null;
+  //     if (payload.categoryName) {
+  //       const [category] = await tx
+  //         .insert(productCategories)
+  //         .values({ name: payload.categoryName })
+  //         .onConflictDoUpdate({
+  //           target: productCategories.name,
+  //           set: { name: productCategories.name },
+  //         })
+  //         .returning();
+  //       productCategoryId = category?.id ?? null;
+  //     }
+  //
+  //     // Update products
+  //     const [updatedProduct] = await tx
+  //       .update(products)
+  //       .set({
+  //         ...product,
+  //         productCategoryId,
+  //         productCollectionId,
+  //       })
+  //       .where(eq(products.id, productId))
+  //       .returning({
+  //         id: products.id,
+  //         name: products.name,
+  //         description: products.description,
+  //         imageUrls: products.imageUrls,
+  //         primaryImageUrl: products.primaryImageUrl,
+  //         options: products.options,
+  //         minPriceCents: products.minPriceCents,
+  //         maxPriceCents: products.maxPriceCents,
+  //         createdAt: products.createdAt,
+  //         updatedAt: products.updatedAt,
+  //       });
+  //
+  //
+  //     // Update product variants
+  //     const updatedProductVariants: ProductVariant[] = [];
+  //     if (product.variants) {
+  //       for (const v of product.variants) {
+  //         const [updatedVariant] = await tx
+  //           .update(productVariants)
+  //           .set({
+  //             priceCents: v.priceCents,
+  //             attributes: v.attributes,
+  //           })
+  //           .where(eq(productVariants.id, v.id))
+  //           .returning({
+  //             id: productVariants.id,
+  //             priceCents: productVariants.priceCents,
+  //             attributes: productVariants.attributes,
+  //           });
+  //
+  //         updatedProductVariants.push(
+  //           updatedVariant as unknown as ProductVariant,
+  //         );
+  //       }
+  //     }
+  //
+  //     const productWithRelations = {
+  //       ...updatedProduct,
+  //       options: payload.options ?? [],
+  //       variants: updatedProductVariants,
+  //       categoryName: categoryName ?? null,
+  //       collectionName: collectionName ?? null,
+  //     };
+  //
+  //     return productWithRelations;
+  //   });
+  // },
+
   updateProduct: async (
     productId: string,
     payload: UpdateProductDBInput,
   ): Promise<ProductWithRelations> => {
-    const { categoryName, collectionName, ...product } = payload;
+    const {
+      categoryName,
+      collectionName,
+      variants: payloadVariants,
+      ...product
+    } = payload;
+
     return await db.transaction(async (tx) => {
       // Upsert collection
       let productCollectionId: string | null = null;
-      if (payload.collectionName) {
+      if (collectionName) {
         const [collection] = await tx
           .insert(productCollections)
-          .values({ name: payload.collectionName })
+          .values({ name: collectionName })
           .onConflictDoUpdate({
             target: productCollections.name,
             set: { name: productCollections.name },
@@ -119,10 +217,10 @@ export const ProductRepository = {
 
       // Upsert category
       let productCategoryId: string | null = null;
-      if (payload.categoryName) {
+      if (categoryName) {
         const [category] = await tx
           .insert(productCategories)
-          .values({ name: payload.categoryName })
+          .values({ name: categoryName })
           .onConflictDoUpdate({
             target: productCategories.name,
             set: { name: productCategories.name },
@@ -131,90 +229,110 @@ export const ProductRepository = {
         productCategoryId = category?.id ?? null;
       }
 
-      // Update products
+      // Update product
       const [updatedProduct] = await tx
         .update(products)
-        .set({
-          ...product,
-          productCategoryId,
-          productCollectionId,
-        })
+        .set({ ...product, productCategoryId, productCollectionId })
         .where(eq(products.id, productId))
-        .returning({
-          id: products.id,
-          name: products.name,
-          description: products.description,
-          imageUrls: products.imageUrls,
-          primaryImageUrl: products.primaryImageUrl,
-          options: products.options,
-          minPriceCents: products.minPriceCents,
-          maxPriceCents: products.maxPriceCents,
-          createdAt: products.createdAt,
-          updatedAt: products.updatedAt,
-        });
+        .returning();
 
-      // Update product variants
-      const updatedProductVariants: ProductVariant[] = [];
-      if (product.variants) {
-        for (const v of product.variants) {
-          const [updatedVariant] = await tx
-            .update(productVariants)
-            .set({
+      // Handle variants
+      const existingVariants = await tx
+        .select()
+        .from(productVariants)
+        .where(eq(productVariants.productId, productId));
+
+      const existingMap = new Map(
+        existingVariants.map((v) => [JSON.stringify(v.attributes), v]),
+      );
+
+      const seenKeys = new Set<string>();
+      const variantsToInsert: {
+        priceCents: number;
+        attributes: Record<string, string>;
+        productId: string;
+        id?: string;
+      }[] = [];
+      const variantsToUpdate: { id: string; priceCents: number }[] = [];
+      const variantsToKeep: ProductVariant[] = [];
+
+      for (const v of payloadVariants ?? []) {
+        const key = JSON.stringify(v.attributes);
+        seenKeys.add(key);
+
+        if (existingMap.has(key)) {
+          const existing = existingMap.get(key)!;
+
+          if (existing.priceCents !== v.priceCents) {
+            variantsToUpdate.push({
+              id: existing.id,
               priceCents: v.priceCents,
-              attributes: v.attributes,
-            })
-            .where(eq(productVariants.id, v.id))
-            .returning({
-              id: productVariants.id,
-              priceCents: productVariants.priceCents,
-              attributes: productVariants.attributes,
             });
+          }
 
-          updatedProductVariants.push(
-            updatedVariant as unknown as ProductVariant,
-          );
+          variantsToKeep.push({
+            ...existing,
+            priceCents: v.priceCents,
+          } as ProductVariant);
+        } else {
+          // New variant: insert
+          variantsToInsert.push({
+            ...v,
+            productId,
+          });
         }
       }
 
-      const productWithRelations = {
+      // Delete removed variants
+      const variantsToDelete = existingVariants.filter(
+        (v) => !seenKeys.has(JSON.stringify(v.attributes)),
+      );
+
+      if (variantsToDelete.length) {
+        await tx.delete(productVariants).where(
+          inArray(
+            productVariants.id,
+            variantsToDelete.map((v) => v.id),
+          ),
+        );
+      }
+
+      // Update existing variants with new prices
+      for (const v of variantsToUpdate) {
+        await tx
+          .update(productVariants)
+          .set({ priceCents: v.priceCents })
+          .where(eq(productVariants.id, v.id));
+      }
+
+      // Insert new variants
+      let insertedVariants: ProductVariant[] = [];
+
+      if (variantsToInsert.length) {
+        insertedVariants = (await tx
+          .insert(productVariants)
+          .values(variantsToInsert)
+          .returning({
+            id: productVariants.id,
+            priceCents: productVariants.priceCents,
+            attributes: productVariants.attributes,
+          })) as ProductVariant[];
+      }
+
+      const updatedVariants: ProductVariant[] = [
+        ...variantsToKeep,
+        ...insertedVariants,
+      ];
+
+      return {
         ...updatedProduct,
         options: payload.options ?? [],
-        variants: updatedProductVariants,
+        variants: updatedVariants,
         categoryName: categoryName ?? null,
         collectionName: collectionName ?? null,
-      };
-
-      return productWithRelations;
+      } satisfies ProductWithRelations;
     });
   },
-
-  // updateProduct: async (
-  //   s: SupabaseType,
-  //   productId: string,
-  //   updates: Partial<
-  //     Omit<ProductsMetadataRow, "id" | "created_at" | "updated_at">
-  //   >,
-  // ) => {
-  //   const { data, error } = await s
-  //     .from("products")
-  //     .update(updates)
-  //     .eq("id", productId)
-  //     .select("*")
-  //     .single();
-  //   return { data, error };
-  // },
-
-  // insertProduct: async (
-  //   s: SupabaseType,
-  //   product: Omit<ProductsMetadataRow, "id" | "created_at" | "updated_at">,
-  // ) => {
-  //   const { data, error } = await s
-  //     .from("products")
-  //     .insert(product)
-  //     .select("*")
-  //     .single();
-  //   return { data, error };
-  // },
 
   deleteProductsByIds: async (s: SupabaseType, productIds: string[]) => {
     const { data, error } = await s
@@ -263,11 +381,39 @@ export const ProductRepository = {
 
 [
   {
-    id: "476bfa54-94f8-4d46-a9af-b2fb6468b665",
-    priceCents: 150000,
+    id: "bfd64878-f045-5952-b678-8a845a82b1b1",
+    attributes: {
+      Color: "Red",
+      "Stem Count": "6",
+    },
+    product_id: "bb5203ae-e8c4-5972-997b-642f711b73e3",
+    price_cents: 50000,
+  },
+  {
+    id: "56a2b912-3964-5120-99f6-0e2c114ba3e2",
     attributes: {
       Color: "Red",
       "Stem Count": "12",
     },
+    product_id: "bb5203ae-e8c4-5972-997b-642f711b73e3",
+    price_cents: 100000,
+  },
+  {
+    id: "613ed00b-ffe5-5f82-9005-632431271f70",
+    attributes: {
+      Color: "Green",
+      "Stem Count": "6",
+    },
+    product_id: "bb5203ae-e8c4-5972-997b-642f711b73e3",
+    price_cents: 50000,
+  },
+  {
+    id: "ad615474-dcd8-5377-affd-0fed6e45fa7b",
+    attributes: {
+      Color: "Green",
+      "Stem Count": "12",
+    },
+    product_id: "bb5203ae-e8c4-5972-997b-642f711b73e3",
+    price_cents: 100000,
   },
 ];

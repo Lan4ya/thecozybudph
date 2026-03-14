@@ -9,17 +9,21 @@ import {
   type ProductListItem,
 } from "@TheCozyBud/types";
 import { snakeToCamel } from "@/lib/utils/caseConverter.ts";
-import type { ProductQueryAPI } from "@/types";
+import type { ProductQueryListItemsAPI } from "@/types";
 import { apiClient } from "@/lib/axios/client";
-import { mapProductAndVariantsRowToProductDomain } from "@/lib/utils/mappers";
+import {
+  mapProductAndRelationsRowToProductWithRelationsDomain,
+  mapProductAndVariantsRowToProductDomain,
+} from "@/lib/utils/mappers";
 
 export const ProductAPI = {
+  // Queries the minimum information of products to display in shop
   queryListItems: async ({
     filters,
     sort,
     page = 0,
     perPage = 12,
-  }: ProductQueryAPI & { noDummyProduct?: boolean }): Promise<
+  }: ProductQueryListItemsAPI & { noDummyProduct?: boolean }): Promise<
     ProductListItem[]
   > => {
     console.log({ page });
@@ -105,6 +109,38 @@ export const ProductAPI = {
 
     console.log("products: ", productListItems);
     return productListItems;
+  },
+
+  // Queries the full information of products along with it's relations
+  // (variants, collections, categories) to display in admin dashboard
+  queryProducts: async ({
+    page = 0,
+    perPage = 12,
+    search,
+  }: {
+    page: number;
+    perPage: number;
+    search?: string;
+  }): Promise<ProductWithRelations[]> => {
+    let query = supabase
+      .from("products")
+      .select(
+        "*, product_variants(attributes, id, price_cents), product_categories(name), product_collections(name)",
+      )
+      .range(page * perPage, (page + 1) * perPage - 1);
+
+    if (search) {
+      query = query.ilike("name", `%${search}%`);
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+    if (!data) return [];
+
+    return data.map((d) =>
+      mapProductAndRelationsRowToProductWithRelationsDomain(d),
+    );
   },
 
   getById: async (productId: string): Promise<Product | null> => {

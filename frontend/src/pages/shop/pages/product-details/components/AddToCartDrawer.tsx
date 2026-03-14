@@ -252,7 +252,7 @@ export const AddToCartDrawer = ({
                 >
                   {addToCartLoading ? (
                     <>
-                      <Spinner className="mr-1 inline-block" /> Adding to Cart
+                      <Spinner /> Adding to Cart
                     </>
                   ) : (
                     "Add to Cart"
