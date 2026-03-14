@@ -4,7 +4,6 @@ import { useRouteError, isRouteErrorResponse } from "react-router";
 import { motion } from "framer-motion";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { useNavigate } from "react-router";
-import { devLog } from "@/lib/utils/logger";
 
 type ErrorPageProps = {
   status?: number;
@@ -25,7 +24,6 @@ export const ErrorPage = ({ status, title, message }: ErrorPageProps) => {
     message || (status ? messages[status] : "Something went wrong.");
 
   if (status === 401) {
-    devLog("error: ", finalMessage);
     navigate("/home");
   }
 

@@ -20,6 +20,7 @@ import SignUp from "./pages/auth/Signup.tsx";
 import TOS from "./pages/terms-of-service/TOS.tsx";
 import PrivacyPolicy from "./pages/privacy-policy/PrivacyPolicy.tsx";
 import { ConfirmEmail } from "./pages/auth/ConfirmEmail.tsx";
+import { AuthLoader } from "./pages/auth/AuthLoader.tsx";
 
 const router = createBrowserRouter([
   {
@@ -29,11 +30,23 @@ const router = createBrowserRouter([
     children: [
       { index: true, Component: Home },
 
-      { path: "auth/signup", Component: SignUp },
+      {
+        path: "auth/signup",
+        loader: AuthLoader,
+        Component: SignUp,
+      },
 
-      { path: "auth/confirm-email", Component: ConfirmEmail },
+      {
+        path: "auth/confirm-email",
+        loader: AuthLoader,
+        Component: ConfirmEmail,
+      },
 
-      { path: "auth/login", Component: Login },
+      {
+        path: "auth/login",
+        loader: AuthLoader,
+        Component: Login,
+      },
 
       {
         path: "profile",

@@ -1,9 +1,9 @@
-/* This is just tailwind utilities grouped together to further increase productivity */
+/* Tailwind utilities grouped together to further increase productivity */
 
 /* disable padding on very small screens */
 
 @layer utilities {
-  /* Use this on all containers so it's assured they all have the same px */
+  /* Use this on all containers (or sub containers depending on the layout) so it's assured they all have the same px */
   .custom-container {
     @apply w-full mx-auto px-4! sm:px-6! max-[380px]:px-2!;
   }

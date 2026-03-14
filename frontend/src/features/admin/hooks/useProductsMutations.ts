@@ -3,7 +3,6 @@ import { ProductAPI } from "@/api/product";
 import { useToast } from "@/providers/ToastProvider";
 import type { ProductWithRelations } from "@TheCozyBud/types";
 import isDev from "@/lib/utils/isDev";
-import { devLog } from "@/lib/utils/logger";
 
 type ProductsQueryData = {
   pages: ProductWithRelations[][];
@@ -20,8 +19,8 @@ export const useProductMutations = () => {
       addToast("Creating new product...", "info");
     },
     onError: function handleCreateProductError(err: Error) {
-      devLog("product error:", err.message);
-      addToast(err.message, "error");
+      isDev && console.error(err.message);
+      addToast("Something wen't wrong. Please try again later.", "error");
     },
     onSuccess: (product) => {
       queryClient.setQueryData<ProductsQueryData>(
@@ -57,9 +56,8 @@ export const useProductMutations = () => {
       addToast("Updating product data...", "info");
     },
     onError: (err: Error) => {
-      const message = err.message || "Failed to update product";
-      isDev && console.error("error message:", message);
-      addToast(message, "error");
+      isDev && console.error(err.message);
+      addToast("Something wen't wrong. Please try again later.", "error");
     },
     onSuccess: (updatedProduct) => {
       queryClient.setQueryData<ProductsQueryData>(
@@ -112,7 +110,7 @@ export const useProductMutations = () => {
     },
     onError: (err: Error) => {
       isDev && console.error(err.message);
-      addToast(err.message || "Failed to delete product", "error");
+      addToast("Something wen't wrong. Please try again later.", "error");
     },
     onSuccess: ({ deletedProductIds }) => {
       queryClient.setQueryData<ProductsQueryData>(

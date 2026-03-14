@@ -15,16 +15,13 @@ import { Link, useNavigate } from "react-router";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import googleIcon from "@/assets/icons/google.svg";
 import { useIsLargeScreen } from "@/hooks/useMediaQuery";
-import { useRedirectIfAuthed } from "@/hooks/useRedirectIfAuthed";
 import { logInSchema, type LogIn } from "@TheCozyBud/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import isDev from "@/lib/utils/isDev";
-// import { Checkbox } from "@/lib/ui/__shadcn__/checkbox";
-// import { Label } from "@radix-ui/react-label";
+import { handleError } from "@/lib/utils/format";
 
 const Login = () => {
-  const checkingAuth = useRedirectIfAuthed();
   const [loading, setLoading] = useState(false);
   const [passVisible, setPassVisible] = useState(false);
 
@@ -41,11 +38,11 @@ const Login = () => {
   } = useForm<LogIn>({
     resolver: zodResolver(logInSchema),
     defaultValues: {
-      email: "aileenambong30@gmail.com",
-      password: "test1234",
+      email: "admin@gmail.com",
+      password: "admin123",
     },
   });
-  const { email, password } = watch();
+  const [email, password] = watch(["email", "password"]);
 
   const disabled = !email || !password;
 
@@ -72,8 +69,7 @@ const Login = () => {
       sessionStorage.setItem("notifyLogInSuccess", "success");
       isDev && console.log({ data });
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : "Unknown error occurred";
+      const message = handleError(err);
 
       setError("root", {
         type: "server",
@@ -98,12 +94,10 @@ const Login = () => {
 
       sessionStorage.setItem("notifyLogInSuccess", "success");
       isDev && console.log({ data });
-      navigate(isDev ? "/" : "https://thecozybud.vercel.app/"); // NOTE: idk yet if im deploy to vercel or cloudflare
+      navigate(isDev ? "/" : "https://thecozybud.vercel.app/"); // NOTE: idk yet if im gon deploy to vercel or cloudflare
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : "Unknown error occurred";
-
-      isDev && console.error(message);
+      const message = handleError(err);
+      console.log(message);
 
       setError("root", {
         type: "server",
@@ -112,8 +106,6 @@ const Login = () => {
     }
     setLoading(false);
   }
-
-  if (checkingAuth) return null;
 
   return (
     <div className="grid lg:grid-cols-[45%_1fr] h-screen">

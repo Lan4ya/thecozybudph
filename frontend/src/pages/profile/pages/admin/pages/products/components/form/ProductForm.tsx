@@ -32,7 +32,6 @@ import {
 } from "./helpers/defaultFormValues";
 import ProductDetails from "./ProductDetails";
 import { formatFileSize } from "@/lib/utils/format";
-import { devLog } from "@/lib/utils/logger";
 import { ProductOptions } from "./ProductOptions";
 import ProductVariants from "./ProductVariants";
 
@@ -123,7 +122,7 @@ export default function ProductForm({
             "basePrice",
           ]);
           if (!valid) {
-            devLog("Step 1 error:", form.formState.errors);
+            console.log("Step 1 error:", form.formState.errors);
             return;
           }
 
@@ -139,7 +138,7 @@ export default function ProductForm({
         case 1: {
           const valid = await form.trigger(["options"]);
           if (!valid) {
-            devLog("Step 2 error:", form.formState.errors.options);
+            console.log("Step 2 error:", form.formState.errors.options);
             return;
           }
           break;
@@ -147,7 +146,7 @@ export default function ProductForm({
         case 2: {
           const valid = await form.trigger(["variants"]);
           if (!valid) {
-            devLog("Step 3 error:", form.formState.errors.variants);
+            console.log("Step 3 error:", form.formState.errors.variants);
             return;
           }
           break;
@@ -166,7 +165,7 @@ export default function ProductForm({
 
   // useEffect(() => {
   //   console.log("current step: ", currentFormStep);
-  //   devLog({ isLastFormStep });
+  //   console.log({ isLastFormStep });
   // }, [currentFormStep]);
 
   // Derive image display: existing minus deletions plus selected blob urls
@@ -381,12 +380,12 @@ export default function ProductForm({
       compressedFiles =
         largeFiles.length > 0 ? await compressImages(largeFiles) : [];
 
-      devLog(largeFiles.map((f) => formatFileSize(f.size)));
-      devLog(compressedFiles.map((f) => formatFileSize(f.size)));
+      console.log(largeFiles.map((f) => formatFileSize(f.size)));
+      console.log(compressedFiles.map((f) => formatFileSize(f.size)));
 
       compressedFiles = [...compressedFiles, ...smallFiles];
 
-      devLog({ compressedFiles });
+      console.log({ compressedFiles });
     }
 
     if (fieldData.mode === "update" && updatingProduct) {
@@ -450,7 +449,7 @@ export default function ProductForm({
           <FormProvider {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit, (err) =>
-                devLog("Form validation errors:", err),
+                console.log("Form validation errors:", err),
               )}
             >
               <div className="max-h-[70dvh] overflow-y-auto custom-container overflow-x-visible">

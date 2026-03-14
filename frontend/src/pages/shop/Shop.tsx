@@ -13,15 +13,16 @@ import Tags from "./components/FilterTags";
 import { useIsExtraLargeScreen } from "@/hooks/useMediaQuery";
 import ShopProductGrid from "./components/ShopProductGrid";
 import { ErrorBoundary } from "react-error-boundary";
+import isDev from "@/lib/utils/isDev";
 
 const Shop = () => {
   const { productQuery, hasProductQueryFilters } = useProductQuery();
   const isXLScreen = useIsExtraLargeScreen();
 
   useEffect(() => {
-    console.log("product query: ", productQuery);
-    console.log("has query filters: ", hasProductQueryFilters);
-  });
+    isDev && console.log("product query: ", productQuery);
+    isDev && console.log("has query filters: ", hasProductQueryFilters);
+  }, [productQuery, hasProductQueryFilters]);
 
   return (
     <div className="max-w-[1600px] mx-auto w-full">

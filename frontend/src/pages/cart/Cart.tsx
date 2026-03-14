@@ -1,6 +1,6 @@
 import { deleteCartItemsSchema, updateCartItemSchema } from "@TheCozyBud/types";
 import CartItem from "./components/CartItem";
-import { DeleteCartItemDialog } from "./components/DeleteDialog";
+import { DeleteCartItemDialog } from "./components/CartItemDeleteDialog";
 import { ArrowLeft, Check } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { useEffect, useState } from "react";
@@ -49,9 +49,8 @@ const Cart = () => {
     })),
   );
 
-  // DEV:
   useEffect(() => {
-    console.log("Cart Items:", cartQueryData);
+    isDev && console.log("Cart Items:", cartQueryData);
   }, [cartQueryData]);
 
   const hydrateCartItems = (): CartItemUI[] => {
@@ -60,7 +59,7 @@ const Cart = () => {
         const existingItem = getCartItem(c.id);
 
         // Fill the cardMessages array with empty strings so its length always matches the item’s quantity.
-        // Needed to render extra empty TextArea's so the user can add more messages if wanted.
+        // This is needed to render extra empty TextArea's so the user can add more messages if wanted.
         const cardMessages =
           c.cardMessages.length < c.quantity
             ? [
@@ -88,16 +87,11 @@ const Cart = () => {
     }
   }, [cartQueryData]);
 
-  // Calculate totals only for selected items
   const selectedItems = cartItems.filter((item) => item.selected);
   const subtotal = selectedItems.reduce(
     (sum, item) => sum + item.product.variant.priceCents * item.quantity,
     0,
   );
-
-  // const shipping = selectedItems.length > 0 ? 150 : 0;
-  // const tax = subtotal * 0.12;
-  // const total = subtotal + shipping + tax;
 
   const { updateCartItemMutation, deleteCartItemsMutation } =
     useCartItemMutations();
@@ -146,67 +140,88 @@ const Cart = () => {
     await deleteCartItemsMutation.mutateAsync({ cartItemIds });
   };
 
+  const hasNoItems =
+    !cartQueryData || (cartQueryData.length === 0 && !isFetching);
+
   if (error && !isFetching) throw error;
 
   return (
     <>
-      <div className="custom-container pt-4 pb-25 max-w-7xl mx-auto">
-        <div className="space-y-8">
-          {/* Header */}
-          <div className="flex justify-between items-center">
+      <div className="custom-container space-y-8 pt-4 pb-25 max-w-7xl mx-auto">
+        <header className="grid grid-cols-3 items-center">
+          <div>
             <Button variant="minimal" size="auto" onClick={() => navigate(-1)}>
               <ArrowLeft />
             </Button>
-
-            <h1 className="text-xl lg:text-2xl font-bold text-foreground">
-              Your Cart
-            </h1>
-
-            <Button
-              variant="minimal"
-              size="auto"
-              className="text-foreground"
-              onClick={() => setIsEditingCart(!isEditingCart)}
-            >
-              <span className="w-8">{isEditingCart ? "Done" : "Edit"}</span>
-            </Button>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Cart Items */}
-            <div className="lg:col-span-2 space-y-6">
-              {cartItems.map((item) => (
-                <CartItem
-                  key={item.id}
-                  cartItemId={item.id}
-                  onToggleSelection={() => toggleItemSelection(item.id!)}
-                  onRequestRemove={() =>
-                    setPendingDeleteIds((p) => [...p, item.id])
-                  }
-                  onUpdateCartItem={(cardMessages, quantity, newVariantId) =>
-                    updateCartItem(
-                      item.id,
-                      cardMessages,
-                      quantity,
-                      newVariantId,
-                    )
-                  }
-                />
-              ))}
+          <h1 className="text-xl lg:text-2xl font-bold text-foreground text-center">
+            Your Cart
+          </h1>
 
-              <DeleteCartItemDialog
-                open={pendingDeleteIds.length > 0}
-                onCancel={() => setPendingDeleteIds([])}
-                onConfirm={() => {
-                  deleteCartItems(pendingDeleteIds);
-                  setPendingDeleteIds([]);
-                }}
-                isDeleting={deleteCartItemLoading}
-                deletingItemCount={pendingDeleteIds.length}
-              />
+          <div className="flex justify-end">
+            {!hasNoItems && (
+              <Button
+                variant="minimal"
+                size="auto"
+                className="text-foreground"
+                onClick={() => setIsEditingCart(!isEditingCart)}
+              >
+                <span className="w-8">{isEditingCart ? "Done" : "Edit"}</span>
+              </Button>
+            )}
+          </div>
+        </header>
+
+        <main>
+          {hasNoItems ? (
+            <div className="mt-40">
+              <p className="text-center text-muted-foreground">
+                No cart items.
+              </p>
             </div>
-          </div>
-        </div>
+          ) : (
+            // Cart Items
+            <div className="max-w-3xl mx-auto">
+              <ul className="lg:col-span-2 space-y-6">
+                {cartItems.map((item) => (
+                  <li key={item.id}>
+                    <CartItem
+                      cartItemId={item.id}
+                      onToggleSelection={() => toggleItemSelection(item.id!)}
+                      onRequestRemove={() =>
+                        setPendingDeleteIds((p) => [...p, item.id])
+                      }
+                      onUpdateCartItem={(
+                        cardMessages,
+                        quantity,
+                        newVariantId,
+                      ) =>
+                        updateCartItem(
+                          item.id,
+                          cardMessages,
+                          quantity,
+                          newVariantId,
+                        )
+                      }
+                    />
+                  </li>
+                ))}
+
+                <DeleteCartItemDialog
+                  open={pendingDeleteIds.length > 0}
+                  onCancel={() => setPendingDeleteIds([])}
+                  onConfirm={() => {
+                    deleteCartItems(pendingDeleteIds);
+                    setPendingDeleteIds([]);
+                  }}
+                  isDeleting={deleteCartItemLoading}
+                  deletingItemCount={pendingDeleteIds.length}
+                />
+              </ul>
+            </div>
+          )}
+        </main>
       </div>
 
       {/* Bottom Bar */}
@@ -256,6 +271,7 @@ const Cart = () => {
             <span className="text-sm">{formatPriceCents(subtotal)}</span>
 
             <Button
+              disabled={hasNoItems}
               onClick={() => {
                 if (selectedItems.length === 0) {
                   addToast("Please select item(s).", "info");

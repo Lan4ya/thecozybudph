@@ -8,15 +8,11 @@ export const AdminLoader = async () => {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    throw redirect("/auth/login");
-  }
+  if (!user) throw redirect("/auth/login");
 
   const isAdmin = user.app_metadata?.role === "admin";
 
-  if (!isAdmin) {
-    throw redirect("/", { status: 403 });
-  }
+  if (!isAdmin) throw redirect("/", { status: 403 });
 
   return null;
 };
@@ -35,15 +31,15 @@ export default function AdminDashboard() {
   const title = routeTitles[location.pathname] ?? "";
 
   return (
-    <div className="pt-3 pb-6 lg:pt-5">
+    <div className="pb-6">
       {/* <AdminDashboardNavbar /> */}
 
-      <h1 className="custom-container flex items-center gap-3 pb-12 text-lg md:text-xl lg:text-2xl font-medium">
-        <Link to="/profile">
-          <ArrowLeft />
-        </Link>
-        {title}
-      </h1>
+      {/* <h1 className="custom-container flex items-center gap-3 pb-12 text-lg md:text-xl lg:text-2xl font-medium"> */}
+      {/*   <Link to="/profile"> */}
+      {/*     <ArrowLeft /> */}
+      {/*   </Link> */}
+      {/*   {title} */}
+      {/* </h1> */}
 
       <DashboardSliderLinks />
 
