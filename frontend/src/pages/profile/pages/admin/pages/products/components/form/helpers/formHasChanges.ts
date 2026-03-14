@@ -1,9 +1,12 @@
 import isEqual from "fast-deep-equal";
-import type { ProductWithRelations } from "@TheCozyBud/types";
-import type { ProductFormValues } from "../ProductForm";
+import type {
+  ProductFormInput,
+  ProductVariant,
+  ProductWithRelations,
+} from "@TheCozyBud/types";
 
 export function formHasChanges(
-  values: ProductFormValues,
+  values: ProductFormInput,
   updatingProduct: ProductWithRelations | null,
   stateOnlyValues?: {
     imagesToDelete?: string[];
@@ -11,14 +14,13 @@ export function formHasChanges(
     primaryImageIndex: number;
   },
 ): boolean {
-  // --- CREATE MODE ---
+  // CREATE MODE
   if (values.mode === "create") {
     const {
       name,
-      price,
+      basePrice,
       description,
-      colorVariants,
-      category,
+      categoryName,
       productImages,
       collectionName,
     } = values;
@@ -26,55 +28,59 @@ export function formHasChanges(
     const noTextData =
       (!name || name.trim() === "") &&
       (!collectionName || collectionName.trim() === "") &&
-      (!price || Number(price) === 0) &&
+      (!basePrice || Number(basePrice) === 0) &&
       (!description || description.trim() === "") &&
-      (!category || category.trim() === "") &&
-      (!colorVariants || colorVariants.length === 0);
+      (!categoryName || categoryName.trim() === "");
 
     const noImages =
       (!productImages || productImages.length === 0) &&
       (stateOnlyValues?.newSelectedFilesCount ?? 0) === 0;
 
-    if (noTextData && noImages) return false;
-
-    return true;
+    const hasChanges = !(noTextData && noImages);
+    return hasChanges;
   }
 
-  // --- UPDATE MODE ---
+  // UPDATE MODE
   if (!updatingProduct) return false;
+
+  function normalizeVariants(variants: Partial<ProductVariant>[]) {
+    return variants.map((v) => ({
+      priceCents: v.priceCents,
+      attributes: v.attributes,
+    }));
+  }
 
   const original = {
     name: updatingProduct.name,
-    price: updatingProduct.price,
     description: updatingProduct.description ?? "",
-    colorVariants: updatingProduct.colorVariants ?? [],
-    category: updatingProduct.categoryName ?? "",
+    categoryName: updatingProduct.categoryName ?? "",
     collectionName: updatingProduct.collectionName ?? "",
     primaryImageIndex:
       updatingProduct.imageUrls.indexOf(updatingProduct.primaryImageUrl) ?? 0,
+    options: updatingProduct.options,
+    variants: normalizeVariants(updatingProduct.variants),
   };
 
-  const { name, price, description, category, colorVariants, collectionName } =
-    values;
+  const { name, description, variants, categoryName, collectionName } = values;
 
   const current = {
     name,
-    price,
     description: description ?? "",
-    colorVariants: colorVariants ?? [],
-    category: category ?? "",
+    categoryName: categoryName ?? "",
     collectionName: collectionName ?? "",
     primaryImageIndex: stateOnlyValues?.primaryImageIndex ?? 0,
+    options: values.options,
+    variants: normalizeVariants(variants ?? []),
   };
 
   // Compare main fields
   if (!isEqual(original, current)) {
-    // console.log("og", original);
-    // console.log("cur", current);
+    console.log("original: ", original);
+    console.log("current: ", current);
     return true;
   }
 
-  // If any image change occurred (add, remove)
+  // If any image change occurred
   if (
     (stateOnlyValues?.imagesToDelete?.length ?? 0) > 0 ||
     (stateOnlyValues?.newSelectedFilesCount ?? 0) > 0

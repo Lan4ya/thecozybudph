@@ -27,11 +27,11 @@ apiClient.interceptors.response.use(
     return response.data.data;
   },
   function normalizeApiError(error) {
-    return Promise.reject(normalizeHTTPError(error));
+    return Promise.reject(normalizeError(error));
   },
 );
 
-const normalizeHTTPError = (error: unknown) => {
+const normalizeError = (error: unknown) => {
   if (axios.isAxiosError(error)) {
     if (error.response?.data?.error) {
       const httpError = error.response.data.error as ApiResponseError["error"];

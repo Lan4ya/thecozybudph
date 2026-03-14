@@ -3,10 +3,9 @@ import { ProductImage } from "@/components/products/ProductImage";
 import { ProductAPI } from "@/api/product";
 import type { ProductWithRelations } from "@TheCozyBud/types";
 import { Button } from "@/lib/ui/__shadcn__/button";
-import { formatPriceCents } from "@/lib/utils/format";
 import { useProductMutations } from "@/features/admin/hooks/useProductsMutations";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
-import { Edit } from "lucide-react";
+import { Check, Edit } from "lucide-react";
 import {
   memo,
   useCallback,
@@ -18,6 +17,7 @@ import {
 } from "react";
 import ProductTableItemsSkeleton from "@/lib/ui/skeletons/AdminProductTableItemSkeleton";
 import { DeleteProductDialog } from "./DeleteDialog";
+import { cn } from "@/lib/utils/cn";
 
 export default function ProductTable({
   onEdit,
@@ -37,7 +37,7 @@ export default function ProductTable({
   } = useSuspenseInfiniteQuery<ProductWithRelations[]>({
     queryKey: ["__admin__products__"],
     queryFn: ({ pageParam }) =>
-      ProductAPI.queryListItems({
+      ProductAPI.queryProducts({
         page: pageParam as number,
         perPage,
       }),
@@ -84,7 +84,7 @@ export default function ProductTable({
   return (
     <div className="flex flex-col gap-4">
       {allProducts.map((p) => (
-        <ProductTableItem
+        <ProductTableRow
           key={p.id}
           onEdit={onEdit}
           product={p}
@@ -111,7 +111,7 @@ type ProductTableInnerProps = {
   setDeletingIds: Dispatch<SetStateAction<Set<string>>>;
 };
 
-function ProductTableItemInner({
+function ProductTableInner({
   product,
   onEdit,
   deletingIds,
@@ -139,41 +139,52 @@ function ProductTableItemInner({
   }, [deleteProductMutation, product.id]);
 
   return (
-    <article className="border flex-between gap-4 px-3 py-4 rounded-lg hover:shadow-sm transition">
+    <article className="border flex items-center gap-4 px-2 py-4 rounded-lg hover:shadow-sm transition">
+      {/* Selection Toggle */}
+      <div className="flex items-center">
+        <div
+          onClick={(e) => {
+            // e.stopPropagation();
+            // onToggleSelection();
+          }}
+          className={cn(
+            "flex-center size-5 border-2 rounded cursor-pointer transition-all",
+            // selected
+            false
+              ? "bg-primary border-primary text-primary-foreground"
+              : "border-muted-foreground hover:border-primary",
+          )}
+        >
+          {/* {selected && <Check className="size-3" />} */}
+        </div>
+      </div>
+
+      {/* Image */}
       <div className="flex items-center gap-4 min-w-0">
-        {product.imageUrls?.[0] && (
+        {product.primaryImageUrl && (
           <ProductImage
             src={product.primaryImageUrl ?? product.imageUrls[0]}
             alt={product.name}
             roundedSize="md"
-            className="size-25"
+            className="size-20"
           />
         )}
 
-        <div className="min-w-0 flex flex-col flex-1">
-          <h3 className="text-xs lg:text-base font-medium truncate">
+        {/* Row Details */}
+        <div className="min-w-0 w-40 flex flex-col flex-1">
+          <h3 className="text-sm lg:text-base font-medium truncate">
             {product.name}
           </h3>
+
           {product.collectionName && (
             <p className="text-xs lg:text-sm mt-1 text-muted-foreground line-clamp-2">
               Collection: {product.collectionName}
             </p>
           )}
-          {/* FIX: */}
-          {product.colorVariants?.length > 0 && (
-            <div className="flex items-center gap-2 text-xs lg:text-sm text-muted-foreground line-clamp-2">
-              Color Variants:
-              <ProductColorVariantCircles
-                colorVariants={product.colorVariants}
-              />
-            </div>
-          )}
-          <p className="text-primary text-md">
-            {formatPriceCents(product.price)}
-          </p>
         </div>
       </div>
 
+      {/* Edit */}
       <div className="flex flex-col items-center gap-3">
         <Button
           variant="outline"
@@ -184,14 +195,14 @@ function ProductTableItemInner({
           <Edit className="size-4" />
         </Button>
 
-        <DeleteProductDialog
-          product={product}
-          onConfirm={handleDelete}
-          isDeleting={isDeleting}
-        />
+        {/*   <DeleteProductDialog */}
+        {/*     product={product} */}
+        {/*     onConfirm={handleDelete} */}
+        {/*     isDeleting={isDeleting} */}
+        {/*   /> */}
       </div>
     </article>
   );
 }
 
-const ProductTableItem = memo(ProductTableItemInner);
+const ProductTableRow = memo(ProductTableInner);

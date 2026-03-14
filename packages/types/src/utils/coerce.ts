@@ -1,10 +1,11 @@
 import { z, ZodType } from "zod";
 
 export const coerceNumber = <T extends ZodType<any, any>>(schema: T) =>
-  z.preprocess((val) => {
-    if (typeof val === "string") return Number(val);
-    return val;
-  }, schema);
+  z.preprocess(
+    (val) =>
+      typeof val === "string" && val.trim() === "" ? undefined : Number(val),
+    schema,
+  );
 
 export const stringToArray = (schema: ZodType = z.string()) =>
   z.preprocess((val) => {

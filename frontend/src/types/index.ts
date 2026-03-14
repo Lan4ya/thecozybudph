@@ -1,4 +1,4 @@
-export interface ProductQueryAPI {
+export interface ProductQueryListItemsAPI {
   filters?: ProductFilters;
   sort?: ProductSortOption;
   page?: number;
