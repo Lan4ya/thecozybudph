@@ -15,6 +15,7 @@ import {
   mapProductAndRelationsRowToProductWithRelationsDomain,
   mapProductAndVariantsRowToProductDomain,
 } from "@/lib/utils/mappers";
+import isDev from "@/lib/utils/isDev";
 
 export const ProductAPI = {
   // Queries the minimum information of products to display in shop
@@ -163,7 +164,7 @@ export const ProductAPI = {
       .select("*, product_variants(id, attributes, price_cents)")
       .in("id", productIds);
 
-    console.log("Fetching products by ids...", data);
+    isDev && console.log("Fetching products by ids...", data);
 
     if (error) throw error;
     if (!data) return null;
@@ -195,8 +196,8 @@ export const ProductAPI = {
       .from("product_categories")
       .select("*");
 
-    console.log("Fetching categories...");
-    console.log(data);
+    isDev && console.log("Fetching categories...");
+    isDev && console.log(data);
     if (error) throw error;
     return snakeToCamel(data ?? []);
   },
@@ -206,8 +207,8 @@ export const ProductAPI = {
       .from("product_collections")
       .select("*");
 
-    console.log("Fetching collections...");
-    console.log(data);
+    isDev && console.log("Fetching collections...");
+    isDev && console.log(data);
 
     if (error) throw error;
     return snakeToCamel(data ?? []);

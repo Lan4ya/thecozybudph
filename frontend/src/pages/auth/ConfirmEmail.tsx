@@ -1,27 +1,31 @@
-import { useState } from "react";
+import LOGO from "@/assets/thecozybud/logo_transparent_oneline1.png";
+import { useLayoutEffect, useState } from "react";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { supabase } from "@/lib/supabase/client";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import isDev from "@/lib/utils/isDev";
 import { useNavigate } from "react-router";
-import { useRedirectIfAuthed } from "@/hooks/useRedirectIfAuthed";
 
 export const ConfirmEmail = () => {
-  const checkingAuth = useRedirectIfAuthed();
-
   const navigate = useNavigate();
+  const [email, setEmail] = useState<string | null>(null);
 
-  const email = localStorage.getItem("confirm-email");
-  if (!email) {
-    navigate("/auth/signup");
-    return null;
-  }
+  useLayoutEffect(() => {
+    const storedEmail = localStorage.getItem("confirm-email");
+    if (!storedEmail) {
+      navigate("/auth/signup", { replace: true });
+      return;
+    }
+    setEmail(storedEmail);
+  }, [navigate]);
 
-  const [resending, setResending] = useState(false);
-  const [sent, setSent] = useState(false);
+  const [isResending, setResending] = useState(false);
+  const [isSent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleResend = async () => {
+    if (!email) return;
+
     setResending(true);
     setError(null);
 
@@ -30,54 +34,69 @@ export const ConfirmEmail = () => {
       email,
       options: {
         emailRedirectTo: isDev
-          ? "http://localhost:5173/dashboard"
+          ? "http://localhost:5173/"
           : "https:thecozybud.vercel.app",
       },
     });
 
     if (error) {
-      setError(error.message || "Failed to resend email. Try again later.");
-    } else {
-      setSent(true);
-      localStorage.removeItem("confirm-email");
+      isDev && console.log(error.message);
+      setError("Failed to resend email. Please try again later.");
+      return;
     }
 
+    setSent(true);
     setResending(false);
   };
 
-  if (checkingAuth) return null;
+  if (!email) return null;
 
   return (
-    <div className="h-screen max-w-md mx-auto p-6 backdrop-blur-md rounded-xl shadow-md flex-center flex-col  text-center space-y-4">
-      <h2 className="text-2xl font-semibold text-foreground">Almost there!</h2>
-      <p className="text-gray-600">
-        A confirmation email has been sent to{" "}
-        <span className="font-medium text-gray-800">{email}</span>. Please check
-        your inbox and click the verification link to activate your account.
-      </p>
+    <main className="custom-container border flex-center flex-col min-h-screen">
+      <div className="px-4 w-full py-3 mb-6 flex-center">
+        <img
+          loading="eager"
+          decoding="sync"
+          src={LOGO}
+          alt="logo"
+          className="h-full w-40"
+        />
+      </div>
 
-      {sent ? (
-        <p className="text-green-600 font-medium">
-          Verification email resent! Check your inbox.
+      <div className="border h-[50vh] shadow-md  max-w-md p-6 backdrop-blur-md rounded-xl flex-center flex-col text-center space-y-4">
+        <h2 className="text-2xl font-semibold text-foreground">
+          Almost there!
+        </h2>
+        <p className="text-gray-600">
+          A confirmation email has been sent to{" "}
+          <span className="font-medium text-gray-800">{email}</span>. Please
+          check your inbox and click the verification link to activate your
+          account.
         </p>
-      ) : (
-        <Button
-          type="button"
-          variant="outline"
-          className="flex items-center justify-center gap-2"
-          onClick={handleResend}
-          disabled={resending}
-        >
-          {resending && <Spinner />}
-          Resend Email
-        </Button>
-      )}
 
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+        {isSent ? (
+          <p className="text-green-600 font-medium">
+            Verification email resent! Check your inbox.
+          </p>
+        ) : (
+          <Button
+            type="button"
+            variant="outline"
+            className="flex items-center justify-center gap-2"
+            onClick={handleResend}
+            disabled={isResending}
+          >
+            {isResending && <Spinner />}
+            Resend
+          </Button>
+        )}
 
-      <p className="text-gray-400 text-xs mt-2">
-        Didn’t receive the email? Check your spam folder.
-      </p>
-    </div>
+        {error && <p className="text-red-500 text-sm">{error}</p>}
+
+        <p className="text-gray-400 text-xs mt-2">
+          Didn’t receive the email? Check your spam folder.
+        </p>
+      </div>
+    </main>
   );
 };

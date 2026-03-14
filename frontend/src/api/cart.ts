@@ -1,4 +1,5 @@
 import { apiClient } from "@/lib/axios/client";
+import isDev from "@/lib/utils/isDev";
 
 import type {
   AddCartItemInput,
@@ -11,7 +12,7 @@ import type {
 
 export const CartAPI = {
   getItems: async (): Promise<CartItem[]> => {
-    console.log("fetching cart items...");
+    isDev && console.log("fetching cart items...");
     return apiClient.get("/cart/items");
   },
 
@@ -23,7 +24,7 @@ export const CartAPI = {
     cartItemId: string,
     payload: UpdateCartItemInput,
   ): Promise<UpdateCartItemRes> => {
-    console.log("updating cart item...");
+    isDev && console.log("updating cart item...");
     return apiClient.patch(`/cart/items/${cartItemId}`, payload);
   },
 

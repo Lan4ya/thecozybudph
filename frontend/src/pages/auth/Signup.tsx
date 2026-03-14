@@ -1,6 +1,6 @@
 import LOGO from "@/assets/thecozybud/logo_transparent_oneline1.png";
 import sign_up_pic from "@/assets/thecozybud/TCB_4.png";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import isDev from "@/lib/utils/isDev";
 
@@ -20,11 +20,9 @@ import { useIsLargeScreen } from "@/hooks/useMediaQuery";
 import { signUpSchema, type SignUp } from "@TheCozyBud/types/src/schema/auth";
 import { Input } from "@/lib/ui/__shadcn__/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRedirectIfAuthed } from "@/hooks/useRedirectIfAuthed";
+import { handleError } from "@/lib/utils/format";
 
 const Signup = () => {
-  const checkingAuth = useRedirectIfAuthed();
-
   const [loading, setLoading] = useState(false);
   const [passVisible, setPassVisible] = useState(false);
   const [signUpSucess, setSignUpSuccess] = useState(false);
@@ -43,12 +41,8 @@ const Signup = () => {
     setError,
   } = useForm<SignUp>({
     resolver: zodResolver(signUpSchema),
-    defaultValues: {
-      email: "aileenambong30@gmail.com",
-      password: "test1234",
-    },
   });
-  const { email, password } = watch();
+  const [email, password] = watch(["email", "password"]);
 
   const disabled = !email || !password;
 
@@ -65,7 +59,7 @@ const Signup = () => {
         options: {
           redirectTo: isDev
             ? "http://localhost:5173/"
-            : "https://thecozybud.vercel.app/", // NOTE: idk yet if im deploy to vercel or cloudflare
+            : "https://thecozybud.vercel.app/", // NOTE: idk yet if im gon deploy to vercel or cloudflare
         },
       });
       if (error) throw error;
@@ -73,8 +67,7 @@ const Signup = () => {
       sessionStorage.setItem("notifyLogInSuccess", "success");
       isDev && console.log({ data });
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : "Unknown error occurred";
+      const message = handleError(err);
 
       setError("root", {
         type: "server",
@@ -98,7 +91,11 @@ const Signup = () => {
       } = await supabase.auth.signUp({
         email,
         password,
-        options: { emailRedirectTo: "/" },
+        options: {
+          emailRedirectTo: isDev
+            ? "http://localhost:5173/"
+            : "https:thecozybud.vercel.app",
+        },
       });
 
       if (error) {
@@ -136,12 +133,12 @@ const Signup = () => {
     }
   };
 
-  if (checkingAuth) return null;
-
-  if (signUpSucess) {
-    localStorage.setItem("confirm-email", email);
-    navigate("/auth/confirm-email");
-  }
+  useEffect(() => {
+    if (signUpSucess) {
+      localStorage.setItem("confirm-email", email);
+      navigate("/auth/confirm-email");
+    }
+  }, [signUpSucess, email, navigate]);
 
   return (
     <div className="grid lg:grid-cols-[45%_1fr] h-screen">

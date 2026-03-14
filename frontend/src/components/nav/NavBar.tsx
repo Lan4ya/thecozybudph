@@ -17,6 +17,7 @@ const NavBar = () => {
   const pathname = useLocation().pathname;
   const { registerSentinel, visibleMap } = useAnimateOnView();
   const { data: cartItems } = useCartQuery();
+  const cartItemsCount = cartItems?.length ?? 0;
 
   useEffect(() => {
     if (pathname !== "/" || isMediumScreenAndBelow) {
@@ -48,7 +49,6 @@ const NavBar = () => {
         visibleMap[0]
           ? "opacity-100 translate-y-0"
           : "opacity-0 -translate-y-8",
-
         isBackgroundShown && "shadow-xs bg-background backdrop-blur-sm ",
       )}
     >
@@ -56,10 +56,7 @@ const NavBar = () => {
       <div className="flex items-center gap-1">
         <NavLink
           to="/"
-          className={cn(
-            "font-back-to-black select-none text-primary hover:text-primary/85 text-2xl lg:text-3xl lg:font-semibold",
-            // pathname === "/" ? "cursor-default" : "cursor-pointer",
-          )}
+          className="font-back-to-black select-none text-primary hover:text-primary/85 text-2xl lg:text-3xl lg:font-semibold"
           onClick={handleLogoClick}
         >
           <div className={cn("w-32 lg:w-37 p-0 m-0 ")}>
@@ -78,7 +75,7 @@ const NavBar = () => {
         <div className="flex-center gap-6">
           <div className="relative">
             <div className="absolute -right-3.5 -top-[9px] flex-center text-secondary-foreground text-[9px] font-medium bg-secondary size-5 rounded-full select-none">
-              {cartItems?.length ?? 0}
+              {cartItemsCount}
             </div>
 
             <NavLink
@@ -98,7 +95,10 @@ const NavBar = () => {
 
       {/* Desktop Layout */}
       {!isMediumScreenAndBelow && (
-        <DesktopNavLinks isBackgroundShown={isBackgroundShown} />
+        <DesktopNavLinks
+          cartItemsCount={cartItemsCount}
+          isBackgroundShown={isBackgroundShown}
+        />
       )}
     </nav>
   );

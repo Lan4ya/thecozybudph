@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { supabase } from "@/lib/supabase/client";
 import type { Session } from "@supabase/supabase-js";
+import isDev from "@/lib/utils/isDev";
 
 type AuthState = {
   session: Session | null;
@@ -31,7 +32,7 @@ export const initAuthStore = () => {
       data: { session },
     } = await supabase.auth.getSession();
 
-    // console.log({ session });
+    isDev && console.log("hasSession: ", !!session);
     // console.log({ user: session?.user });
 
     if (!mounted) return;
@@ -46,6 +47,12 @@ export const initAuthStore = () => {
     (_event, session) => {
       if (!mounted) return;
       setSession(session ?? null);
+
+      // Clean up confirm-email from localStorage once the user has verified their email.
+      // This is added afterlsign up.
+      if (session?.user?.confirmed_at) {
+        localStorage.removeItem("confirm-email");
+      }
     },
   );
 

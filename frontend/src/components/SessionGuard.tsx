@@ -15,15 +15,13 @@ export default function SessionGuard() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const protectedPrefixes = ["/profile"];
-  const isProtectedRoute = protectedPrefixes.some((p) =>
+  const protectedRoutes = ["/profile"];
+  const isProtectedRoute = protectedRoutes.some((p) =>
     location.pathname.startsWith(p),
   );
   const showModal = !session && isProtectedRoute;
 
-  const handleLoginRedirect = () => {
-    navigate("/auth/signup");
-  };
+  const handleLoginRedirect = () => navigate("/auth/signup");
 
   if (!showModal) return null;
 

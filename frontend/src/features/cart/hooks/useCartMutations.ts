@@ -1,5 +1,5 @@
 import { CartAPI } from "@/api/cart";
-import { devLog } from "@/lib/utils/logger";
+import isDev from "@/lib/utils/isDev";
 import { useToast } from "@/providers/ToastProvider";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { CartItem } from "@TheCozyBud/types";
@@ -11,8 +11,8 @@ export const useCartItemMutations = () => {
   const addToCartMutation = useMutation({
     mutationFn: CartAPI.addItems,
     onError: (err: Error) => {
+      isDev && console.error(err.message);
       addToast("Something wen't wrong. Please try again later.", "error");
-      devLog(err.message);
     },
     onSuccess: (cartItem) => {
       queryClient.setQueryData<CartItem[]>(["cart"], (old = []) => {
@@ -51,8 +51,8 @@ export const useCartItemMutations = () => {
       });
     },
     onError: (err: Error) => {
+      isDev && console.error(err.message);
       addToast("Something went wrong. Please try again later.", "error");
-      devLog(err.message);
     },
   });
 
@@ -96,8 +96,8 @@ export const useCartItemMutations = () => {
       });
     },
     onError: (err: Error) => {
+      isDev && console.error(err.message);
       addToast("Something wen't wrong. Please try again later.", "error");
-      devLog(err.message);
     },
   });
 

@@ -35,17 +35,8 @@ export const CartItemOptionsDrawer = ({
 }: CartItemDrawerProps) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const {
-    getCartItem,
-    setCartItems,
-    increment,
-    decrement,
-    // selectedOptions,
-    // setSelectedOption,
-  } = useCartStore(
+  const { getCartItem, setCartItems, increment, decrement } = useCartStore(
     useShallow((s) => ({
-      // selectedOptions: s.selectedOptions,
-      // setSelectedOption: s.setSelectedOption,
       getCartItem: s.getCartItem,
       setCartItems: s.setCartItems,
       increment: s.increment,

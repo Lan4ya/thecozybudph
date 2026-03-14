@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router";
 import { cn } from "@/lib/utils/cn";
-import { supabase } from "@/lib/supabase/client";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const navItems = [
   { label: "Shop", href: "/shop" },
@@ -17,15 +17,13 @@ const navItems = [
 ];
 
 export const DesktopNavLinks = ({
+  cartItemsCount,
   isBackgroundShown,
 }: {
+  cartItemsCount: boolean;
   isBackgroundShown: boolean;
 }) => {
-  const [hasSession, setHasSession] = useState(false);
-
-  supabase.auth.getSession().then(({ data: { session } }) => {
-    if (session) setHasSession(true);
-  });
+  const hasSession = useAuthStore((s) => s.session);
 
   const [hovered, setHovered] = useState<string | null>(null);
   const location = useLocation();
@@ -96,7 +94,7 @@ export const DesktopNavLinks = ({
           )}
         >
           <div className="absolute -right-3.5 -top-[9px] flex-center text-secondary-foreground text-[9px] font-medium bg-secondary size-5 rounded-full select-none">
-            0
+            {cartItemsCount}
           </div>
           <ShoppingCart />
         </NavLink>
