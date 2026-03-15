@@ -2,7 +2,10 @@ import Carousel from "./components/Carousel.tsx";
 import { Link, useParams } from "react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ProductAPI } from "@/api/product.ts";
-import { type Product, addCartItemSchema } from "@TheCozyBud/types";
+import {
+  type Product as ProductType,
+  addCartItemSchema,
+} from "@TheCozyBud/types";
 import PersistSuspense from "@/components/PersistSuspense";
 import { RouteLoaderSpinner } from "@/components/RouteLoaderSpinner";
 import { ArrowLeft } from "lucide-react";
@@ -20,17 +23,17 @@ import isDev from "@/lib/utils/isDev";
 import { useCartItemMutations } from "@/features/cart/hooks/useCartMutations.ts";
 import { useAuthStore } from "@/store/useAuthStore.tsx";
 
-export const ProductDetails = () => {
+const Product = () => {
   return (
     <div className="max-w-7xl flex flex-col items-center gap-8 mb-25 lg:grid lg:grid-cols-2 lg:gap-12 lg:items-start lg:mt-8 justify-center lg:mx-auto lg:px-6">
       <PersistSuspense fallback={<RouteLoaderSpinner />}>
-        <ProductDetailsInner />
+        <ProductInner />
       </PersistSuspense>
     </div>
   );
 };
 
-const ProductDetailsInner = () => {
+const ProductInner = () => {
   const { id } = useParams();
 
   const isValidUUID = useMemo(() => {
@@ -46,7 +49,7 @@ const ProductDetailsInner = () => {
     data: product,
     isLoading: getProductLoading,
     error,
-  } = useSuspenseQuery<Product | null>({
+  } = useSuspenseQuery<ProductType | null>({
     queryKey: ["product", id],
     queryFn: () => {
       if (!isValidUUID || !id) return Promise.resolve(null);
@@ -253,3 +256,5 @@ const ProductDetailsInner = () => {
     </>
   );
 };
+
+export default Product;

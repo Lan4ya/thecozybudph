@@ -1,11 +1,11 @@
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  computePosition,
-  offset,
-  flip,
-  shift,
-  autoUpdate,
-} from "@floating-ui/dom";
+// import {
+//   computePosition,
+//   offset,
+//   flip,
+//   shift,
+//   autoUpdate,
+// } from "@floating-ui/dom";
 
 import React, {
   forwardRef,

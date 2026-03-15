@@ -1,6 +1,6 @@
 import GridStyleButtons from "./components/GridStyleButtons";
 import { ShoppingBag } from "lucide-react";
-import { useProductQuery } from "../../features/shop/hooks/useFilters";
+import { useProductQueryState } from "@/features/shop/hooks/useProductQueryState";
 import { useEffect } from "react";
 import { SortDropdownMenu } from "./components/SortDropDown";
 import Search from "./components/filters/Search";
@@ -11,12 +11,12 @@ import PersistSuspense from "@/components/PersistSuspense";
 import { ShopProductGridSkeleton } from "../../lib/ui/skeletons/ShopProductGridItemsSkeleton";
 import Tags from "./components/FilterTags";
 import { useIsExtraLargeScreen } from "@/hooks/useMediaQuery";
-import ShopProductGrid from "./components/ShopProductGrid";
+import ProductsGrid from "./components/ProductsGrid";
 import { ErrorBoundary } from "react-error-boundary";
 import isDev from "@/lib/utils/isDev";
 
 const Shop = () => {
-  const { productQuery, hasProductQueryFilters } = useProductQuery();
+  const { productQuery, hasProductQueryFilters } = useProductQueryState();
   const isXLScreen = useIsExtraLargeScreen();
 
   useEffect(() => {
@@ -79,7 +79,7 @@ const Shop = () => {
               </div>
             }
           >
-            <ShopProductGrid />
+            <ProductsGrid />
           </PersistSuspense>
         </ErrorBoundary>
       </main>

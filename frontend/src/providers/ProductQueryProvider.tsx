@@ -1,9 +1,9 @@
 import { useLocation, useSearchParams } from "react-router";
 import { createContext, useCallback, useEffect, useMemo } from "react";
 import type { ProductQueryDomain } from "@/types";
-import { getProductQueryParams } from "@/features/shop/utils/parseProductQueryParams";
+import { parseProductQueryParams } from "@/features/shop/utils/parseProductQueryParams";
 
-type ProductQueryContextType = {
+type ProductQueryStateContextType = {
   productQuery: ProductQueryDomain;
   setProductQuery: (
     updates:
@@ -14,12 +14,10 @@ type ProductQueryContextType = {
   clearProductQueryFilters: () => void;
 };
 
-// const DEFAULT_SORT = "Popularity";
+export const ProductQueryStateContext =
+  createContext<ProductQueryStateContextType | null>(null);
 
-export const ProductQueryContext =
-  createContext<ProductQueryContextType | null>(null);
-
-export function ProductQueryProvider({
+export function ProductQueryStateProvider({
   children,
 }: {
   children: React.ReactNode;
@@ -27,7 +25,8 @@ export function ProductQueryProvider({
   const [searchParams, setSearchParams] = useSearchParams();
   const pathname = useLocation().pathname;
 
-  const productQuery: ProductQueryDomain = getProductQueryParams(searchParams);
+  const productQuery: ProductQueryDomain =
+    parseProductQueryParams(searchParams);
 
   // default sort search param
   useEffect(() => {
@@ -43,7 +42,7 @@ export function ProductQueryProvider({
         | Partial<ProductQueryDomain>
         | ((pq: ProductQueryDomain) => Partial<ProductQueryDomain>),
     ) => {
-      const qp: ProductQueryDomain = getProductQueryParams(searchParams);
+      const qp: ProductQueryDomain = parseProductQueryParams(searchParams);
       const nextQp = typeof updates === "function" ? updates(qp) : updates;
 
       // Handle filters
@@ -75,7 +74,7 @@ export function ProductQueryProvider({
   );
 
   const clearProductQueryFilters = useCallback(() => {
-    const qp = getProductQueryParams(searchParams);
+    const qp = parseProductQueryParams(searchParams);
 
     if (qp.filters) {
       Object.keys(qp.filters).forEach((key) => {
@@ -105,8 +104,8 @@ export function ProductQueryProvider({
   );
 
   return (
-    <ProductQueryContext.Provider value={value}>
+    <ProductQueryStateContext.Provider value={value}>
       {children}
-    </ProductQueryContext.Provider>
+    </ProductQueryStateContext.Provider>
   );
 }

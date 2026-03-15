@@ -1,23 +1,7 @@
-import { Link, Outlet, redirect, useLocation } from "react-router";
-import { supabase } from "@/lib/supabase/client";
-import { ArrowLeft } from "lucide-react";
-import { DashboardSliderLinks } from "./components/DashboardSliderLinks";
+import { Outlet, useLocation } from "react-router";
+import { DashboardSliderLinks } from "./components/SliderLinks";
 
-export const AdminLoader = async () => {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) throw redirect("/auth/login");
-
-  const isAdmin = user.app_metadata?.role === "admin";
-
-  if (!isAdmin) throw redirect("/", { status: 403 });
-
-  return null;
-};
-
-export default function AdminDashboard() {
+const AdminDashboard = () => {
   const location = useLocation();
 
   const routeTitles: Record<string, string> = {
@@ -48,4 +32,6 @@ export default function AdminDashboard() {
       </main>
     </div>
   );
-}
+};
+
+export default AdminDashboard;

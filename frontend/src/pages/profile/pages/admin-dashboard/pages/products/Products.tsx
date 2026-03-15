@@ -17,7 +17,7 @@ import type { ProductWithRelations } from "@TheCozyBud/types";
 import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 import ProductTableItemsSkeleton from "../../../../../../lib/ui/skeletons/AdminProductTableItemSkeleton";
 
-export default function AdminDashboardProducts() {
+export default function Products() {
   const [formOpen, setFormOpen] = useState(false);
   const [updatingProduct, setUpdatingProduct] =
     useState<ProductWithRelations | null>(null);

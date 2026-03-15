@@ -2,7 +2,7 @@ import { supabase } from "@/lib/supabase/client";
 import isDev from "@/lib/utils/isDev";
 import { redirect } from "react-router";
 
-export const AuthLoader = async () => {
+const AuthLoader = async () => {
   const {
     data: { session },
   } = await supabase.auth.getSession();
@@ -13,3 +13,5 @@ export const AuthLoader = async () => {
     return null;
   }
 };
+
+export default AuthLoader;

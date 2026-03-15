@@ -3,7 +3,7 @@ import type {
   ProductFiltersDomain,
   ProductPriceRangeOption,
 } from "../../../types";
-import { useProductQuery } from "../../../features/shop/hooks/useFilters";
+import { useProductQueryState } from "../../../features/shop/hooks/useProductQueryState";
 import { useIsExtraLargeScreen } from "@/hooks/useMediaQuery";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import toggleArrItem from "@/lib/utils/toggleArrItem";
@@ -21,7 +21,7 @@ const xIcon = <X className="size-4" />;
 
 const Tags = () => {
   const [isClearFilterItemsBtnShown, showClearFilterItemsBtn] = useState(false);
-  const { productQuery, hasProductQueryFilters } = useProductQuery();
+  const { productQuery, hasProductQueryFilters } = useProductQueryState();
   const isXlScreen = useIsExtraLargeScreen();
 
   const queryCount = useMemo(
@@ -128,7 +128,7 @@ type TagItemProps = {
 };
 
 const TagItem = ({ label, filterKey, isXlScreen }: TagItemProps) => {
-  const { setProductQuery, clearProductQueryFilters } = useProductQuery();
+  const { setProductQuery, clearProductQueryFilters } = useProductQueryState();
 
   return (
     <Button

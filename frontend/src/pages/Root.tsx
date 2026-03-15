@@ -2,7 +2,7 @@ import { Outlet, useLocation } from "react-router";
 import NavBar from "@/components/nav/NavBar";
 import Footer from "@/components/Footer";
 import { cn } from "@/lib/utils/cn";
-import { ProductQueryProvider } from "@/providers/ProductQueryProvider";
+import { ProductQueryStateProvider } from "@/providers/ProductQueryProvider";
 import SessionGuard from "@/components/SessionGuard";
 import { initAuthStore } from "@/store/useAuthStore";
 import { useEffect, useMemo } from "react";
@@ -35,7 +35,7 @@ function Root() {
     <>
       <SessionGuard />
 
-      <ProductQueryProvider>
+      <ProductQueryStateProvider>
         <div
           className={cn(
             "flex flex-col min-h-screen",
@@ -49,7 +49,7 @@ function Root() {
           <Outlet />
           {!hideFooter && <Footer />}
         </div>
-      </ProductQueryProvider>
+      </ProductQueryStateProvider>
     </>
   );
 }

@@ -4,7 +4,7 @@ import type {
   ProductSortOption,
 } from "@/types";
 
-export function getProductQueryParams(
+export function parseProductQueryParams(
   params: URLSearchParams,
 ): ProductQueryDomain {
   const filters: ProductQueryDomain["filters"] = {};
