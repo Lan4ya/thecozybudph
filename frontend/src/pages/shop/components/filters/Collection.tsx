@@ -2,20 +2,11 @@ import searchSubstring from "@/lib/utils/searchSubstring";
 import { useMemo, useState } from "react";
 import { FilterDropdown } from "./FilterDropDown";
 import { FilterDropdownItem } from "./FilterDropdownItem";
-import { ProductAPI } from "@/api/product";
-import { useQuery } from "@tanstack/react-query";
-import type { ProductCollection } from "@TheCozyBud/types";
+import { useCollectionsQuery } from "@/features/shop/hooks/useCollectionsQuery";
 
 const Collections = () => {
   const [inputValue, setInputValue] = useState("");
-  const {
-    data: collections,
-    error,
-    isLoading,
-  } = useQuery<ProductCollection[]>({
-    queryKey: ["product_collections"],
-    queryFn: ProductAPI.getCollections,
-  });
+  const { collections, error, isLoading } = useCollectionsQuery();
 
   const filteredCollections = useMemo(() => {
     return searchSubstring(collections ?? [], inputValue, (item) => item.name);

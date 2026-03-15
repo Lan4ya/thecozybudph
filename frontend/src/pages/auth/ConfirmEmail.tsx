@@ -6,7 +6,7 @@ import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import isDev from "@/lib/utils/isDev";
 import { useNavigate } from "react-router";
 
-export const ConfirmEmail = () => {
+const ConfirmEmail = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState<string | null>(null);
 
@@ -100,3 +100,5 @@ export const ConfirmEmail = () => {
     </main>
   );
 };
+
+export default ConfirmEmail;

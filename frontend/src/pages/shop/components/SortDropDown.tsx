@@ -8,12 +8,12 @@ import {
   DropdownMenuTrigger,
 } from "@/lib/ui/__shadcn__/dropdown-menu";
 import { ArrowUpDown } from "lucide-react";
-import { useProductQuery } from "../../../features/shop/hooks/useFilters";
+import { useProductQueryState } from "../../../features/shop/hooks/useProductQueryState";
 import type { ProductSortOption } from "../../../types";
 import { DropdownMenuRadioGroup } from "@radix-ui/react-dropdown-menu";
 
 export function SortDropdownMenu() {
-  const { productQuery, setProductQuery } = useProductQuery();
+  const { productQuery, setProductQuery } = useProductQueryState();
   const [sortOpt, setSortOpt] = React.useState<ProductSortOption>(
     productQuery.sort ?? "Popularity",
   );

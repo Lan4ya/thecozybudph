@@ -1,26 +1,25 @@
 import { createBrowserRouter, redirect } from "react-router";
+import { RouteLoaderSpinner } from "./components/RouteLoaderSpinner.tsx";
+import { CatchAllErrorPage } from "./pages/ErrorPage.tsx";
 import Root from "./pages/Root.tsx";
-import Home from "./pages/home/Home.tsx";
-import Shop from "./pages/shop/Shop.tsx";
-import Cart from "./pages/cart/Cart.tsx";
 import About from "./pages/about/About.tsx";
+import { AuthLoader, ConfirmEmail, Login, Signup } from "./pages/auth";
+import Cart from "./pages/cart/Cart.tsx";
 import Contact from "./pages/contact/Contact.tsx";
 import Events from "./pages/events/Events.tsx";
-import AdminDashboard, {
-  AdminLoader as AdminLoader,
-} from "./pages/profile/pages/admin/Dashboard.tsx";
-import AdminDashboardProducts from "./pages/profile/pages/admin/pages/products/Products.tsx";
-import AdminDashboardOrders from "./pages/profile/pages/admin/pages/orders/Orders.tsx";
-import { CatchAllErrorPage } from "./pages/ErrorPage.tsx";
-import { RouteLoaderSpinner } from "./components/RouteLoaderSpinner.tsx";
-import { ProductDetails } from "./pages/shop/pages/product-details/ProductDetails.tsx";
-import Login from "./pages/auth/Login.tsx";
-import Profile from "./pages/profile/Profile.tsx";
-import SignUp from "./pages/auth/Signup.tsx";
-import TOS from "./pages/terms-of-service/TOS.tsx";
+import Home from "./pages/home/Home.tsx";
 import PrivacyPolicy from "./pages/privacy-policy/PrivacyPolicy.tsx";
-import { ConfirmEmail } from "./pages/auth/ConfirmEmail.tsx";
-import { AuthLoader } from "./pages/auth/AuthLoader.tsx";
+import Profile from "./pages/profile/Profile.tsx";
+import { Shop, ShopProduct } from "./pages/shop";
+import TermsOfService from "./pages/terms-of-service/TermsOfService.tsx";
+import {
+  AdminLoader,
+  AdminDashboard,
+  AdminDashboardEvents,
+  AdminDashboardOrders,
+  AdminDashboardAnalytics,
+  AdminDashboardProducts,
+} from "@/pages/profile/pages/admin-dashboard/index.ts";
 
 const router = createBrowserRouter([
   {
@@ -33,7 +32,7 @@ const router = createBrowserRouter([
       {
         path: "auth/signup",
         loader: AuthLoader,
-        Component: SignUp,
+        Component: Signup,
       },
 
       {
@@ -64,6 +63,8 @@ const router = createBrowserRouter([
               },
               { path: "products", Component: AdminDashboardProducts },
               { path: "orders", Component: AdminDashboardOrders },
+              { path: "analytics", Component: AdminDashboardAnalytics },
+              { path: "events", Component: AdminDashboardEvents },
             ],
           },
         ],
@@ -75,7 +76,7 @@ const router = createBrowserRouter([
           { index: true, Component: Shop },
           {
             path: "products/:id",
-            Component: ProductDetails,
+            Component: ShopProduct,
           },
         ],
       },
@@ -86,7 +87,7 @@ const router = createBrowserRouter([
 
       { path: "contact", Component: Contact },
 
-      { path: "terms-of-service", Component: TOS },
+      { path: "terms-of-service", Component: TermsOfService },
 
       { path: "privacy-policy", Component: PrivacyPolicy },
 

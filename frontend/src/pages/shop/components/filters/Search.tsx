@@ -1,9 +1,9 @@
-import { useProductQuery } from "../../../../features/shop/hooks/useFilters";
+import { useProductQueryState } from "../../../../features/shop/hooks/useProductQueryState";
 import { Search as SearchIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const Search = () => {
-  const { productQuery, setProductQuery } = useProductQuery();
+  const { productQuery, setProductQuery } = useProductQueryState();
   const [search, setSearch] = useState("");
 
   // sync local state with context state

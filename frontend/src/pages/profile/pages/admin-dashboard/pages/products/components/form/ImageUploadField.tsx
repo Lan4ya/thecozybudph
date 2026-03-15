@@ -39,7 +39,7 @@ function ImageUploadInput({
           }}
           className="cursor-pointer inline-flex items-center gap-2 px-3 py-2 border rounded-md"
         >
-          <UploadCloud className="w-4 h-4" />
+          <UploadCloud className="size-4" />
           <span className="text-sm">Choose images</span>
 
           <input
@@ -58,7 +58,7 @@ function ImageUploadInput({
         <UploadHint maxImages={maxImages} />
       </div>
 
-      <div className="flex gap-3">
+      <ul className="flex gap-3">
         {images.map((src, idx) => (
           <ImageItem
             key={`${src}-${idx}`}
@@ -69,7 +69,7 @@ function ImageUploadInput({
             setPrimaryImageIndex={setPrimaryImageIndex}
           />
         ))}
-      </div>
+      </ul>
     </div>
   );
 }
@@ -90,7 +90,7 @@ const ImageItem = ({
   setPrimaryImageIndex,
 }: ImageItemProps) => {
   return (
-    <div className="select-none relative size-28   border rounded-md mt-2">
+    <li className="select-none relative size-28   border rounded-md mt-2">
       <div className="w-full h-full rounded-md overflow-hidden">
         <ProductImage
           src={src}
@@ -102,7 +102,7 @@ const ImageItem = ({
       <Button
         variant="destructive"
         onClick={() => onRemoveImage(src, idx)}
-        className="size-6! absolute -top-2 -right-2 z-50 bg-white rounded-full opacity-100"
+        className="size-6 absolute -top-2 -right-2 z-50 rounded-full opacity-100"
       >
         <X className="size-3" />
       </Button>
@@ -122,7 +122,7 @@ const ImageItem = ({
       >
         {isPrimary ? "Primary" : "Set Primary"}
       </button>
-    </div>
+    </li>
   );
 };
 

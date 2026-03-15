@@ -1,6 +1,6 @@
 // Sets the initial theme before React is loaded to avoid FOUC
 
-// This file should be called inside the head index.html
+// This file should be called inside the head of index.html
 // like so: <script src="/init-theme.js"></script>
 
 (function () {
