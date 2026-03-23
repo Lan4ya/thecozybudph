@@ -138,7 +138,7 @@ const Signup = () => {
       localStorage.setItem("confirm-email", email);
       navigate("/auth/confirm-email");
     }
-  }, [signUpSucess, email, navigate]);
+  }, [signUpSucess]);
 
   return (
     <div className="grid lg:grid-cols-[45%_1fr] h-screen">

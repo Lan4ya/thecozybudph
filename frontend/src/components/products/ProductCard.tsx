@@ -33,7 +33,7 @@ const ProductCard = ({ productId, name, imageUrl, price }: Props) => {
             {name}
           </h3>
 
-          <div className="font-medium lg:text-lg text-primary">
+          <div className="font-medium text-primary">
             {formatPriceCents(price)}
           </div>
         </div>

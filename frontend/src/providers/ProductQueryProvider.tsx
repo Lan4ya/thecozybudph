@@ -1,7 +1,7 @@
 import { useLocation, useSearchParams } from "react-router";
 import { createContext, useCallback, useEffect, useMemo } from "react";
 import type { ProductQueryDomain } from "@/types";
-import { parseProductQueryParams } from "@/features/shop/utils/parseProductQueryParams";
+import { parseProductQueryParams } from "@/pages/shop/utils/parseProductQueryParams";
 
 type ProductQueryStateContextType = {
   productQuery: ProductQueryDomain;

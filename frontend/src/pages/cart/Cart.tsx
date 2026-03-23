@@ -1,22 +1,13 @@
-import { deleteCartItemsSchema, updateCartItemSchema } from "@TheCozyBud/types";
-import CartItem from "./components/CartItem";
-import { DeleteCartItemDialog } from "./components/CartItemDeleteDialog";
+import { CartItemsList } from "./components/CartItemsList";
 import { ArrowLeft, Check } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
-import { useEffect, useState } from "react";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { formatPriceCents } from "@/lib/utils/format";
 import { useNavigate } from "react-router";
-import { useCartItemMutations } from "@/features/cart/hooks/useCartMutations";
-import {
-  useCartStore,
-  type CartItemUI,
-} from "@/features/cart/store/useCartStore";
-import isDev from "@/lib/utils/isDev";
-import z from "zod";
+import { useCartStore } from "@/pages/cart/store/useCartStore";
 import { useToast } from "@/providers/ToastProvider";
 import { useShallow } from "zustand/react/shallow";
-import { useCartQuery } from "@/features/cart/hooks/useCartQuery";
+import { CustomErrorBoundary } from "@/components/CustomErrorBoundary";
 
 // TODO:
 // add created_at in db for most recent display sorting
@@ -25,17 +16,13 @@ const Cart = () => {
   const navigate = useNavigate();
   const { addToast } = useToast();
 
-  const { data: cartQueryData, error, isFetching } = useCartQuery();
-
   const {
-    getCartItem,
-    setCartItems,
     cartItems,
-    toggleItemSelection,
     toggleAllSelection,
     allItemsSelected,
     isEditingCart,
     setIsEditingCart,
+    setPendingDeleteIds,
   } = useCartStore(
     useShallow((s) => ({
       cartItems: s.cartItems,
@@ -46,104 +33,18 @@ const Cart = () => {
       allItemsSelected: s.allItemsSelected,
       isEditingCart: s.isEditingCart,
       setIsEditingCart: s.setIsEditingCart,
+      pendingDeleteIds: s.pendingDeleteIds,
+      setPendingDeleteIds: s.setPendingDeleteIds,
     })),
   );
 
-  useEffect(() => {
-    isDev && console.log("Cart Items:", cartQueryData);
-  }, [cartQueryData]);
-
-  const hydrateCartItems = (): CartItemUI[] => {
-    return (
-      cartQueryData?.map((c) => {
-        const existingItem = getCartItem(c.id);
-
-        // Fill the cardMessages array with empty strings so its length always matches the item’s quantity.
-        // This is needed to render extra empty TextArea's so the user can add more messages if wanted.
-        const cardMessages =
-          c.cardMessages.length < c.quantity
-            ? [
-                ...c.cardMessages,
-                ...Array(Math.max(0, c.quantity - c.cardMessages.length)).fill(
-                  "",
-                ),
-              ]
-            : c.cardMessages;
-
-        return {
-          ...c,
-          cardMessages,
-          selected: existingItem?.selected ?? false,
-        };
-      }) ?? []
-    );
-  };
-
-  const [pendingDeleteIds, setPendingDeleteIds] = useState<string[]>([]);
-
-  useEffect(() => {
-    if (cartQueryData) {
-      setCartItems(hydrateCartItems());
-    }
-  }, [cartQueryData]);
+  const hasNoItems = false;
 
   const selectedItems = cartItems.filter((item) => item.selected);
   const subtotal = selectedItems.reduce(
     (sum, item) => sum + item.product.variant.priceCents * item.quantity,
     0,
   );
-
-  const { updateCartItemMutation, deleteCartItemsMutation } =
-    useCartItemMutations();
-  const deleteCartItemLoading = deleteCartItemsMutation.isPending;
-
-  const updateCartItem = async (
-    cartItemId: string,
-    cardMessages?: string[],
-    quantity?: number,
-    newVariantId?: string,
-  ) => {
-    const cartItem = getCartItem(cartItemId);
-    if (!cartItem) return;
-
-    const result = updateCartItemSchema.safeParse({
-      newVariantId,
-      quantity,
-      cardMessages,
-    });
-
-    if (!result.success) {
-      isDev && console.error(z.flattenError(result.error));
-      addToast("Something wen't wrong. Please try again later.", "error");
-      return;
-    }
-
-    await updateCartItemMutation.mutateAsync({
-      cartItemId,
-      newVariantId: result.data.newVariantId,
-      quantity: result.data.quantity,
-      cardMessages: result.data.cardMessages,
-    });
-  };
-
-  const deleteCartItems = async (cartItemIds: string[]) => {
-    const result = deleteCartItemsSchema.safeParse({
-      cartItemIds,
-    });
-
-    if (!result.success) {
-      isDev && console.error(z.flattenError(result.error));
-      addToast("Something wen't wrong. Please try again later.", "error");
-      return;
-    }
-
-    await deleteCartItemsMutation.mutateAsync({ cartItemIds });
-  };
-
-  const hasNoItems =
-    !cartQueryData || (cartQueryData.length === 0 && !isFetching);
-
-  if (error && !isFetching) throw error;
 
   return (
     <>
@@ -167,60 +68,33 @@ const Cart = () => {
                 className="text-foreground"
                 onClick={() => setIsEditingCart(!isEditingCart)}
               >
-                <span className="w-8">{isEditingCart ? "Done" : "Edit"}</span>
+                <span className="text-base lg:text-lg w-8">
+                  {isEditingCart ? "Done" : "Edit"}
+                </span>
               </Button>
             )}
           </div>
         </header>
 
+        {/* Cart Items List */}
         <main>
-          {hasNoItems ? (
-            <div className="mt-40">
-              <p className="text-center text-muted-foreground">
-                No cart items.
-              </p>
-            </div>
-          ) : (
-            // Cart Items
-            <div className="max-w-3xl mx-auto">
-              <ul className="lg:col-span-2 space-y-6">
-                {cartItems.map((item) => (
-                  <li key={item.id}>
-                    <CartItem
-                      cartItemId={item.id}
-                      onToggleSelection={() => toggleItemSelection(item.id!)}
-                      onRequestRemove={() =>
-                        setPendingDeleteIds((p) => [...p, item.id])
-                      }
-                      onUpdateCartItem={(
-                        cardMessages,
-                        quantity,
-                        newVariantId,
-                      ) =>
-                        updateCartItem(
-                          item.id,
-                          cardMessages,
-                          quantity,
-                          newVariantId,
-                        )
-                      }
-                    />
-                  </li>
-                ))}
+          <CustomErrorBoundary uiMessage="Failed to load cart items.">
+            <CartItemsList />
+          </CustomErrorBoundary>
 
-                <DeleteCartItemDialog
-                  open={pendingDeleteIds.length > 0}
-                  onCancel={() => setPendingDeleteIds([])}
-                  onConfirm={() => {
-                    deleteCartItems(pendingDeleteIds);
-                    setPendingDeleteIds([]);
-                  }}
-                  isDeleting={deleteCartItemLoading}
-                  deletingItemCount={pendingDeleteIds.length}
-                />
-              </ul>
-            </div>
-          )}
+          {/* {session ? ( */}
+          {/*   <PersistSuspense fallback={<CartItemsListSkeleton />}> */}
+          {/*     <CustomErrorBoundary uiMessage="Failed to load cart items."> */}
+          {/*       <CartItemsList /> */}
+          {/*     </CustomErrorBoundary> */}
+          {/*   </PersistSuspense> */}
+          {/* ) : ( */}
+          {/*   <div className="mt-40"> */}
+          {/*     <p className="text-center text-muted-foreground"> */}
+          {/*       No cart items. */}
+          {/*     </p> */}
+          {/*   </div> */}
+          {/* )} */}
         </main>
       </div>
 

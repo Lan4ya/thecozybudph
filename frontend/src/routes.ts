@@ -1,7 +1,7 @@
 import { createBrowserRouter, redirect } from "react-router";
 import { RouteLoaderSpinner } from "./components/RouteLoaderSpinner.tsx";
 import { CatchAllErrorPage } from "./pages/ErrorPage.tsx";
-import Root from "./pages/Root.tsx";
+import Root, { RootLoader } from "./pages/Root.tsx";
 import About from "./pages/about/About.tsx";
 import { AuthLoader, ConfirmEmail, Login, Signup } from "./pages/auth";
 import Cart from "./pages/cart/Cart.tsx";
@@ -13,7 +13,7 @@ import Profile from "./pages/profile/Profile.tsx";
 import { Shop, ShopProduct } from "./pages/shop";
 import TermsOfService from "./pages/terms-of-service/TermsOfService.tsx";
 import {
-  AdminLoader,
+  AdminDashboardLoader,
   AdminDashboard,
   AdminDashboardEvents,
   AdminDashboardOrders,
@@ -24,6 +24,7 @@ import {
 const router = createBrowserRouter([
   {
     path: "/",
+    loader: RootLoader,
     Component: Root,
     ErrorBoundary: CatchAllErrorPage,
     children: [
@@ -53,7 +54,7 @@ const router = createBrowserRouter([
           { index: true, Component: Profile },
           {
             path: "admin",
-            loader: AdminLoader,
+            loader: AdminDashboardLoader,
             HydrateFallback: RouteLoaderSpinner,
             Component: AdminDashboard,
             children: [

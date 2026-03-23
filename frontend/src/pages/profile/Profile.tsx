@@ -7,34 +7,42 @@ import { useNavigate } from "react-router";
 import { Edit, ChevronRight } from "lucide-react";
 import DefaultAvatar from "@/assets/thecozybud/avatar.png";
 import { useAuthStore } from "@/store/useAuthStore";
+import { handleError } from "@/lib/utils/format";
+import { useToast } from "@/providers/ToastProvider";
 
 const ChevronRightIcon = <ChevronRight className="text-gray-500" />;
 
 const Profile = () => {
-  const { session, loading, isAdmin } = useAuthStore();
+  const session = useAuthStore((s) => s.session);
+  const isAdmin = session?.user?.app_metadata?.role === "admin";
+
   const [signingOut, setSigningOut] = useState(false);
 
   const navigate = useNavigate();
+  const { addToast } = useToast();
 
   const userName =
     session?.user?.user_metadata?.name ?? session?.user?.email?.split("@")[0];
 
   const handleLogout = async () => {
     setSigningOut(true);
+
+    // INFO: clearing cache and stores on SIGNED_OUT event is already handled by onAuthStateChange()
+
     try {
       const { error } = await supabase.auth.signOut({ scope: "global" });
       if (error) throw error;
 
+      // Redirect
       navigate("/auth/login", { replace: true });
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Unknown error occurred";
+      const message = handleError(err);
+      addToast("Logout failed. Please try again.", "error");
       isDev && console.error(message);
+
       setSigningOut(false);
     }
   };
-
-  if (loading) return null;
 
   return (
     <div className="">
@@ -91,12 +99,12 @@ const Profile = () => {
         </Button>
       )}
 
-      <div className="custom-container">
+      <div className="custom-container flex-center">
         <Button
           variant="destructive"
           onClick={handleLogout}
           disabled={signingOut}
-          className="mt-60 w-full"
+          className="max-w-120 mt-60 w-full md:ml-auto md:w-40"
         >
           {signingOut ? <Spinner /> : null}
           {signingOut ? "Logging out" : "Logout"}

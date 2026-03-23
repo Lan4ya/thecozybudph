@@ -3,7 +3,7 @@ import type { Product } from "@TheCozyBud/types";
 import { MessageCircle } from "lucide-react";
 import { useEffect } from "react";
 import { AddToCartDrawer } from "./AddToCartDrawer";
-import { useProductSelectionStore } from "@/features/shop/store/useProductSelectionStore";
+import { useProductSelectionStore } from "@/pages/shop/store/useProductSelectionStore";
 
 type BottomBarProps = {
   product: Product;

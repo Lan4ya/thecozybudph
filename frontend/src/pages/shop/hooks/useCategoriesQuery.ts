@@ -10,6 +10,7 @@ export const useCategoriesQuery = () => {
   } = useQuery<ProductCategory[]>({
     queryKey: ["product_categories"],
     queryFn: ProductAPI.getCategories,
+    staleTime: 0,
   });
 
   return {

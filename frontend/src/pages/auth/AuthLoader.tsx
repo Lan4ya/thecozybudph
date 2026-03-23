@@ -1,5 +1,4 @@
 import { supabase } from "@/lib/supabase/client";
-import isDev from "@/lib/utils/isDev";
 import { redirect } from "react-router";
 
 const AuthLoader = async () => {
@@ -8,10 +7,10 @@ const AuthLoader = async () => {
   } = await supabase.auth.getSession();
 
   if (session) {
-    throw redirect(isDev ? "/" : "https://thecozybud.vercel.app/");
-  } else {
-    return null;
+    throw redirect("/");
   }
+
+  return null;
 };
 
 export default AuthLoader;

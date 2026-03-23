@@ -32,22 +32,18 @@ apiClient.interceptors.response.use(
 );
 
 const normalizeError = (error: unknown) => {
-  if (axios.isAxiosError(error)) {
-    if (error.response?.data?.error) {
-      const httpError = error.response.data.error as ApiResponseError["error"];
-      // console.log({ httpError });
+  if (axios.isAxiosError(error) && error.response?.data?.error) {
+    const httpError = error.response.data.error as ApiResponseError["error"];
 
-      const message =
-        typeof httpError === "string"
-          ? httpError
-          : httpError
-              .map((e) => (e.field ? `${e.field}: ${e.message}` : e.message))
-              .join(",\n");
+    const errorMessage =
+      typeof httpError === "string"
+        ? httpError
+        : httpError
+            .map((e) => (e.field ? `${e.field}: ${e.message}` : e.message))
+            .join(",\n");
 
-      return new Error(message);
-    }
-
-    return new Error(error.message);
+    // console.log({ httpError });
+    return new Error(errorMessage);
   }
 
   if (error instanceof Error) {

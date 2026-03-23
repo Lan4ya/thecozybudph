@@ -50,7 +50,7 @@ export const ProductAPI = {
     }
 
     const priceRange = filters?.priceRange;
-    console.log("Price Range Filter: ", priceRange);
+    // console.log("Price Range Filter: ", priceRange);
 
     if (priceRange) {
       // convert to cents for comparison
@@ -108,7 +108,7 @@ export const ProductAPI = {
 
     const productListItems = snakeToCamel(data);
 
-    console.log("products: ", productListItems);
+    // console.log("products: ", productListItems);
     return productListItems;
   },
 

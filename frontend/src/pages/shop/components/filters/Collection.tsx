@@ -2,7 +2,7 @@ import searchSubstring from "@/lib/utils/searchSubstring";
 import { useMemo, useState } from "react";
 import { FilterDropdown } from "./FilterDropDown";
 import { FilterDropdownItem } from "./FilterDropdownItem";
-import { useCollectionsQuery } from "@/features/shop/hooks/useCollectionsQuery";
+import { useCollectionsQuery } from "../../hooks/useCollectionsQuery";
 
 const Collections = () => {
   const [inputValue, setInputValue] = useState("");
@@ -13,7 +13,6 @@ const Collections = () => {
   }, [inputValue, collections]);
 
   if (error && !isLoading) {
-    // console.error(error);
     return (
       <FilterDropdown
         dropdownType="collectionNames"

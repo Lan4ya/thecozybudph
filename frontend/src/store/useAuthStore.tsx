@@ -1,63 +1,21 @@
 import { create } from "zustand";
-import { supabase } from "@/lib/supabase/client";
-import type { Session } from "@supabase/supabase-js";
-import isDev from "@/lib/utils/isDev";
+import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
+
+type AuthStatus = "loading" | "authenticated" | "unauthenticated" | "expired";
 
 type AuthState = {
+  status: AuthStatus;
   session: Session | null;
-  isAdmin: boolean;
-  loading: boolean;
-  setSession: (session: Session | null) => void;
+  event: AuthChangeEvent | null;
 };
 
-export const useAuthStore = create<AuthState>((set) => ({
+// useInitAuthStore hook will populate the states in this store accordingly once initialized in Root.tsx.
+// This store can be used then throughout the app as the single source of truth for auth session and user role
+
+// See: ../hooks/useInitAuthStore.ts
+
+export const useAuthStore = create<AuthState>(() => ({
+  status: "loading",
   session: null,
-  isAdmin: false,
-  loading: true,
-  setSession: (session) =>
-    set({
-      session,
-      isAdmin: session?.user?.app_metadata?.role === "admin",
-    }),
+  event: null,
 }));
-
-// Initialize once in Root.tsx
-export const initAuthStore = () => {
-  const { setSession } = useAuthStore.getState();
-  let mounted = true;
-
-  // Fetch session once
-  const init = async () => {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    isDev && console.log("hasSession: ", !!session);
-    // console.log({ user: session?.user });
-
-    if (!mounted) return;
-    setSession(session ?? null);
-    useAuthStore.setState({ loading: false });
-  };
-
-  init();
-
-  // Listen to auth state changes
-  const { data: listener } = supabase.auth.onAuthStateChange(
-    (_event, session) => {
-      if (!mounted) return;
-      setSession(session ?? null);
-
-      // Clean up confirm-email from localStorage once the user has verified their email.
-      // This is added afterlsign up.
-      if (session?.user?.confirmed_at) {
-        localStorage.removeItem("confirm-email");
-      }
-    },
-  );
-
-  return () => {
-    mounted = false;
-    listener.subscription.unsubscribe();
-  };
-};

@@ -4,13 +4,14 @@ import {
   type QueryFunctionContext,
   useSuspenseInfiniteQuery,
 } from "@tanstack/react-query";
-import { useCallback, useMemo } from "react";
-import { useProductQueryState } from "./useProductQueryState";
+import { useCallback, useEffect, useMemo } from "react";
+import { useProductsFilterAndSortState } from "./useProductsFilterAndSortState";
 import { useCollectionsQuery } from "./useCollectionsQuery";
 import { useCategoriesQuery } from "./useCategoriesQuery";
 
-export const useInfiniteProductsQuery = () => {
-  const { productQuery, hasProductQueryFilters } = useProductQueryState();
+export const useProductsSuspenseInfiniteQuery = () => {
+  const { productQuery, hasProductQueryFilters } =
+    useProductsFilterAndSortState();
 
   const { categories } = useCategoriesQuery();
   const { collections } = useCollectionsQuery();
@@ -32,7 +33,13 @@ export const useInfiniteProductsQuery = () => {
 
   const queryKey = hasQueries
     ? ["products", productQuery]
-    : ["products", "Popularity"]; // default page
+    : ["products", "Popularity"]; // default queryKey
+
+  const perPage = 12;
+
+  useEffect(() => {
+    console.log({ hasQueries });
+  }, []);
 
   const queryFn = useCallback(
     async ({ pageParam = 0 }: QueryFunctionContext) => {
@@ -82,8 +89,6 @@ export const useInfiniteProductsQuery = () => {
     [productQuery, categoryNameToId, collectionNameToId],
   );
 
-  const perPage = 12;
-
   const {
     data,
     fetchNextPage,
@@ -97,11 +102,8 @@ export const useInfiniteProductsQuery = () => {
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length < perPage ? undefined : allPages.length,
-    staleTime: hasQueries ? 0 : 30 * 60 * 1000, // cache only the default page
-    meta: { persist: false },
-
-    // keepPreviousData: true, // avoids flicker when switching queries
-    // enabled: true, // we’ll handle disabled via queryKey if needed
+    staleTime: 0,
+    gcTime: 5 * 60 * 1000,
   });
 
   return {

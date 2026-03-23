@@ -2,7 +2,7 @@ import searchSubstring from "@/lib/utils/searchSubstring";
 import { useMemo, useState } from "react";
 import { FilterDropdown } from "./FilterDropDown";
 import { FilterDropdownItem } from "./FilterDropdownItem";
-import { useCategoriesQuery } from "@/features/shop/hooks/useCategoriesQuery";
+import { useCategoriesQuery } from "@/pages/shop/hooks/useCategoriesQuery";
 
 const Categories = () => {
   const [inputValue, setInputValue] = useState("");

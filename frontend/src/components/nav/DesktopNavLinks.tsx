@@ -3,13 +3,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router";
 import { cn } from "@/lib/utils/cn";
-import { useAuthStore } from "@/store/useAuthStore";
 
 const navItems = [
   { label: "Shop", href: "/shop" },
   { label: "Events", href: "/events" },
   { label: "About", href: "/about" },
-  { label: "Contact", href: "/contact" },
   { label: "FAQ", href: "/FAQ" },
   { label: "Sign up", href: "/auth/signup" },
   { label: "Log in", href: "/auth/login" },
@@ -19,12 +17,12 @@ const navItems = [
 export const DesktopNavLinks = ({
   cartItemsCount,
   isBackgroundShown,
+  hasSession,
 }: {
-  cartItemsCount: boolean;
+  cartItemsCount: number;
   isBackgroundShown: boolean;
+  hasSession: boolean;
 }) => {
-  const hasSession = useAuthStore((s) => s.session);
-
   const [hovered, setHovered] = useState<string | null>(null);
   const location = useLocation();
   const active = hovered ?? location.pathname;

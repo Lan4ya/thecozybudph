@@ -4,6 +4,8 @@ import { useRouteError, isRouteErrorResponse } from "react-router";
 import { motion } from "framer-motion";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { useNavigate } from "react-router";
+import { useEffect } from "react";
+import { useAuthStore } from "@/store/useAuthStore";
 
 type ErrorPageProps = {
   status?: number;
@@ -23,9 +25,18 @@ export const ErrorPage = ({ status, title, message }: ErrorPageProps) => {
   const finalMessage =
     message || (status ? messages[status] : "Something went wrong.");
 
-  if (status === 401) {
-    navigate("/home");
-  }
+  const isTokenExpired = status === 401 && finalMessage === "Token expired";
+
+  // set global auth status to expired to toggle session expired modal
+  useEffect(() => {
+    if (isTokenExpired) {
+      useAuthStore.setState({
+        status: "expired",
+      });
+    }
+  }, [status, finalMessage]);
+
+  if (isTokenExpired) return null;
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background text-center px-6">
@@ -57,7 +68,7 @@ export const ErrorPage = ({ status, title, message }: ErrorPageProps) => {
             >
               Try Again
             </Button>
-          ) : status === 404 ? (
+          ) : status === 404 || status === 401 ? (
             <Button
               onClick={() => navigate("/")}
               variant="default"

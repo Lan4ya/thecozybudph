@@ -14,7 +14,7 @@ import { A11y, Navigation } from "swiper/modules";
 import { Textarea } from "@/lib/ui/__shadcn__/textarea";
 import React, { useState, useEffect } from "react";
 import "swiper/swiper.css";
-import { useCartStore } from "@/features/cart/store/useCartStore";
+import { useCartStore } from "@/pages/cart/store/useCartStore";
 import { useShallow } from "zustand/react/shallow";
 import { ProductImage } from "@/components/products/ProductImage";
 import { ProductAPI } from "@/api/product";
