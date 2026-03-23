@@ -8,14 +8,20 @@ import { NavLink, useLocation } from "react-router";
 import { useAnimateOnView } from "@/hooks/useAnimateOnView";
 import { MobileDrawer } from "./MobileDrawer";
 import { DesktopNavLinks } from "./DesktopNavLinks";
-import { useCartQuery } from "@/features/cart/hooks/useCartQuery";
+import { useCartQuery } from "@/pages/cart/hooks/useCartQuery";
+import { useAuthStore } from "@/store/useAuthStore";
 // import logo_mini_transparent from "@/assets/thecozybud/logo_mini_transparent.png";
 
 const NavBar = () => {
   const isMediumScreenAndBelow = useMediaQuery("(max-width: 1023px)");
   const [isBackgroundShown, setShowBackground] = useState(false);
+
   const pathname = useLocation().pathname;
+
   const { registerSentinel, visibleMap } = useAnimateOnView();
+
+  const session = useAuthStore((s) => s.session);
+
   const { data: cartItems } = useCartQuery();
   const cartItemsCount = cartItems?.length ?? 0;
 
@@ -89,13 +95,14 @@ const NavBar = () => {
             </NavLink>
           </div>
 
-          <MobileDrawer />
+          <MobileDrawer hasSession={!!session} />
         </div>
       )}
 
       {/* Desktop Layout */}
       {!isMediumScreenAndBelow && (
         <DesktopNavLinks
+          hasSession={!!session}
           cartItemsCount={cartItemsCount}
           isBackgroundShown={isBackgroundShown}
         />

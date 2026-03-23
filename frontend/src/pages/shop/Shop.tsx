@@ -1,6 +1,6 @@
 import GridStyleButtons from "./components/GridStyleButtons";
 import { ShoppingBag } from "lucide-react";
-import { useProductQueryState } from "@/features/shop/hooks/useProductQueryState";
+import { useProductsFilterAndSortState } from "@/pages/shop/hooks/useProductsFilterAndSortState";
 import { useEffect } from "react";
 import { SortDropdownMenu } from "./components/SortDropDown";
 import Search from "./components/filters/Search";
@@ -14,10 +14,13 @@ import { useIsExtraLargeScreen } from "@/hooks/useMediaQuery";
 import ProductsGrid from "./components/ProductsGrid";
 import { ErrorBoundary } from "react-error-boundary";
 import isDev from "@/lib/utils/isDev";
+import { useNavigate } from "react-router";
 
 const Shop = () => {
-  const { productQuery, hasProductQueryFilters } = useProductQueryState();
+  const { productQuery, hasProductQueryFilters } =
+    useProductsFilterAndSortState();
   const isXLScreen = useIsExtraLargeScreen();
+  const navigate = useNavigate();
 
   useEffect(() => {
     isDev && console.log("product query: ", productQuery);
@@ -40,13 +43,8 @@ const Shop = () => {
 
               <PriceRange />
 
-              <ErrorBoundary fallback={null}>
-                <Categories />
-              </ErrorBoundary>
-
-              {/* <ErrorBoundary fallback={null}> */}
+              <Categories />
               <Collections />
-              {/* </ErrorBoundary> */}
             </div>
 
             {isXLScreen && (
@@ -71,17 +69,26 @@ const Shop = () => {
           </div>
         </div>
 
-        <ErrorBoundary fallback={null}>
-          <PersistSuspense
-            fallback={
-              <div className="grid gap-5 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6  xl:gap-8 2xl:gap-10 ">
-                <ShopProductGridSkeleton />
+        <PersistSuspense
+          fallback={
+            <div className="grid gap-5 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 xl:gap-8 2xl:gap-10 ">
+              <ShopProductGridSkeleton />
+            </div>
+          }
+        >
+          <ErrorBoundary
+            fallbackRender={({ error }) => (
+              <div className="col-span-full text-center py-10">
+                <p className="text-destructive mb-4">
+                  {error.message || "Failed to load products."}
+                </p>
               </div>
-            }
+            )}
+            onReset={() => navigate(0)}
           >
             <ProductsGrid />
-          </PersistSuspense>
-        </ErrorBoundary>
+          </ErrorBoundary>
+        </PersistSuspense>
       </main>
     </div>
   );

@@ -4,11 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  type ProductFormInput,
-  type ProductWithRelations,
-  productFormSchema,
-} from "@TheCozyBud/types";
+import { type ProductFormInput, productFormSchema } from "@TheCozyBud/types";
 import {
   Card,
   CardHeader,
@@ -24,8 +20,8 @@ import {
 } from "./helpers/buildProductFormData";
 import z from "zod";
 import { formHasChanges } from "./helpers/formHasChanges";
-import { useProductMutations } from "@/features/admin/hooks/useProductsMutations";
-import { useImageCompressor } from "@/features/admin/hooks/useImageConverter";
+import { useProductMutations } from "@/pages/profile/pages/admin-dashboard/pages/products/hooks/useProductsMutations";
+import { useImageCompressor } from "@/pages/profile/pages/admin-dashboard/pages/products/hooks/useImageConverter";
 import {
   getCreateFormDefaultValues,
   getUpdateFormDefaultValues,
@@ -34,21 +30,17 @@ import ProductDetails from "./ProductDetails";
 import { formatFileSize } from "@/lib/utils/format";
 import { ProductOptions } from "./ProductOptions";
 import ProductVariants from "./ProductVariants";
-
-type ProductFormProps = {
-  open: boolean;
-  updatingProduct: ProductWithRelations | null;
-  onToggle: (t: boolean) => void;
-};
+import { useProductsPageState } from "../../hooks/useProductsPageState";
+import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 
 const MAX_IMAGES = 3;
 
-export default function ProductForm({
-  open,
-  updatingProduct,
-  onToggle,
-}: ProductFormProps) {
-  // const { addToast } = useToast();
+export default function ProductForm() {
+  const {
+    isFormOpen,
+    editingProduct: updatingProduct,
+    setFormOpen,
+  } = useProductsPageState();
 
   const [newSelectedFiles, setNewSelectedFiles] = useState<
     { file: File; url: string }[]
@@ -178,9 +170,9 @@ export default function ProductForm({
     return [...filteredExisting, ...newUrls];
   }, [updatingProduct, imageUrlsToDelete, newSelectedFiles]);
 
-  // Reset on form open
+  // Reset on form isFormOpen
   useEffect(() => {
-    if (!open) return;
+    if (!isFormOpen) return;
 
     newSelectedFiles.forEach((s) => URL.revokeObjectURL(s.url)); // cleanup previous blobs
     setNewSelectedFiles([]);
@@ -204,7 +196,7 @@ export default function ProductForm({
     } else {
       setPrimaryImageIndex(0);
     }
-  }, [open, updatingProduct, form.reset]);
+  }, [isFormOpen, updatingProduct, form.reset]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -367,7 +359,7 @@ export default function ProductForm({
   const onSubmit = async (fieldData: ProductFormInput) => {
     console.log("submit trigger");
     // setSubmitting(true);
-    onToggle(false); // close form immediately
+    setFormOpen(false); // close form immediately
 
     const files = newSelectedFiles.map((s) => s.file);
     console.log({ files });
@@ -410,7 +402,9 @@ export default function ProductForm({
     }
   };
 
-  if (!open) return null;
+  useLockBodyScroll(isFormOpen);
+
+  if (!isFormOpen) return null;
 
   return (
     <motion.div
@@ -421,7 +415,7 @@ export default function ProductForm({
     >
       <Card className="w-full max-w-2xl relative ">
         <button
-          onClick={() => onToggle(false)}
+          onClick={() => setFormOpen(false)}
           className="absolute top-3 right-3 p-1 rounded-md"
           aria-label="close"
         >
@@ -463,7 +457,7 @@ export default function ProductForm({
                 <Button
                   variant="outline"
                   type="button"
-                  onClick={() => onToggle(false)}
+                  onClick={() => setFormOpen(false)}
                   className="mr-auto"
                 >
                   Cancel

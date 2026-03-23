@@ -5,7 +5,6 @@ const navItems = [
   { label: "Shop", href: "/shop" },
   { label: "Events", href: "/events" },
   { label: "About", href: "/about" },
-  { label: "Contact", href: "/contact" },
   { label: "FAQ", href: "/FAQ" },
   { label: "Sign up", href: "/auth/signup" },
   { label: "Log in", href: "/auth/login" },
@@ -44,11 +43,8 @@ import {
 } from "@/lib/ui/__shadcn__/drawer";
 import { NavLink, useLocation } from "react-router";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { useAuthStore } from "@/store/useAuthStore";
 
-export const MobileDrawer = () => {
-  const hasSession = useAuthStore((s) => s.session);
-
+export const MobileDrawer = ({ hasSession }: { hasSession: boolean }) => {
   const location = useLocation();
   const pn = location.pathname;
 
@@ -80,9 +76,7 @@ export const MobileDrawer = () => {
 
         <div className="flex flex-col  mt-6 gap-1">
           {navItems.map(({ label, href }) => {
-            if (label === "Profile" && !hasSession) {
-              return;
-            }
+            if (label === "Profile" && !hasSession) return;
 
             if ((label === "Sign up" || label === "Log in") && hasSession) {
               return;

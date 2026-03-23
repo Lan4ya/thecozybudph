@@ -10,6 +10,7 @@ export const useCollectionsQuery = () => {
   } = useQuery<ProductCollection[]>({
     queryKey: ["product_collections"],
     queryFn: ProductAPI.getCollections,
+    staleTime: 0,
   });
 
   return { collections, error, isLoading };

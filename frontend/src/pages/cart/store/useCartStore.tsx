@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import type { CartItem } from "@TheCozyBud/types";
+import type { SetStateAction } from "react";
 
 type Expand<T> = {
   [K in keyof T]: T[K];
@@ -15,10 +16,10 @@ type CartState = {
   cartItems: CartItemUI[];
   allItemsSelected: boolean;
   isEditingCart: boolean;
+  pendingDeleteIds: string[];
 
-  setCartItems: (
-    itemsOrUpdater: CartItemUI[] | ((prev: CartItemUI[]) => CartItemUI[]),
-  ) => void;
+  setCartItems: (items: SetStateAction<CartItemUI[]>) => void;
+
   getCartItem: (cartItemid: string) => CartItemUI | undefined;
 
   increment: (cartItemId: string) => void;
@@ -28,6 +29,9 @@ type CartState = {
   toggleAllSelection: () => void;
 
   setIsEditingCart: (v: boolean) => void;
+
+  setPendingDeleteIds: (ids: SetStateAction<string[]>) => void;
+  reset: () => void;
 };
 
 export const useCartStore = create<CartState>((set, get) => ({
@@ -35,6 +39,15 @@ export const useCartStore = create<CartState>((set, get) => ({
   selectedOptions: {},
   allItemsSelected: false,
   isEditingCart: false,
+  pendingDeleteIds: [],
+
+  reset: () =>
+    set({
+      cartItems: [],
+      allItemsSelected: false,
+      isEditingCart: false,
+      pendingDeleteIds: [],
+    }),
 
   getCartItem: (cartItemId: string) =>
     get().cartItems.find((i) => i.id === cartItemId),
@@ -118,4 +131,10 @@ export const useCartStore = create<CartState>((set, get) => ({
     }),
 
   setIsEditingCart: (v) => set({ isEditingCart: v }),
+
+  setPendingDeleteIds: (ids) =>
+    set((state) => ({
+      pendingDeleteIds:
+        typeof ids === "function" ? ids(state.pendingDeleteIds) : ids,
+    })),
 }));

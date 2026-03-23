@@ -1,14 +1,11 @@
-import ProductColorVariantCircles from "@/components/products/ProductColorVariants";
 import { ProductImage } from "@/components/products/ProductImage";
 import { ProductAPI } from "@/api/product";
 import type { ProductWithRelations } from "@TheCozyBud/types";
 import { Button } from "@/lib/ui/__shadcn__/button";
-import { useProductMutations } from "@/features/admin/hooks/useProductsMutations";
+import { useProductMutations } from "@/pages/profile/pages/admin-dashboard/pages/products/hooks/useProductsMutations";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
-import { Check, Edit } from "lucide-react";
+import { Edit } from "lucide-react";
 import {
-  memo,
-  useCallback,
   useEffect,
   useRef,
   useState,
@@ -16,14 +13,13 @@ import {
   type SetStateAction,
 } from "react";
 import ProductTableItemsSkeleton from "@/lib/ui/skeletons/AdminProductTableItemSkeleton";
-import { DeleteProductDialog } from "./DeleteDialog";
 import { cn } from "@/lib/utils/cn";
+import { useProductsPageState } from "../../hooks/useProductsPageState";
+import { formatPriceCents } from "@/lib/utils/format";
 
-export default function ProductTable({
-  onEdit,
-}: {
-  onEdit: (selectedProduct: ProductWithRelations) => void;
-}) {
+export default function ProductTable() {
+  const { setEditingProduct, setFormOpen } = useProductsPageState();
+
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
 
   const perPage = 12;
@@ -82,13 +78,16 @@ export default function ProductTable({
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-5">
       {allProducts.map((p) => (
-        <ProductTableRow
+        <ProductRow
           key={p.id}
-          onEdit={onEdit}
+          onEdit={() => {
+            setEditingProduct(p);
+            setFormOpen(true);
+          }}
           product={p}
-          deletingIds={deletingIds}
+          isDeleting={deletingIds.has(p.id)}
           setDeletingIds={setDeletingIds}
         />
       ))}
@@ -104,24 +103,22 @@ export default function ProductTable({
   );
 }
 
-type ProductTableInnerProps = {
+type ProductRowProps = {
   product: ProductWithRelations;
-  onEdit: (selectedProduct: ProductWithRelations) => void;
-  deletingIds: Set<string>;
+  onEdit: () => void;
+  isDeleting: boolean;
   setDeletingIds: Dispatch<SetStateAction<Set<string>>>;
 };
 
-function ProductTableInner({
+function ProductRow({
   product,
   onEdit,
-  deletingIds,
+  isDeleting,
   setDeletingIds,
-}: ProductTableInnerProps) {
-  const isDeleting = deletingIds.has(product.id);
-
+}: ProductRowProps) {
   const { deleteProductMutation } = useProductMutations();
 
-  const handleDelete = useCallback(async () => {
+  const handleDelete = async () => {
     setDeletingIds((prev) => new Set(prev).add(product.id));
 
     deleteProductMutation.mutate(
@@ -136,10 +133,10 @@ function ProductTableInner({
         },
       },
     );
-  }, [deleteProductMutation, product.id]);
+  };
 
   return (
-    <article className="border flex items-center gap-4 px-2 py-4 rounded-lg hover:shadow-sm transition">
+    <article className="border grid grid-cols-[auto_auto_5fr_1fr] items-center gap-4 px-2 py-4 rounded-lg hover:shadow-sm transition">
       {/* Selection Toggle */}
       <div className="flex items-center">
         <div
@@ -160,28 +157,26 @@ function ProductTableInner({
       </div>
 
       {/* Image */}
-      <div className="flex items-center gap-4 min-w-0">
-        {product.primaryImageUrl && (
-          <ProductImage
-            src={product.primaryImageUrl ?? product.imageUrls[0]}
-            alt={product.name}
-            roundedSize="md"
-            className="size-20"
-          />
-        )}
+      <ProductImage
+        src={product.primaryImageUrl}
+        alt={product.name}
+        roundedSize="md"
+        className="size-20"
+      />
 
-        {/* Row Details */}
-        <div className="min-w-0 w-40 flex flex-col flex-1">
-          <h3 className="text-sm lg:text-base font-medium truncate">
-            {product.name}
-          </h3>
+      {/* Row Details */}
+      <div className="flex flex-col flex-1">
+        <h3 className="text-sm lg:text-base font-medium truncate">
+          {product.name}
+        </h3>
 
-          {product.collectionName && (
-            <p className="text-xs lg:text-sm mt-1 text-muted-foreground line-clamp-2">
-              Collection: {product.collectionName}
-            </p>
-          )}
-        </div>
+        <p className="text-xs font-semibold lg:text-sm text-primary">
+          Price: {formatPriceCents(product.minPriceCents)}
+        </p>
+
+        <p className="text-xs lg:text-sm text-muted-foreground line-clamp-2">
+          Category: {product.categoryName}
+        </p>
       </div>
 
       {/* Edit */}
@@ -189,7 +184,7 @@ function ProductTableInner({
         <Button
           variant="outline"
           size="sm"
-          onClick={() => onEdit(product)}
+          onClick={onEdit}
           aria-label={`Edit ${product.name}`}
         >
           <Edit className="size-4" />
@@ -204,5 +199,3 @@ function ProductTableInner({
     </article>
   );
 }
-
-const ProductTableRow = memo(ProductTableInner);

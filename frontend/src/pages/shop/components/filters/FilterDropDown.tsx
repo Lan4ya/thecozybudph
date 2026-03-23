@@ -14,7 +14,7 @@ import { Button } from "@/lib/ui/__shadcn__/button";
 import { ChevronDown } from "lucide-react";
 import PersistSuspense from "@/components/PersistSuspense";
 import { Skeleton } from "@/lib/ui/__shadcn__/skeleton";
-import { useProductQueryState } from "../../../../features/shop/hooks/useProductQueryState";
+import { useProductsFilterAndSortState } from "../../hooks/useProductsFilterAndSortState";
 import { useIsSmallScreen, useMediaQuery } from "@/hooks/useMediaQuery";
 import type {
   ProductFiltersDomain,
@@ -50,7 +50,7 @@ export const FilterDropdown = ({
   setInputValue: setControlledValue,
 }: FilterDropdownMenuProps) => {
   const [open, setOpen] = useState(false);
-  const { productQuery } = useProductQueryState();
+  const { productQuery } = useProductsFilterAndSortState();
   const isMobile = useIsSmallScreen();
 
   const [isInputFocused, setInputFocus] = useState(false);
@@ -215,7 +215,7 @@ const DisplaySelectedFilters = ({
 }: {
   dropdownType: DropdownFilterLabels;
 }) => {
-  const { setProductQuery, productQuery } = useProductQueryState();
+  const { setProductQuery, productQuery } = useProductsFilterAndSortState();
   const filterVal = productQuery.filters?.[dropdownType];
 
   const smScreen = useMediaQuery("(max-width: 449px)");

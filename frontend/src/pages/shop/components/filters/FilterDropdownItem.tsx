@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { DropdownMenuItem } from "../dropdown";
 import { Check } from "lucide-react";
-import { useProductQueryState } from "../../../../features/shop/hooks/useProductQueryState";
+import { useProductsFilterAndSortState } from "../../hooks/useProductsFilterAndSortState";
 import toggleArrItem from "@/lib/utils/toggleArrItem";
 import {
   type ArrayFilterKeys,
@@ -33,7 +33,7 @@ export const FilterDropdownItem = ({
   filterKey,
   filterVal,
 }: FilterDropdownItemProps) => {
-  const { productQuery, setProductQuery } = useProductQueryState();
+  const { productQuery, setProductQuery } = useProductsFilterAndSortState();
 
   const isArr = useMemo(
     () => arrayFiltersKeys.includes(filterKey as ArrayFilterKeys),

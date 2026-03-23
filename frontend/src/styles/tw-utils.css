@@ -1,6 +1,4 @@
-/* Tailwind utilities grouped together to further increase productivity */
-
-/* disable padding on very small screens */
+/* Tailwind utilities */
 
 @layer utilities {
   /* Use this on all containers (or sub containers depending on the layout) so it's assured they all have the same px */
@@ -45,6 +43,7 @@
     font-size: 12px;
   }
 
+  /* dev border */
   .b {
     @apply border border-blue-400;
   }

@@ -1,16 +1,15 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { ProductImage } from "@/components/products/ProductImage";
+import { useCartStore } from "@/pages/cart/store/useCartStore";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Card, CardContent } from "@/lib/ui/__shadcn__/card";
-import { Trash2, Plus, Minus, Check, XIcon } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { formatPriceCents } from "@/lib/utils/format";
-import { useRef, useState } from "react";
-import "swiper/swiper.css";
-import { CartItemOptionsDrawer } from "./CartItemOptionsDrawer";
-import { useCartStore } from "@/features/cart/store/useCartStore";
-import { ProductImage } from "@/components/products/ProductImage";
+import { AnimatePresence, motion } from "framer-motion";
+import { Check, Trash2, XIcon, Minus, Plus } from "lucide-react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router";
 import { useShallow } from "zustand/react/shallow";
+import { CartItemOptionsDrawer } from "./CartItemOptionsDrawer";
 
 type CartItemProps = {
   cartItemId: string;
@@ -86,154 +85,147 @@ const CartItem = ({
         </div>
       )}
 
-      <CardContent className="px-2">
-        <div
-          className="flex gap-3 cursor-default"
-          onClick={() =>
-            isItemAvailable && navigate(`/shop/products/${product.id}`)
-          }
-        >
-          {/* Selection Toggle */}
-          <div className="flex items-center">
-            <div
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleSelection();
-              }}
-              className={cn(
-                "flex-center size-5 border-2 rounded cursor-pointer transition-all",
-                selected
-                  ? "bg-primary border-primary text-primary-foreground"
-                  : "border-muted-foreground hover:border-primary",
-              )}
-            >
-              {selected && <Check className="size-3" />}
-            </div>
+      <CardContent
+        className="flex gap-3 cursor-default px-2"
+        onClick={() =>
+          isItemAvailable && navigate(`/shop/products/${product.id}`)
+        }
+      >
+        {/* Selection Toggle */}
+        <div className="flex items-center">
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleSelection();
+            }}
+            className={cn(
+              "flex-center size-5 border-2 rounded cursor-pointer transition-all",
+              selected
+                ? "bg-primary border-primary text-primary-foreground"
+                : "border-muted-foreground hover:border-primary",
+            )}
+          >
+            {selected && <Check className="size-3" />}
           </div>
+        </div>
 
-          {/* Product Details */}
-          <div className="flex flex-col flex-1">
-            <div className="flex gap-2">
-              <ProductImage
-                src={product.primaryImageUrl}
-                className="size-20"
-                roundedSize="md"
-              />
+        {/* Product Details */}
+        <div className="flex-1 flex gap-2">
+          <ProductImage
+            src={product.primaryImageUrl}
+            className="size-20"
+            roundedSize="md"
+          />
 
-              <div className="flex-1 min-w-0 flex flex-col">
-                <div className="flex items-center justify-between">
-                  <h3 className={"font-medium line-clamp-2 "}>
-                    {product.name}
-                  </h3>
+          <div className="flex-1 min-w-0 flex flex-col">
+            {/* Name & Edit Btn*/}
+            <div className="flex items-center justify-between">
+              <h3 className={"font-medium line-clamp-2 "}>{product.name}</h3>
 
-                  {/* Edit / Trash Buttons */}
-                  <div className="flex tems-center">
-                    <AnimatePresence mode="wait">
-                      {!isEditing ? (
-                        <motion.div
-                          key="edit"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: 0.18, ease: "easeOut" }}
-                        >
-                          <Button
-                            size="sm"
-                            variant="minimal"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setIsEditing(true);
-                            }}
-                          >
-                            Edit
-                          </Button>
-                        </motion.div>
-                      ) : (
-                        <motion.div
-                          key="actions"
-                          className="flex gap-2.5"
-                          initial={{ opacity: 0, x: 12 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: 12 }}
-                          transition={{ duration: 0.18, ease: "easeOut" }}
-                        >
-                          <Button
-                            size="icon-sm"
-                            variant="destructive"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onRequestRemove();
-                            }}
-                          >
-                            <Trash2 className="size-4" />
-                          </Button>
-                          <Button
-                            size="icon-sm"
-                            variant="minimal"
-                            className="border"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setIsEditing(false);
-                            }}
-                          >
-                            <XIcon className="size-4" />
-                          </Button>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                </div>
-
-                {/* Price */}
-                <div className="-mt-1">
-                  <p className={cn("text-primary font-semibold")}>{price}</p>
-                </div>
-
-                <div className="flex justify-between">
-                  <div onClick={(e) => e.stopPropagation()}>
-                    <CartItemOptionsDrawer
-                      cartItemId={cartItemId}
-                      onUpdateCartItem={onUpdateCartItem}
-                    />
-                  </div>
-
-                  {/* Controls */}
-                  <div className="flex justify-between items-center">
-                    {/* Quantity */}
-                    <div className="flex items-center">
+              <div className="flex tems-center">
+                <AnimatePresence mode="wait">
+                  {!isEditing ? (
+                    <motion.div
+                      key="edit"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.18, ease: "easeOut" }}
+                    >
                       <Button
+                        size="sm"
                         variant="minimal"
-                        size="icon-sm"
-                        className=""
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (quantity === 1) {
-                            onRequestRemove();
-                            return;
-                          }
-                          handleDecrement();
+                          setIsEditing(true);
                         }}
                       >
-                        <Minus className="size-3" />
+                        Edit
                       </Button>
-
-                      <span className="text-sm font-medium bg-sidebar rounded-sm min-w-6 text-center">
-                        {quantity}
-                      </span>
-
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="actions"
+                      className="flex gap-2.5"
+                      initial={{ opacity: 0, x: 12 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 12 }}
+                      transition={{ duration: 0.18, ease: "easeOut" }}
+                    >
                       <Button
-                        variant="minimal"
                         size="icon-sm"
-                        className=""
+                        variant="destructive"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleIncrement();
+                          onRequestRemove();
                         }}
                       >
-                        <Plus className="size-3" />
+                        <Trash2 className="size-4" />
                       </Button>
-                    </div>
-                  </div>
+                      <Button
+                        size="icon-sm"
+                        variant="minimal"
+                        className="border"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsEditing(false);
+                        }}
+                      >
+                        <XIcon className="size-4" />
+                      </Button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+
+            {/* Price */}
+            <div className="-mt-1">
+              <p className={cn("text-primary font-semibold")}>{price}</p>
+            </div>
+
+            {/* Drawer & Quantity Control */}
+            <div className="flex justify-between">
+              <div onClick={(e) => e.stopPropagation()}>
+                <CartItemOptionsDrawer
+                  cartItemId={cartItemId}
+                  onUpdateCartItem={onUpdateCartItem}
+                />
+              </div>
+
+              <div className="flex justify-between items-center">
+                <div className="flex items-center">
+                  <Button
+                    variant="minimal"
+                    size="icon-sm"
+                    className=""
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (quantity === 1) {
+                        onRequestRemove();
+                        return;
+                      }
+                      handleDecrement();
+                    }}
+                  >
+                    <Minus className="size-3" />
+                  </Button>
+
+                  <span className="text-sm font-medium bg-sidebar rounded-sm min-w-6 text-center">
+                    {quantity}
+                  </span>
+
+                  <Button
+                    variant="minimal"
+                    size="icon-sm"
+                    className=""
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleIncrement();
+                    }}
+                  >
+                    <Plus className="size-3" />
+                  </Button>
                 </div>
               </div>
             </div>

@@ -1,5 +1,5 @@
 export { default as AdminDashboard } from "./AdminDashboard.tsx";
-export { default as AdminLoader } from "./Loader.tsx";
+export { default as AdminDashboardLoader } from "./Loader.tsx";
 export { default as AdminDashboardOrders } from "./pages/orders/Orders.tsx";
 export { default as AdminDashboardAnalytics } from "./pages/analytics/Analytics.tsx";
 export { default as AdminDashboardEvents } from "./pages/events/Events.tsx";

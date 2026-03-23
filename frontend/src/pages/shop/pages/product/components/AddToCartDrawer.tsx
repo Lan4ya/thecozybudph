@@ -9,7 +9,7 @@ import { Button } from "@/lib/ui/__shadcn__/button";
 import { ShoppingCart } from "lucide-react";
 import { motion } from "framer-motion";
 import { formatPriceCents } from "@/lib/utils/format";
-import { useProductSelectionStore } from "@/features/shop/store/useProductSelectionStore";
+import { useProductSelectionStore } from "@/pages/shop/store/useProductSelectionStore";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { A11y, Navigation } from "swiper/modules";
 import { Textarea } from "@/lib/ui/__shadcn__/textarea";

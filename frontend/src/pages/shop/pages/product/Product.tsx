@@ -18,9 +18,9 @@ import { cn } from "@/lib/utils/cn";
 import { BottomBar } from "./components/BottomBar.tsx";
 import { formatPriceCents } from "@/lib/utils/format";
 import z from "zod";
-import { useProductSelectionStore } from "@/features/shop/store/useProductSelectionStore.tsx";
+import { useProductSelectionStore } from "@/pages/shop/store/useProductSelectionStore.tsx";
 import isDev from "@/lib/utils/isDev";
-import { useCartItemMutations } from "@/features/cart/hooks/useCartMutations.ts";
+import { useCartItemMutations } from "@/pages/cart/hooks/useCartMutations.ts";
 import { useAuthStore } from "@/store/useAuthStore.tsx";
 
 const Product = () => {
