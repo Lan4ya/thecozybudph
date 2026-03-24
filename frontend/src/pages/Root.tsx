@@ -14,7 +14,12 @@ import { TanstackQueryDevtoolsToggle } from "@/components/TanstackQueryDevToolsT
 import SessionExpiredModal from "@/components/SessionExpiredModal";
 
 const NAV_HIDDEN_PATHS = ["/auth/login", "/auth/signup", "/auth/confirm-email"];
-const FOOTER_HIDDEN_PATHS = [...NAV_HIDDEN_PATHS, "/cart", "/shop/products"];
+const FOOTER_HIDDEN_PATHS = [
+  ...NAV_HIDDEN_PATHS,
+  "/cart",
+  "/shop/products",
+  "/profile/admin",
+];
 const PROTECTED_ROUTES = ["/profile"];
 
 const matchesPath = (pathname: string, paths: string[]) =>

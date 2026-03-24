@@ -7,59 +7,55 @@ import {
   DialogFooter,
 } from "@/lib/ui/__shadcn__/dialog";
 import { Button } from "@/lib/ui/__shadcn__/button";
-import type { ProductWithRelations } from "@TheCozyBud/types";
 import { DialogClose, DialogTrigger } from "@radix-ui/react-dialog";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import { Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
 export function DeleteProductDialog({
-  product,
   onConfirm,
-  isDeleting,
+  deleteLoading,
+  deletingCount,
 }: {
-  product: ProductWithRelations;
   onConfirm: () => void;
-  isDeleting: boolean;
+  deleteLoading: boolean;
+  deletingCount: number;
 }) {
   return (
     <Dialog>
+      {/* @ts-ignore */}
       <DialogTrigger asChild>
         <Button
           variant="destructive"
           size="sm"
-          disabled={isDeleting}
-          className={cn(isDeleting && "opacity-70 pointer-events-none")}
-          aria-label={`Delete ${product.name}`}
+          disabled={deleteLoading}
+          className={cn(deleteLoading && "opacity-70 pointer-events-none")}
+          aria-label={`Delete product`}
         >
-          {isDeleting ? <Spinner /> : <Trash2 className="size-4" />}
+          {deleteLoading && <Spinner />} Delete
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[420px]">
         <DialogHeader>
+          {/* @ts-ignore */}
           <DialogTitle className="text-destructive">Delete Product</DialogTitle>
 
           <DialogDescription>
-            Are you sure you want to delete{" "}
-            <span className="break-all font-medium text-foreground">
-              {product.name}
-            </span>
-            ? This action cannot be undone.
+            {deletingCount > 1
+              ? `Do you want to remove ${deletingCount} products`
+              : "Do you want to remove this product?"}
           </DialogDescription>
         </DialogHeader>
 
         <DialogFooter className="flex justify-end gap-2 mt-4">
+          {/* @ts-ignore */}
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
 
+          {/* @ts-ignore */}
           <DialogClose asChild>
-            <Button
-              variant="destructive"
-              onClick={() => {
-                onConfirm();
-              }}
-            >
+            <Button variant="destructive" onClick={onConfirm}>
               Delete
             </Button>
           </DialogClose>

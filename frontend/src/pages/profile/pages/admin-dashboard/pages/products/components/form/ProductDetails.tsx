@@ -5,7 +5,7 @@ import type {
   UpdateProductInput,
 } from "@TheCozyBud/types";
 import { useFormContext, type FieldErrors } from "react-hook-form";
-import ImageUploadInput from "./ImageUploadField";
+import ImageUploadInput from "./ImageUploadInput";
 import { cn } from "@/lib/utils/cn";
 
 interface ProductDetailsProps {
@@ -38,7 +38,7 @@ export const ProductDetails = ({
   const isCreateMode = formValues.mode === "create";
 
   return (
-    <div className={cn("grid grid-cols-1 gap-4 md:gap-6 md:grid-cols-2")}>
+    <div className="grid grid-cols-1 gap-4 md:gap-6 md:grid-cols-2 pb-4">
       {/* Name */}
       <div className={cn(!isCreateMode && "md:col-span-2")}>
         <label className="block text-sm mb-1 text-muted-foreground">Name</label>
@@ -146,7 +146,7 @@ export const ProductDetails = ({
       </div>
 
       {/* Image Upload */}
-      <div className="relative md:col-span-2">
+      <div className="md:col-span-2 relative">
         <ImageUploadInput
           images={displayImages}
           onSelectFiles={handleSelectFiles}
@@ -158,7 +158,7 @@ export const ProductDetails = ({
         {formValues.mode === "create" &&
           (errors as FieldErrors<CreateProductInput>)?.productImages
             ?.message && (
-            <p className="absolute -bottom-1 text-xs text-red-500 mt-1">
+            <p className="absolute -bottom-4 text-xs text-red-500">
               {
                 (errors as FieldErrors<CreateProductInput>).productImages
                   ?.message
@@ -168,7 +168,7 @@ export const ProductDetails = ({
         {formValues.mode === "update" &&
           (errors as FieldErrors<UpdateProductInput>)?.newProductImages
             ?.message && (
-            <p className="text-xs text-red-500 mt-1">
+            <p className="absolute -bottom-4 text-xs text-red-500">
               {
                 (errors as FieldErrors<UpdateProductInput>).newProductImages
                   ?.message

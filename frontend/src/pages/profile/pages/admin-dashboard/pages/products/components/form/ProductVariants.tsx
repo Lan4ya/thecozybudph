@@ -4,9 +4,9 @@ import { useMemo, useEffect } from "react";
 import { Input } from "@/lib/ui/__shadcn__/input";
 import { cn } from "@/lib/utils/cn";
 
-type Props = { updatingProduct: ProductWithRelations | null };
+type Props = { editingProduct: ProductWithRelations | null };
 
-const ProductVariants = ({ updatingProduct }: Props) => {
+const ProductVariants = ({ editingProduct }: Props) => {
   const { control, watch, setValue, register } =
     useFormContext<ProductFormInput>();
 
@@ -23,7 +23,7 @@ const ProductVariants = ({ updatingProduct }: Props) => {
   ]);
 
   const initPriceCents =
-    mode === "create" ? basePrice * 100 : (updatingProduct?.minPriceCents ?? 0);
+    mode === "create" ? basePrice * 100 : (editingProduct?.minPriceCents ?? 0);
 
   const combinations = useMemo(() => generateCombinations(options), [options]);
 
@@ -69,9 +69,9 @@ const ProductVariants = ({ updatingProduct }: Props) => {
   };
 
   return (
-    <div className="flex flex-col rounded-lg border bg-background overflow-hidden">
+    <div className="flex flex-col rounded-lg border overflow-hidden">
       {/* Header */}
-      <div className="grid grid-cols-[3fr_1fr] bg-muted/50 px-4 py-2 text-sm font-medium">
+      <div className="grid grid-cols-[3fr_1fr] bg-sidebar px-4 py-2 text-sm font-medium">
         <span>Attributes</span>
         <span>Price (PHP)</span>
       </div>
@@ -94,7 +94,7 @@ const ProductVariants = ({ updatingProduct }: Props) => {
               {Object.entries(combo).map(([name, val]) => (
                 <span
                   key={name}
-                  className="rounded-md bg-muted px-2 py-1 text-xs font-medium"
+                  className="rounded-md border px-2 py-1 text-xs font-medium"
                 >
                   {name}: {val}
                 </span>

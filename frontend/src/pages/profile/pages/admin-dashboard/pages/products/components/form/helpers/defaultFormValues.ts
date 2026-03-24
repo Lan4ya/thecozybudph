@@ -7,14 +7,25 @@ import type {
 export function getCreateFormDefaultValues(): CreateProductFormInput {
   return {
     mode: "create",
-    name: "",
-    categoryName: "",
-    collectionName: "",
-    description: "",
+    // name: "",
+    // categoryName: "",
+    // collectionName: "",
+    // description: "",
+    // productImages: [],
+    // basePrice: "" as unknown as number,
+    // primaryImageIndex: 0,
+    // options: [{ name: "", values: ["", ""] }],
+    name: `test-product-${Math.floor(Math.random() * 1000)}`,
+    categoryName: "mug",
+    collectionName: "test-collection",
+    description: "lorem ipsum dolor sit amet consectetur adipiscing elit",
     productImages: [],
-    basePrice: "" as unknown as number,
+    basePrice: "15000" as unknown as number,
     primaryImageIndex: 0,
-    options: [{ name: "", values: ["", ""] }],
+    options: [
+      { name: "stem count", values: ["6", "12"] },
+      { name: "color", values: ["red-blue", "red-green"] },
+    ],
     variants: [],
   };
 }

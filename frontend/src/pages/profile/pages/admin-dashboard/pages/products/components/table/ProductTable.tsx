@@ -2,51 +2,50 @@ import { ProductImage } from "@/components/products/ProductImage";
 import { ProductAPI } from "@/api/product";
 import type { ProductWithRelations } from "@TheCozyBud/types";
 import { Button } from "@/lib/ui/__shadcn__/button";
-import { useProductMutations } from "@/pages/profile/pages/admin-dashboard/pages/products/hooks/useProductsMutations";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
-import { Edit } from "lucide-react";
-import {
-  useEffect,
-  useRef,
-  useState,
-  type Dispatch,
-  type SetStateAction,
-} from "react";
-import ProductTableItemsSkeleton from "@/lib/ui/skeletons/AdminProductTableItemSkeleton";
+import { Check, Edit } from "lucide-react";
+import { useEffect, useRef } from "react";
+import ProductTableRowsSkeleton from "@/lib/ui/skeletons/AdminProductTableItemSkeleton";
 import { cn } from "@/lib/utils/cn";
 import { useProductsPageState } from "../../hooks/useProductsPageState";
 import { formatPriceCents } from "@/lib/utils/format";
 
 export default function ProductTable() {
-  const { setEditingProduct, setFormOpen } = useProductsPageState();
-
-  const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
+  const {
+    openEditProductForm,
+    deletingProductIds,
+    toggleDeletingProductId,
+    searchQuery,
+  } = useProductsPageState();
 
   const perPage = 12;
+  const DAY = 1000 * 60 * 60 * 24;
+  const queryKey = searchQuery
+    ? ["__admin__products__", { search: searchQuery }]
+    : ["__admin__products__"];
   const {
-    data: products,
+    data: productQuery,
     fetchNextPage,
     hasNextPage,
     error,
     isFetchingNextPage,
     isFetching,
   } = useSuspenseInfiniteQuery<ProductWithRelations[]>({
-    queryKey: ["__admin__products__"],
+    queryKey,
     queryFn: ({ pageParam }) =>
       ProductAPI.queryProducts({
         page: pageParam as number,
         perPage,
+        search: searchQuery,
       }),
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
       if (!lastPage) return undefined;
       return lastPage.length < perPage ? undefined : allPages.length;
     },
-    staleTime: 1000 * 60 * 60 * 7,
-    gcTime: 1000 * 60 * 60 * 24 * 7,
+    staleTime: searchQuery ? 0 : DAY * 7,
+    gcTime: searchQuery ? 5 * 60 * 1000 : DAY * 14,
   });
-
-  if (error && !isFetching) throw error;
 
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
@@ -67,32 +66,40 @@ export default function ProductTable() {
     return () => observer.disconnect();
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-  const allProducts = products.pages.flat();
+  const products = productQuery.pages.flat();
 
-  if (!allProducts.length) {
-    return (
-      <div className="py-12 text-center text-muted-foreground">
-        No products yet. Create one using the <strong>Plus Icon</strong> button.
-      </div>
-    );
+  if (error && !isFetching) throw error;
+
+  if (!products.length && !isFetching) {
+    if (searchQuery) {
+      return (
+        <div className="py-12 text-center text-muted-foreground">
+          No products found.
+        </div>
+      );
+    } else {
+      return (
+        <div className="py-12 text-center text-muted-foreground">
+          No products yet. Create one using the <strong>Plus Icon</strong>{" "}
+          button.
+        </div>
+      );
+    }
   }
 
   return (
     <div className="flex flex-col gap-5">
-      {allProducts.map((p) => (
+      {products.map((p) => (
         <ProductRow
           key={p.id}
-          onEdit={() => {
-            setEditingProduct(p);
-            setFormOpen(true);
-          }}
+          onEdit={() => openEditProductForm(p)}
+          onToggle={() => toggleDeletingProductId(p.id)}
           product={p}
-          isDeleting={deletingIds.has(p.id)}
-          setDeletingIds={setDeletingIds}
+          isDeleting={deletingProductIds.has(p.id)}
         />
       ))}
 
-      {isFetchingNextPage && <ProductTableItemsSkeleton />}
+      {isFetchingNextPage && <ProductTableRowsSkeleton />}
 
       <div
         ref={sentinelRef}
@@ -106,53 +113,30 @@ export default function ProductTable() {
 type ProductRowProps = {
   product: ProductWithRelations;
   onEdit: () => void;
+  onToggle: () => void;
   isDeleting: boolean;
-  setDeletingIds: Dispatch<SetStateAction<Set<string>>>;
 };
 
 function ProductRow({
   product,
   onEdit,
   isDeleting,
-  setDeletingIds,
+  onToggle,
 }: ProductRowProps) {
-  const { deleteProductMutation } = useProductMutations();
-
-  const handleDelete = async () => {
-    setDeletingIds((prev) => new Set(prev).add(product.id));
-
-    deleteProductMutation.mutate(
-      { productIds: [product.id] },
-      {
-        onSettled: () => {
-          setDeletingIds((prev) => {
-            const next = new Set(prev);
-            next.delete(product.id);
-            return next;
-          });
-        },
-      },
-    );
-  };
-
   return (
-    <article className="border grid grid-cols-[auto_auto_5fr_1fr] items-center gap-4 px-2 py-4 rounded-lg hover:shadow-sm transition">
+    <article className="border grid grid-cols-[auto_auto_7fr_1fr] items-center gap-4 px-2 py-4 rounded-lg hover:shadow-sm transition">
       {/* Selection Toggle */}
       <div className="flex items-center">
         <div
-          onClick={(e) => {
-            // e.stopPropagation();
-            // onToggleSelection();
-          }}
+          onClick={onToggle}
           className={cn(
             "flex-center size-5 border-2 rounded cursor-pointer transition-all",
-            // selected
-            false
+            isDeleting
               ? "bg-primary border-primary text-primary-foreground"
               : "border-muted-foreground hover:border-primary",
           )}
         >
-          {/* {selected && <Check className="size-3" />} */}
+          {isDeleting && <Check className="size-3" />}
         </div>
       </div>
 
@@ -164,8 +148,8 @@ function ProductRow({
         className="size-20"
       />
 
-      {/* Row Details */}
-      <div className="flex flex-col flex-1">
+      {/* Details */}
+      <div className="flex flex-col">
         <h3 className="text-sm lg:text-base font-medium truncate">
           {product.name}
         </h3>
@@ -180,7 +164,7 @@ function ProductRow({
       </div>
 
       {/* Edit */}
-      <div className="flex flex-col items-center gap-3">
+      <div className="">
         <Button
           variant="outline"
           size="sm"
@@ -189,12 +173,6 @@ function ProductRow({
         >
           <Edit className="size-4" />
         </Button>
-
-        {/*   <DeleteProductDialog */}
-        {/*     product={product} */}
-        {/*     onConfirm={handleDelete} */}
-        {/*     isDeleting={isDeleting} */}
-        {/*   /> */}
       </div>
     </article>
   );
