@@ -15,8 +15,8 @@ export function parseProductQueryParams(
   const categories = params.getAll("categories");
   if (categories.length) filters.categories = categories;
 
-  const collectionName = params.getAll("collectionNames");
-  if (collectionName.length) filters.collectionNames = collectionName;
+  const collectionNames = params.getAll("collectionNames");
+  if (collectionNames.length) filters.collectionNames = collectionNames;
 
   const priceRange = params.get("priceRange");
   if (priceRange) filters.priceRange = priceRange as ProductPriceRangeOption;

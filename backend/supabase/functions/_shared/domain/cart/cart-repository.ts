@@ -32,14 +32,16 @@ export const CartRepository = {
         cardMessages: cartItems.cardMessages,
         productId: cartItems.productId,
         productVariantId: cartItems.productVariantId,
+        isAvailable: cartItems.isAvailable,
+        createdAt: cartItems.createdAt,
+
         productName: products.name,
         productOptions: products.options,
         primaryImageUrl: products.primaryImageUrl,
+
         variantId: productVariants.id,
         variantPrice: productVariants.priceCents,
         variantAttributes: productVariants.attributes,
-        isAvailable: cartItems.isAvailable,
-        createdAt: cartItems.createdAt,
       })
       .from(cartItems)
       .leftJoin(products, eq(products.id, cartItems.productId))
@@ -50,26 +52,43 @@ export const CartRepository = {
       .where(eq(cartItems.cartId, cartId))
       .orderBy(desc(cartItems.createdAt));
 
-    const cartItemsMapped: CartItem[] = rows.map((row) => ({
-      id: row.id,
-      cartId: row.cartId!,
-      quantity: row.quantity,
-      cardMessages: row.cardMessages,
-      isAvailable: row.isAvailable,
-      product: {
-        id: row.productId!,
-        name: row.productName!,
-        primaryImageUrl: row.primaryImageUrl!,
-        options: row.productOptions as unknown as ProductOption[],
-        variant: {
-          id: row.variantId!,
-          priceCents: row.variantPrice ?? 0,
-          attributes:
-            row.variantAttributes as unknown as ProductVariant["attributes"],
-        },
-      },
-      createdAt: row.createdAt,
-    }));
+    const cartItemsMapped: CartItem[] = rows.map((row) => {
+      let product: CartItem["product"];
+      let isAvailable = true;
+
+      if (
+        !row.productVariantId ||
+        !row.productId ||
+        !row.primaryImageUrl ||
+        !row.productName
+      ) {
+        product = null;
+        isAvailable = false;
+      } else {
+        product = {
+          id: row.productId,
+          name: row.productName,
+          primaryImageUrl: row.primaryImageUrl,
+          options: row.productOptions as unknown as ProductOption[],
+          variant: {
+            id: row.variantId!,
+            priceCents: row.variantPrice ?? 0,
+            attributes:
+              row.variantAttributes as unknown as ProductVariant["attributes"],
+          },
+        };
+      }
+
+      return {
+        id: row.id,
+        cartId: row.cartId!,
+        quantity: row.quantity,
+        cardMessages: row.cardMessages,
+        isAvailable,
+        product,
+        createdAt: row.createdAt,
+      };
+    });
 
     return cartItemsMapped;
   },
@@ -101,7 +120,7 @@ export const CartRepository = {
 
       if (!variant || !variant.productName || !variant.primaryImageUrl) {
         throw AppError.badRequest(
-          `Variant ${payload.variantId} not found or incomplete`,
+          `Variant ${payload.variantId} not found or data is incomplete`,
         );
       }
 
@@ -178,7 +197,9 @@ export const CartRepository = {
         throw AppError.notFound("Cart item not found or incomplete");
       }
 
-      // CASE A
+      // CASE A: No variant change (or no new variant provided)
+      // Only update mutable fields (quantity, cardMessages)
+      // No need to touch productVariantId or perform merge logic
       if (
         !payload.newVariantId ||
         payload.newVariantId === currentItem.productVariantId
@@ -206,6 +227,7 @@ export const CartRepository = {
             productName: products.name,
             primaryImageUrl: products.primaryImageUrl,
             options: products.options,
+
             variantId: productVariants.id,
             variantPriceCents: productVariants.priceCents,
             variantAttributes: productVariants.attributes,
@@ -219,7 +241,12 @@ export const CartRepository = {
           .where(eq(cartItems.id, updatedRow.id))
           .limit(1);
 
-        if (!productRow || !productRow.productId || !productRow.productName) {
+        if (
+          !productRow ||
+          !productRow.productId ||
+          !productRow.productName ||
+          !productRow.options
+        ) {
           throw AppError.notFound("Product not found");
         }
 
@@ -232,7 +259,7 @@ export const CartRepository = {
             id: productRow.productId,
             name: productRow.productName,
             primaryImageUrl: productRow.primaryImageUrl ?? "",
-            options: productRow.options as ProductOption[],
+            options: productRow.options as unknown as ProductOption[],
             variant: {
               id: productRow.variantId!,
               priceCents: productRow.variantPriceCents ?? 0,
@@ -245,7 +272,7 @@ export const CartRepository = {
         return { item };
       }
 
-      // ---------------- LOAD VARIANT ----------------
+      // Load Variant
       const [variant] = await tx
         .select({
           id: productVariants.id,
@@ -292,7 +319,10 @@ export const CartRepository = {
       let finalRow;
       let deletedItemId: string | undefined;
 
-      // ---------------- CASE B (MERGE) ----------------
+      // CASE B: Target variant already exists in cart → merge items
+      // Combine quantities and merge cardMessages into existing item
+      // Delete the current item to avoid duplicate variant entries
+      // Ensures one cart item per productVariantId
       if (existingTarget && existingTarget.id !== currentItem.id) {
         const [updatedTarget] = await tx
           .update(cartItems)
@@ -317,7 +347,9 @@ export const CartRepository = {
         deletedItemId = currentItem.id;
       }
 
-      // ---------------- CASE C ----------------
+      // CASE C: Variant change with no existing target item
+      // Update current row with new variantId and overwrite fields
+      // No merge needed since no duplicate variant exists in cart
       else {
         const [updatedItem] = await tx
           .update(cartItems)
@@ -349,7 +381,7 @@ export const CartRepository = {
           id: variant.productId,
           name: variant.productName,
           primaryImageUrl: variant.primaryImageUrl,
-          options: variant.productOptions as ProductOption[],
+          options: variant.productOptions as unknown as ProductOption[],
           variant: {
             id: variant.id,
             priceCents: variant.priceCents,

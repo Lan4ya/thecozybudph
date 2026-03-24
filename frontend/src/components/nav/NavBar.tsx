@@ -23,7 +23,13 @@ const NavBar = () => {
   const session = useAuthStore((s) => s.session);
 
   const { data: cartItems } = useCartQuery();
-  const cartItemsCount = cartItems?.length ?? 0;
+
+  useEffect(() => {
+    console.log({ cartItems });
+  }, [cartItems]);
+
+  const cartItemsCount =
+    cartItems?.filter((c) => c.isAvailable && c.product).length ?? 0;
 
   useEffect(() => {
     if (pathname !== "/" || isMediumScreenAndBelow) {

@@ -7,9 +7,11 @@ import { useProductsPageState } from "../hooks/useProductsPageState";
 import { useToast } from "@/providers/ToastProvider";
 import { DeleteProductDialog } from "./table/DeleteDialog";
 import { useProductMutations } from "../hooks/useProductsMutations";
+import { useQueryClient } from "@tanstack/react-query";
 
 const TopBar = () => {
   const { deleteProductMutation } = useProductMutations();
+  const queryClient = useQueryClient();
 
   const {
     setSearchQuery,
@@ -62,6 +64,7 @@ const TopBar = () => {
       {
         onSettled: () => {
           resetDeletingProductIds();
+          queryClient.resetQueries({ queryKey: ["cart"] });
         },
       },
     );

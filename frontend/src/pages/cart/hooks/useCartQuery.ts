@@ -15,10 +15,10 @@ export const useCartSuspenseQuery = () => {
 
 export const useCartQuery = () => {
   const session = useAuthStore((s) => s.session);
-  const loading = useAuthStore((s) => s.loading);
+  const status = useAuthStore((s) => s.status);
 
   return useQuery<CartItem[]>({
     ...cartQueryOptions,
-    enabled: !!session && !loading,
+    enabled: !!session && status !== "loading",
   });
 };

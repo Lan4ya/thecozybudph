@@ -2,10 +2,7 @@ import { useEffect } from "react";
 import "swiper/swiper.css";
 import { useCartStore, type CartItemUI } from "@/pages/cart/store/useCartStore";
 import { useShallow } from "zustand/react/shallow";
-import {
-  useCartQuery,
-  useCartSuspenseQuery,
-} from "@/pages/cart/hooks/useCartQuery";
+import { useCartQuery } from "@/pages/cart/hooks/useCartQuery";
 import { DeleteCartItemDialog } from "./CartItemDeleteDialog";
 import { useCartItemMutations } from "@/pages/cart/hooks/useCartMutations";
 import isDev from "@/lib/utils/isDev";
@@ -44,27 +41,54 @@ export const CartItemsList = () => {
 
   const hydrateCartItems = (): CartItemUI[] => {
     return (
-      cartQueryData?.map((c) => {
-        const existingItem = getCartItem(c.id);
+      cartQueryData?.reduce<CartItemUI[]>((acc, item) => {
+        if (!item.isAvailable) return acc;
+
+        const existingItem = getCartItem(item.id);
 
         // Fill the cardMessages array with empty strings so its length always matches the item’s quantity.
         // This is needed to render extra empty TextArea's so the user can add more messages if wanted.
         const cardMessages =
-          c.cardMessages.length < c.quantity
+          item.cardMessages.length < item.quantity
             ? [
-                ...c.cardMessages,
-                ...Array(Math.max(0, c.quantity - c.cardMessages.length)).fill(
-                  "",
-                ),
+                ...item.cardMessages,
+                ...Array(
+                  Math.max(0, item.quantity - item.cardMessages.length),
+                ).fill(""),
               ]
-            : c.cardMessages;
+            : item.cardMessages;
 
-        return {
-          ...c,
+        acc.push({
+          ...item,
           cardMessages,
           selected: existingItem?.selected ?? false,
-        };
-      }) ?? []
+        });
+
+        return acc;
+      }, []) ?? []
+      // cartQueryData
+      //   ?.map((c) => {
+      //     const existingItem = getCartItem(c.id);
+      //
+      //     // Fill the cardMessages array with empty strings so its length always matches the item’s quantity.
+      //     // This is needed to render extra empty TextArea's so the user can add more messages if wanted.
+      //     const cardMessages =
+      //       c.cardMessages.length < c.quantity
+      //         ? [
+      //             ...c.cardMessages,
+      //             ...Array(
+      //               Math.max(0, c.quantity - c.cardMessages.length),
+      //             ).fill(""),
+      //           ]
+      //         : c.cardMessages;
+      //
+      //     return {
+      //       ...c,
+      //       cardMessages,
+      //       selected: existingItem?.selected ?? false,
+      //     };
+      //   })
+      //   .filter((c) => !c.isAvailable) ?? []
     );
   };
 
@@ -126,10 +150,7 @@ export const CartItemsList = () => {
 
   if (isFetching) return <CartItemsListSkeleton />;
 
-  const hasNoItems =
-    (!cartQueryData || cartQueryData?.length === 0) && !isFetching;
-
-  if (hasNoItems)
+  if (!cartItems.length && !isFetching)
     return (
       <div className="mt-40">
         <p className="text-center text-muted-foreground">No cart items.</p>

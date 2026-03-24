@@ -45,6 +45,9 @@ const CartItem = ({
   if (!cartItem) return null;
 
   const { quantity, selected, product, isAvailable } = cartItem;
+
+  if (!isAvailable || !product) return null;
+
   const price = formatPriceCents(product.variant.priceCents * quantity);
 
   const isItemAvailable = isAvailable && product.id && product.variant.id;
