@@ -1,32 +1,33 @@
 import { Skeleton } from "@/lib/ui/__shadcn__/skeleton";
 
-const ProductTableItemsSkeleton = () => {
+const ProductTableRowsSkeleton = () => {
   return (
-    <>
+    <div className="flex flex-col gap-5">
       {Array.from({ length: 4 }).map((_, i) => (
-        <Skeleton
+        <div
           key={i}
-          className="bg-background border flex-between gap-4 px-3 py-4 rounded-lg hover:shadow-sm transition"
+          className="border grid grid-cols-[auto_auto_7fr_1fr] items-center gap-4 px-3 py-4 rounded-lg"
         >
-          <div className="flex items-center gap-2 min-w-0">
-            {/* {image} */}
-            <Skeleton className="size-25" />
-
-            <div className="min-w-0 flex flex-col gap-2 flex-1">
-              <Skeleton className="w-15 h-2" />
-              <Skeleton className="w-20 h-2" />
-              <Skeleton className="w-15 h-2" />
-            </div>
+          {/* Toggle */}
+          <div className="flex items-center">
+            <Skeleton className="size-5 border-2 rounded" />
           </div>
 
-          <div className="flex flex-col items-center gap-3">
-            <Skeleton className="size-8" />
-            <Skeleton className="size-8" />
+          {/* Image */}
+          <Skeleton className="size-20" />
+
+          {/* Details */}
+          <div className="flex flex-col gap-2">
+            <Skeleton className="w-20 h-3" />
+            <Skeleton className="w-15 h-2" />
+            <Skeleton className="w-15 h-2" />
           </div>
-        </Skeleton>
+
+          <Skeleton className="w-9 h-8" />
+        </div>
       ))}
-    </>
+    </div>
   );
 };
 
-export default ProductTableItemsSkeleton;
+export default ProductTableRowsSkeleton;
