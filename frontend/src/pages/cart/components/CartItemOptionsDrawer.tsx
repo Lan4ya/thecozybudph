@@ -53,12 +53,15 @@ export const CartItemOptionsDrawer = ({
     error,
     isFetching,
   } = useQuery({
-    queryKey: ["productVariants", cartItem.product.id],
-    queryFn: () => ProductAPI.getById(cartItem.product.id!),
-    enabled: !!cartItem.product.id && drawerOpen,
-    meta: { persist: false },
+    queryKey: ["productVariants", cartItem.product?.id],
+    queryFn: () => ProductAPI.getById(cartItem.product?.id!),
+    enabled: !!cartItem.product?.id && drawerOpen,
+    staleTime: 0,
+    gcTime: 5 * 60 * 1000,
   });
-  const { quantity, cardMessages, product } = cartItem;
+  const { isAvailable, quantity, cardMessages, product } = cartItem;
+
+  if (!isAvailable || !product) return null;
 
   const [selectedOptions, setSelectedOptions] = useState<
     Record<string, string>

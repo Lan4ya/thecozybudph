@@ -141,7 +141,6 @@ export type DeleteProductsInput = z.infer<typeof deleteProductsSchema>;
 // PRODUCT FORM
 
 const createProductFormSchema = createProductSchema.extend({
-  // in peso NOT cents since this is for form input
   basePrice: coerceNumber(
     z
       .number("base price is required")
@@ -160,4 +159,6 @@ export const productFormSchema = z.discriminatedUnion("mode", [
   updateProductFormSchema,
 ]);
 
+export type CreateProductFormInput = z.infer<typeof createProductFormSchema>;
+export type UpdateProductFormInput = z.infer<typeof updateProductFormSchema>;
 export type ProductFormInput = z.infer<typeof productFormSchema>;

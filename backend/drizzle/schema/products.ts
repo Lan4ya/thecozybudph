@@ -29,7 +29,6 @@ export const products = pgTable("products", {
   minPriceCents: integer("min_price_cents").notNull(),
   maxPriceCents: integer("max_price_cents").notNull(),
 
-  // store collection/category IDs if needed
   productCollectionId: uuid("product_collection_id").references(
     () => productCollections.id,
     { onDelete: "set null" },
@@ -39,7 +38,6 @@ export const products = pgTable("products", {
     { onDelete: "set null" },
   ),
 
-  // store all options + values as JSONB
   options: jsonb("options").notNull(),
   /*
     Example:
