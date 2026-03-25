@@ -12,6 +12,7 @@ import PrivacyPolicy from "./pages/privacy-policy/PrivacyPolicy.tsx";
 import Profile from "./pages/profile/Profile.tsx";
 import { Shop, ShopProduct } from "./pages/shop";
 import TermsOfService from "./pages/terms-of-service/TermsOfService.tsx";
+import FAQ from "./pages/FAQ/FAQ.tsx";
 import {
   AdminDashboardLoader,
   AdminDashboard,
@@ -93,6 +94,8 @@ const router = createBrowserRouter([
       { path: "privacy-policy", Component: PrivacyPolicy },
 
       { path: "about", Component: About },
+
+      { path: "FAQ", Component: FAQ },
     ],
   },
 ]);
