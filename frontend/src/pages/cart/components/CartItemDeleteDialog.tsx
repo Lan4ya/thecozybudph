@@ -1,18 +1,14 @@
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { Button } from "@/lib/ui/__shadcn__/button";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/lib/ui/__shadcn__/dialog";
-import { Button } from "@/lib/ui/__shadcn__/button";
-import type { ProductWithRelations } from "@TheCozyBud/types";
-import { DialogClose, DialogTrigger } from "@radix-ui/react-dialog";
-import { Spinner } from "@/lib/ui/__shadcn__/spinner";
-import { Trash2 } from "lucide-react";
-import { cn } from "@/lib/utils/cn";
+import { DialogClose } from "@radix-ui/react-dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { useState } from "react";
 
 export function DeleteCartItemDialog({

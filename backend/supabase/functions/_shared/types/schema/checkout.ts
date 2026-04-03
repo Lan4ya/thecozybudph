@@ -3,8 +3,8 @@ import { createOrderSchema } from "./order.ts";
 import { createPaymentSchema } from "./payment.ts";
 
 export const checkoutSchema = z.object({
-  orderDetails: createOrderSchema,
-  paymentDetails: createPaymentSchema.omit({ orderId: true }),
+  order: createOrderSchema,
+  payment: createPaymentSchema,
 });
 
 export type CheckoutInput = z.infer<typeof checkoutSchema>;

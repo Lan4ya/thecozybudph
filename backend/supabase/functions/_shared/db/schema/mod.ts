@@ -5,4 +5,4 @@ export * from "./orders.ts";
 export * from "./products.ts";
 export * from "./payments.ts";
 export * from "./profiles.ts";
-// export * from "./webhook-events.ts";
+export * from "./webhook-events.ts";

@@ -9,11 +9,13 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
   process.exit(1);
 }
 
-// Read CLI args: node createAdmin.js email@example.com password123
+// Usage: pnpm tsx createAdmin.js email@example.com password123
+
+// Read CLI args
 const [, , email, password] = process.argv;
 
 if (!email || !password) {
-  console.error("Usage: ts-node createAdmin.ts <email> <password>");
+  console.error("Usage: pnpm tsx createAdmin.ts <email> <password>");
   process.exit(1);
 }
 
@@ -50,7 +52,8 @@ async function createAdmin() {
     process.exit(1);
   }
 
-  console.log("Admin user created:", user.id);
+  console.log("Admin user created.");
+  console.log("user id: ", user.id);
 }
 
 createAdmin();

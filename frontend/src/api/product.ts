@@ -82,7 +82,7 @@ export const ProductAPI = {
 
         case "Highest Price":
           query
-            .order("max_price_cents", { ascending: false })
+            .order("min_price_cents", { ascending: false })
             .order("id", { ascending: false });
           break;
 
@@ -128,7 +128,9 @@ export const ProductAPI = {
       .select(
         "*, product_variants(attributes, id, price_cents), product_categories(name), product_collections(name)",
       )
-      .range(page * perPage, (page + 1) * perPage - 1);
+      .range(page * perPage, (page + 1) * perPage - 1)
+      .order("created_at", { ascending: false })
+      .order("id", { ascending: false });
 
     if (search) {
       query = query.ilike("name", `%${search}%`);

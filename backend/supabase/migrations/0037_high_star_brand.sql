@@ -1,0 +1,1 @@
+ALTER TABLE "order_items" ALTER COLUMN "collection" DROP NOT NULL;

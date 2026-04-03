@@ -47,7 +47,7 @@ const normalizeError = (error: unknown) => {
   }
 
   if (error instanceof Error) {
-    return error;
+    return error.message;
   }
 
   return new Error("Unknown error occurred");

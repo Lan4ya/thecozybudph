@@ -1,3 +1,5 @@
+import type { CartItem, Expand } from "@TheCozyBud/types";
+
 export interface ProductQueryListItemsAPI {
   filters?: ProductFilters;
   sort?: ProductSortOption;
@@ -70,4 +72,12 @@ export type NonArrayFilterKeys = Exclude<
   ArrayFilterKeys
 >;
 
-// --------------------------------------------------
+// UI Types
+
+export type CartItemUI = Expand<
+  CartItem & {
+    selected: boolean;
+  }
+>;
+
+export type CheckoutUI = {};

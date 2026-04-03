@@ -1,29 +1,24 @@
-import { AddressRepository } from "../address-repository.ts";
 import { Address, CreateAddressInput } from "@shared/types/index.ts";
-import { camelToSnake, snakeToCamel } from "@shared/utils/caseConverter.ts";
-import { AppError } from "@shared/errors/Errors.ts";
-import { SupabaseType } from "@shared/types.d.ts";
+import { handleDbError } from "../../../errors/handle-db-error.ts";
+import { AddressRepository } from "../address-repository.ts";
+import { DrizzleClient } from "../../../db/client.ts";
 
 export const createAddress = async (
-  supabase: SupabaseType,
+  db: DrizzleClient,
   payload: CreateAddressInput,
   profileId: string,
 ): Promise<Address> => {
-  const addressDBInput = camelToSnake({ ...payload, profileId });
+  console.log({ profileId });
 
-  const { data: address, error } = await AddressRepository.insertAddress(
-    supabase,
-    addressDBInput,
-  );
-
-  if (error)
-    throw AppError.internal(`Failed to create address: ${error.message}`);
-
-  if (!address) {
-    throw AppError.internal(
-      "Invariant Violation: insertAddress returned null data",
-    );
+  let address: Address;
+  try {
+    address = await AddressRepository.insert(db, {
+      profileId,
+      ...payload,
+    });
+  } catch (error) {
+    throw handleDbError("Failed to create address", error);
   }
 
-  return snakeToCamel(address);
+  return address;
 };

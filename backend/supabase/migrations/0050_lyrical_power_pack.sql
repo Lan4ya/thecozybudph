@@ -1,0 +1,1 @@
+ALTER TABLE "order_items_snapshots" ADD COLUMN "card_messages" varchar(600)[] DEFAULT ARRAY[]::varchar[] NOT NULL;

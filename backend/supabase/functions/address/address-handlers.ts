@@ -1,28 +1,23 @@
-import { zodValidatorMiddleware } from "@shared/middlewares/zodValidatorMiddleware.ts";
-import { AppEnv } from "@shared/types.d.ts";
-import { createFactory } from "hono/factory";
 import { AddressService } from "@shared/domain/address/mod.ts";
-import { handleSuccess } from "@shared/utils/mod.ts";
+import { zodValidatorMiddleware } from "@shared/middlewares/zodValidatorMiddleware.ts";
 import {
   addressIdSchema,
   createAddressSchema,
   updateAddressSchema,
 } from "@shared/types/index.ts";
-
-const factory = createFactory<AppEnv>();
-const { createHandlers } = factory;
+import {
+  handleSuccess,
+  createHandlers,
+  requireVariables,
+} from "@shared/utils/mod.ts";
 
 export const createAddressHandler = createHandlers(
   zodValidatorMiddleware("json", createAddressSchema),
   async (c) => {
-    const supabase = c.get("supabase");
-    const { sub: profileId } = c.get("claims");
     const payload = c.req.valid("json");
-    const res = await AddressService.createAddress(
-      supabase,
-      payload,
-      profileId,
-    );
+    const { db, claims } = requireVariables(c, "db", "claims");
+    const profileId = claims.sub;
+    const res = await AddressService.createAddress(db, payload, profileId);
     return handleSuccess(res);
   },
 );
@@ -31,17 +26,17 @@ export const updateAddressHandler = createHandlers(
   zodValidatorMiddleware("param", addressIdSchema),
   zodValidatorMiddleware("json", updateAddressSchema),
   async (c) => {
-    const supabase = c.get("supabase");
+    const { db } = requireVariables(c, "db");
     const payload = c.req.valid("json");
     const { id } = c.req.valid("param");
-    const res = await AddressService.updateAddress(supabase, id, payload);
+    const res = await AddressService.updateAddress(db, id, payload);
     return handleSuccess(res);
   },
 );
 
-export const getAddressHandler = createHandlers(async (c) => {
-  const supabase = c.get("supabase");
-  const { sub: profileId } = c.get("claims");
-  const res = await AddressService.getAddress(supabase, profileId);
+export const getAddressesHandler = createHandlers(async (c) => {
+  const { db, claims } = requireVariables(c, "db", "claims");
+  const profileId = claims.sub;
+  const res = await AddressService.getAddresses(db, profileId);
   return handleSuccess(res);
 });

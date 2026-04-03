@@ -12,12 +12,14 @@ import { useInitAuthStore } from "@/hooks/useInitAuthStore";
 import { supabase } from "@/lib/supabase/client";
 import { TanstackQueryDevtoolsToggle } from "@/components/TanstackQueryDevToolsToggle";
 import SessionExpiredModal from "@/components/SessionExpiredModal";
+import { ScrollToTop } from "@/components/ScrollToTop";
 
 const NAV_HIDDEN_PATHS = ["/auth/login", "/auth/signup", "/auth/confirm-email"];
 const FOOTER_HIDDEN_PATHS = [
   ...NAV_HIDDEN_PATHS,
   "/cart",
   "/shop/products",
+  "/checkout",
   "/profile/admin",
 ];
 const PROTECTED_ROUTES = ["/profile"];
@@ -50,6 +52,8 @@ function Root() {
 
   // subscribe to auth state changes
   useInitAuthStore();
+
+  ScrollToTop();
 
   return (
     <ProductQueryStateProvider>

@@ -36,33 +36,45 @@ export type Database = {
     Tables: {
       addresses: {
         Row: {
+          address_line: string
+          barangay: string
+          city: string
           full_name: string
           id: string
           phone_number: string
           postal_code: string
-          product_collection_id: string | null
+          profile_id: string | null
+          province: string
           region: string
         }
         Insert: {
+          address_line: string
+          barangay: string
+          city: string
           full_name: string
           id?: string
           phone_number: string
           postal_code: string
-          product_collection_id?: string | null
+          profile_id?: string | null
+          province: string
           region: string
         }
         Update: {
+          address_line?: string
+          barangay?: string
+          city?: string
           full_name?: string
           id?: string
           phone_number?: string
           postal_code?: string
-          product_collection_id?: string | null
+          profile_id?: string | null
+          province?: string
           region?: string
         }
         Relationships: [
           {
-            foreignKeyName: "addresses_product_collection_id_profiles_id_fk"
-            columns: ["product_collection_id"]
+            foreignKeyName: "addresses_profile_id_profiles_id_fk"
+            columns: ["profile_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -147,100 +159,158 @@ export type Database = {
           },
         ]
       }
-      order_items: {
+      order_address_snapshots: {
         Row: {
+          address_line: string
+          barangay: string
+          city: string
+          full_name: string
+          id: string
+          order_id: string
+          phone_number: string
+          postal_code: string
+          province: string
+          region: string
+        }
+        Insert: {
+          address_line: string
+          barangay: string
+          city: string
+          full_name: string
+          id?: string
+          order_id: string
+          phone_number: string
+          postal_code: string
+          province: string
+          region: string
+        }
+        Update: {
+          address_line?: string
+          barangay?: string
+          city?: string
+          full_name?: string
+          id?: string
+          order_id?: string
+          phone_number?: string
+          postal_code?: string
+          province?: string
+          region?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_address_snapshots_order_id_orders_id_fk"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_items_snapshots: {
+        Row: {
+          card_messages: string[]
+          category: string
+          collection: string | null
           id: string
           name: string
           order_id: string
           price_cents: number
+          primary_image_url: string
           product_id: string | null
+          product_variant_id: string | null
           quantity: number
+          variant_attributes: Json
         }
         Insert: {
+          card_messages?: string[]
+          category: string
+          collection?: string | null
           id?: string
           name: string
           order_id: string
           price_cents: number
+          primary_image_url: string
           product_id?: string | null
+          product_variant_id?: string | null
           quantity: number
+          variant_attributes: Json
         }
         Update: {
+          card_messages?: string[]
+          category?: string
+          collection?: string | null
           id?: string
           name?: string
           order_id?: string
           price_cents?: number
+          primary_image_url?: string
           product_id?: string | null
+          product_variant_id?: string | null
           quantity?: number
+          variant_attributes?: Json
         }
         Relationships: [
           {
-            foreignKeyName: "order_items_order_id_orders_id_fk"
+            foreignKeyName: "order_items_snapshots_order_id_orders_id_fk"
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "order_items_product_id_products_id_fk"
+            foreignKeyName: "order_items_snapshots_product_id_products_id_fk"
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_snapshots_product_variant_id_product_variants_id_fk"
+            columns: ["product_variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
             referencedColumns: ["id"]
           },
         ]
       }
       orders: {
         Row: {
-          address_id: string | null
-          cart_id: string | null
           created_at: string | null
           discount_cents: number
           id: string
           profile_id: string
           shipping_cents: number
+          source: string
           status: string
           subtotal_cents: number
           total_cents: number
+          updated_at: string | null
         }
         Insert: {
-          address_id?: string | null
-          cart_id?: string | null
           created_at?: string | null
           discount_cents?: number
           id?: string
           profile_id: string
           shipping_cents: number
+          source: string
           status?: string
           subtotal_cents: number
           total_cents: number
+          updated_at?: string | null
         }
         Update: {
-          address_id?: string | null
-          cart_id?: string | null
           created_at?: string | null
           discount_cents?: number
           id?: string
           profile_id?: string
           shipping_cents?: number
+          source?: string
           status?: string
           subtotal_cents?: number
           total_cents?: number
+          updated_at?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "orders_address_id_addresses_id_fk"
-            columns: ["address_id"]
-            isOneToOne: false
-            referencedRelation: "addresses"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "orders_cart_id_carts_id_fk"
-            columns: ["cart_id"]
-            isOneToOne: false
-            referencedRelation: "carts"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "orders_profile_id_profiles_id_fk"
             columns: ["profile_id"]

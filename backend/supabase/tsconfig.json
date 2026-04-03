@@ -1,8 +1,7 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    // "types": [
-    //   "./types.d.ts"
-    // ],
+    "noUncheckedIndexedAccess": true,
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "NodeNext",
@@ -11,7 +10,7 @@
       "deno.window",
       "deno.ns"
     ],
-    "jsx": "react-jsx",
+    // "jsx": "react-jsx",
     "skipLibCheck": true
   },
   "exclude": [

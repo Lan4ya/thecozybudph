@@ -5,17 +5,20 @@ import {
 } from "@shared/types/index.ts";
 import { CartRepository } from "../cart-repository.ts";
 import { AppError } from "@shared/errors/Errors.ts";
+import { DrizzleClient } from "../../../db/client.ts";
 
 export const deleteCartItems = async (
+  db: DrizzleClient,
   supabase: SupabaseType,
   payload: DeleteCartItemsInput,
   profileId: string,
 ): Promise<DeleteCartItemsRes> => {
-  const { data: cart, error: cartErr } =
-    await CartRepository.getCartByProfileId(supabase, profileId);
+  const cart = await CartRepository.getCartByProfileId(db, profileId);
 
-  if (cartErr || !cart?.id) {
-    throw AppError.internal(cartErr?.message);
+  if (!cart?.id) {
+    throw AppError.internal(
+      "Invariant violation: get cart by profile id returned no data",
+    );
   }
 
   const { data, error } = await CartRepository.deleteCartItems(

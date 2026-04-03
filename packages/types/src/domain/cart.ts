@@ -11,7 +11,7 @@ export type CartItem = {
     name: string;
     primaryImageUrl: string;
     variant: ProductVariant;
-  } | null;
+  };
   // createdAt: Date;
 };
 

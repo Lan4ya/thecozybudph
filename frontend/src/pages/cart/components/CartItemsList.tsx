@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import "swiper/swiper.css";
-import { useCartStore, type CartItemUI } from "@/pages/cart/store/useCartStore";
+import { useCartStore } from "@/pages/cart/store/useCartStore";
 import { useShallow } from "zustand/react/shallow";
 import { useCartQuery } from "@/pages/cart/hooks/useCartQuery";
 import { DeleteCartItemDialog } from "./CartItemDeleteDialog";
@@ -11,6 +11,7 @@ import z from "zod";
 import { useToast } from "@/providers/ToastProvider";
 import CartItem from "./CartItem";
 import CartItemsListSkeleton from "@/lib/ui/skeletons/CartItemsListSkeleton";
+import type { CartItemUI } from "@/types";
 
 export const CartItemsList = () => {
   const { addToast } = useToast();

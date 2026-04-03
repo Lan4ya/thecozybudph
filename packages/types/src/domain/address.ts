@@ -1,4 +1,11 @@
-import { AddressesRow } from "../db/index.ts";
-import { SnakeToCamel } from "../utils/snakeToCamelCase.ts";
-
-export type Address = SnakeToCamel<Omit<AddressesRow, "created_at">>;
+export type Address = {
+  id: string;
+  fullName: string;
+  postalCode: string;
+  region: string;
+  city: string;
+  province: string;
+  barangay: string;
+  addressLine: string;
+  phoneNumber: string;
+};

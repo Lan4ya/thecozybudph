@@ -5,9 +5,11 @@ import {
   timestamp,
   integer,
   check,
+  pgPolicy,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { orders } from "./orders.ts";
+import { authenticatedRole } from "drizzle-orm/supabase/rls";
 
 export const payments = pgTable(
   "payments",
@@ -36,5 +38,31 @@ export const payments = pgTable(
       "payments_status_check",
       sql`${table.status} IN ('pending', 'paid', 'failed', 'cancelled', 'refunded')`,
     ),
+
+    pgPolicy("authenticated can select own payments", {
+      as: "permissive",
+      to: authenticatedRole,
+      for: "select",
+      using: sql`
+        EXISTS (
+          SELECT 1 FROM orders  
+          WHERE orders.id = order_id
+          AND orders.profile_id = auth.uid()
+        )
+      `,
+    }),
+
+    pgPolicy("authenticated can insert own payments", {
+      as: "permissive",
+      to: authenticatedRole,
+      for: "insert",
+      withCheck: sql`
+        EXISTS (
+          SELECT 1 FROM orders  
+          WHERE orders.id = order_id
+          AND orders.profile_id = auth.uid()
+        )
+      `,
+    }),
   ],
 );
