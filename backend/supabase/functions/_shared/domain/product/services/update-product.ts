@@ -1,14 +1,16 @@
 import {
   ProductWithRelations,
-  UpdateProductDBInput,
   UpdateProductInput,
 } from "@shared/types/index.ts";
 import { AppError } from "@shared/errors/Errors.ts";
 import { SupabaseType } from "@shared/types.d.ts";
 import { ProductRepository } from "../product-repository.ts";
 import { ProductStorage } from "../product-storage.ts";
+import { DrizzleClient } from "../../../db/client.ts";
+import { UpdateProductWithRelations } from "../../../db/types/products.ts";
 
 export const updateProduct = async (
+  db: DrizzleClient,
   supabase: SupabaseType,
   productId: string,
   payload: UpdateProductInput,
@@ -69,18 +71,21 @@ export const updateProduct = async (
     }
   }
 
-  const productUpdates: UpdateProductDBInput = {
+  const productUpdates: UpdateProductWithRelations = {
     ...rest,
     imageUrls: updatedImageUrls,
     primaryImageUrl: updatedImageUrls[primaryImageIndex ?? 0],
   };
 
-  let updatedProductWithRelations;
   try {
-    updatedProductWithRelations = await ProductRepository.updateProduct(
-      productId,
-      productUpdates,
-    );
+    const updatedProductWithRelations =
+      await ProductRepository.updateProductWithRelations(
+        db,
+        productId,
+        productUpdates,
+      );
+
+    return updatedProductWithRelations;
   } catch (error) {
     await cleanupUploads().catch((err) => {
       console.error("Image cleanup failed after update error", err);
@@ -88,6 +93,4 @@ export const updateProduct = async (
 
     throw AppError.internal("Failed to update product", { cause: error });
   }
-
-  return updatedProductWithRelations;
 };

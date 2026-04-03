@@ -38,7 +38,7 @@ const Cart = () => {
     })),
   );
 
-  const hasNoItems = false;
+  const hasNoItems = !cartItems.length;
 
   const selectedItems = cartItems.filter((item) => item.selected);
   const subtotal = selectedItems.reduce(
@@ -81,20 +81,6 @@ const Cart = () => {
           <CustomErrorBoundary uiMessage="Failed to load cart items.">
             <CartItemsList />
           </CustomErrorBoundary>
-
-          {/* {session ? ( */}
-          {/*   <PersistSuspense fallback={<CartItemsListSkeleton />}> */}
-          {/*     <CustomErrorBoundary uiMessage="Failed to load cart items."> */}
-          {/*       <CartItemsList /> */}
-          {/*     </CustomErrorBoundary> */}
-          {/*   </PersistSuspense> */}
-          {/* ) : ( */}
-          {/*   <div className="mt-40"> */}
-          {/*     <p className="text-center text-muted-foreground"> */}
-          {/*       No cart items. */}
-          {/*     </p> */}
-          {/*   </div> */}
-          {/* )} */}
         </main>
       </div>
 

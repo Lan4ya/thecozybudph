@@ -1,7 +1,7 @@
 import type { SupabaseType } from "@shared/types.d.ts";
 import type {
-  CreateProductDBInput,
-  UpdateProductDBInput,
+  // CreateProductDBInput,
+  // UpdateProductDBInput,
   ProductWithRelations,
   ProductVariant,
 } from "@shared/types/index.ts";
@@ -11,16 +11,21 @@ import {
   productCollections,
   productVariants,
 } from "../../db/schema/products.ts";
-import { db } from "../../db/client.ts";
 import { eq, inArray } from "drizzle-orm";
+import { DrizzleClient } from "../../db/client.ts";
+import {
+  InsertProductWithRelations,
+  UpdateProductWithRelations,
+} from "../../db/types/products.ts";
 
 export const ProductRepository = {
-  createProduct: async (
-    payload: CreateProductDBInput,
+  insertProductWithRelations: async (
+    db: DrizzleClient,
+    payload: InsertProductWithRelations,
   ): Promise<ProductWithRelations> => {
     const { categoryName, collectionName, ...product } = payload;
 
-    return await db.transaction(async (tx) => {
+    return await db.admin.transaction(async (tx) => {
       // Insert or get collection
       let productCollectionId: string | null = null;
       if (payload.collectionName) {
@@ -32,6 +37,7 @@ export const ProductRepository = {
             set: { name: productCollections.name },
           })
           .returning();
+
         productCollectionId = collection.id;
       }
 
@@ -49,7 +55,8 @@ export const ProductRepository = {
         productCategoryId = category?.id ?? null;
       }
 
-      const [createdProduct] = await tx
+      // Insert product
+      const [insertedProduct] = await tx
         .insert(products)
         .values({
           ...product,
@@ -70,7 +77,7 @@ export const ProductRepository = {
         });
 
       const variantRows = product.variants.map((v) => ({
-        productId: createdProduct.id,
+        productId: insertedProduct.id,
         priceCents: v.priceCents,
         attributes: v.attributes,
       }));
@@ -86,7 +93,7 @@ export const ProductRepository = {
         });
 
       const productWithRelations = {
-        ...createdProduct,
+        ...insertedProduct,
         options: payload.options,
         variants: variants as unknown as ProductVariant[],
         categoryName: categoryName ?? null,
@@ -97,101 +104,10 @@ export const ProductRepository = {
     });
   },
 
-  // updateProduct: async (
-  //   productId: string,
-  //   payload: UpdateProductDBInput,
-  // ): Promise<ProductWithRelations> => {
-  //   const { categoryName, collectionName, ...product } = payload;
-  //   return await db.transaction(async (tx) => {
-  //     // Upsert collection
-  //     let productCollectionId: string | null = null;
-  //     if (payload.collectionName) {
-  //       const [collection] = await tx
-  //         .insert(productCollections)
-  //         .values({ name: payload.collectionName })
-  //         .onConflictDoUpdate({
-  //           target: productCollections.name,
-  //           set: { name: productCollections.name },
-  //         })
-  //         .returning();
-  //       productCollectionId = collection.id;
-  //     }
-  //
-  //     // Upsert category
-  //     let productCategoryId: string | null = null;
-  //     if (payload.categoryName) {
-  //       const [category] = await tx
-  //         .insert(productCategories)
-  //         .values({ name: payload.categoryName })
-  //         .onConflictDoUpdate({
-  //           target: productCategories.name,
-  //           set: { name: productCategories.name },
-  //         })
-  //         .returning();
-  //       productCategoryId = category?.id ?? null;
-  //     }
-  //
-  //     // Update products
-  //     const [updatedProduct] = await tx
-  //       .update(products)
-  //       .set({
-  //         ...product,
-  //         productCategoryId,
-  //         productCollectionId,
-  //       })
-  //       .where(eq(products.id, productId))
-  //       .returning({
-  //         id: products.id,
-  //         name: products.name,
-  //         description: products.description,
-  //         imageUrls: products.imageUrls,
-  //         primaryImageUrl: products.primaryImageUrl,
-  //         options: products.options,
-  //         minPriceCents: products.minPriceCents,
-  //         maxPriceCents: products.maxPriceCents,
-  //         createdAt: products.createdAt,
-  //         updatedAt: products.updatedAt,
-  //       });
-  //
-  //
-  //     // Update product variants
-  //     const updatedProductVariants: ProductVariant[] = [];
-  //     if (product.variants) {
-  //       for (const v of product.variants) {
-  //         const [updatedVariant] = await tx
-  //           .update(productVariants)
-  //           .set({
-  //             priceCents: v.priceCents,
-  //             attributes: v.attributes,
-  //           })
-  //           .where(eq(productVariants.id, v.id))
-  //           .returning({
-  //             id: productVariants.id,
-  //             priceCents: productVariants.priceCents,
-  //             attributes: productVariants.attributes,
-  //           });
-  //
-  //         updatedProductVariants.push(
-  //           updatedVariant as unknown as ProductVariant,
-  //         );
-  //       }
-  //     }
-  //
-  //     const productWithRelations = {
-  //       ...updatedProduct,
-  //       options: payload.options ?? [],
-  //       variants: updatedProductVariants,
-  //       categoryName: categoryName ?? null,
-  //       collectionName: collectionName ?? null,
-  //     };
-  //
-  //     return productWithRelations;
-  //   });
-  // },
-
-  updateProduct: async (
+  updateProductWithRelations: async (
+    db: DrizzleClient,
     productId: string,
-    payload: UpdateProductDBInput,
+    payload: UpdateProductWithRelations,
   ): Promise<ProductWithRelations> => {
     const {
       categoryName,
@@ -200,7 +116,7 @@ export const ProductRepository = {
       ...product
     } = payload;
 
-    return await db.transaction(async (tx) => {
+    return await db.admin.transaction(async (tx) => {
       // Upsert collection
       let productCollectionId: string | null = null;
       if (collectionName) {
@@ -257,6 +173,11 @@ export const ProductRepository = {
       const variantsToKeep: ProductVariant[] = [];
 
       for (const v of payloadVariants ?? []) {
+        // Ensure priceCents is defined (should be validated before this)
+        if (v.priceCents === undefined) {
+          throw new Error("priceCents is required for variants");
+        }
+
         const key = JSON.stringify(v.attributes);
         seenKeys.add(key);
 
@@ -273,11 +194,12 @@ export const ProductRepository = {
           variantsToKeep.push({
             ...existing,
             priceCents: v.priceCents,
-          } as ProductVariant);
+          });
         } else {
           // New variant: insert
           variantsToInsert.push({
-            ...v,
+            priceCents: v.priceCents,
+            attributes: v.attributes,
             productId,
           });
         }
@@ -311,7 +233,7 @@ export const ProductRepository = {
       if (variantsToInsert.length) {
         insertedVariants = (await tx
           .insert(productVariants)
-          .values(variantsToInsert)
+          .values(variantsToInsert) // Now this satisfies the type
           .returning({
             id: productVariants.id,
             priceCents: productVariants.priceCents,
@@ -378,42 +300,3 @@ export const ProductRepository = {
     return { data, error };
   },
 };
-
-[
-  {
-    id: "bfd64878-f045-5952-b678-8a845a82b1b1",
-    attributes: {
-      Color: "Red",
-      "Stem Count": "6",
-    },
-    product_id: "bb5203ae-e8c4-5972-997b-642f711b73e3",
-    price_cents: 50000,
-  },
-  {
-    id: "56a2b912-3964-5120-99f6-0e2c114ba3e2",
-    attributes: {
-      Color: "Red",
-      "Stem Count": "12",
-    },
-    product_id: "bb5203ae-e8c4-5972-997b-642f711b73e3",
-    price_cents: 100000,
-  },
-  {
-    id: "613ed00b-ffe5-5f82-9005-632431271f70",
-    attributes: {
-      Color: "Green",
-      "Stem Count": "6",
-    },
-    product_id: "bb5203ae-e8c4-5972-997b-642f711b73e3",
-    price_cents: 50000,
-  },
-  {
-    id: "ad615474-dcd8-5377-affd-0fed6e45fa7b",
-    attributes: {
-      Color: "Green",
-      "Stem Count": "12",
-    },
-    product_id: "bb5203ae-e8c4-5972-997b-642f711b73e3",
-    price_cents: 100000,
-  },
-];

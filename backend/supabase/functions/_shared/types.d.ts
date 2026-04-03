@@ -1,5 +1,8 @@
 import { JwtPayload, SupabaseClient } from "supabase";
+import { DrizzleClient } from "./db/client.ts";
 import { Database } from "./types/index.ts";
+
+export type SupabaseType = SupabaseClient<Database>;
 
 type Bindings = {
   SUPABASE_URL: string;
@@ -8,16 +11,16 @@ type Bindings = {
 };
 
 type Variables = {
-  validatedPayload: unknown;
-  supabase: SupabaseClient<Database>;
-  supabaseService: SupabaseClient<Database>;
-  role: "user" | "admin";
-  claims: JwtPayload;
+  supabase?: SupabaseType;
+  supabaseService?: SupabaseClient<Database>;
+  claims?: JwtPayload;
+  // for simplicity of this project, there's no role based hierarchy. either
+  // user is admin or not.
+  isAdmin?: boolean;
+  db?: DrizzleClient;
 };
 
 export type AppEnv = {
-  Bindings: Bindings;
+  Bindings?: Bindings;
   Variables: Variables;
 };
-
-export type SupabaseType = AppEnv["Variables"]["supabase"];

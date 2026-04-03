@@ -1,71 +1,84 @@
-import {
-  CreateAddressDBInput,
-  UpdateAddressDBInput,
-} from "@shared/types/index.ts";
-import { SupabaseType } from "@shared/types.d.ts";
+import { eq, sql } from "drizzle-orm";
+import { DrizzleClient } from "../../db/client.ts";
+import { addresses } from "../../db/schema/addresses.ts";
+import { AddressInsert } from "../../db/types/addresses.ts";
 import { AppError } from "../../errors/Errors.ts";
 
-const addressSelects =
-  "id, address_line, barangay, city, full_name, phone_number, postal_code, profile_id, province, region";
-
 export const AddressRepository = {
-  insertAddress: async (
-    supabase: SupabaseType,
-    address: CreateAddressDBInput,
-  ) => {
-    const { data, error } = await supabase
-      .from("addresses")
-      .insert(address)
-      .select(addressSelects)
-      .single();
-    return { data, error };
+  insert: async (db: DrizzleClient, address: AddressInsert) => {
+    return await db.rls(async (tx) => {
+      // Count existing addresses for this profile
+      const [countResult] = await tx
+        .select({ c: sql<number>`count(*)` })
+        .from(addresses)
+        .where(eq(addresses.profileId, address.profileId!))
+        .execute();
+
+      console.log({ countResult });
+
+      if (countResult.c >= 3) {
+        throw AppError.badRequest("Cannot have more than 3 addresses");
+      }
+
+      // Insert new address
+      const [inserted] = await tx.insert(addresses).values(address).returning();
+      return inserted;
+    });
   },
 
-  updateAddress: async (
-    supabase: SupabaseType,
+  update: async (
+    db: DrizzleClient,
     id: string,
-    address: UpdateAddressDBInput,
+    address: Partial<AddressInsert>,
   ) => {
-    const { data, error } = await supabase
-      .from("addresses")
-      .update(address)
-      .select(addressSelects)
-      .eq("id", id)
-      .single();
-    return { data, error };
+    return await db.rls(async (tx) => {
+      const [updated] = await tx
+        .update(addresses)
+        .set(address)
+        .where(eq(addresses.id, id))
+        .returning();
+
+      return updated;
+    });
   },
 
-  getAddressByProfileId: async (supabase: SupabaseType, profileId: string) => {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select(`addresses(${addressSelects})`) // Left Join
-      .eq("id", profileId)
-      .single();
-    return { data, error };
-  },
+  getById: async (db: DrizzleClient, id: string) =>
+    await db.rls(async (tx) => {
+      const [address] = await tx
+        .select({
+          id: addresses.id,
+          fullName: addresses.fullName,
+          postalCode: addresses.postalCode,
+          region: addresses.region,
+          city: addresses.city,
+          province: addresses.province,
+          barangay: addresses.barangay,
+          addressLine: addresses.addressLine,
+          phoneNumber: addresses.phoneNumber,
+        })
+        .from(addresses)
+        .where(eq(addresses.id, id));
 
-  assertAddressOwnership: async (
-    supabase: SupabaseType,
-    profileId: string,
-    addressId: string,
-  ) => {
-    const { data, error } = await supabase
-      .from("addresses")
-      .select("id")
-      .eq("id", addressId)
-      .eq("profile_id", profileId)
-      .maybeSingle();
+      return address;
+    }),
 
-    if (error) {
-      throw AppError.internal(error.message);
-    }
+  getByProfileId: (db: DrizzleClient, profileId: string) =>
+    db.rls(async (tx) => {
+      const address = await tx
+        .select({
+          id: addresses.id,
+          fullName: addresses.fullName,
+          postalCode: addresses.postalCode,
+          region: addresses.region,
+          city: addresses.city,
+          province: addresses.province,
+          barangay: addresses.barangay,
+          addressLine: addresses.addressLine,
+          phoneNumber: addresses.phoneNumber,
+        })
+        .from(addresses)
+        .where(eq(addresses.profileId, profileId));
 
-    if (!data) {
-      throw AppError.forbidden(
-        "Can't find Address or it does not belong to the user",
-      );
-    }
-
-    return data;
-  },
+      return address;
+    }),
 };

@@ -1,22 +1,22 @@
-// IMPORTANT: getClaims() only verifies the jwt token and doesn't guarantee
-// user still exists in DB!. use getUser() for that task. Only use this for
-// read-only operations or caching
-
 import { Context } from "hono";
 import { Next } from "hono";
 import { AppError } from "../errors/Errors.ts";
-// import { isDev } from "../utils/isDev.ts";
+import { isDev } from "../utils/isDev.ts";
+import { AppEnv } from "../types.d.ts";
+import { JwtPayload } from "supabase";
+import { requireVariables } from "../utils/hono.ts";
 
-export const authMiddleware = () => async (c: Context, next: Next) => {
+// Use this on all routes that should require authenticated users
+export const authMiddleware = () => async (c: Context<AppEnv>, next: Next) => {
+  const { supabase } = requireVariables(c, "supabase");
+
   const authHeader = c.req.header("Authorization");
-
   const token = authHeader?.split(" ")[1];
 
-  const supabase = c.get("supabase");
   const { data, error } = await supabase.auth.getClaims(token);
-  const claims = data?.claims;
+  const claims: JwtPayload | undefined = data?.claims;
 
-  // isDev && console.log("claims: ", claims);
+  isDev && console.log("claims: ", claims);
 
   if (error || !claims) {
     throw AppError.unauthorized(

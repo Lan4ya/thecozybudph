@@ -63,7 +63,7 @@ export const productBaseSchema = z.object({
   ),
 });
 
-const productVariantSchema = z.object({
+export const productVariantSchema = z.object({
   id: z.uuid("product variant id is not a valid UUID").optional(),
   priceCents: coerceNumber(
     z

@@ -9,6 +9,7 @@ import {
   adminMiddleware,
   authMiddleware,
   supabaseServiceMiddleware,
+  drizzleMiddleware,
 } from "@shared/middlewares/mod.ts";
 
 const products = new Hono<Env>();
@@ -17,6 +18,7 @@ products.use("*", supabaseMiddleware());
 products.use("*", authMiddleware());
 products.use("*", adminMiddleware());
 products.use("*", supabaseServiceMiddleware());
+products.use("*", drizzleMiddleware());
 
 // ------------------- ADMIN ONLY API's -------------------
 

@@ -1,5 +1,5 @@
 import Carousel from "./components/Carousel.tsx";
-import { Link, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ProductAPI } from "@/api/product.ts";
 import {
@@ -35,6 +35,7 @@ const Product = () => {
 
 const ProductInner = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const isValidUUID = useMemo(() => {
     if (!id) return false;
@@ -114,6 +115,34 @@ const ProductInner = () => {
     }
 
     await addToCartMutation.mutateAsync(result.data);
+    reset(product.options);
+  };
+
+  const handleBuyNow = async () => {
+    if (!product) return;
+
+    if (!session) {
+      addToast("Please log in first to continue.", "error");
+      return;
+    }
+
+    const { quantity, selectedVariant, cardMessages } =
+      useProductSelectionStore.getState();
+
+    const result = addCartItemSchema.safeParse({
+      productId: product.id,
+      variantId: selectedVariant?.id,
+      quantity,
+      cardMessages,
+    });
+
+    if (!result.success) {
+      isDev && console.error(z.flattenError(result.error));
+      addToast("Something wen't wrong. Please try again later.", "error");
+      return;
+    }
+
+    navigate("/checkout");
     reset(product.options);
   };
 
@@ -251,7 +280,9 @@ const ProductInner = () => {
       <BottomBar
         product={product}
         onAddToCart={handleAddToCart}
+        onBuyNow={handleBuyNow}
         addToCartLoading={addToCartLoading}
+        buyNowLoading={false} // TODO: TMP
       />
     </>
   );

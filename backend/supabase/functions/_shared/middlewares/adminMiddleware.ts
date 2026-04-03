@@ -1,28 +1,25 @@
+import { Context, Next } from "hono";
 import { AppError } from "../errors/Errors.ts";
 import { AppEnv } from "../types.d.ts";
-import { Context, Next } from "hono";
+import { requireVariables } from "../utils/hono.ts";
 
+// Use this on all routes that should require admin priviliges
 export const adminMiddleware = () => {
   return async (c: Context<AppEnv>, next: Next) => {
-    const claims = c.get("claims");
-
-    if (!claims) {
-      // authMiddleware contract violation
-      throw AppError.internal(
-        "Internal server error",
-        "adminMiddleware requires authMiddleware to run first to properly verify the token",
-      );
-    }
+    const { claims } = requireVariables(c, "claims");
 
     // How this works is that app_metadata can be customized either through direct sql or supabase.auth.admin()
     // and only the admin account has the app_metadata.role set to admin set to it's JwtPayload, every other account doesn't.
-    const role = claims.app_metadata?.role;
+    const role = claims.app_metadata?.role as "admin" | null;
 
-    if (!role || role !== "admin") {
-      throw AppError.forbidden();
+    if (role !== "admin") {
+      throw AppError.forbidden(
+        "Forbidden",
+        "adminMiddleware error: Insufficient priviliges",
+      );
     }
 
-    c.set("role", role);
+    c.set("isAdmin", true);
     await next();
   };
 };

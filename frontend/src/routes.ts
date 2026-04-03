@@ -21,6 +21,7 @@ import {
   AdminDashboardAnalytics,
   AdminDashboardProducts,
 } from "@/pages/profile/pages/admin-dashboard/index.ts";
+import Checkout from "./pages/checkout/Checkout.tsx";
 
 const router = createBrowserRouter([
   {
@@ -82,6 +83,8 @@ const router = createBrowserRouter([
           },
         ],
       },
+
+      { path: "checkout", Component: Checkout },
 
       { path: "events", Component: Events },
 

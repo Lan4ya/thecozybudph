@@ -1,29 +1,16 @@
+import { UpdateCartItemInput, UpdateCartItemRes } from "@shared/types/index.ts";
+import { DrizzleClient } from "../../../db/client.ts";
+import { handleDbError } from "../../../errors/handle-db-error.ts";
 import { CartRepository } from "../cart-repository.ts";
-import { UpdateCartItemInput, CartItem } from "@shared/types/index.ts";
-import { AppError } from "@shared/errors/Errors.ts";
 
 export const updateCartItem = async (
+  db: DrizzleClient,
   cartItemId: string,
   payload: UpdateCartItemInput,
-): Promise<CartItem> => {
-  let cartItem;
+): Promise<UpdateCartItemRes> => {
   try {
-    cartItem = await CartRepository.updateCartItem(cartItemId, payload);
+    return await CartRepository.updateCartItem(db, cartItemId, payload);
   } catch (error) {
-    if (error instanceof AppError) {
-      throw error;
-    }
-
-    throw AppError.internal("Failed to update cart item variant", {
-      cause: error,
-    });
+    throw handleDbError("Failed to update cart item", error);
   }
-
-  if (!cartItem) {
-    throw AppError.internal(
-      "Invariant violation: updateCartItemVariant returned no data",
-    );
-  }
-
-  return cartItem;
 };

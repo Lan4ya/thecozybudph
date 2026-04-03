@@ -29,7 +29,6 @@ const TopBar = () => {
 
   useEffect(() => {
     const q = searchInputVal.trim();
-
     if (q === searchQuery) return;
 
     // debounced search

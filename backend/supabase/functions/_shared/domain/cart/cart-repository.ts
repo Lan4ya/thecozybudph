@@ -1,96 +1,60 @@
 import { SupabaseType } from "@shared/types.d.ts";
+import { and, desc, eq, sql } from "drizzle-orm";
+import { cartItems, carts } from "../../db/schema/carts.ts";
+import { products, productVariants } from "../../db/schema/products.ts";
+import { AppError } from "../../errors/Errors.ts";
 import {
   AddCartItemInput,
   CartItem,
   ProductOption,
   ProductVariant,
   UpdateCartItemInput,
-  UpdateCartItemRes,
 } from "../../types/index.ts";
-import { db } from "../../db/client.ts";
-import { cartItems } from "../../db/schema/carts.ts";
-import { and, desc, eq, sql } from "drizzle-orm";
-import { products, productVariants } from "../../db/schema/products.ts";
-import { AppError } from "../../errors/Errors.ts";
+import { DrizzleClient } from "../../db/client.ts";
 
 export const CartRepository = {
-  getCartByProfileId: async (supabase: SupabaseType, profileId: string) => {
-    const { data, error } = await supabase
-      .from("carts")
-      .select("id")
-      .eq("profile_id", profileId)
-      .maybeSingle();
-    return { data, error };
+  getCartByProfileId: (db: DrizzleClient, profileId: string) => {
+    return db.rls(async (tx) => {
+      const result = await tx
+        .select({ id: carts.id })
+        .from(carts)
+        .where(eq(carts.profileId, profileId))
+        .limit(1);
+
+      return result[0] ?? null;
+    });
   },
 
-  getCartItems: async (cartId: string): Promise<CartItem[]> => {
-    const rows = await db
-      .select({
-        id: cartItems.id,
-        cartId: cartItems.cartId,
-        quantity: cartItems.quantity,
-        cardMessages: cartItems.cardMessages,
-        productId: cartItems.productId,
-        productVariantId: cartItems.productVariantId,
-        isAvailable: cartItems.isAvailable,
-        createdAt: cartItems.createdAt,
+  getCartItemsByCartId: (db: DrizzleClient, cartId: string) => {
+    return db.rls(async (tx) => {
+      return await tx
+        .select({
+          id: cartItems.id,
+          cartId: cartItems.cartId,
+          quantity: cartItems.quantity,
+          cardMessages: cartItems.cardMessages,
+          productId: cartItems.productId,
+          productVariantId: cartItems.productVariantId,
+          isAvailable: cartItems.isAvailable,
+          createdAt: cartItems.createdAt,
 
-        productName: products.name,
-        productOptions: products.options,
-        primaryImageUrl: products.primaryImageUrl,
+          productName: products.name,
+          productOptions: products.options,
+          primaryImageUrl: products.primaryImageUrl,
 
-        variantId: productVariants.id,
-        variantPrice: productVariants.priceCents,
-        variantAttributes: productVariants.attributes,
-      })
-      .from(cartItems)
-      .leftJoin(products, eq(products.id, cartItems.productId))
-      .leftJoin(
-        productVariants,
-        eq(productVariants.id, cartItems.productVariantId),
-      )
-      .where(eq(cartItems.cartId, cartId))
-      .orderBy(desc(cartItems.createdAt));
-
-    const cartItemsMapped: CartItem[] = rows.map((row) => {
-      let product: CartItem["product"];
-      let isAvailable = true;
-
-      if (
-        !row.productVariantId ||
-        !row.productId ||
-        !row.primaryImageUrl ||
-        !row.productName
-      ) {
-        product = null;
-        isAvailable = false;
-      } else {
-        product = {
-          id: row.productId,
-          name: row.productName,
-          primaryImageUrl: row.primaryImageUrl,
-          options: row.productOptions as unknown as ProductOption[],
-          variant: {
-            id: row.variantId!,
-            priceCents: row.variantPrice ?? 0,
-            attributes:
-              row.variantAttributes as unknown as ProductVariant["attributes"],
-          },
-        };
-      }
-
-      return {
-        id: row.id,
-        cartId: row.cartId!,
-        quantity: row.quantity,
-        cardMessages: row.cardMessages,
-        isAvailable,
-        product,
-        createdAt: row.createdAt,
-      };
+          variantId: productVariants.id,
+          variantPrice: productVariants.priceCents,
+          variantAttributes: productVariants.attributes,
+        })
+        .from(cartItems)
+        .leftJoin(products, eq(products.id, cartItems.productId))
+        .leftJoin(
+          productVariants,
+          eq(productVariants.id, cartItems.productVariantId),
+        )
+        .where(eq(cartItems.cartId, cartId))
+        .orderBy(desc(cartItems.createdAt));
     });
-
-    return cartItemsMapped;
   },
 
   /**
@@ -98,11 +62,12 @@ export const CartRepository = {
    * If the item already exists in the cart, it increments the quantity and
    * appends any new card messages.
    */
-  upsertCartItem: async (
+  upsertCartItem: (
+    db: DrizzleClient,
     cartId: string,
     payload: AddCartItemInput,
   ): Promise<CartItem> => {
-    return await db.transaction(async (tx) => {
+    return db.rls(async (tx) => {
       const [variant] = await tx
         .select({
           id: productVariants.id,
@@ -174,11 +139,12 @@ export const CartRepository = {
     });
   },
 
-  updateCartItem: async (
+  updateCartItem: (
+    db: DrizzleClient,
     cartItemId: string,
     payload: UpdateCartItemInput,
-  ): Promise<UpdateCartItemRes> => {
-    return await db.transaction(async (tx) => {
+  ) => {
+    return db.rls(async (tx) => {
       const [currentItem] = await tx
         .select({
           id: cartItems.id,
@@ -269,7 +235,10 @@ export const CartRepository = {
           },
         };
 
-        return { item };
+        return {
+          item,
+          deletedItemId: null,
+        };
       }
 
       // Load Variant
@@ -317,7 +286,7 @@ export const CartRepository = {
         .limit(1);
 
       let finalRow;
-      let deletedItemId: string | undefined;
+      let deletedItemId: string | null = null;
 
       // CASE B: Target variant already exists in cart → merge items
       // Combine quantities and merge cardMessages into existing item

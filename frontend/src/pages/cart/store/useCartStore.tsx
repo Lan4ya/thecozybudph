@@ -1,16 +1,6 @@
 import { create } from "zustand";
-import type { CartItem } from "@TheCozyBud/types";
 import type { SetStateAction } from "react";
-
-type Expand<T> = {
-  [K in keyof T]: T[K];
-} & {};
-
-export type CartItemUI = Expand<
-  CartItem & {
-    selected: boolean;
-  }
->;
+import type { CartItemUI } from "@/types";
 
 type CartState = {
   cartItems: CartItemUI[];
@@ -49,12 +39,9 @@ export const useCartStore = create<CartState>((set, get) => ({
       pendingDeleteIds: [],
     }),
 
-  getCartItem: (cartItemId: string) =>
-    get().cartItems.find((i) => i.id === cartItemId),
+  getCartItem: (cartItemId) => get().cartItems.find((i) => i.id === cartItemId),
 
-  setCartItems: (
-    itemsOrUpdater: CartItemUI[] | ((prev: CartItemUI[]) => CartItemUI[]),
-  ) =>
+  setCartItems: (itemsOrUpdater) =>
     set((state) => ({
       cartItems:
         typeof itemsOrUpdater === "function"

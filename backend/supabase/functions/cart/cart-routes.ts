@@ -1,5 +1,9 @@
 import { Hono, Env } from "hono";
-import { supabaseMiddleware, authMiddleware } from "@shared/middlewares/mod.ts";
+import {
+  supabaseMiddleware,
+  authMiddleware,
+  drizzleMiddleware,
+} from "@shared/middlewares/mod.ts";
 import {
   addCartItemsHandler,
   getCartItemsHandler,
@@ -11,6 +15,7 @@ const cart = new Hono<Env>();
 
 cart.use("*", supabaseMiddleware());
 cart.use("*", authMiddleware());
+cart.use("*", drizzleMiddleware());
 
 cart.get("/items", ...getCartItemsHandler);
 cart.post("/items", ...addCartItemsHandler);

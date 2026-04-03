@@ -1,10 +1,10 @@
-import { CartItem } from "../domain/cart.ts";
-
-export type DeleteCartItemsRes = {
-  deletedItemIds: string[];
-};
+import { CartItem } from "../domain/index.ts";
 
 export type UpdateCartItemRes = {
   item: CartItem;
-  deletedItemId?: string;
+  deletedItemId: string | null;
+};
+
+export type DeleteCartItemsRes = {
+  deletedItemIds: string[];
 };

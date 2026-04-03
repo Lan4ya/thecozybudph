@@ -16,11 +16,12 @@ export function getCreateFormDefaultValues(): CreateProductFormInput {
     // primaryImageIndex: 0,
     // options: [{ name: "", values: ["", ""] }],
     name: `test-product-${Math.floor(Math.random() * 1000)}`,
-    categoryName: "mug",
+    categoryName: "Mug",
     collectionName: "test-collection",
-    description: "lorem ipsum dolor sit amet consectetur adipiscing elit",
+    description:
+      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Libero vel magnam sint possimus eaque voluptatum alias culpa nesciunt quae necessitatibus. Excepturi corporis dicta dolor a necessitatibus totam quod ea consequatur?",
     productImages: [],
-    basePrice: "15000" as unknown as number,
+    basePrice: "500" as unknown as number,
     primaryImageIndex: 0,
     options: [
       { name: "stem count", values: ["6", "12"] },

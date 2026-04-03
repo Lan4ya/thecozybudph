@@ -1,29 +1,24 @@
+import { unknown } from "zod";
+
 export class AppError extends Error {
   statusCode: number;
-  isOperational: boolean;
 
-  constructor(
-    statusCode: number,
-    message: string,
-    cause?: unknown,
-    isOperational = true,
-  ) {
+  constructor(statusCode: number, message: string, cause?: unknown) {
     super(message, { cause });
     this.statusCode = statusCode;
-    this.isOperational = isOperational;
     Error.captureStackTrace(this, this.constructor);
   }
 
-  static badRequest(message: string) {
-    return new AppError(400, message);
+  static badRequest(message: string, cause?: unknown) {
+    return new AppError(400, message, cause);
   }
 
-  static forbidden(message: string = "Forbidden") {
-    return new AppError(403, message);
+  static forbidden(message: string = "Forbidden", cause?: unknown) {
+    return new AppError(403, message, cause);
   }
 
-  static unauthorized(message: string = "Unauthorized") {
-    return new AppError(401, message);
+  static unauthorized(message: string = "Unauthorized", cause?: unknown) {
+    return new AppError(401, message, cause);
   }
 
   static notFound(message: string = "Resource not found") {
@@ -35,7 +30,7 @@ export class AppError extends Error {
   }
 
   static internal(message: string = "Internal server error", cause?: unknown) {
-    return new AppError(500, message, cause, true);
+    return new AppError(500, message, cause);
   }
 }
 

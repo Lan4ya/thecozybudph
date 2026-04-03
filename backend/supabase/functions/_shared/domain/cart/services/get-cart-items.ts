@@ -1,41 +1,69 @@
-import { SupabaseType } from "@shared/types.d.ts";
 import { CartRepository } from "../cart-repository.ts";
 
-import { CartItem } from "@shared/types/index.ts";
+import {
+  CartItem,
+  ProductOption,
+  ProductVariant,
+} from "@shared/types/index.ts";
 import { AppError } from "@shared/errors/Errors.ts";
+import { DrizzleClient } from "../../../db/client.ts";
+import { handleDbError } from "../../../errors/handle-db-error.ts";
 
 export const getCartItems = async (
-  supabase: SupabaseType,
+  db: DrizzleClient,
   profileId: string,
 ): Promise<CartItem[]> => {
-  const { data: cart, error } = await CartRepository.getCartByProfileId(
-    supabase,
-    profileId,
-  );
+  const cart = await CartRepository.getCartByProfileId(db, profileId);
 
-  if (error) throw AppError.internal("Failed to get cart", { cause: error });
-
-  if (!cart?.id)
-    throw AppError.notFound(`Cart for profile ${profileId} not found`);
-
-  let data: CartItem[];
-  try {
-    data = await CartRepository.getCartItems(cart.id);
-  } catch (error) {
-    if (error instanceof AppError) {
-      throw error;
-    }
-
-    throw AppError.internal("Failed adding product to cart", {
-      cause: error,
-    });
-  }
-
-  if (!data) {
+  if (!cart?.id) {
     throw AppError.internal(
-      "Invariant violation: getCartItems returned no data without error",
+      "Invariant violation: get cart by profile id returned no data",
     );
   }
 
-  return data;
+  try {
+    const rows = await CartRepository.getCartItemsByCartId(db, cart.id);
+
+    const cartItems: CartItem[] = rows.map((row) => {
+      let product: CartItem["product"];
+      let isAvailable = true;
+
+      if (
+        !row.productVariantId ||
+        !row.productId ||
+        !row.primaryImageUrl ||
+        !row.productName
+      ) {
+        product = null;
+        isAvailable = false;
+      } else {
+        product = {
+          id: row.productId,
+          name: row.productName,
+          primaryImageUrl: row.primaryImageUrl,
+          options: row.productOptions as unknown as ProductOption[],
+          variant: {
+            id: row.variantId!,
+            priceCents: row.variantPrice ?? 0,
+            attributes:
+              row.variantAttributes as unknown as ProductVariant["attributes"],
+          },
+        };
+      }
+
+      return {
+        id: row.id,
+        cartId: row.cartId!,
+        quantity: row.quantity,
+        cardMessages: row.cardMessages,
+        isAvailable,
+        product,
+        createdAt: row.createdAt,
+      };
+    });
+
+    return cartItems;
+  } catch (error) {
+    throw handleDbError("Failed adding product to cart", error);
+  }
 };

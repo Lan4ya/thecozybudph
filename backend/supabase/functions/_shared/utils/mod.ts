@@ -4,3 +4,4 @@ export * from "./caseConverter.ts";
 export * from "./parseJSONField.ts";
 export * from "./supabaseUploadImages.ts";
 export * from "./format.ts";
+export * from "./hono.ts";

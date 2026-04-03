@@ -1,14 +1,16 @@
 import { AppError } from "@shared/errors/Errors.ts";
 import { SupabaseType } from "@shared/types.d.ts";
 import {
-  CreateProductDBInput,
   CreateProductInput,
   ProductWithRelations,
 } from "@shared/types/index.ts";
 import { ProductRepository } from "../product-repository.ts";
 import { ProductStorage } from "../product-storage.ts";
+import { DrizzleClient } from "../../../db/client.ts";
+import { InsertProductWithRelations } from "../../../db/types/products.ts";
 
 export const createProduct = async (
+  db: DrizzleClient,
   supabase: SupabaseType,
   payload: CreateProductInput,
 ): Promise<ProductWithRelations> => {
@@ -26,23 +28,21 @@ export const createProduct = async (
   const minPriceCents = Math.min(...prices);
   const maxPriceCents = Math.max(...prices);
 
-  const dbInserts: CreateProductDBInput = {
+  const productInserts: InsertProductWithRelations = {
     ...rest,
-    description: rest.description ?? null,
     imageUrls: urls,
     primaryImageUrl: urls[primaryImageIndex],
-    collectionName: rest.collectionName ?? null,
-    categoryName: payload.categoryName ?? null,
     minPriceCents,
     maxPriceCents,
   };
 
-  let createdProductWithRelations;
   try {
-    createdProductWithRelations =
-      await ProductRepository.createProduct(dbInserts);
+    const createdProductWithRelations =
+      await ProductRepository.insertProductWithRelations(db, productInserts);
+
+    return createdProductWithRelations;
   } catch (error) {
-    // Delete uploaded imgages if createProduct fails
+    // Delete uploaded images if createProduct fails
     await cleanup().catch((err) => {
       console.error("Image cleanup failed after insert error", err);
     });
@@ -50,6 +50,4 @@ export const createProduct = async (
     const msg = error instanceof AppError ? error.message : error;
     throw AppError.internal("Failed to create product", { cause: msg });
   }
-
-  return createdProductWithRelations;
 };

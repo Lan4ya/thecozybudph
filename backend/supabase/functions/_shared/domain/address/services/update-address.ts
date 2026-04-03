@@ -1,32 +1,19 @@
+import { Address } from "@shared/types/index.ts";
+import { AddressUpdate } from "../../../db/types/addresses.ts";
+import { handleDbError } from "../../../errors/handle-db-error.ts";
 import { AddressRepository } from "../address-repository.ts";
-import { Address, UpdateAddressInput } from "@shared/types/index.ts";
-import { camelToSnake, snakeToCamel } from "@shared/utils/caseConverter.ts";
-import { AppError } from "@shared/errors/Errors.ts";
-import { SupabaseType } from "@shared/types.d.ts";
+import { DrizzleClient } from "../../../db/client.ts";
 
 export const updateAddress = async (
-  supabase: SupabaseType,
+  db: DrizzleClient,
   id: string,
-  payload: UpdateAddressInput,
+  payload: AddressUpdate,
 ): Promise<Address> => {
-  const addressDBInput = camelToSnake({
-    ...payload,
-  });
-
-  const { data: address, error } = await AddressRepository.updateAddress(
-    supabase,
-    id,
-    addressDBInput,
-  );
-
-  if (error)
-    throw AppError.internal(`Failed to update address: ${error.message}`);
-
-  if (!address) {
-    throw AppError.internal(
-      "Invariant Violation: address update returned null data",
-    );
+  let address: Address;
+  try {
+    address = await AddressRepository.update(db, id, payload);
+  } catch (error) {
+    throw handleDbError("Failed to update address", error);
   }
-
-  return snakeToCamel(address);
+  return address;
 };

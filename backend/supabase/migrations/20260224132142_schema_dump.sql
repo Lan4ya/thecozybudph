@@ -167,7 +167,6 @@ SET default_table_access_method = "heap";
 
 ALTER TABLE "public"."addresses" OWNER TO "postgres";
 ALTER TABLE "public"."carts" OWNER TO "postgres";
-ALTER TABLE "public"."order_items" OWNER TO "postgres";
 ALTER TABLE "public"."orders" OWNER TO "postgres";
 ALTER TABLE "public"."payments" OWNER TO "postgres";
 ALTER TABLE "public"."product_categories" OWNER TO "postgres";
@@ -199,16 +198,6 @@ CREATE OR REPLACE TRIGGER "on_auth_user_created" AFTER INSERT ON auth.users FOR 
 ALTER TABLE "public"."addresses" ENABLE ROW LEVEL SECURITY;
 
 
-CREATE POLICY "allow public read" ON "public"."product_categories" FOR SELECT USING (true);
-
-
-
-CREATE POLICY "allow public read" ON "public"."product_collections" FOR SELECT USING (true);
-
-
-
-CREATE POLICY "allow public read" ON "public"."products" FOR SELECT USING (true);
-
 
 CREATE POLICY "allow public read access 1doady1_0" on "storage"."objects" as permissive for select to public using ((bucket_id = 'events'::text));
 
@@ -225,7 +214,6 @@ ALTER TABLE "public"."cart_items" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."carts" ENABLE ROW LEVEL SECURITY;
 
 
-ALTER TABLE "public"."order_items" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "public"."orders" ENABLE ROW LEVEL SECURITY;
@@ -333,12 +321,6 @@ GRANT ALL ON TABLE "public"."cart_items" TO "service_role";
 GRANT ALL ON TABLE "public"."carts" TO "anon";
 GRANT ALL ON TABLE "public"."carts" TO "authenticated";
 GRANT ALL ON TABLE "public"."carts" TO "service_role";
-
-
-
-GRANT ALL ON TABLE "public"."order_items" TO "anon";
-GRANT ALL ON TABLE "public"."order_items" TO "authenticated";
-GRANT ALL ON TABLE "public"."order_items" TO "service_role";
 
 
 

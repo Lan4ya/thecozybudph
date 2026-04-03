@@ -1,37 +1,63 @@
 import { AppError } from "@shared/errors/Errors.ts";
-import { Context, Hono } from "hono";
-import { isDev } from "@shared/utils/isDev.ts";
 import { handleError } from "@shared/middlewares/errorHandler.ts";
-import { logger } from "hono/logger";
 import { supabaseMiddleware } from "@shared/middlewares/supabaseMiddleware.ts";
+import { isDev } from "@shared/utils/isDev.ts";
+import { Context, Hono } from "hono";
+import { logger } from "hono/logger";
+import { AppEnv } from "@shared/types.d.ts";
 
 // WARN: This function is only for local environment only. DO NOT deploy it. It's
-// only purpose is for quick testing. the endpoints below are fully handled
-// on the client side with proper RLS.
+// only purpose is for quick testing and are not needed in production.
+const dev = new Hono<AppEnv>().basePath("dev-only");
 
-const dev = new Hono().basePath("dev-only");
-
-dev.use(logger());
 dev.use("*", supabaseMiddleware());
+dev.use(logger());
 
 dev.post("/auth/signup", async (c: Context) => {
   if (!isDev) throw new Error("Dev ednpoint only");
 
   const s = c.get("supabase");
   const { email, password } = await c.req.json();
-  const { data, error } = await s.auth.signUp({ email, password });
+  const { data, error } = await s.auth.signUp({
+    email,
+    password,
+  });
   if (error) throw error;
   return c.json(data);
 });
 
 dev.post("/auth/login", async (c: Context) => {
-  // if (!isDev) throw new Error("Dev ednpoint only");
+  if (!isDev) throw new Error("Dev ednpoint only");
 
   const s = c.get("supabase");
   const { email, password } = await c.req.json();
   const { data, error } = await s.auth.signInWithPassword({ email, password });
   if (error) throw error;
   return c.json(data);
+});
+
+dev.get("/orders", async (c: Context) => {
+  if (!isDev) throw new Error("dev endpoint only");
+
+  const s = c.get("supabase");
+  const { data: orders, error } = await s.from("orders").select("*");
+
+  if (error) throw error;
+  if (!orders) throw AppError.notFound(`No Orders found`);
+
+  return c.json({ orders }, 200);
+});
+
+dev.get("/payments", async (c: Context) => {
+  if (!isDev) throw new Error("dev endpoint only");
+
+  const s = c.get("supabase");
+  const { data: payments, error } = await s.from("payments").select("*");
+
+  if (error) throw error;
+  if (!payments) throw AppError.notFound(`No Payments found`);
+
+  return c.json({ payments }, 200);
 });
 
 dev.get("/products", async (c: Context) => {
