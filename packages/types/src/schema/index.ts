@@ -6,4 +6,5 @@ export * from "./address.ts";
 export * from "./payment.ts";
 export * from "./checkout.ts";
 export * from "./profile.ts";
+export * from "./eventInquiry.ts";
 export * from "./common.ts";
