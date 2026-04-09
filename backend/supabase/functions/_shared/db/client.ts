@@ -7,7 +7,11 @@ import postgres from "postgres";
 import * as schema from "./schema/mod.ts";
 
 // TODO: get the prod url for tx pooler and add it to the secret list
+
 const adminConnString = Deno.env.get("DB_TX_POOLER_URL")!;
+
+// INFO: use this conn string instead of DB_TX_POOLER_URL if DB won't boot:
+// const adminConnString = Deno.env.get("SUPABASE_DB_URL")!;
 
 const adminPg = postgres(adminConnString, {
   prepare: false, // prepared statements are not supported in serverless functions
