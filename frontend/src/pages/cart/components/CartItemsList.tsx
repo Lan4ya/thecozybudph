@@ -67,29 +67,6 @@ export const CartItemsList = () => {
 
         return acc;
       }, []) ?? []
-      // cartQueryData
-      //   ?.map((c) => {
-      //     const existingItem = getCartItem(c.id);
-      //
-      //     // Fill the cardMessages array with empty strings so its length always matches the item’s quantity.
-      //     // This is needed to render extra empty TextArea's so the user can add more messages if wanted.
-      //     const cardMessages =
-      //       c.cardMessages.length < c.quantity
-      //         ? [
-      //             ...c.cardMessages,
-      //             ...Array(
-      //               Math.max(0, c.quantity - c.cardMessages.length),
-      //             ).fill(""),
-      //           ]
-      //         : c.cardMessages;
-      //
-      //     return {
-      //       ...c,
-      //       cardMessages,
-      //       selected: existingItem?.selected ?? false,
-      //     };
-      //   })
-      //   .filter((c) => !c.isAvailable) ?? []
     );
   };
 

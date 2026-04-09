@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev:frontend": "pnpm --filter frontend dev",
+    "dev:backend": "cd backend && sudo systemctl start docker && supabase functions serve --no-verify-jwt",
     "build:frontend": "pnpm --filter frontend build",
     "build": "pnpm -r build"
   },

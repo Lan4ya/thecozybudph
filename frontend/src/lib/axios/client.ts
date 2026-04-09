@@ -1,6 +1,6 @@
 import axios from "axios";
 import { supabase } from "@/lib/supabase/client";
-import type { ApiResponseError } from "@TheCozyBud/types";
+import type { ApiResponseError, ApiResponseSuccess } from "@TheCozyBud/types";
 
 const { VITE_SUPABASE_URL } = import.meta.env;
 const SUPABASE_URL = VITE_SUPABASE_URL;
@@ -23,8 +23,8 @@ apiClient.interceptors.request.use(async (config) => {
 });
 
 apiClient.interceptors.response.use(
-  function unwrapApiResponse(response) {
-    return response.data.data;
+  function unwrapApiResponse<T>(response: { data: ApiResponseSuccess<T> }) {
+    return response.data.data as T;
   },
   function normalizeApiError(error) {
     return Promise.reject(normalizeError(error));

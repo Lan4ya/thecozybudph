@@ -41,6 +41,7 @@ export type Database = {
           city: string
           full_name: string
           id: string
+          is_default: boolean
           phone_number: string
           postal_code: string
           profile_id: string | null
@@ -53,6 +54,7 @@ export type Database = {
           city: string
           full_name: string
           id?: string
+          is_default?: boolean
           phone_number: string
           postal_code: string
           profile_id?: string | null
@@ -65,6 +67,7 @@ export type Database = {
           city?: string
           full_name?: string
           id?: string
+          is_default?: boolean
           phone_number?: string
           postal_code?: string
           profile_id?: string | null

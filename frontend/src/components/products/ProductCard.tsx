@@ -13,7 +13,6 @@ const ProductCard = ({ productId, name, imageUrl, price }: Props) => {
   const navigate = useNavigate();
 
   const handleClick = async () => {
-    // navigate("/shop");
     navigate(`/shop/products/${productId}`);
   };
 

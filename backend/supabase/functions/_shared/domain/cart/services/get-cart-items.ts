@@ -25,38 +25,25 @@ export const getCartItems = async (
     const rows = await CartRepository.getCartItemsByCartId(db, cart.id);
 
     const cartItems: CartItem[] = rows.map((row) => {
-      let product: CartItem["product"];
-      let isAvailable = true;
-
-      if (
-        !row.productVariantId ||
-        !row.productId ||
-        !row.primaryImageUrl ||
-        !row.productName
-      ) {
-        product = null;
-        isAvailable = false;
-      } else {
-        product = {
-          id: row.productId,
-          name: row.productName,
-          primaryImageUrl: row.primaryImageUrl,
-          options: row.productOptions as unknown as ProductOption[],
-          variant: {
-            id: row.variantId!,
-            priceCents: row.variantPrice ?? 0,
-            attributes:
-              row.variantAttributes as unknown as ProductVariant["attributes"],
-          },
-        };
-      }
+      const product = {
+        id: row.productId,
+        name: row.productName,
+        primaryImageUrl: row.primaryImageUrl,
+        options: row.productOptions as unknown as ProductOption[],
+        variant: {
+          id: row.variantId!,
+          priceCents: row.variantPrice ?? 0,
+          attributes:
+            row.variantAttributes as unknown as ProductVariant["attributes"],
+        },
+      };
 
       return {
         id: row.id,
         cartId: row.cartId!,
         quantity: row.quantity,
         cardMessages: row.cardMessages,
-        isAvailable,
+        isAvailable: row.isAvailable,
         product,
         createdAt: row.createdAt,
       };

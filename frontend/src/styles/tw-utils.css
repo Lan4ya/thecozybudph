@@ -43,6 +43,10 @@
     font-size: 12px;
   }
 
+  .text-link {
+    @apply underline text-blue-500 hover:text-blue-500/90;
+  }
+
   /* dev border */
   .b {
     @apply border border-blue-400;

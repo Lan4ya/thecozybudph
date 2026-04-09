@@ -4,14 +4,18 @@ import {
   authMiddleware,
   drizzleMiddleware,
 } from "@shared/middlewares/mod.ts";
-import { checkoutHandler } from "./checkout-handlers.ts";
+import {
+  createPendingCheckoutHandler,
+  createShippingQuoteHandler,
+} from "./checkout-handlers.ts";
 
 const checkout = new Hono<Env>();
 
 checkout.use("*", supabaseMiddleware());
 checkout.use("*", authMiddleware());
-checkout.use("*", drizzleMiddleware());
+// checkout.use("*", drizzleMiddleware());
 
-checkout.post("/", ...checkoutHandler);
+checkout.post("/", drizzleMiddleware(), ...createPendingCheckoutHandler);
+checkout.post("/shipping/quotes", ...createShippingQuoteHandler);
 
 export default checkout;

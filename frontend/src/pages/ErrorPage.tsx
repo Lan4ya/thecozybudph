@@ -70,7 +70,7 @@ export const ErrorPage = ({ status, title, message }: ErrorPageProps) => {
             </Button>
           ) : status === 404 || status === 401 ? (
             <Button
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/", { replace: true })}
               variant="default"
               size="lg"
               className="rounded-2xl"

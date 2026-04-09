@@ -3,7 +3,7 @@ import ProductCard from "@/components/products/ProductCard";
 import { ShopProductGridSkeleton } from "@/lib/ui/skeletons/ShopProductGridItemsSkeleton";
 import { useProductsSuspenseInfiniteQuery } from "@/pages/shop/hooks/useProductsSuspenseInfiniteQuery";
 
-const ProductsGrid = () => {
+const ProductGrid = () => {
   const {
     error,
     isFetching,
@@ -62,4 +62,4 @@ const ProductsGrid = () => {
   );
 };
 
-export default ProductsGrid;
+export default ProductGrid;

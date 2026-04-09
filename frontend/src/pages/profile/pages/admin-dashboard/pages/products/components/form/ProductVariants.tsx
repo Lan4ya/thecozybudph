@@ -1,4 +1,4 @@
-import { useFieldArray, useFormContext } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import type { ProductFormInput, ProductWithRelations } from "@TheCozyBud/types";
 import { useMemo, useEffect } from "react";
 import { Input } from "@/lib/ui/__shadcn__/input";
@@ -7,13 +7,7 @@ import { cn } from "@/lib/utils/cn";
 type Props = { editingProduct: ProductWithRelations | null };
 
 const ProductVariants = ({ editingProduct }: Props) => {
-  const { control, watch, setValue, register } =
-    useFormContext<ProductFormInput>();
-
-  // const { fields, append, remove } = useFieldArray({
-  //   name: "variants",
-  //   control,
-  // });
+  const { watch, setValue } = useFormContext<ProductFormInput>();
 
   const [mode, options, variants, basePrice] = watch([
     "mode",
@@ -107,7 +101,6 @@ const ProductVariants = ({ editingProduct }: Props) => {
               className="w-full"
               value={price}
               onChange={(e) => handlePriceChange(idx, e.target.value)}
-              //{...register(`variants.${idx}.priceCents`)}
               onKeyDown={restrictDecimalInput}
               onPaste={restrictPaste}
             />

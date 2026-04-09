@@ -6,14 +6,12 @@ export const orderSourceSchema = z.object({
   source: z.enum(["cart", "shop"]),
 });
 
-export const orderItemsSchema = z
-  .array(addCartItemSchema)
-  .min(1, "order must have at least one item");
+export const orderItemSchema = addCartItemSchema;
 
 export const orderAddressSchema = createAddressSchema;
 
 export const createOrderSchema = orderSourceSchema.extend({
-  items: orderItemsSchema,
+  items: z.array(orderItemSchema).min(1, "order must have at least one item"),
   addressId: z.uuid("addressId is not a valid UUID"),
 });
 

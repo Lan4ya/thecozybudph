@@ -1,4 +1,3 @@
-import { drizzleMiddleware } from "@shared/middlewares/mod.ts";
 import { Env, Hono } from "hono";
 import { checkoutPaymongoWebhookHandler } from "./webhook-handlers.ts";
 

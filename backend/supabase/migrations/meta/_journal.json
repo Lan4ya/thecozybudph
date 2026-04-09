@@ -442,6 +442,13 @@
       "when": 1775112985162,
       "tag": "0062_green_purifiers",
       "breakpoints": true
+    },
+    {
+      "idx": 63,
+      "version": "7",
+      "when": 1775220954710,
+      "tag": "0063_striped_ben_grimm",
+      "breakpoints": true
     }
   ]
 }

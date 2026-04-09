@@ -5,6 +5,7 @@ import { ProductAPI } from "@/api/product.ts";
 import {
   type Product as ProductType,
   addCartItemSchema,
+  orderItemSchema,
 } from "@TheCozyBud/types";
 import PersistSuspense from "@/components/PersistSuspense";
 import { RouteLoaderSpinner } from "@/components/RouteLoaderSpinner";
@@ -22,6 +23,7 @@ import { useProductSelectionStore } from "@/pages/shop/store/useProductSelection
 import isDev from "@/lib/utils/isDev";
 import { useCartItemMutations } from "@/pages/cart/hooks/useCartMutations.ts";
 import { useAuthStore } from "@/store/useAuthStore.tsx";
+import { useCheckoutStore } from "@/pages/checkout/store/useCheckoutStore.ts";
 
 const Product = () => {
   return (
@@ -38,8 +40,6 @@ const ProductInner = () => {
   const navigate = useNavigate();
 
   const isValidUUID = useMemo(() => {
-    if (!id) return false;
-
     const parsedId = z.uuid().safeParse(id);
     if (!parsedId.success) return false;
 
@@ -53,7 +53,7 @@ const ProductInner = () => {
   } = useSuspenseQuery<ProductType | null>({
     queryKey: ["product", id],
     queryFn: () => {
-      if (!isValidUUID || !id) return Promise.resolve(null);
+      if (!id || !isValidUUID) return Promise.resolve(null);
       return ProductAPI.getById(id);
     },
     staleTime: 1 * 60 * 60 * 1000,
@@ -71,7 +71,11 @@ const ProductInner = () => {
     (s) => s.setSelectedOptions,
   );
 
-  const reset = useProductSelectionStore((s) => s.reset);
+  const resetProductSelectionStore = useProductSelectionStore((s) => s.reset);
+
+  const setCheckoutSessionId = useCheckoutStore((s) => s.setSessionId);
+  const setCheckoutSource = useCheckoutStore((s) => s.setSource);
+  const setCheckoutOrderItems = useCheckoutStore((s) => s.setOrderItems);
 
   useEffect(() => {
     if (!product) return;
@@ -110,12 +114,12 @@ const ProductInner = () => {
 
     if (!result.success) {
       isDev && console.error(z.flattenError(result.error));
-      addToast("Something wen't wrong. Please try again later.", "error");
+      addToast("Invalid card message or quantity. Please try again.", "error");
       return;
     }
 
     await addToCartMutation.mutateAsync(result.data);
-    reset(product.options);
+    resetProductSelectionStore(product.options);
   };
 
   const handleBuyNow = async () => {
@@ -129,7 +133,7 @@ const ProductInner = () => {
     const { quantity, selectedVariant, cardMessages } =
       useProductSelectionStore.getState();
 
-    const result = addCartItemSchema.safeParse({
+    const result = orderItemSchema.safeParse({
       productId: product.id,
       variantId: selectedVariant?.id,
       quantity,
@@ -138,12 +142,26 @@ const ProductInner = () => {
 
     if (!result.success) {
       isDev && console.error(z.flattenError(result.error));
-      addToast("Something wen't wrong. Please try again later.", "error");
+      addToast("Invalid card message or quantity. Please try again.", "error");
       return;
     }
 
-    navigate("/checkout");
-    reset(product.options);
+    const orderItem = {
+      ...result.data,
+      name: product.name,
+      priceCents: selectedVariant?.priceCents ?? product.minPriceCents,
+      attributes: selectedVariant?.attributes ?? {},
+      imageUrl: product.imageUrls[0] ?? "",
+    };
+
+    const sessionId = crypto.randomUUID();
+
+    setCheckoutSessionId(sessionId);
+    setCheckoutSource("shop");
+    setCheckoutOrderItems([orderItem]);
+    navigate(`/checkout/${sessionId}`);
+
+    resetProductSelectionStore(product.options);
   };
 
   const handleHeartClick = async () => {

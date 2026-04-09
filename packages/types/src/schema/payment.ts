@@ -4,13 +4,11 @@ import { z } from "zod";
 export const paymentMethodTypesSchema = z.enum(["gcash", "brankas"]); // brankas is online banking
 
 export const createPaymentSchema = z.object({
-  method: z.object({
-    billing: z.object({
-      name: z.string().trim().min(1, "name is required"),
-      email: z.email().trim().min(1, "email is required"),
-    }),
-    type: paymentMethodTypesSchema,
+  billing: z.object({
+    name: z.string().trim().min(1, "name is required"),
+    email: z.email().trim().min(1, "email is required"),
   }),
+  type: paymentMethodTypesSchema,
 });
 
 export type CreatePaymentInput = z.infer<typeof createPaymentSchema>;

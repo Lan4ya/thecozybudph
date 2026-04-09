@@ -80,4 +80,15 @@ export type CartItemUI = Expand<
   }
 >;
 
+export type CheckoutOrderSummaryUI = {
+  quantity: number;
+  cardMessages: string[];
+  // productId: string;
+  // variantId: string;
+  attributes: Record<string, string>;
+  name: string;
+  priceCents: number;
+  imageUrl: string;
+};
+
 export type CheckoutUI = {};

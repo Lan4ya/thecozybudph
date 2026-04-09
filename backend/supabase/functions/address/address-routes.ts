@@ -7,6 +7,7 @@ import {
 import {
   createAddressHandler,
   getAddressesHandler,
+  getDefaultAddressesHandler,
   updateAddressHandler,
 } from "./address-handlers.ts";
 
@@ -17,6 +18,7 @@ address.use("*", authMiddleware());
 address.use("*", drizzleMiddleware());
 
 address.get("/", ...getAddressesHandler);
+address.get("/default", ...getDefaultAddressesHandler);
 address.post("/", ...createAddressHandler);
 address.patch("/:id", ...updateAddressHandler);
 

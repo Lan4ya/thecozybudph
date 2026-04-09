@@ -1,7 +1,8 @@
 import { createBrowserRouter, redirect } from "react-router";
 import { RouteLoaderSpinner } from "./components/RouteLoaderSpinner.tsx";
 import { CatchAllErrorPage } from "./pages/ErrorPage.tsx";
-import Root, { RootLoader } from "./pages/Root.tsx";
+import Root from "./pages/Root.tsx";
+import RootLoader from "./pages/RootLoader.tsx";
 import About from "./pages/about/About.tsx";
 import { AuthLoader, ConfirmEmail, Login, Signup } from "./pages/auth";
 import Cart from "./pages/cart/Cart.tsx";
@@ -21,7 +22,8 @@ import {
   AdminDashboardAnalytics,
   AdminDashboardProducts,
 } from "@/pages/profile/pages/admin-dashboard/index.ts";
-import Checkout from "./pages/checkout/Checkout.tsx";
+import { Checkout, CheckoutLoader } from "./pages/checkout/index.ts";
+import AddressSelection from "./pages/checkout/pages/AddressSelection.tsx";
 
 const router = createBrowserRouter([
   {
@@ -63,6 +65,7 @@ const router = createBrowserRouter([
               {
                 index: true,
                 loader: () => redirect("products"),
+                Component: AdminDashboardProducts,
               },
               { path: "products", Component: AdminDashboardProducts },
               { path: "orders", Component: AdminDashboardOrders },
@@ -84,7 +87,13 @@ const router = createBrowserRouter([
         ],
       },
 
-      { path: "checkout", Component: Checkout },
+      {
+        path: "checkout/:sessionId",
+        children: [
+          { index: true, Component: Checkout, loader: CheckoutLoader },
+          { path: "address-selection", Component: AddressSelection },
+        ],
+      },
 
       { path: "events", Component: Events },
 

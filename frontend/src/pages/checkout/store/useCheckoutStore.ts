@@ -1,12 +1,17 @@
-import type { CheckoutInput, ProductVariant } from "@TheCozyBud/types";
-import type { SetStateAction } from "react";
+import type {
+  Address,
+  CreatePaymentInput,
+  ProductVariant,
+} from "@TheCozyBud/types";
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 
-type Payment = CheckoutInput["payment"] | null;
+type Payment = CreatePaymentInput & { total: number };
 type Source = "shop" | "cart";
 
-type OrderItemUI = {
+const CHECKOUT_SESSION_NAME = "checkout-details";
+
+export type OrderItemUI = {
   quantity: number;
   cardMessages: string[];
   productId: string;
@@ -18,44 +23,66 @@ type OrderItemUI = {
   imageUrl: string;
 };
 
+type Shipping = {
+  fee: number;
+  serviceType: string;
+} | null;
+
 type CheckoutState = {
-  source: Source;
+  source: Source | null;
   orderItems: OrderItemUI[];
-  payment: Payment;
+  payment: Partial<Payment> | null;
+  address: Address | null;
+  shipping: Shipping;
 
   setOrderItems: (oi: OrderItemUI[]) => void;
-  setPayment: (p: SetStateAction<Payment>) => void;
+  setPayment: (p: Partial<Payment>) => void;
   setSource: (s: Source) => void;
+  setAddress: (a: Address) => void;
+  setShipping: (s: Shipping) => void;
+
+  sessionId: string | null;
+  setSessionId: (id: string) => void;
+
+  reset: () => void;
 };
 
 export const useCheckoutStore = create<CheckoutState>()(
   persist(
     (set) => ({
-      source: "shop",
-      quantity: 1,
-      cardMessages: [""],
-      selectedVariant: null,
+      source: null,
       orderItems: [],
+      address: null,
+      shipping: null,
       payment: null,
+      sessionId: "",
+
+      reset: () => {
+        set({ orderItems: [], source: null, payment: null, sessionId: "" });
+        sessionStorage.removeItem(CHECKOUT_SESSION_NAME);
+      },
 
       setSource: (source) => set({ source }),
 
+      setAddress: (address) => set({ address }),
+
+      setSessionId: (id) => set({ sessionId: id }),
+
+      setShipping: (shipping) => set({ shipping }),
+
       setOrderItems: (orderItems) => set({ orderItems }),
 
-      setPayment: (paymentOrUpdater) =>
-        set((state) => ({
-          payment:
-            typeof paymentOrUpdater === "function"
-              ? paymentOrUpdater(state.payment)
-              : paymentOrUpdater,
-        })),
+      setPayment: (payment) => set({ payment }),
     }),
     {
-      name: "checkout-details", // name for localStorage key
+      name: CHECKOUT_SESSION_NAME,
+      storage: createJSONStorage(() => sessionStorage),
       partialize: (state) => ({
         // only persist specific fields
         orderItems: state.orderItems,
         source: state.source,
+        sessionId: state.sessionId,
+        address: state.address,
       }),
     },
   ),

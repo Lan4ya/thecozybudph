@@ -27,9 +27,8 @@ const Profile = () => {
   const handleLogout = async () => {
     setSigningOut(true);
 
-    // INFO: clearing cache and stores on SIGNED_OUT event is already handled by onAuthStateChange()
-
     try {
+      // INFO: clearing cache and stores on SIGNED_OUT event is already handled by onAuthStateChange()
       const { error } = await supabase.auth.signOut({ scope: "global" });
       if (error) throw error;
 

@@ -1,22 +1,24 @@
 import TopBar from "./components/TopBar";
-import AddressSection from "./components/Address";
-import ShippingSection from "./components/Shipping";
-import PaymentMethodsSection from "./components/PaymentMethods";
-import PaymentDetailsSection from "./components/PaymentDetails";
+import AddressSection from "./components/AddressSection";
+import ShippingSection from "./components/ShippingSection";
+import PaymentMethodsSection from "./components/PaymentMethodsSection";
+import PaymentDetailsSection from "./components/PaymentDetailsSection";
 import BottomBar from "./components/BottomBar";
-import OrderItems from "./components/OrderItems";
+import OrderSummary from "./components/OrderSummary";
 
 const Checkout = () => {
   return (
-    <div className="min-h-screen bg-background pb-28">
+    // <div className="min-h-screen pb-28">
+    <div className="pb-28">
       <div className="custom-container max-w-7xl mx-auto pt-6 space-y-6">
         <TopBar />
         <AddressSection />
-        <OrderItems />
+        <OrderSummary />
         <ShippingSection />
         <PaymentMethodsSection />
         <PaymentDetailsSection />
       </div>
+
       <BottomBar />
     </div>
   );

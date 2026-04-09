@@ -11,7 +11,7 @@ import PersistSuspense from "@/components/PersistSuspense";
 import { ShopProductGridSkeleton } from "../../lib/ui/skeletons/ShopProductGridItemsSkeleton";
 import Tags from "./components/FilterTags";
 import { useIsExtraLargeScreen } from "@/hooks/useMediaQuery";
-import ProductsGrid from "./components/ProductsGrid";
+import ProductGrid from "./components/ProductGrid";
 import { ErrorBoundary } from "react-error-boundary";
 import isDev from "@/lib/utils/isDev";
 import { useNavigate } from "react-router";
@@ -86,7 +86,7 @@ const Shop = () => {
             )}
             onReset={() => navigate(0)}
           >
-            <ProductsGrid />
+            <ProductGrid />
           </ErrorBoundary>
         </PersistSuspense>
       </main>

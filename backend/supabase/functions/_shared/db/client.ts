@@ -6,11 +6,11 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "./schema/mod.ts";
 
-// Uses database user 'postgres'
-const adminConnString = Deno.env.get("SUPABASE_DB_URL")!;
+// TODO: get the prod url for tx pooler and add it to the secret list
+const adminConnString = Deno.env.get("DB_TX_POOLER_URL")!;
 
 const adminPg = postgres(adminConnString, {
-  prepare: false,
+  prepare: false, // prepared statements are not supported in serverless functions
 });
 
 export const adminDb = drizzle(adminPg, {

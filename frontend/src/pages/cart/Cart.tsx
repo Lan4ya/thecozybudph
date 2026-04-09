@@ -8,6 +8,7 @@ import { useCartStore } from "@/pages/cart/store/useCartStore";
 import { useToast } from "@/providers/ToastProvider";
 import { useShallow } from "zustand/react/shallow";
 import { CustomErrorBoundary } from "@/components/CustomErrorBoundary";
+import { useCheckoutStore } from "../checkout/store/useCheckoutStore";
 
 // TODO:
 // add created_at in db for most recent display sorting
@@ -46,21 +47,65 @@ const Cart = () => {
     0,
   );
 
+  const handleDeleteItems = () => {
+    if (selectedItems.length === 0) {
+      addToast("Please select item(s).", "info");
+      return;
+    }
+
+    setPendingDeleteIds(
+      cartItems.reduce<string[]>((acc, i) => {
+        if (i.selected) acc.push(i.id);
+        return acc;
+      }, []),
+    );
+  };
+
+  const handleCheckout = () => {
+    if (selectedItems.length === 0) {
+      addToast("Please select item(s).", "info");
+      return;
+    }
+
+    const orderItems = selectedItems
+      .filter(
+        (item): item is typeof item & { product: { id: string } } =>
+          item.product.id !== null,
+      )
+      .map((item) => ({
+        variantId: item.product.variant.id,
+        productId: item.product.id,
+        quantity: item.quantity,
+        cardMessages: item.cardMessages,
+        imageUrl: item.product.primaryImageUrl,
+        attributes: item.product.variant.attributes,
+        name: item.product.name,
+        priceCents: item.product.variant.priceCents,
+      }));
+
+    const sessionId = crypto.randomUUID();
+
+    useCheckoutStore.getState().setSessionId(sessionId);
+    useCheckoutStore.getState().setSource("shop");
+    useCheckoutStore.getState().setOrderItems(orderItems);
+    navigate(`/checkout/${sessionId}`);
+  };
+
   return (
     <>
-      <div className="custom-container space-y-8 pt-4 pb-25 max-w-7xl mx-auto">
-        <header className="grid grid-cols-3 items-center">
+      <div className="custom-container space-y-8 pb-25 pt-6 max-w-7xl mx-auto">
+        <header className="py-2 border-b border-border/40  grid grid-cols-3 items-center">
           <div>
             <Button variant="minimal" size="auto" onClick={() => navigate(-1)}>
               <ArrowLeft />
             </Button>
           </div>
 
-          <h1 className="text-xl lg:text-2xl font-bold text-foreground text-center">
+          <h1 className="text-xl lg:text-2xl font-semibold text-foreground text-center">
             Your Cart
           </h1>
 
-          <div className="flex justify-end">
+          <div className="flex justify-end ">
             {!hasNoItems && (
               <Button
                 variant="minimal"
@@ -68,7 +113,12 @@ const Cart = () => {
                 className="text-foreground"
                 onClick={() => setIsEditingCart(!isEditingCart)}
               >
-                <span className="text-base lg:text-lg w-8">
+                <span
+                  className={cn(
+                    "text-base lg:text-lg w-8",
+                    isEditingCart && "text-primary",
+                  )}
+                >
                   {isEditingCart ? "Done" : "Edit"}
                 </span>
               </Button>
@@ -110,19 +160,7 @@ const Cart = () => {
           <Button
             variant={"destructive"}
             className=""
-            onClick={() => {
-              if (selectedItems.length === 0) {
-                addToast("Please select item(s).", "info");
-                return;
-              }
-
-              setPendingDeleteIds(
-                cartItems.reduce<string[]>((acc, i) => {
-                  if (i.selected) acc.push(i.id);
-                  return acc;
-                }, []),
-              );
-            }}
+            onClick={handleDeleteItems}
           >
             Delete
           </Button>
@@ -132,12 +170,7 @@ const Cart = () => {
 
             <Button
               disabled={hasNoItems}
-              onClick={() => {
-                if (selectedItems.length === 0) {
-                  addToast("Please select item(s).", "info");
-                  return;
-                }
-              }}
+              onClick={handleCheckout}
               className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
             >
               Check Out

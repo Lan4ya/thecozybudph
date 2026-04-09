@@ -131,6 +131,8 @@ export const ProductOptionsDrawer = ({
             <>
               <div className="space-y-3">
                 <h3 className="font-semibold">Customize Arrangement</h3>
+
+                {/* Option Selections */}
                 <div className="text-sm text-muted-foreground space-y-4">
                   {productOptions.map((option) => {
                     const selectedValues = selectedOptions[option.name] ?? [];
@@ -192,7 +194,7 @@ export const ProductOptionsDrawer = ({
                     ))}
                   </Swiper>
 
-                  {/* Nav Buttons */}
+                  {/* Card Msg Nav Buttons */}
                   <button
                     className={`custom-prev absolute left-2 top-1/2 -translate-y-1/2 z-30 size-10 backdrop-blur-sm rounded-full flex items-center justify-center text-2xl font-bold transition-all duration-200 shadow-lg border ${
                       isFirstSlide

@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { CreditCard, ChevronRight } from "lucide-react";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { cn } from "@/lib/utils/cn";
+import { useCheckoutStore } from "../store/useCheckoutStore";
+import { useAuthStore } from "@/store/useAuthStore";
 
 type PaymentMethod = {
   id: string;
@@ -19,16 +21,36 @@ const paymentMethods: PaymentMethod[] = [
     // icon: "📱",
     description: "Scan QR or pay via app",
   },
-  {
-    id: "bpi",
-    name: "BPI",
-    badge: "Activate",
-    // description: "₱100 off on top of vouchers",
-  },
+  // {
+  //   id: "bpi",
+  //   name: "BPI",
+  //   badge: "Activate",
+  //   // description: "₱100 off on top of vouchers",
+  // },
 ];
 
 const PaymentMethodsSection = () => {
   const [selectedId, setSelectedId] = useState(paymentMethods[0].id);
+  const setPayment = useCheckoutStore((s) => s.setPayment);
+  const session = useAuthStore((s) => s.session);
+  // const payment = useCheckoutStore((s) => s.payment);
+
+  const email = session?.user?.email;
+  // TODO: prefer users name in DB after api for that is available
+  const userName = session?.user?.user_metadata?.name ?? email?.split("@")[0];
+
+  useEffect(() => {
+    const p = useCheckoutStore.getState().payment;
+
+    if (!p)
+      setPayment({
+        billing: {
+          name: userName || "",
+          email: email || "",
+        },
+        type: "gcash",
+      });
+  }, []);
 
   return (
     <motion.div
@@ -40,11 +62,11 @@ const PaymentMethodsSection = () => {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <CreditCard className="size-5 text-primary" />
-          <h2 className="font-semibold text-foreground">Payment Methods</h2>
+          <h2 className="font-semibold text-foreground">Payment Method</h2>
         </div>
-        <Button variant="minimal" size="sm" className="text-primary gap-1">
-          View All <ChevronRight className="size-4" />
-        </Button>
+        {/* <Button variant="minimal" size="sm" className="text-primary gap-1"> */}
+        {/*   View All <ChevronRight className="size-4" /> */}
+        {/* </Button> */}
       </div>
 
       <div className="space-y-3">
@@ -89,12 +111,6 @@ const PaymentMethodsSection = () => {
                 )}
               </div>
             </div>
-            {method.id === "spaylater" && (
-              <div className="text-right text-xs text-muted-foreground">
-                <div>₱298.66 x 3 mth</div>
-                <div>₱165.15 x 6 mth</div>
-              </div>
-            )}
           </label>
         ))}
       </div>

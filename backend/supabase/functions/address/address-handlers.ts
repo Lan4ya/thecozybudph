@@ -34,6 +34,13 @@ export const updateAddressHandler = createHandlers(
   },
 );
 
+export const getDefaultAddressesHandler = createHandlers(async (c) => {
+  const { db, claims } = requireVariables(c, "db", "claims");
+  const profileId = claims.sub;
+  const res = await AddressService.getDefaultAddress(db, profileId);
+  return handleSuccess(res);
+});
+
 export const getAddressesHandler = createHandlers(async (c) => {
   const { db, claims } = requireVariables(c, "db", "claims");
   const profileId = claims.sub;

@@ -9,7 +9,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "../dropdown";
+} from "../base-dropdown";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { ChevronDown } from "lucide-react";
 import PersistSuspense from "@/components/PersistSuspense";

@@ -24,10 +24,6 @@ const NavBar = () => {
 
   const { data: cartItems } = useCartQuery();
 
-  useEffect(() => {
-    console.log({ cartItems });
-  }, [cartItems]);
-
   const cartItemsCount =
     cartItems?.filter((c) => c.isAvailable && c.product).length ?? 0;
 

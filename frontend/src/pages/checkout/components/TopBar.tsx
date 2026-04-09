@@ -14,11 +14,11 @@ const TopBar = () => {
     >
       <Button
         variant="minimal"
-        size="icon-sm"
+        size="auto"
         onClick={() => navigate(-1)}
         className="text-muted-foreground hover:text-foreground"
       >
-        <ChevronLeft className="size-5" />
+        <ChevronLeft />
       </Button>
       <h1 className="text-xl font-semibold text-foreground">Checkout</h1>
       <div className="w-10" /> {/* spacer for alignment */}

@@ -1,4 +1,4 @@
-import { SeedPg } from "@snaplet/seed/adapter-pg";
+  import { SeedPg } from "@snaplet/seed/adapter-pg";
 import { defineConfig } from "@snaplet/seed/config";
 import { Client } from "pg";
 

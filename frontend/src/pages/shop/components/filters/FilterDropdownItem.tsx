@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react";
-import { DropdownMenuItem } from "../dropdown";
+import { DropdownMenuItem } from "../base-dropdown";
 import { Check } from "lucide-react";
 import { useProductsFilterAndSortState } from "../../hooks/useProductsFilterAndSortState";
 import toggleArrItem from "@/lib/utils/toggleArrItem";

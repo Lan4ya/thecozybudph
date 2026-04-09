@@ -47,8 +47,8 @@ export const CartRepository = {
           variantAttributes: productVariants.attributes,
         })
         .from(cartItems)
-        .leftJoin(products, eq(products.id, cartItems.productId))
-        .leftJoin(
+        .innerJoin(products, eq(products.id, cartItems.productId))
+        .innerJoin(
           productVariants,
           eq(productVariants.id, cartItems.productVariantId),
         )

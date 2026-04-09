@@ -1,3 +1,5 @@
+import Lalamove from "@lalamove/lalamove-js";
+
 export type CreatePendingCheckoutRes = {
   order: {
     source: string;
@@ -55,3 +57,5 @@ export type CreatePendingCheckoutRes = {
     returnUrl: string;
   };
 };
+
+export type CreateQuotationsRes = Lalamove.IQuotation[];

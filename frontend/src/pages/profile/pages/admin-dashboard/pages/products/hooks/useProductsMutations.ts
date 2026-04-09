@@ -13,7 +13,7 @@ export const useProductMutations = () => {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
 
-  const createProductMutation = useMutation({
+  const { mutate: createProductMutation } = useMutation({
     mutationFn: ProductAPI.create,
     onMutate: () => {
       addToast("Creating new product...", "info");
@@ -44,7 +44,7 @@ export const useProductMutations = () => {
     },
   });
 
-  const updateProductMutation = useMutation({
+  const { mutate: updateProductMutation } = useMutation({
     mutationFn: ({
       formData,
       productId,
@@ -100,7 +100,7 @@ export const useProductMutations = () => {
     },
   });
 
-  const deleteProductMutation = useMutation({
+  const { mutate: deleteProductMutation } = useMutation({
     mutationFn: ProductAPI.deleteMany,
     onMutate: ({ productIds }) => {
       addToast(

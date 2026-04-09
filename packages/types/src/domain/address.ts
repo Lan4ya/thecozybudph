@@ -8,4 +8,5 @@ export type Address = {
   barangay: string;
   addressLine: string;
   phoneNumber: string;
+  isDefault: boolean;
 };
