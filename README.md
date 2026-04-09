@@ -17,7 +17,7 @@
 ##### Backend:
 - [ Supabase (Deno & PostgreSQL) ](https://supabase.com/) 
 - [ Hono ](https://hono.dev/) 
-- [ Node ](https://nodejs.org/en)
+- [ Node (scripting only)](https://nodejs.org/en)
 - [PayMongo](https://www.paymongo.com/) 
 - [Drizzle](https://orm.drizzle.team/docs/get-started) 
 
@@ -53,7 +53,7 @@ VITE_SUPABASE_ANON_KEY=
 
 ```bash
 # ./backend/.env
-SUPABASE_URL=http:
+SUPABASE_URL=
 SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 SUPABASE_DB_URL=
@@ -61,16 +61,32 @@ SUPABASE_DB_URL=
 
 ```bash
 # ./backend/supabase/.env
+
+# Google OAuth:
 GOOGLE_CLIENT_ID=
 GOOGLE_SECRET=
+
+# Google SMTP:
+GOOGLE_APP_USERNAME=
+GOOGLE_APP_PASSWORD=
 ```
 
 ```bash
 # ./backend/supabase/functions/.env
-ENV=
-SUPABASE_URL=
-SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
+DB_TX_POOLER_URL=
+
+PAYMONGO_PUBLIC_KEY=
+PAYMONGO_SECRET_KEY=
+PAYMONGO_CHECKOUT_WEBHOOK_SECRET=
+
+LALAMOVE_PUBLIC_KEY=
+LALAMOVE_SECRET_KEY=
+
+GEOAPIFY_API_KEY=
+
+# defaults
+ENV=development 
+APP_URL=https://thecozybudph.com
 ```
 
 #### 4. Run development server
