@@ -1,7 +1,7 @@
 import {
   ProductWithRelations,
   UpdateProductInput,
-} from "@shared/types/index.ts";
+} from "@shared/package-types/index.ts";
 import { AppError } from "@shared/errors/Errors.ts";
 import { SupabaseType } from "@shared/types.d.ts";
 import { ProductRepository } from "../product-repository.ts";

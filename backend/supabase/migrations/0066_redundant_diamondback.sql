@@ -1,0 +1,1 @@
+ALTER TABLE "order_address_snapshots" ALTER COLUMN "province" DROP NOT NULL;

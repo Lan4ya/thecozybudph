@@ -1,21 +1,29 @@
-import { Hono, Env } from "hono";
 import {
-  supabaseMiddleware,
   authMiddleware,
   drizzleMiddleware,
+  supabaseMiddleware,
 } from "@shared/middlewares/mod.ts";
+import { Env, Hono } from "hono";
 import {
-  createPendingCheckoutHandler,
+  createOrderHandler,
+  createPaymentHandler,
   createShippingQuoteHandler,
+  paymentWebhookHandler,
 } from "./checkout-handlers.ts";
 
 const checkout = new Hono<Env>();
 
-checkout.use("*", supabaseMiddleware());
-checkout.use("*", authMiddleware());
-// checkout.use("*", drizzleMiddleware());
+// Public
+checkout.post("/webhook", ...paymentWebhookHandler);
 
-checkout.post("/", drizzleMiddleware(), ...createPendingCheckoutHandler);
-checkout.post("/shipping/quotes", ...createShippingQuoteHandler);
+// Protected
+const protectedRoutes = new Hono<Env>();
+protectedRoutes.use("*", supabaseMiddleware(), authMiddleware());
+
+protectedRoutes.post("/order", drizzleMiddleware(), ...createOrderHandler);
+protectedRoutes.post("/payment", drizzleMiddleware(), ...createPaymentHandler);
+protectedRoutes.post("/shipping/quotes", ...createShippingQuoteHandler);
+
+checkout.route("/", protectedRoutes);
 
 export default checkout;

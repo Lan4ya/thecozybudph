@@ -12,7 +12,7 @@ import {
 import { sql } from "drizzle-orm";
 import { profiles } from "./profiles.ts";
 import { products, productVariants } from "./products.ts";
-import { ProductVariant } from "../../types/index.ts";
+import { ProductVariant } from "@shared/package-types/index.ts";
 import { authenticatedRole } from "drizzle-orm/supabase/rls";
 
 export const orders = pgTable(
@@ -30,6 +30,7 @@ export const orders = pgTable(
     discountCents: integer("discount_cents").default(0).notNull(),
     shippingCents: integer("shipping_cents").notNull(),
     totalCents: integer("total_cents").notNull(),
+
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   },
@@ -71,7 +72,7 @@ export const orderAddressesSnapshot = pgTable(
     postalCode: varchar("postal_code", { length: 4 }).notNull(),
     region: text("region").notNull(),
     city: text("city").notNull(),
-    province: text("province").notNull(),
+    province: text("province"),
     barangay: text("barangay").notNull(),
     addressLine: text("address_line").notNull(),
     phoneNumber: varchar("phone_number", { length: 13 }).notNull(), // length is 13 since we will use universal dialing code for PH +63XXXXXXXXXX

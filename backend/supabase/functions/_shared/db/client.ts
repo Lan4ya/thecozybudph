@@ -6,15 +6,13 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "./schema/mod.ts";
 
-// TODO: get the prod url for tx pooler and add it to the secret list
+const connString = Deno.env.get("DB_TX_POOLER_URL")!;
 
-const adminConnString = Deno.env.get("DB_TX_POOLER_URL")!;
+// Use this conn string instead if the pooler url doesnt work on your machine:
+// const connString = Deno.env.get("SUPABASE_DB_URL")!;
 
-// INFO: use this conn string instead of DB_TX_POOLER_URL if DB won't boot:
-// const adminConnString = Deno.env.get("SUPABASE_DB_URL")!;
-
-const adminPg = postgres(adminConnString, {
-  prepare: false, // prepared statements are not supported in serverless functions
+const adminPg = postgres(connString, {
+  prepare: false, // prepared statements are not supported in serverless
 });
 
 export const adminDb = drizzle(adminPg, {

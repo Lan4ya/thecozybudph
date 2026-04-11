@@ -1,12 +1,15 @@
-import { DeleteProducts, DeleteProductsInput } from "@shared/types/index.ts";
-import { SupabaseType } from "@shared/types.d.ts";
 import { AppError } from "@shared/errors/Errors.ts";
+import {
+  DeleteProducts,
+  DeleteProductsInput,
+} from "@shared/package-types/index.ts";
 import { isDev } from "@shared/utils/isDev.ts";
+import { DrizzleClient } from "../../../db/client.ts";
 import { ProductRepository } from "../product-repository.ts";
 import { ProductStorage } from "../product-storage.ts";
 
 export const deleteProducts = async (
-  supabase: SupabaseType,
+  db: DrizzleClient,
   payload: DeleteProductsInput,
 ): Promise<DeleteProducts> => {
   const { productIds } = payload;

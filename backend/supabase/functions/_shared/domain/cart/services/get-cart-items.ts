@@ -4,7 +4,7 @@ import {
   CartItem,
   ProductOption,
   ProductVariant,
-} from "@shared/types/index.ts";
+} from "@shared/package-types/index.ts";
 import { AppError } from "@shared/errors/Errors.ts";
 import { DrizzleClient } from "../../../db/client.ts";
 import { handleDbError } from "../../../errors/handle-db-error.ts";

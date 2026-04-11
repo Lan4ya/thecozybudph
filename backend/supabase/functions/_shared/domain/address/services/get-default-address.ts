@@ -1,6 +1,6 @@
 import { DrizzleClient } from "../../../db/client.ts";
 import { handleDbError } from "../../../errors/handle-db-error.ts";
-import { Address } from "../../../types/index.ts";
+import { Address } from "@shared/package-types/index.ts";
 import { AddressRepository } from "../address-repository.ts";
 
 export const getDefaultAddress = async (

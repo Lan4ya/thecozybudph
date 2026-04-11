@@ -1,4 +1,4 @@
-import { AddCartItemInput, CartItem } from "@shared/types/index.ts";
+import { AddCartItemInput, CartItem } from "@shared/package-types/index.ts";
 import { DrizzleClient } from "../../../db/client.ts";
 import { handleDbError } from "../../../errors/handle-db-error.ts";
 import { CartRepository } from "../cart-repository.ts";

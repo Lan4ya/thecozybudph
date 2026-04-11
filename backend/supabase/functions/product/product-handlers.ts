@@ -5,7 +5,7 @@ import {
   deleteProductsSchema,
   productIdSchema,
   updateProductSchema,
-} from "@shared/types/index.ts";
+} from "@shared/package-types/index.ts";
 import {
   createHandlers,
   handleSuccess,

@@ -1,14 +1,14 @@
 import { and, eq, ne, sql } from "drizzle-orm";
 import { DrizzleClient } from "../../db/client.ts";
 import { addresses } from "../../db/schema/addresses.ts";
-import { AddressInsert } from "../../db/types/addresses.ts";
+import { InsertAddress } from "../../db/types/addresses.ts";
 import { AppError } from "../../errors/Errors.ts";
-import { Address } from "../../types/index.ts";
+import { Address } from "@shared/package-types/index.ts";
 
 export const AddressRepository = {
   insert: async (
     db: DrizzleClient,
-    addressInsert: AddressInsert & { profileId: string },
+    addressInsert: InsertAddress & { profileId: string },
   ) => {
     return await db.rls(async (tx) => {
       // Count existing addresses for this profile
@@ -45,6 +45,7 @@ export const AddressRepository = {
         .insert(addresses)
         .values({ ...addressInsert, isDefault })
         .returning();
+
       return inserted;
     });
   },
@@ -52,7 +53,7 @@ export const AddressRepository = {
   update: async (
     db: DrizzleClient,
     id: string,
-    addressUpdate: Partial<AddressInsert>,
+    addressUpdate: Partial<InsertAddress>,
   ) => {
     return await db.rls(async (tx) => {
       // Get the current address to know its profileId and current isDefault status
@@ -110,26 +111,24 @@ export const AddressRepository = {
     });
   },
 
-  getById: async (db: DrizzleClient, id: string) =>
-    await db.rls(async (tx) => {
-      const [address] = await tx
-        .select({
-          id: addresses.id,
-          fullName: addresses.fullName,
-          postalCode: addresses.postalCode,
-          region: addresses.region,
-          city: addresses.city,
-          province: addresses.province,
-          barangay: addresses.barangay,
-          addressLine: addresses.addressLine,
-          phoneNumber: addresses.phoneNumber,
-        })
-        .from(addresses)
-        .where(eq(addresses.id, id))
-        .limit(1);
-
-      return address;
-    }),
+  getById: (db: DrizzleClient, id: string) =>
+    db.rls(
+      async (tx) =>
+        await tx.query.addresses.findFirst({
+          where: (addresses, { eq }) => eq(addresses.id, id),
+          columns: {
+            id: true,
+            fullName: true,
+            postalCode: true,
+            region: true,
+            city: true,
+            province: true,
+            barangay: true,
+            addressLine: true,
+            phoneNumber: true,
+          },
+        }),
+    ),
 
   getDefault: (db: DrizzleClient, profileId: string) =>
     db.rls(async (tx) => {
@@ -149,6 +148,7 @@ export const AddressRepository = {
           barangay: true,
           addressLine: true,
           phoneNumber: true,
+          isDefault: true,
         },
       });
     }),
@@ -167,6 +167,7 @@ export const AddressRepository = {
           barangay: true,
           addressLine: true,
           phoneNumber: true,
+          isDefault: true,
         },
       });
     }),

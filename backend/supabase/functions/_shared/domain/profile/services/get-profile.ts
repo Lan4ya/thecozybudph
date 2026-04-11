@@ -1,6 +1,5 @@
 import { AppError } from "@shared/errors/Errors.ts";
 import { SupabaseType } from "@shared/types.d.ts";
-import { Profile } from "@shared/types/index.ts";
 import { snakeToCamel } from "../../../utils/caseConverter.ts";
 import { ProfileRepository } from "../profile-repository.ts";
 

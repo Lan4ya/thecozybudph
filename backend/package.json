@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "db:generate-types": "supabase gen types typescript --local > ../packages/types/src/db/supabase.types.ts && mkdir -p  ./supabase/functions/_shared/types && rm -rf ./supabase/functions/_shared/types/* && cp -r ../packages/types/src/* ./supabase/functions/_shared/types/",
+    "pkg:generate-types": "supabase gen types typescript --local > ../packages/types/src/supabase.types.ts && mkdir -p  ./supabase/functions/_shared/package-types && rm -rf ./supabase/functions/_shared/package-types/* && cp -r ../packages/types/src/* ./supabase/functions/_shared/package-types/",
     "db:apply-schemas": "pnpm exec drizzle-kit generate && supabase migrations up --include-all"
   },
   "dependencies": {

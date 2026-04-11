@@ -1,10 +1,7 @@
-import type { SupabaseType } from "@shared/types.d.ts";
 import type {
-  // CreateProductDBInput,
-  // UpdateProductDBInput,
   ProductWithRelations,
   ProductVariant,
-} from "@shared/types/index.ts";
+} from "@shared/package-types/index.ts";
 import {
   products,
   productCategories,
@@ -256,47 +253,76 @@ export const ProductRepository = {
     });
   },
 
-  deleteProductsByIds: async (s: SupabaseType, productIds: string[]) => {
-    const { data, error } = await s
-      .from("products")
-      .delete()
-      .in("id", productIds)
-      .select("id");
-    return { data, error };
+  deleteProductsByIds: (db: DrizzleClient, productIds: string[]) => {
+    return db.rls(async (tx) => {
+      if (productIds.length === 0) return [];
+
+      return await tx
+        .delete(products)
+        .where(inArray(products.id, productIds))
+        .returning({ id: products.id });
+    });
   },
 
-  getProductById: async (s: SupabaseType, productId: string) => {
-    const { data, error } = await s
-      .from("products")
-      .select("*")
-      .eq("id", productId)
-      .maybeSingle();
-    return { data, error };
+  getProductById: (db: DrizzleClient, productId: string) => {
+    return db.rls(async (tx) => {
+      const [product] = await tx
+        .select()
+        .from(products)
+        .where(eq(products.id, productId))
+        .limit(1);
+
+      return product ?? null;
+    });
   },
 
-  getProductsByIds: async (s: SupabaseType, productIds: string[]) => {
-    const { data, error } = await s
-      .from("products")
-      .select("id, image_urls")
-      .in("id", productIds);
-    return { data, error };
+  getProductsByIds: (db: DrizzleClient, productIds: string[]) => {
+    return db.rls(async (tx) => {
+      if (productIds.length === 0) return [];
+
+      return await tx
+        .select({
+          id: products.id,
+          imageUrls: products.imageUrls,
+        })
+        .from(products)
+        .where(inArray(products.id, productIds));
+    });
   },
 
-  upsertCategory: async (s: SupabaseType, name: string) => {
-    const { data, error } = await s
-      .from("product_categories")
-      .upsert({ name }, { onConflict: "name" })
-      .select("id, name")
-      .single();
-    return { data, error };
+  upsertCategory: (db: DrizzleClient, name: string) => {
+    return db.rls(async (tx) => {
+      const [category] = await tx
+        .insert(productCategories)
+        .values({ name })
+        .onConflictDoUpdate({
+          target: productCategories.name,
+          set: { name },
+        })
+        .returning({
+          id: productCategories.id,
+          name: productCategories.name,
+        });
+
+      return category ?? null;
+    });
   },
 
-  upsertCollection: async (s: SupabaseType, name: string) => {
-    const { data, error } = await s
-      .from("product_collections")
-      .upsert({ name }, { onConflict: "name" })
-      .select("id, name")
-      .single();
-    return { data, error };
+  upsertCollection: (db: DrizzleClient, name: string) => {
+    return db.rls(async (tx) => {
+      const [collection] = await tx
+        .insert(productCollections)
+        .values({ name })
+        .onConflictDoUpdate({
+          target: productCollections.name,
+          set: { name },
+        })
+        .returning({
+          id: productCollections.id,
+          name: productCollections.name,
+        });
+
+      return collection ?? null;
+    });
   },
 };

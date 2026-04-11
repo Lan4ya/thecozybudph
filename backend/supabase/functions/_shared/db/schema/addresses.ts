@@ -23,7 +23,7 @@ export const addresses = pgTable(
     postalCode: varchar("postal_code", { length: 4 }).notNull(),
     region: text("region").notNull(),
     city: text("city").notNull(),
-    province: text("province").notNull(),
+    province: text("province"),
     barangay: text("barangay").notNull(),
     addressLine: text("address_line").notNull(),
     phoneNumber: varchar("phone_number", { length: 13 }).notNull(),

@@ -25,7 +25,7 @@ export const payments = pgTable(
 
     amountCents: integer("amount_cents").notNull(),
     currency: text("currency").default("PHP").notNull(),
-    status: text("status").notNull(),
+    status: text("status").default("pending").notNull(),
     method: text("method"),
 
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),

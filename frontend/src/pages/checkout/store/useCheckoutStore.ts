@@ -1,12 +1,13 @@
 import type {
   Address,
   CreatePaymentInput,
+  PaymentMethodTypes,
   ProductVariant,
 } from "@TheCozyBud/types";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-type Payment = CreatePaymentInput & { total: number };
+type Payment = { type: PaymentMethodTypes; total: number };
 type Source = "shop" | "cart";
 
 const CHECKOUT_SESSION_NAME = "checkout-details";
@@ -72,7 +73,16 @@ export const useCheckoutStore = create<CheckoutState>()(
 
       setOrderItems: (orderItems) => set({ orderItems }),
 
-      setPayment: (payment) => set({ payment }),
+      setPayment: (patch) =>
+        set((state) => {
+          const prev = state.payment ?? {};
+          return {
+            payment: {
+              ...prev,
+              ...patch,
+            },
+          };
+        }),
     }),
     {
       name: CHECKOUT_SESSION_NAME,

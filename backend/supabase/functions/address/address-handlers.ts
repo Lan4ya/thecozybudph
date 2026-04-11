@@ -4,7 +4,7 @@ import {
   addressIdSchema,
   createAddressSchema,
   updateAddressSchema,
-} from "@shared/types/index.ts";
+} from "@shared/package-types/index.ts";
 import {
   handleSuccess,
   createHandlers,

@@ -3,7 +3,7 @@ import { AppEnv } from "@shared/types.d.ts";
 import { createFactory } from "hono/factory";
 import { ProfileService } from "@shared/domain/profile/mod.ts";
 import { handleSuccess, requireVariables } from "@shared/utils/mod.ts";
-import { updateProfileSchema } from "@shared/types/index.ts";
+import { updateProfileSchema } from "@shared/package-types/index.ts";
 
 const factory = createFactory<AppEnv>();
 const { createHandlers } = factory;

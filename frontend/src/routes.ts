@@ -23,7 +23,9 @@ import {
   AdminDashboardProducts,
 } from "@/pages/profile/pages/admin-dashboard/index.ts";
 import { Checkout, CheckoutLoader } from "./pages/checkout/index.ts";
-import AddressSelection from "./pages/checkout/pages/AddressSelection.tsx";
+import AddressSelection from "./pages/checkout/pages/address-selection/AddressSelection.tsx";
+import PaymentStatus from "./pages/checkout/pages/payment-status/PaymentStatus.tsx";
+import PaymentConfirmation from "./pages/checkout/pages/payment-confirmation/PaymentConfirmation.tsx";
 
 const router = createBrowserRouter([
   {
@@ -92,6 +94,8 @@ const router = createBrowserRouter([
         children: [
           { index: true, Component: Checkout, loader: CheckoutLoader },
           { path: "address-selection", Component: AddressSelection },
+          { path: "payment-confirmation", Component: PaymentConfirmation },
+          { path: "payment-status", Component: PaymentStatus },
         ],
       },
 

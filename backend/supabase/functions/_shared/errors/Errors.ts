@@ -1,5 +1,3 @@
-import { unknown } from "zod";
-
 export class AppError extends Error {
   statusCode: number;
 

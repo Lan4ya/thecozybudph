@@ -1,5 +1,4 @@
-import { SupabaseType } from "@shared/types.d.ts";
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { cartItems, carts } from "../../db/schema/carts.ts";
 import { products, productVariants } from "../../db/schema/products.ts";
 import { AppError } from "../../errors/Errors.ts";
@@ -9,7 +8,7 @@ import {
   ProductOption,
   ProductVariant,
   UpdateCartItemInput,
-} from "../../types/index.ts";
+} from "../../package-types/index.ts";
 import { DrizzleClient } from "../../db/client.ts";
 
 export const CartRepository = {
@@ -366,18 +365,20 @@ export const CartRepository = {
     });
   },
 
-  deleteCartItems: async (
-    supabase: SupabaseType,
+  deleteCartItems: (
+    db: DrizzleClient,
     cartId: string,
     cartItemIds: string[],
   ) => {
-    const { data, error } = await supabase
-      .from("cart_items")
-      .delete()
-      .eq("cart_id", cartId)
-      .in("id", cartItemIds)
-      .select("id");
+    return db.rls(async (tx) => {
+      const deleted = await tx
+        .delete(cartItems)
+        .where(
+          and(eq(cartItems.cartId, cartId), inArray(cartItems.id, cartItemIds)),
+        )
+        .returning({ id: cartItems.id });
 
-    return { data, error };
+      return deleted;
+    });
   },
 };

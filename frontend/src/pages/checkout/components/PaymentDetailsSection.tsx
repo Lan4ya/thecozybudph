@@ -24,11 +24,7 @@ const PaymentDetailsSection = () => {
 
   const total = shippingCents + subtotalCents + passOnFeeCents;
 
-  useEffect(() => {
-    setPayment({
-      total,
-    });
-  }, []);
+  useEffect(() => setPayment({ total }), [total]);
 
   return (
     <motion.div

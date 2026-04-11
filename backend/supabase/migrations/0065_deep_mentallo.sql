@@ -1,0 +1,1 @@
+ALTER TABLE "addresses" ALTER COLUMN "province" DROP NOT NULL;

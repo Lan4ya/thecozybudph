@@ -5,12 +5,18 @@ import {
   orders,
 } from "../schema/orders.ts";
 
-export type OrderItemSnapshotInsert = InferInsertModel<
+export type InsertOrderItemSnapshot = InferInsertModel<
   typeof orderItemsSnapshots
 >;
 
-export type OrderInsert = InferInsertModel<typeof orders>;
+export type InsertOrder = InferInsertModel<typeof orders>;
 
-export type OrderAddressSnapshotInsert = InferInsertModel<
+export type InsertOrderAddressSnapshot = InferInsertModel<
   typeof orderAddressesSnapshot
 >;
+
+export type InsertPendingOrder = {
+  order: Omit<InsertOrder, "id">;
+  items: Omit<InsertOrderItemSnapshot, "id" | "orderId">[];
+  address: Omit<InsertOrderAddressSnapshot, "id" | "orderId">;
+};

@@ -1,15 +1,14 @@
-import { SupabaseType } from "@shared/types.d.ts";
-import {
-  DeleteCartItemsRes,
-  DeleteCartItemsInput,
-} from "@shared/types/index.ts";
-import { CartRepository } from "../cart-repository.ts";
 import { AppError } from "@shared/errors/Errors.ts";
+import {
+  DeleteCartItemsInput,
+  DeleteCartItemsRes,
+} from "@shared/package-types/index.ts";
 import { DrizzleClient } from "../../../db/client.ts";
+import { CartRepository } from "../cart-repository.ts";
+import { handleDbError } from "../../../errors/handle-db-error.ts";
 
 export const deleteCartItems = async (
   db: DrizzleClient,
-  supabase: SupabaseType,
   payload: DeleteCartItemsInput,
   profileId: string,
 ): Promise<DeleteCartItemsRes> => {
@@ -21,19 +20,17 @@ export const deleteCartItems = async (
     );
   }
 
-  const { data, error } = await CartRepository.deleteCartItems(
-    supabase,
-    cart.id,
-    payload.cartItemIds,
-  );
+  try {
+    const data = await CartRepository.deleteCartItems(
+      db,
+      cart.id,
+      payload.cartItemIds,
+    );
 
-  if (error || !data) {
-    throw AppError.internal(error?.message);
+    const deletedItemIds = data.map((item) => item.id);
+
+    return { deletedItemIds };
+  } catch (error) {
+    throw handleDbError("Failed to delete cart items", error);
   }
-
-  const deletedItemIds = data.map((item) => item.id);
-
-  return {
-    deletedItemIds,
-  };
 };

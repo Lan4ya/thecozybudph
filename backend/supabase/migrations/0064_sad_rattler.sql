@@ -1,0 +1,2 @@
+ALTER TABLE "payments" ALTER COLUMN "status" SET DEFAULT 'pending';--> statement-breakpoint
+CREATE UNIQUE INDEX "unique_default_address_per_profile" ON "addresses" USING btree ("profile_id","is_default") WHERE "addresses"."is_default" = true;

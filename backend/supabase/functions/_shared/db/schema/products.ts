@@ -10,7 +10,7 @@ import {
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
-import { ProductOption, ProductVariant } from "../../types/index.ts";
+import { ProductOption, ProductVariant } from "@shared/package-types/index.ts";
 import { publicRole } from "../rls-roles.ts";
 
 export const productCollections = pgTable(

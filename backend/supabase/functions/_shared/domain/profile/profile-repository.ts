@@ -1,27 +1,33 @@
-import type { SupabaseType } from "@shared/types.d.ts";
-import type { UpdateProfileDBInput } from "@shared/types/index.ts";
+import { eq } from "drizzle-orm";
+import { DrizzleClient } from "../../db/client.ts";
+import { profiles } from "../../db/schema/mod.ts";
 
 export const ProfileRepository = {
-  updateProfile: async (
-    s: SupabaseType,
+  updateProfile: (
+    db: DrizzleClient,
     updates: UpdateProfileDBInput,
     profileId: string,
   ) => {
-    const { data, error } = await s
-      .from("profiles")
-      .update(updates)
-      .select("*")
-      .eq("id", profileId)
-      .maybeSingle();
-    return { data, error };
+    return db.rls(async (tx) => {
+      const [updated] = await tx
+        .update(profiles)
+        .set(updates)
+        .where(eq(profiles.id, profileId))
+        .returning();
+
+      return updated ?? null;
+    });
   },
 
-  getProfileById: async (s: SupabaseType, profileId: string) => {
-    const { data, error } = await s
-      .from("profiles")
-      .select("*")
-      .eq("id", profileId)
-      .maybeSingle();
-    return { data, error };
+  getProfileById: (db: DrizzleClient, profileId: string) => {
+    return db.rls(async (tx) => {
+      const [profile] = await tx
+        .select()
+        .from(profiles)
+        .where(eq(profiles.id, profileId))
+        .limit(1);
+
+      return profile ?? null;
+    });
   },
 };

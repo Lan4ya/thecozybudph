@@ -3,7 +3,7 @@ import { SupabaseType } from "@shared/types.d.ts";
 import {
   CreateProductInput,
   ProductWithRelations,
-} from "@shared/types/index.ts";
+} from "@shared/package-types/index.ts";
 import { ProductRepository } from "../product-repository.ts";
 import { ProductStorage } from "../product-storage.ts";
 import { DrizzleClient } from "../../../db/client.ts";

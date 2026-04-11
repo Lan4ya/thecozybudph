@@ -8,7 +8,7 @@ import {
   cartItemIdSchema,
   deleteCartItemsSchema,
   updateCartItemSchema,
-} from "@shared/types/index.ts";
+} from "@shared/package-types/index.ts";
 
 const factory = createFactory<AppEnv>();
 const { createHandlers } = factory;

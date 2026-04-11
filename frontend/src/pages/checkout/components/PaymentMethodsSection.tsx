@@ -5,9 +5,10 @@ import { Button } from "@/lib/ui/__shadcn__/button";
 import { cn } from "@/lib/utils/cn";
 import { useCheckoutStore } from "../store/useCheckoutStore";
 import { useAuthStore } from "@/store/useAuthStore";
+import type { PaymentMethodTypes } from "@TheCozyBud/types";
 
 type PaymentMethod = {
-  id: string;
+  type: PaymentMethodTypes;
   name: string;
   icon?: string;
   description?: string;
@@ -16,13 +17,13 @@ type PaymentMethod = {
 
 const paymentMethods: PaymentMethod[] = [
   {
-    id: "gcash",
+    type: "gcash",
     name: "GCash",
     // icon: "📱",
     description: "Scan QR or pay via app",
   },
   // {
-  //   id: "bpi",
+  //   type: "bpi",
   //   name: "BPI",
   //   badge: "Activate",
   //   // description: "₱100 off on top of vouchers",
@@ -30,27 +31,18 @@ const paymentMethods: PaymentMethod[] = [
 ];
 
 const PaymentMethodsSection = () => {
-  const [selectedId, setSelectedId] = useState(paymentMethods[0].id);
+  const [selectedType, setSelectedType] = useState(paymentMethods[0].type);
   const setPayment = useCheckoutStore((s) => s.setPayment);
-  const session = useAuthStore((s) => s.session);
   // const payment = useCheckoutStore((s) => s.payment);
-
-  const email = session?.user?.email;
-  // TODO: prefer users name in DB after api for that is available
-  const userName = session?.user?.user_metadata?.name ?? email?.split("@")[0];
 
   useEffect(() => {
     const p = useCheckoutStore.getState().payment;
 
     if (!p)
       setPayment({
-        billing: {
-          name: userName || "",
-          email: email || "",
-        },
-        type: "gcash",
+        type: selectedType,
       });
-  }, []);
+  }, [selectedType]);
 
   return (
     <motion.div
@@ -72,22 +64,22 @@ const PaymentMethodsSection = () => {
       <div className="space-y-3">
         {paymentMethods.map((method) => (
           <label
-            key={method.id}
+            key={method.type}
             className={cn(
               "flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-all",
-              selectedId === method.id
+              selectedType === method.type
                 ? "border-primary bg-primary/5"
                 : "border-border/40 hover:border-primary/50",
             )}
-            onClick={() => setSelectedId(method.id)}
+            onClick={() => setSelectedType(method.type)}
           >
             <div className="flex items-center gap-3">
               <input
                 type="radio"
                 name="payment"
-                value={method.id}
-                checked={selectedId === method.id}
-                onChange={() => setSelectedId(method.id)}
+                value={method.type}
+                checked={selectedType === method.type}
+                onChange={() => setSelectedType(method.type)}
                 className="text-primary focus:ring-primary"
               />
               <div>

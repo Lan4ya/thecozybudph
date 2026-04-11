@@ -1,5 +1,5 @@
 import { AppError, ValidationError } from "../errors/Errors.ts";
-import type { ApiResponseError } from "../types/index.ts";
+import type { ApiResponseError } from "@shared/package-types/index.ts";
 
 // Global error handler
 export const handleError = (

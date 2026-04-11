@@ -1,8 +1,6 @@
-import { Profile } from "@shared/types/index.ts";
 import { AppError } from "@shared/errors/Errors.ts";
 import { SupabaseType } from "@shared/types.d.ts";
 import { snakeToCamel } from "@shared/utils/caseConverter.ts";
-import { UpdateProfileInput } from "../../../types/schema/index.ts";
 import { ProfileRepository } from "../profile-repository.ts";
 
 export const updateProfile = async (
