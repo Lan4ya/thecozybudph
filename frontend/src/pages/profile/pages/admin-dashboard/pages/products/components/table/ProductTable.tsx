@@ -14,6 +14,7 @@ export default function ProductTable() {
   const {
     openEditProductForm,
     deletingProductIds,
+    isDeletingInProgress,
     toggleDeletingProductId,
     searchQuery,
   } = useProductsPageState();
@@ -96,6 +97,7 @@ export default function ProductTable() {
           onToggle={() => toggleDeletingProductId(p.id)}
           product={p}
           isDeleting={deletingProductIds.has(p.id)}
+          disableActions={isDeletingInProgress && deletingProductIds.has(p.id)}
         />
       ))}
 
@@ -115,6 +117,7 @@ type ProductRowProps = {
   onEdit: () => void;
   onToggle: () => void;
   isDeleting: boolean;
+  disableActions: boolean;
 };
 
 function ProductRow({
@@ -122,22 +125,27 @@ function ProductRow({
   onEdit,
   isDeleting,
   onToggle,
+  disableActions,
 }: ProductRowProps) {
   return (
     <article className="border grid grid-cols-[auto_auto_7fr_1fr] items-center gap-4 px-2 py-4 rounded-lg hover:shadow-sm transition">
       {/* Selection Toggle */}
       <div className="flex items-center">
-        <div
+        <button
+          type="button"
           onClick={onToggle}
+          disabled={disableActions}
+          aria-label={`Select ${product.name} for deletion`}
           className={cn(
             "flex-center size-5 border-2 rounded cursor-pointer transition-all",
+            disableActions && "cursor-not-allowed opacity-50",
             isDeleting
               ? "bg-primary border-primary text-primary-foreground"
               : "border-muted-foreground hover:border-primary",
           )}
         >
           {isDeleting && <Check className="size-3" />}
-        </div>
+        </button>
       </div>
 
       {/* Image */}
@@ -169,6 +177,7 @@ function ProductRow({
           variant="outline"
           size="sm"
           onClick={onEdit}
+          disabled={disableActions}
           aria-label={`Edit ${product.name}`}
         >
           <Edit className="size-4" />

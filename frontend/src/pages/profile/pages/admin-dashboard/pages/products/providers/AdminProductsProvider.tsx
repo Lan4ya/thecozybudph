@@ -16,6 +16,8 @@ type AdminProductsContextType = {
   openEditProductForm: (product: ProductWithRelations) => void;
 
   deletingProductIds: Set<string>;
+  isDeletingInProgress: boolean;
+  setDeletingInProgress: (isDeleting: boolean) => void;
   toggleDeletingProductId: (id: string) => void;
   resetDeletingProductIds: () => void;
 
@@ -33,6 +35,7 @@ const AdminProductsProvider = ({ children }: { children: React.ReactNode }) => {
   const [deletingProductIds, setDeletingProductIds] = useState<Set<string>>(
     new Set(),
   );
+  const [isDeletingInProgress, setDeletingInProgress] = useState(false);
 
   const [searchParams, setSearchParams] = useSearchParams();
   let searchQuery = searchParams.get("search") || "";
@@ -90,6 +93,8 @@ const AdminProductsProvider = ({ children }: { children: React.ReactNode }) => {
       openEditProductForm,
 
       deletingProductIds,
+      isDeletingInProgress,
+      setDeletingInProgress,
       toggleDeletingProductId,
       resetDeletingProductIds,
 
@@ -103,6 +108,8 @@ const AdminProductsProvider = ({ children }: { children: React.ReactNode }) => {
       openCreateProductForm,
       openEditProductForm,
       deletingProductIds,
+      isDeletingInProgress,
+      setDeletingInProgress,
       toggleDeletingProductId,
       resetDeletingProductIds,
       searchQuery,
