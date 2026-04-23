@@ -1,0 +1,81 @@
+import {
+  pgTable,
+  uuid,
+  text,
+  timestamp,
+  integer,
+  check,
+  pgPolicy,
+  boolean,
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import { orders } from "./orders.ts";
+import { authenticatedRole } from "drizzle-orm/supabase/rls";
+import { profiles } from "./profiles.ts";
+import type { PaymentStatus } from "../core-types.ts";
+
+export const payments = pgTable(
+  "payments",
+  {
+    id: uuid("id").defaultRandom().notNull().primaryKey(),
+    orderId: uuid("order_id")
+      .notNull()
+      .references(() => orders.id, { onDelete: "set null" }),
+    profileId: uuid("profile_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "set null" }),
+
+    currency: text("currency").default("PHP").notNull(),
+    status: text("status").$type<PaymentStatus>().default("pending").notNull(),
+    isActive: boolean("is_active").default(true).notNull(),
+
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+    paidAt: timestamp("paid_at", { withTimezone: true }),
+
+    // Paymongo Details
+    paymentIntentId: text("payment_intent_id"),
+    paymentId: text("payment_id"),
+    amountCents: integer("amount_cents"),
+    method: text("method"),
+  },
+  (t) => [
+    uniqueIndex("payments_unique_active_per_order_profile")
+      .on(t.orderId, t.profileId)
+      .where(sql`${t.isActive} = true`),
+
+    uniqueIndex("payments_unique_paid_per_order")
+      .on(t.orderId)
+      .where(sql`${t.status} = 'paid'`),
+
+    check("payments_amount_cents_check", sql`${t.amountCents} >= 0`),
+
+    check(
+      "payments_status_check",
+      sql`${t.status} IN ('pending', 'paid', 'failed', 'cancelled', 'refunded')`,
+    ),
+
+    pgPolicy("authenticated can select own payment", {
+      as: "permissive",
+      to: authenticatedRole,
+      for: "select",
+      using: sql`auth.uid() = profile_id`,
+    }),
+
+    pgPolicy("authenticated can update own payment", {
+      as: "permissive",
+      to: authenticatedRole,
+      for: "update",
+      using: sql`auth.uid() = profile_id`,
+      withCheck: sql`auth.uid() = profile_id`,
+    }),
+
+    pgPolicy("authenticated can insert own payment", {
+      as: "permissive",
+      to: authenticatedRole,
+      for: "insert",
+      withCheck: sql`auth.uid() = profile_id`,
+    }),
+  ],
+);

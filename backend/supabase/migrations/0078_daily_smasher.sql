@@ -1,0 +1,2 @@
+DROP INDEX "unique_default_address_per_profile";--> statement-breakpoint
+CREATE UNIQUE INDEX "unique_default_address_per_profile" ON "addresses" USING btree ("profile_id") WHERE "addresses"."is_default" = true;

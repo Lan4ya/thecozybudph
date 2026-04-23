@@ -1,0 +1,1 @@
+ALTER TABLE "payments" ALTER COLUMN "is_active" SET DEFAULT true;

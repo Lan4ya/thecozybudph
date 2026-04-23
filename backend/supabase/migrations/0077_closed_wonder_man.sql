@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "payments_unique_active_per_order_profile" ON "payments" USING btree ("order_id","profile_id") WHERE "payments"."is_active" = true;

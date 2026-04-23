@@ -1,0 +1,1 @@
+ALTER TABLE "payments" ALTER COLUMN "profile_id" SET NOT NULL;
