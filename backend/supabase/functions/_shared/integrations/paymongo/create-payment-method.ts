@@ -1,12 +1,12 @@
 import {
-  CreatePaymentMethodInput,
+  PaymentMethodInput,
   CreatePaymentMethodResponse,
-} from "@shared/package-types/index.ts";
+} from "@shared/schemas/index.ts";
 import { paymongoClient } from "./client.ts";
 
 // https://developers.paymongo.com/reference/create-a-paymentmethod
 export const createPaymentMethod = async (
-  payload: CreatePaymentMethodInput,
+  payload: PaymentMethodInput,
   idempotencyKey: string,
 ): Promise<CreatePaymentMethodResponse["data"]> => {
   const body = {

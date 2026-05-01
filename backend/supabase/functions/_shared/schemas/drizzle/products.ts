@@ -10,8 +10,8 @@ import {
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
-import { ProductOption, ProductVariant } from "../core-types.ts";
 import { pgRole } from "drizzle-orm/pg-core/roles";
+import { ProductOption, ProductVariant } from "../types/index.ts";
 
 export const publicRole = pgRole("public").existing();
 

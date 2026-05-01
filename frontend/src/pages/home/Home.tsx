@@ -1,6 +1,6 @@
 import PersistSuspense from "@/components/PersistSuspense";
 import Hero from "./components/Hero";
-import ProductRecommendations from "./components/ProductRecommendations";
+import Recommendations from "./components/Recommendations";
 import HomeProductGridSkeleton from "@/lib/ui/skeletons/HomeProductGridSkeleton";
 import EventSection from "./components/EventSection";
 import { ReviewCarousel } from "./components/ReviewCarousel";
@@ -43,7 +43,7 @@ const Home = () => {
 
       <ErrorBoundary fallback={null}>
         <PersistSuspense fallback={<HomeProductGridSkeleton />}>
-          <ProductRecommendations />
+          <Recommendations />
         </PersistSuspense>
       </ErrorBoundary>
 

@@ -6,23 +6,25 @@ import { calculatePassOnFee } from "../calculatePassOnFee";
 import { useEffect } from "react";
 
 const PaymentDetailsSection = () => {
-  const orderItems = useCheckoutStore((s) => s.orderItems);
+  const orderItems = useCheckoutStore((s) => s.orderItemsUI);
   const shipping = useCheckoutStore((s) => s.shipping);
   const payment = useCheckoutStore((s) => s.payment);
   const setPayment = useCheckoutStore((s) => s.setPayment);
 
-  const shippingCents = (shipping?.fee ?? 0) * 100;
+  const shippingCents = Math.round((shipping?.fee ?? 0) * 100);
   const subtotalCents = orderItems.reduce(
     (sum, item) => sum + item.priceCents * item.quantity,
     0,
   );
+  const discountCents = 0;
+  const baseTotalCents = subtotalCents + shippingCents - discountCents;
 
   const passOnFeeCents = calculatePassOnFee(
-    subtotalCents,
+    baseTotalCents,
     payment?.type ?? "gcash",
   );
 
-  const total = shippingCents + subtotalCents + passOnFeeCents;
+  const total = baseTotalCents + passOnFeeCents;
 
   useEffect(() => setPayment({ total }), [total]);
 

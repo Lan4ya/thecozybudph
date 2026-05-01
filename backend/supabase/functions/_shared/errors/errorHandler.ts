@@ -1,4 +1,4 @@
-import type { ApiResponseError } from "@shared/package-types/index.ts";
+import type { ApiResponseError } from "@shared/schemas/index.ts";
 import { AppError, ValidationError } from "../errors/Errors.ts";
 import { DrizzleQueryError, DrizzleError } from "drizzle-orm/errors";
 
@@ -66,8 +66,7 @@ export const handleError = (
 
     console.error({
       type: "ValidationError",
-      message: error.message,
-      cause: error.cause,
+      errors: error.errors,
     });
   }
 

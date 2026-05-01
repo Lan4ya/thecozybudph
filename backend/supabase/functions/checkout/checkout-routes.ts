@@ -6,7 +6,7 @@ import {
 import { Env, Hono } from "hono";
 import {
   createOrderHandler,
-  createPaymentHandler,
+  payOrderHandler,
   createShippingQuoteHandler,
   paymentWebhookHandler,
 } from "./checkout-handlers.ts";
@@ -21,7 +21,7 @@ const protectedRoutes = new Hono<Env>();
 protectedRoutes.use("*", supabaseMiddleware(), authMiddleware());
 
 protectedRoutes.post("/order", drizzleMiddleware(), ...createOrderHandler);
-protectedRoutes.post("/payment", drizzleMiddleware(), ...createPaymentHandler);
+protectedRoutes.post("/order/:id/pay", drizzleMiddleware(), ...payOrderHandler);
 protectedRoutes.post("/shipping/quotes", ...createShippingQuoteHandler);
 
 checkout.route("/", protectedRoutes);

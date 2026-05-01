@@ -1,5 +1,5 @@
 import { Button } from "@/lib/ui/__shadcn__/button";
-import type { Product } from "@TheCozyBud/types";
+import type { Product } from "@TheCozyBud/schemas";
 import { MessageCircle, ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
 import { OptionsDrawer } from "./OptionsDrawer";

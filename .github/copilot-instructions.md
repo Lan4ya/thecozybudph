@@ -44,6 +44,9 @@ Common middleware, db client, errors, utils, and integrations live under `backen
 
 ## Key codebase conventions
 
+0. ** **
+   -- Use rip-grep (rg) when reading/searching files
+
 1. **Path aliases are required**
    - Frontend uses `@/*` → `frontend/src/*`.
    - Edge functions use import map alias `@shared/` → `backend/supabase/functions/_shared/`.

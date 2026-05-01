@@ -6,7 +6,7 @@ import "swiper/swiper.css";
 import { ProductImage } from "@/components/products/ProductImage";
 import { Link } from "react-router";
 import { ArrowLeft } from "lucide-react";
-import { useIsLargeScreen } from "@/hooks/useMediaQuery";
+import { useIsLgScreenMin } from "@/hooks/useMediaQuery";
 
 interface CarouselProps {
   urls: string[];
@@ -16,14 +16,14 @@ const Carousel = ({ urls }: CarouselProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
   if (!urls || urls.length === 0) return null;
-  const isLgScreen = useIsLargeScreen();
+  const isLgScreen = useIsLgScreenMin();
 
   const isFirstSlide = activeIndex === 0;
   const isLastSlide = activeIndex === urls.length - 1;
 
   return (
     <div className="flex flex-col w-full -mt-0.5 lg:mt-0 max-w-[500px] gap-4 lg:pt-0">
-      {/* Main Carousel */}
+      {/* Carousel */}
       <div className=" overflow-hidden relative w-full  bg-background group active:cursor-grabbing">
         {!isLgScreen && (
           <Link

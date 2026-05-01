@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { ProductOption, ProductVariant } from "@TheCozyBud/types";
+import type { ProductOption, ProductVariant } from "@TheCozyBud/schemas";
 
 type SelectedOptions = Record<string, string>;
 

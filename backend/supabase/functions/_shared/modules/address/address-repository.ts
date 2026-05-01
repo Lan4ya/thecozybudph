@@ -1,9 +1,7 @@
 import { and, eq, ne, sql } from "drizzle-orm";
 import { DrizzleClient } from "../../db/client.ts";
-import { addresses } from "../../db/schema/addresses.ts";
-import { InsertAddress } from "../../db/types/addresses.ts";
 import { AppError } from "../../errors/Errors.ts";
-import { Address } from "@shared/package-types/index.ts";
+import { InsertAddress, Address, addresses } from "@shared/schemas/index.ts";
 
 export const AddressRepository = {
   insert: async (

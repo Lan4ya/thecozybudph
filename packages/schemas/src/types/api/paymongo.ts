@@ -8,9 +8,16 @@
  *  https://developers.paymongo.com/reference/create-a-paymentintent
  */
 
-import { CreatePaymentInput } from "../schema/payment.ts";
+import type { PaymentMethodTypes } from "./payment.ts";
 
-export type PaymentMethodInput = Omit<CreatePaymentInput, "orderId">;
+export type PaymentMethodInput = {
+  type: PaymentMethodTypes;
+  billing: {
+    name: string;
+    email: string;
+  };
+};
+export type CreatePaymentMethodInput = PaymentMethodInput;
 
 export interface CreatePaymentIntentResponse {
   data: {

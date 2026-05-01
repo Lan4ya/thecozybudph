@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "pkg:generate": "supabase gen types typescript --local > ../packages/schemas/src/types/supabase.types.ts && mkdir -p  ./supabase/functions/_shared/schemas && rm -rf ./supabase/functions/_shared/schemas/* && cp -r ../packages/schemas/src/* ./supabase/functions/_shared/schemas/",
-    "db:apply-schemas": "pnpm exec drizzle-kit generate && supabase migrations up --include-all"
+    "pkg:generate": "pnpm dlx supabase gen types typescript --local > ../packages/schemas/src/types/db/supabase.types.ts && mkdir -p  ./supabase/functions/_shared/schemas && rm -rf ./supabase/functions/_shared/schemas/* && cp -r ../packages/schemas/src/* ./supabase/functions/_shared/schemas/",
+    "db:apply-schemas": "pnpm exec drizzle-kit generate && pnpm dlx supabase migrations up --include-all"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.1",

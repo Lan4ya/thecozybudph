@@ -10,7 +10,7 @@ import Collections from "./components/filters/Collection";
 import PersistSuspense from "@/components/PersistSuspense";
 import { ShopProductGridSkeleton } from "../../lib/ui/skeletons/ShopProductGridItemsSkeleton";
 import Tags from "./components/FilterTags";
-import { useIsExtraLargeScreen } from "@/hooks/useMediaQuery";
+import { useIsXlScreenMin } from "@/hooks/useMediaQuery";
 import ProductGrid from "./components/ProductGrid";
 import { ErrorBoundary } from "react-error-boundary";
 import isDev from "@/lib/utils/isDev";
@@ -19,7 +19,7 @@ import { useNavigate } from "react-router";
 const Shop = () => {
   const { productQuery, hasProductQueryFilters } =
     useProductsFilterAndSortState();
-  const isXLScreen = useIsExtraLargeScreen();
+  const isXLScreen = useIsXlScreenMin();
   const navigate = useNavigate();
 
   useEffect(() => {

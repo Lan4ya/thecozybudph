@@ -4,7 +4,7 @@ import type {
   ProductPriceRangeOption,
 } from "../../../types";
 import { useProductsFilterAndSortState } from "../hooks/useProductsFilterAndSortState";
-import { useIsExtraLargeScreen } from "@/hooks/useMediaQuery";
+import { useIsXlScreenMin } from "@/hooks/useMediaQuery";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import toggleArrItem from "@/lib/utils/toggleArrItem";
 import { useMemo, useState } from "react";
@@ -23,7 +23,7 @@ const Tags = () => {
   const [isClearFilterItemsBtnShown, showClearFilterItemsBtn] = useState(false);
   const { productQuery, hasProductQueryFilters } =
     useProductsFilterAndSortState();
-  const isXlScreen = useIsExtraLargeScreen();
+  const isXlScreen = useIsXlScreenMin();
 
   const queryCount = useMemo(
     () =>

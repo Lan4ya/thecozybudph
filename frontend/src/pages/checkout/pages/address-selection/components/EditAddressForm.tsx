@@ -5,10 +5,10 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
-  updateAddressSchema,
+  updateAddressFormSchema,
   type Address,
   type UpdateAddressInput,
-} from "@TheCozyBud/types";
+} from "@TheCozyBud/schemas";
 import isDev from "@/lib/utils/isDev";
 import { useCallback } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -19,7 +19,7 @@ import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import { checkoutAddressesQK } from "@/pages/checkout/hooks/useAddressQuery";
 import { useCheckoutStore } from "@/pages/checkout/store/useCheckoutStore";
 
-type FormValues = z.infer<typeof updateAddressSchema>;
+type EditAddressFormValues = z.infer<typeof updateAddressFormSchema>;
 
 const FieldError = ({ message }: { message?: string }) =>
   message ? <p className="mt-1 text-xs text-red-500">{message}</p> : null;
@@ -38,9 +38,12 @@ const EditAddressForm = ({
     watch,
     control,
     formState: { errors, isValid, isDirty },
-  } = useForm<FormValues>({
-    defaultValues: updatingAddress,
-    resolver: zodResolver(updateAddressSchema),
+  } = useForm<EditAddressFormValues>({
+    defaultValues: {
+      ...updatingAddress,
+      province: updatingAddress.province ?? undefined,
+    },
+    resolver: zodResolver(updateAddressFormSchema),
     mode: "onChange",
   });
 
@@ -86,11 +89,6 @@ const EditAddressForm = ({
       },
     });
 
-  const onSubmit = (address: FormValues) => {
-    console.log("submit address payload", address);
-    updateAddressMutation({ address, addressId: updatingAddress.id });
-  };
-
   const toggleDefault = useCallback(() => {
     if (updatingAddress.isDefault) {
       addToast(
@@ -106,12 +104,16 @@ const EditAddressForm = ({
     });
   }, [isDefault, setValue]);
 
+  const onSubmit = (address: EditAddressFormValues) => {
+    // console.log("submit address payload", address);
+    updateAddressMutation({ address, addressId: updatingAddress.id });
+  };
+
   return (
     <form
       onSubmit={handleSubmit(onSubmit, (err) => {
         isDev && console.log(err);
       })}
-      className=""
       noValidate
     >
       <div className="max-w-7xl px-4 pb-32 pt-6 custom-container">

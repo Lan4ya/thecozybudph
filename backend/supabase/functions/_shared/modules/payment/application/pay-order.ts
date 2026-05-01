@@ -1,7 +1,11 @@
-import { ConfirmOrderInput, PayOrderRes } from "@shared/package-types/index.ts";
+import {
+  ConfirmOrderReq,
+  orders,
+  payments,
+  PayOrderRes,
+} from "@shared/schemas/index.ts";
 import { and, eq } from "drizzle-orm";
 import { DrizzleClient } from "../../../db/client.ts";
-import { payments } from "../../../db/schema/payments.ts";
 import { AppError } from "../../../errors/Errors.ts";
 import {
   attachPaymentIntent,
@@ -17,7 +21,7 @@ const APP_URL = Deno.env.get("APP_URL");
 // decided to not use DB repositories for the main op.
 export const payOrder = async (
   db: DrizzleClient,
-  payload: ConfirmOrderInput,
+  payload: ConfirmOrderReq,
   orderId: string,
   idempotencyKey?: string,
 ): Promise<PayOrderRes> => {
@@ -30,6 +34,19 @@ export const payOrder = async (
   if (!order) throw AppError.notFound("Order not found");
 
   return db.rls(async (tx) => {
+    if (new Date().getTime() > order.expiresAt.getTime()) {
+      await tx
+        .update(orders)
+        .set({ status: "expired" })
+        .where(eq(orders.id, orderId));
+      await tx
+        .update(payments)
+        .set({ status: "failed" })
+        .where(eq(payments.orderId, orderId));
+
+      throw AppError.badRequest("Order has expired");
+    }
+
     const existingPayment = await tx.query.payments.findFirst({
       where: and(
         eq(payments.isActive, true),

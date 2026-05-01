@@ -7,22 +7,25 @@ import TCB_3 from "@/assets/thecozybud/TCB_3.png";
 import TCB_5 from "@/assets/thecozybud/TCB_5.jpg";
 import TCB_6 from "@/assets/thecozybud/TCB_6.jpg";
 import TCB_7 from "@/assets/thecozybud/TCB_7.jpg";
-import { useAnimateOnView } from "@/hooks/useAnimateOnView";
+import {
+  useAnimateOnView,
+  type RegisterSentinel,
+} from "@/hooks/useAnimateOnView";
 import { cn } from "@/lib/utils/cn";
-import { useIsLargeScreen } from "@/hooks/useMediaQuery";
+import { useIsLgScreenMin } from "@/hooks/useMediaQuery";
 
 const imgSrcs = [TCB_1_Cropped, TCB_6, TCB_7, TCB_5, TCB_3];
 
 const Hero = () => {
   const { registerSentinel, visibleMap } = useAnimateOnView();
-  const isLgScreen = useIsLargeScreen();
+  const isLgScreenMin = useIsLgScreenMin();
 
   return (
     <section
       className="flex w-full items-center justify-center  lg:mb-6 lg:h-screen"
       aria-label="Hero"
     >
-      {isLgScreen ? (
+      {isLgScreenMin ? (
         <DesktopHeroInner
           registerSentinel={registerSentinel}
           visibleMap={visibleMap}
@@ -43,12 +46,12 @@ const MobileHeroInner = ({
   registerSentinel,
   visibleMap,
 }: {
-  registerSentinel: (ref: HTMLElement | null) => void;
+  registerSentinel: RegisterSentinel;
   visibleMap: boolean[];
 }) => {
   const [imgLoaded, setImgLoaded] = useState(false);
   const slides = [imgSrcs[imgSrcs.length - 1], ...imgSrcs, imgSrcs[0]];
-  const [index, setIndex] = useState(1); // start at first real slide
+  const [index, setIndex] = useState(1);
   const [transition, setTransition] = useState(true);
 
   useEffect(() => {
@@ -61,11 +64,10 @@ const MobileHeroInner = ({
 
   useEffect(() => {
     if (index === slides.length - 1) {
-      // reached ghost FIRST
       setTimeout(() => {
         setTransition(false);
-        setIndex(1); // real FIRST
-      }, TRANSITION_MS); // match CSS transition duration
+        setIndex(1);
+      }, TRANSITION_MS);
     }
   }, [index]);
 

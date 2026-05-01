@@ -6,11 +6,11 @@ import {
   type Product as ProductType,
   addCartItemSchema,
   orderItemSchema,
-} from "@TheCozyBud/types";
+} from "@TheCozyBud/schemas";
 import PersistSuspense from "@/components/PersistSuspense";
 import { RouteLoaderSpinner } from "@/components/RouteLoaderSpinner";
 import { ArrowLeft } from "lucide-react";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useIsLgScreenMin, useMediaQuery } from "@/hooks/useMediaQuery";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Star, Heart, Shield } from "lucide-react";
@@ -60,7 +60,8 @@ const ProductInner = () => {
     gcTime: 1 * 60 * 60 * 1000,
   });
 
-  const smScreenAndBelow = useMediaQuery("(max-width: 518px)");
+  const isSmScreenMax = useMediaQuery("(max-width: 518px)");
+  const isLgScreenMin = useIsLgScreenMin();
 
   const { addToast } = useToast();
   const session = useAuthStore((s) => s.session);
@@ -73,9 +74,9 @@ const ProductInner = () => {
 
   const resetProductSelectionStore = useProductSelectionStore((s) => s.reset);
 
-  const setCheckoutSessionId = useCheckoutStore((s) => s.setSessionId);
+  const setCheckoutIds = useCheckoutStore((s) => s.setCheckoutIds);
   const setCheckoutSource = useCheckoutStore((s) => s.setSource);
-  const setCheckoutOrderItems = useCheckoutStore((s) => s.setOrderItems);
+  const setCheckoutOrderItems = useCheckoutStore((s) => s.setOrderItemsUI);
 
   useEffect(() => {
     if (!product) return;
@@ -156,7 +157,8 @@ const ProductInner = () => {
 
     const sessionId = crypto.randomUUID();
 
-    setCheckoutSessionId(sessionId);
+    useCheckoutStore.getState().reset();
+    setCheckoutIds({ session: sessionId });
     setCheckoutSource("shop");
     setCheckoutOrderItems([orderItem]);
     navigate(`/checkout/${sessionId}`);
@@ -179,7 +181,7 @@ const ProductInner = () => {
 
   return (
     <>
-      {smScreenAndBelow && (
+      {isSmScreenMax && (
         <Link
           to="/shop"
           className="p-2 rounded-md text-lg bg-black/60 text-white flex-center gap-2 hover:bg-black/45 absolute top-18 left-4"
@@ -188,16 +190,9 @@ const ProductInner = () => {
         </Link>
       )}
 
-      {/* Product Carousel */}
       <Carousel urls={product.imageUrls} />
 
-      {/* Main Container */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="max-[380px]:px-2! px-4 lg:px-0 max-w-2xl w-full"
-      >
+      <div className="max-[380px]:px-2! px-4 lg:px-0 max-w-2xl w-full">
         <div className="space-y-2 border-b pb-6">
           {/* Product Header */}
           <div className="flex items-center justify-between">
@@ -237,12 +232,7 @@ const ProductInner = () => {
         </div>
 
         {/* Features */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.7 }}
-          className="grid grid-cols-1 sm:grid-cols-3 gap-4 py-6 border-b"
-        >
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 py-6 border-b">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-red-200 rounded-full">
               <Heart className="w-5 h-5 text-red-600" />
@@ -278,30 +268,24 @@ const ProductInner = () => {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Description */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="space-y-4 py-6 "
-        >
+        <div className="space-y-4 py-6 ">
           <h3 className="font-semibold">Description</h3>
           <div className="text-sm text-muted-foreground">
             {product.description ?? "No product description"}
           </div>
-        </motion.div>
-      </motion.div>
+        </div>
 
-      {/* CTA */}
-      <BottomBar
-        product={product}
-        onAddToCart={handleAddToCart}
-        onBuyNow={handleBuyNow}
-        addToCartLoading={addToCartLoading}
-        buyNowLoading={false} // TODO: TMP
-      />
+        {/* CTA */}
+        <BottomBar
+          product={product}
+          onAddToCart={handleAddToCart}
+          onBuyNow={handleBuyNow}
+          addToCartLoading={addToCartLoading}
+        />
+      </div>
     </>
   );
 };

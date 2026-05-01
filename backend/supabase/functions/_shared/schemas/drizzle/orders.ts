@@ -12,15 +12,9 @@ import {
 import { sql } from "drizzle-orm";
 import { profiles } from "./profiles.ts";
 import { products, productVariants } from "./products.ts";
-import { ProductVariant } from "../core-types.ts";
+import { OrderSource, ProductVariant } from "../types/index.ts";
 import { authenticatedRole } from "drizzle-orm/supabase/rls";
-
-export type OrderStatusDB =
-  | "to_pay"
-  | "to_ship"
-  | "to_receive"
-  | "completed"
-  | "cancelled";
+import { DBOrderStatus } from "../types/db/order.ts";
 
 export const orders = pgTable(
   "orders",
@@ -29,13 +23,14 @@ export const orders = pgTable(
     profileId: uuid("profile_id")
       .notNull()
       .references(() => profiles.id, { onDelete: "set null" }),
-    status: text("status").$type<OrderStatusDB>().default("to_pay").notNull(),
-    source: text("source").notNull(),
+    status: text("status").$type<DBOrderStatus>().default("to_pay").notNull(),
+    source: text("source").$type<OrderSource>().notNull(),
 
     // Payment Details
     subtotalCents: integer("subtotal_cents").notNull(),
     discountCents: integer("discount_cents").default(0).notNull(),
     shippingCents: integer("shipping_cents").notNull(),
+    passOnFee: integer("pass_on_fee").notNull(),
     totalCents: integer("total_cents").notNull(),
 
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
@@ -50,7 +45,7 @@ export const orders = pgTable(
     check("orders_source_check", sql`${table.source} IN ('shop', 'cart')`),
     check(
       "orders_status_check",
-      sql`${table.status} IN ('to_pay', 'to_ship', 'to_receive', 'completed', 'cancelled')`,
+      sql`${table.status} IN ('to_pay', 'paid', 'to_ship', 'shipped', 'to_receive', 'fulfilled', 'cancelled', 'expired')`,
     ),
 
     pgPolicy("authenticated can select own order", {
@@ -73,6 +68,13 @@ export const orders = pgTable(
       for: "update",
       using: sql`auth.uid() = profile_id`,
       withCheck: sql`auth.uid() = profile_id`,
+    }),
+
+    pgPolicy("authenticated can update before expiry", {
+      as: "permissive",
+      to: authenticatedRole,
+      for: "update",
+      using: sql`expires_at() > now()`,
     }),
   ],
 );

@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import { DrizzleClient } from "../../db/client.ts";
-import { orders, payments } from "../../db/schema/mod.ts";
+import { orders, payments } from "@shared/schemas/index.ts";
 
 export const PaymentRepository = {
   checkExists: (

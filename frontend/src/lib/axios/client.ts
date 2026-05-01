@@ -1,6 +1,7 @@
 import axios from "axios";
 import { supabase } from "@/lib/supabase/client";
-import type { ApiResponseError, ApiResponseSuccess } from "@TheCozyBud/types";
+import type { ApiResponseError, ApiResponseSuccess } from "@TheCozyBud/schemas";
+import isDev from "../utils/isDev";
 
 const { VITE_SUPABASE_URL } = import.meta.env;
 const SUPABASE_URL = VITE_SUPABASE_URL;
@@ -32,18 +33,24 @@ apiClient.interceptors.response.use(
 );
 
 const normalizeError = (error: unknown) => {
-  if (axios.isAxiosError(error) && error.response?.data?.error) {
-    const httpError = error.response.data.error as ApiResponseError["error"];
+  isDev && console.error(error);
 
-    const errorMessage =
-      typeof httpError === "string"
-        ? httpError
-        : httpError
+  if (axios.isAxiosError(error) && error.response?.data?.error) {
+    const raw = error.response.data.error as ApiResponseError["error"];
+    const status = error.response?.status;
+
+    const message =
+      typeof raw === "string"
+        ? raw
+        : raw
             .map((e) => (e.field ? `${e.field}: ${e.message}` : e.message))
             .join(",\n");
 
-    // console.log({ httpError });
-    return new Error(errorMessage);
+    return new AppError({
+      message,
+      status,
+      // code: error.code,
+    });
   }
 
   if (error instanceof Error) {
@@ -52,3 +59,18 @@ const normalizeError = (error: unknown) => {
 
   return new Error("Unknown error occurred");
 };
+
+// export const isAppError = (err: unknown): err is AppError =>
+//   typeof err === "object" && err !== null && (err as any).isAppError === true;
+
+export class AppError extends Error {
+  status?: number;
+  code?: string;
+
+  constructor(params: { message: string; status?: number; code?: string }) {
+    super(params.message);
+    this.name = "AppError";
+    this.status = params.status;
+    // this.code = params.code;
+  }
+}

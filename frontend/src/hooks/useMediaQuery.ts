@@ -11,9 +11,17 @@ type MediaQueryEntry = {
 
 const mediaQueryStore = new Map<string, MediaQueryEntry>();
 
-// Call the base function itself if you want a customized breakpoint
-// or use the helper functions below for common breakpoints.
+// Helpers
+export const useIsSmScreenMax = () => !!useMediaQuery("(max-width: 639px)");
 
+export const useIsMdScreen = () =>
+  !!useMediaQuery("(min-width: 640px) and (max-width: 1023px)");
+
+export const useIsLgScreenMin = () => !!useMediaQuery("(min-width: 1024px)");
+
+export const useIsXlScreenMin = () => !!useMediaQuery("(min-width: 1280px)");
+
+// Use the base function instead if you want a customized breakpoint
 export function useMediaQuery(
   query: string,
   options?: { defaultMatches?: boolean },
@@ -114,16 +122,3 @@ export function useMediaQuery(
 
   return matches;
 }
-
-// Helper Functions for common breakpoints.
-
-// The sizes set in these helper fn's tries to match tailwind's breakpoints:
-// sm	640px	Small screens (phones)
-// md	768px	Medium (tablets)
-// lg	1024px	Large (laptops)
-export const useIsSmallScreen = () => !!useMediaQuery("(max-width: 639px)");
-export const useIsMediumScreen = () =>
-  !!useMediaQuery("(min-width: 640px) and (max-width: 1023px)");
-export const useIsLargeScreen = () => !!useMediaQuery("(min-width: 1024px)");
-export const useIsExtraLargeScreen = () =>
-  !!useMediaQuery("(min-width: 1280px)");

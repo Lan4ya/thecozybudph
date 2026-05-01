@@ -36,8 +36,6 @@ export interface ProductListItem {
   maxPriceCents: number;
 }
 
-export type DeleteProducts = { deletedProductIds: string[] };
-
 export type ProductCategory = {
   id: string;
   name: string;

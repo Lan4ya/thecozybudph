@@ -2,7 +2,10 @@ import {
   capitalizeFirstLetter,
   capitalizeFirstLetterOfEachWord,
 } from "@/lib/utils/format";
-import type { CreateProductInput, UpdateProductInput } from "@TheCozyBud/types";
+import type {
+  CreateProductInput,
+  UpdateProductInput,
+} from "@TheCozyBud/schemas";
 
 export function buildCreateProductFormData(fields: CreateProductInput) {
   const fd = new FormData();
@@ -71,7 +74,7 @@ export function buildUpdateProductFormData(fields: UpdateProductInput) {
   appendIfDefined(fd, "primaryImageIndex", fields.primaryImageIndex);
 
   fields.imageUrlsToDelete?.forEach((url) =>
-    fd.append("imageUrlsToDelete[]", url),
+    fd.append("imageUrlsToDelete", url),
   );
 
   fields.newProductImages?.forEach((file) =>

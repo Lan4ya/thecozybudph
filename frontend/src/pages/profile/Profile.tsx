@@ -4,13 +4,49 @@ import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import isDev from "@/lib/utils/isDev";
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { Edit, ChevronRight } from "lucide-react";
+import { Edit, ChevronRight, Shield } from "lucide-react";
 import DefaultAvatar from "@/assets/thecozybud/avatar.png";
 import { useAuthStore } from "@/store/useAuthStore";
 import { handleError } from "@/lib/utils/format";
 import { useToast } from "@/providers/ToastProvider";
 
-const ChevronRightIcon = <ChevronRight className="text-gray-500" />;
+const Row = ({
+  label,
+  onClick,
+  icon,
+}: {
+  label: string;
+  onClick?: () => void;
+  icon?: React.ReactNode;
+}) => (
+  <button
+    onClick={onClick}
+    className="w-full flex items-center justify-between px-4 py-4 md:px-5 md:py-4 hover:bg-card/60 transition-colors"
+  >
+    <div className="flex items-center gap-3 text-sm md:text-base">
+      {icon}
+      {label}
+    </div>
+    <ChevronRight className="size-4 text-muted" />
+  </button>
+);
+
+const Section = ({
+  children,
+  title,
+}: {
+  children: React.ReactNode;
+  title?: string;
+}) => (
+  <div className="bg-card rounded-xl border overflow-hidden">
+    {title && (
+      <div className="px-4 py-3 md:px-5 text-xs text-muted uppercase tracking-wide">
+        {title}
+      </div>
+    )}
+    <div className="divide-y">{children}</div>
+  </div>
+);
 
 const Profile = () => {
   const session = useAuthStore((s) => s.session);
@@ -28,11 +64,9 @@ const Profile = () => {
     setSigningOut(true);
 
     try {
-      // INFO: clearing cache and stores on SIGNED_OUT event is already handled by onAuthStateChange()
       const { error } = await supabase.auth.signOut({ scope: "global" });
       if (error) throw error;
 
-      // Redirect
       navigate("/auth/login", { replace: true });
     } catch (err) {
       const message = handleError(err);
@@ -44,70 +78,85 @@ const Profile = () => {
   };
 
   return (
-    <div className="">
-      <div className="custom-container bg-sidebar border-b-4 flex items-center gap-2 py-8">
-        <div className=" mr-1 w-14 h-14 overflow-hidden rounded-full border-2">
-          <img
-            className="w-full h-full object-cover"
-            src={DefaultAvatar}
-            alt="avatar"
-          />
+    <div className="w-full px-4 py-6 md:px-6 lg:px-8">
+      {/* Container */}
+      <div className="max-w-5xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex sm:items-center gap-4 bg-card/40 p-5 rounded-xl border">
+          <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-full overflow-hidden border shrink-0">
+            <img
+              src={DefaultAvatar}
+              alt="avatar"
+              className="w-full h-full object-cover"
+            />
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <p className="text-lg md:text-xl font-semibold truncate">
+              {userName}
+            </p>
+            <p className="text-sm text-muted truncate">
+              {session?.user?.email}
+            </p>
+          </div>
+
+          <Button
+            size="icon"
+            variant="outline"
+            className="self-start sm:self-auto"
+            onClick={() => navigate("/profile/edit")}
+          >
+            <Edit className="size-4" />
+          </Button>
         </div>
 
-        <h2 className="text-20-semibold">{userName}</h2>
+        {/* Grid Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left (Main) */}
+          <div className="lg:col-span-2 space-y-6">
+            <Section title="Account">
+              <Row
+                label="My Purchases"
+                onClick={() => navigate("/profile/my-purchases")}
+              />
+              <Row
+                label="Vouchers"
+                onClick={() => navigate("/profile/vouchers")}
+              />
+              <Row
+                label="Settings"
+                onClick={() => navigate("/profile/settings")}
+              />
+            </Section>
 
-        <Button variant="outline" size="icon">
-          <Edit className="size-4" />
-        </Button>
-      </div>
+            {isAdmin && (
+              <Section title="Admin">
+                <Row
+                  label="Dashboard"
+                  icon={<Shield className="size-4 text-primary" />}
+                  onClick={() => navigate("/profile/admin")}
+                />
+              </Section>
+            )}
+          </div>
 
-      <Button
-        variant="minimal"
-        size="auto"
-        className="custom-container flex justify-between border-b border-border/30 items-center gap-2 py-5"
-      >
-        My Purchases
-        {ChevronRightIcon}
-      </Button>
-      <Button
-        variant="minimal"
-        size="auto"
-        className="custom-container flex justify-between border-b border-border/30 items-center gap-2 py-5"
-      >
-        Settings
-        {ChevronRightIcon}
-      </Button>
-      <Button
-        variant="minimal"
-        size="auto"
-        className="custom-container flex justify-between border-b border-border/30 items-center gap-2 py-5"
-      >
-        Voucher
-        {ChevronRightIcon}
-      </Button>
-
-      {isAdmin && (
-        <Button
-          variant="minimal"
-          size="auto"
-          className="custom-container flex justify-between border-b border-border/30 items-center gap-2 py-5"
-          onClick={() => navigate("/profile/admin")}
-        >
-          Admin Dashboard
-          {ChevronRightIcon}
-        </Button>
-      )}
-
-      <div className="custom-container flex-center">
-        <Button
-          variant="destructive"
-          onClick={handleLogout}
-          disabled={signingOut}
-          className="max-w-120 mt-60 w-full md:ml-auto md:w-40"
-        >
-          {signingOut ? <Spinner /> : null}
-          {signingOut ? "Logging out" : "Logout"}
-        </Button>
+          {/* Right (Side / Actions) */}
+          <div className="space-y-6">
+            <Section title="Danger Zone">
+              <div className="p-4">
+                <Button
+                  variant="destructive"
+                  className="w-full"
+                  onClick={handleLogout}
+                  disabled={signingOut}
+                >
+                  {signingOut && <Spinner />}
+                  {signingOut ? "Logging out..." : "Logout"}
+                </Button>
+              </div>
+            </Section>
+          </div>
+        </div>
       </div>
     </div>
   );

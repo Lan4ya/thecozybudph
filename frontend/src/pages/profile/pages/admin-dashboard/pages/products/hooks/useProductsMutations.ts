@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ProductAPI } from "@/api/product";
+import { AdminAPI } from "@/api/admin";
 import { useToast } from "@/providers/ToastProvider";
-import type { ProductWithRelations } from "@TheCozyBud/types";
+import type { ProductWithRelations } from "@TheCozyBud/schemas";
 import isDev from "@/lib/utils/isDev";
 
 type ProductsQueryData = {
@@ -13,8 +13,8 @@ export const useProductMutations = () => {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
 
-  const { mutate: createProductMutation } = useMutation({
-    mutationFn: ProductAPI.create,
+  const createProductMutation = useMutation({
+    mutationFn: AdminAPI.createProduct,
     onMutate: () => {
       addToast("Creating new product...", "info");
     },
@@ -23,8 +23,8 @@ export const useProductMutations = () => {
       addToast("Something wen't wrong. Please try again later.", "error");
     },
     onSuccess: (product) => {
-      queryClient.setQueryData<ProductsQueryData>(
-        ["__admin__products__"],
+      queryClient.setQueriesData<ProductsQueryData>(
+        { queryKey: ["__admin__products__"] },
         (oldData) => {
           if (!oldData) return oldData;
 
@@ -44,14 +44,14 @@ export const useProductMutations = () => {
     },
   });
 
-  const { mutate: updateProductMutation } = useMutation({
+  const updateProductMutation = useMutation({
     mutationFn: ({
       formData,
       productId,
     }: {
       formData: FormData;
       productId: string;
-    }) => ProductAPI.update(formData, productId),
+    }) => AdminAPI.updateProduct(formData, productId),
     onMutate: () => {
       addToast("Updating product data...", "info");
     },
@@ -60,8 +60,8 @@ export const useProductMutations = () => {
       addToast("Something wen't wrong. Please try again later.", "error");
     },
     onSuccess: (updatedProduct) => {
-      queryClient.setQueryData<ProductsQueryData>(
-        ["__admin__products__"],
+      queryClient.setQueriesData<ProductsQueryData>(
+        { queryKey: ["__admin__products__"] },
         (oldData) => {
           if (!oldData?.pages) return oldData;
 
@@ -100,8 +100,8 @@ export const useProductMutations = () => {
     },
   });
 
-  const { mutate: deleteProductMutation } = useMutation({
-    mutationFn: ProductAPI.deleteMany,
+  const deleteProductMutation = useMutation({
+    mutationFn: AdminAPI.deleteProducts,
     onMutate: ({ productIds }) => {
       addToast(
         `Deleting product${productIds.length > 1 ? "s" : ""}...`,
@@ -113,8 +113,8 @@ export const useProductMutations = () => {
       addToast("Something wen't wrong. Please try again later.", "error");
     },
     onSuccess: ({ deletedProductIds }) => {
-      queryClient.setQueryData<ProductsQueryData>(
-        ["__admin__products__"],
+      queryClient.setQueriesData<ProductsQueryData>(
+        { queryKey: ["__admin__products__"] },
         (oldData) => {
           if (!oldData?.pages) return oldData;
 

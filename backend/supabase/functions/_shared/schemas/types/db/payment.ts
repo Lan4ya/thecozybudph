@@ -1,14 +1,9 @@
-import { SnakeToCamel } from "../utils/snakeToCamelCase.ts";
-import type { Tables } from "./supabase.types.ts";
+import { InferInsertModel } from "drizzle-orm";
+import { payments } from "../../drizzle/index.ts";
 
-export type PaymentsRow = Tables<"payments">;
+export type InsertPayment = Omit<
+  InferInsertModel<typeof payments>,
+  "id" | "paidAt" | "paymentId" | "status" | "isActive"
+>;
 
-export type CreatePendingPaymentDBInput = SnakeToCamel<
-  Omit<PaymentsRow, "id" | "created_at" | "updated_at" | "order_id">
->;
-export type PaymentDBUpdate = Partial<
-  Pick<
-    PaymentsRow,
-    "amount_cents" | "method" | "paid_at" | "payment_id" | "status"
-  >
->;
+export type UpdatePayment = Partial<InferInsertModel<typeof payments>>;

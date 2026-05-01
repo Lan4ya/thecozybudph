@@ -1,6 +1,6 @@
 import { AppError } from "@shared/errors/Errors.ts";
 import { SupabaseType } from "@shared/types.d.ts";
-import { snakeToCamel } from "../../../utils/caseConverter.ts";
+import { snakeToCamelKeys } from "../../../utils/caseConverter.ts";
 import { ProfileRepository } from "../profile-repository.ts";
 
 export const getProfile = async (
@@ -18,5 +18,5 @@ export const getProfile = async (
     throw AppError.notFound(`Profile with id ${profileId} not found`);
   }
 
-  return snakeToCamel(profile);
+  return snakeToCamelKeys(profile);
 };

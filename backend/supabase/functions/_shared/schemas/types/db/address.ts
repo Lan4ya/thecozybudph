@@ -1,6 +1,5 @@
-import type { Tables } from "./supabase.types.ts";
+import { InferInsertModel } from "drizzle-orm";
+import { addresses } from "../../drizzle/index.ts";
 
-export type AddressesRow = Tables<"addresses">;
-
-export type CreateAddressDBInput = Omit<AddressesRow, "id" | "created_at">;
-export type UpdateAddressDBInput = Partial<Omit<AddressesRow, "created_at">>;
+export type InsertAddress = InferInsertModel<typeof addresses>;
+export type UpdateAddress = Partial<InsertAddress>;

@@ -1,13 +1,13 @@
 import {
   ProductWithRelations,
   UpdateProductInput,
-} from "@shared/package-types/index.ts";
+  UpdateProductWithRelations,
+} from "@shared/schemas/index.ts";
 import { AppError } from "@shared/errors/Errors.ts";
 import { SupabaseType } from "@shared/types.d.ts";
 import { ProductRepository } from "../product-repository.ts";
 import { ProductStorage } from "../product-storage.ts";
 import { DrizzleClient } from "../../../db/client.ts";
-import { UpdateProductWithRelations } from "../../../db/types/products.ts";
 
 export const updateProduct = async (
   db: DrizzleClient,

@@ -2,7 +2,7 @@ import type {
   CreateProductFormInput,
   ProductWithRelations,
   UpdateProductFormInput,
-} from "@TheCozyBud/types";
+} from "@TheCozyBud/schemas";
 
 export function getCreateFormDefaultValues(): CreateProductFormInput {
   return {
@@ -34,6 +34,10 @@ export function getCreateFormDefaultValues(): CreateProductFormInput {
 export function getUpdateFormDefaultValues(
   updatingProduct: ProductWithRelations,
 ): Omit<UpdateProductFormInput, "productId"> {
+  const defaultPrimaryImageIndex = updatingProduct.imageUrls.indexOf(
+    updatingProduct.primaryImageUrl,
+  );
+
   return {
     mode: "update",
     name: updatingProduct.name,
@@ -42,9 +46,8 @@ export function getUpdateFormDefaultValues(
     categoryName: updatingProduct.categoryName ?? "",
     newProductImages: [],
     imageUrlsToDelete: [],
-    primaryImageIndex: updatingProduct.imageUrls.indexOf(
-      updatingProduct.primaryImageUrl,
-    ),
+    primaryImageIndex:
+      defaultPrimaryImageIndex >= 0 ? defaultPrimaryImageIndex : 0,
     options: updatingProduct.options,
     variants: updatingProduct.variants,
   };

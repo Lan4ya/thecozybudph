@@ -14,18 +14,28 @@ import Profile from "./pages/profile/Profile.tsx";
 import { Shop, ShopProduct } from "./pages/shop";
 import TermsOfService from "./pages/terms-of-service/TermsOfService.tsx";
 import FAQ from "./pages/FAQ/FAQ.tsx";
+import MyPurchases from "./pages/profile/pages/my-purchases/MyPurchases.tsx";
+import Settings from "./pages/profile/pages/settings/Settings.tsx";
 import {
   AdminDashboardLoader,
   AdminDashboard,
   AdminDashboardEvents,
   AdminDashboardOrders,
+  AdminDashboardUsers,
   AdminDashboardAnalytics,
   AdminDashboardProducts,
 } from "@/pages/profile/pages/admin-dashboard/index.ts";
-import { Checkout, CheckoutLoader } from "./pages/checkout/index.ts";
-import AddressSelection from "./pages/checkout/pages/address-selection/AddressSelection.tsx";
-import PaymentStatus from "./pages/checkout/pages/payment-status/PaymentStatus.tsx";
-import PaymentConfirmation from "./pages/checkout/pages/payment-confirmation/PaymentConfirmation.tsx";
+import {
+  Checkout,
+  CheckoutLoader,
+  CheckoutAddressSelection,
+  CheckoutPaymentConfirmation,
+  CheckoutPaymentConfirmationLoader,
+} from "@/pages/checkout/index.ts";
+import {
+  CheckoutPaymentStatus,
+  CheckoutPaymentStatusLoader,
+} from "./pages/payment/index.ts";
 
 const router = createBrowserRouter([
   {
@@ -58,6 +68,8 @@ const router = createBrowserRouter([
         path: "profile",
         children: [
           { index: true, Component: Profile },
+          { path: "my-purchases", Component: MyPurchases },
+          { path: "settings", Component: Settings },
           {
             path: "admin",
             loader: AdminDashboardLoader,
@@ -71,6 +83,7 @@ const router = createBrowserRouter([
               },
               { path: "products", Component: AdminDashboardProducts },
               { path: "orders", Component: AdminDashboardOrders },
+              { path: "users", Component: AdminDashboardUsers },
               { path: "analytics", Component: AdminDashboardAnalytics },
               { path: "events", Component: AdminDashboardEvents },
             ],
@@ -93,10 +106,23 @@ const router = createBrowserRouter([
         path: "checkout/:sessionId",
         children: [
           { index: true, Component: Checkout, loader: CheckoutLoader },
-          { path: "address-selection", Component: AddressSelection },
-          { path: "payment-confirmation", Component: PaymentConfirmation },
-          { path: "payment-status", Component: PaymentStatus },
+          {
+            path: "address-selection",
+            Component: CheckoutAddressSelection,
+            loader: CheckoutLoader,
+          },
+          {
+            path: "order/:orderId/pay",
+            Component: CheckoutPaymentConfirmation,
+            loader: CheckoutPaymentConfirmationLoader,
+          },
         ],
+      },
+
+      {
+        path: "payment/:paymentId/status",
+        Component: CheckoutPaymentStatus,
+        loader: CheckoutPaymentStatusLoader,
       },
 
       { path: "events", Component: Events },

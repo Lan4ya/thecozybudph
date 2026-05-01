@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router";
-import { type Address } from "@TheCozyBud/types";
+import { type Address } from "@TheCozyBud/schemas";
 import { useState } from "react";
 import CreateAddressForm from "./components/CreateAddressForm";
 import EditAddressForm from "./components/EditAddressForm";
@@ -7,7 +7,7 @@ import BottomBar from "./components/BottomBar";
 import AddressList from "./components/AddressList";
 import { useCheckoutStore } from "../../store/useCheckoutStore";
 
-type State =
+type PageState =
   | { type: "selecting" }
   | { type: "creating" }
   | { type: "editing"; address: Address | null };
@@ -16,8 +16,9 @@ const AddressSelection = () => {
   const locState = useLocation().state;
   const navigate = useNavigate();
   const setCheckoutAddress = useCheckoutStore((state) => state.setAddress);
+  const setShipping = useCheckoutStore((state) => state.setShipping);
 
-  const [state, setState] = useState<State>(() => {
+  const [state, setState] = useState<PageState>(() => {
     if (locState === "creating") return { type: "creating" };
     if (locState === "editing") return { type: "editing", address: null };
     return { type: "selecting" };

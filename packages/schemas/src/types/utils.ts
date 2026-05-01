@@ -6,11 +6,7 @@ export type Expand<T> = {
 
 type Primitive = string | number | boolean | bigint | symbol | null | undefined;
 
-/**
- * Types we should NOT recursively transform.
- * Add more here if needed (RegExp, Map, Set, etc.)
- */
-type Builtin = Date | JSON;
+type Builtin = Date | JSON; // etc.
 
 /* ---------------------------------- */
 /*         Snake → Camel Case         */
@@ -34,11 +30,6 @@ export type SnakeToCamel<T> = T extends Primitive
               : K]: SnakeToCamel<T[K]>;
           }
         : T;
-
-/**
- * Types we should NOT recursively transform.
- * Add more here if needed (RegExp, Map, Set, etc.)
- */
 
 /* ---------------------------------- */
 /*         Camel → Snake Case         */
@@ -64,6 +55,14 @@ export type CamelToSnake<T> = T extends Primitive
               : K]: CamelToSnake<T[K]>;
           }
         : T;
+
+export function snakeToCamelString(str: string): string {
+  return str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+}
+
+export function camelToSnakeCaseString(camel: string): string {
+  return camel.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+}
 
 export const coerceNumber = <T extends ZodType<any, any>>(schema: T) =>
   z.preprocess(
@@ -96,3 +95,14 @@ export const stringToObject = <T extends ZodType>(schema: T) =>
     if (typeof val === "object" && val !== null) return val;
     return {};
   }, schema);
+
+/**
+ * Creates a Zod schema for validating route params with a dynamic UUID key.
+ *
+ * Example:
+ * uuidParamSchema("id") → { id: string (uuid) }
+ * uuidParamSchema("orderId") → { orderId: string (uuid) }
+ */ export const uuidParamSchema = (key: string) =>
+  z.object({
+    [key]: z.uuid(),
+  });

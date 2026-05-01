@@ -1,6 +1,6 @@
 {
-  "id": "f919162d-2d08-42ad-aa49-3b4f0eedd350",
-  "prevId": "eb2506b9-6946-4b65-81b6-25505f378fa6",
+  "id": "31d680ef-48ad-4c37-8092-9c9ef89de280",
+  "prevId": "f919162d-2d08-42ad-aa49-3b4f0eedd350",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -784,7 +784,7 @@
         },
         "orders_status_check": {
           "name": "orders_status_check",
-          "value": "\"orders\".\"status\" IN ('to_pay', 'to_ship', 'to_receive', 'completed', 'cancelled')"
+          "value": "\"orders\".\"status\" IN ('to_pay','paid', 'to_ship','shipped', 'to_receive', 'fulfilled', 'cancelled')"
         }
       },
       "isRLSEnabled": false

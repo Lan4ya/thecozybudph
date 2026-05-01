@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { coerceNumber } from "./utils.ts";
+import { coerceNumber } from "../types/utils.ts";
 
 export const cardMessagesSchema = z.preprocess((val) => {
   if (!Array.isArray(val)) return [];

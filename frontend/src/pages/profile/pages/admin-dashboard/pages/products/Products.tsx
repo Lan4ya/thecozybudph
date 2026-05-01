@@ -1,15 +1,15 @@
 import PersistSuspense from "@/components/PersistSuspense";
-import ProductTable from "./components/table/ProductTable";
+import ProductTable from "./components/ProductTable";
 import ProductForm from "./components/form/ProductForm";
 import ProductTableRowsSkeleton from "../../../../../../lib/ui/skeletons/AdminProductTableItemSkeleton";
 import AdminProductsProvider from "./providers/AdminProductsProvider";
-import TopBar from "./components/TopBar";
+import ProductTopBar from "./components/ProductTopBar";
 
 export default function Products() {
   return (
     <AdminProductsProvider>
-      <div className="max-w-[1080px] mx-auto space-y-4">
-        <TopBar />
+      <div className="space-y-6">
+        <ProductTopBar />
 
         <PersistSuspense fallback={<ProductTableRowsSkeleton />}>
           <ProductTable />

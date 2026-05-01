@@ -2,7 +2,7 @@ import { Button } from "@/lib/ui/__shadcn__/button";
 import { motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 import { useAddressesQuery } from "../../hooks/useAddressQuery";
-import type { Address } from "@TheCozyBud/types";
+import type { Address } from "@TheCozyBud/schemas";
 import { Input } from "@/lib/ui/__shadcn__/input";
 
 const AddressList = ({ onEdit }: { onEdit: (address: Address) => void }) => {

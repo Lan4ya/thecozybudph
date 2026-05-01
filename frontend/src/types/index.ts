@@ -1,4 +1,4 @@
-import type { CartItem, Expand } from "@TheCozyBud/types";
+import type { CartItem, Expand } from "@TheCozyBud/schemas";
 
 export interface ProductQueryListItemsAPI {
   filters?: ProductFilters;

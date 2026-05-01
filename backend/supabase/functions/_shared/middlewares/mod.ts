@@ -1,6 +1,5 @@
 export * from "./authMiddleware.ts";
 export * from "./drizzleMiddleware.ts";
-export * from "./errorHandler.ts";
 export * from "./adminMiddleware.ts";
 export * from "./supabaseMiddleware.ts";
 export * from "./supabaseServiceMiddleware.ts";

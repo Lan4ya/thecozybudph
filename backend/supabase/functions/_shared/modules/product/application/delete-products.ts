@@ -1,8 +1,5 @@
 import { AppError } from "@shared/errors/Errors.ts";
-import {
-  DeleteProducts,
-  DeleteProductsInput,
-} from "@shared/package-types/index.ts";
+import { DeleteProducts, DeleteProductsInput } from "@shared/schemas/index.ts";
 import { isDev } from "@shared/utils/isDev.ts";
 import { DrizzleClient } from "../../../db/client.ts";
 import { ProductRepository } from "../product-repository.ts";

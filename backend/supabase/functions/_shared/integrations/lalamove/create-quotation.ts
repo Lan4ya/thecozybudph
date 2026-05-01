@@ -3,18 +3,17 @@ import {
   CreateQuotationsRes,
   CreateShippingQuoteInput,
   QuoteStop,
-} from "@shared/package-types/index.ts";
+} from "@shared/schemas/index.ts";
 import { MARKET, sdkClient } from "./client.ts";
 import { getCoordinates } from "../geoapify/get-coordinates.ts";
 
-// https://apidocs.geoapify.com/playground/geocoding/?searchType=structured&query=38 Upper Montagu Street, London W1H 1LJ, United Kingdom&street=Tuazon Street&postcode=1008&city=Sampaloc Manila&country=Philippines&numberOfResults=1&lang=en&type=street#geocoding
-
+// Default company address.
 const companyAddress =
   "Pioneer Street, Mandaluyong, 1552 National Capital District, Philippines";
 
-// This is from Geoapify also. I decided to query it in advance and hardcode it
-// so that we can have a faster response, querying only the lat and lng of
-// dropoff address (delivery address).
+// This is the result of the company's address from Geoapify. I decided to
+// query it in advance and hardcode it so that we can have a faster response,
+// querying only the lat and lng of dropoff address (delivery address).
 const pickupStop: QuoteStop = {
   coordinates: {
     lat: "14.571965",
@@ -35,6 +34,7 @@ export const createShippingQuotation = async (
     deliveryAddress.postalCode,
     deliveryAddress.region,
     deliveryAddress.city,
+    deliveryAddress.province,
     "Philippines",
   ].join(", ");
 

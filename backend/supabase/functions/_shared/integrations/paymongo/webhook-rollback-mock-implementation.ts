@@ -7,7 +7,7 @@
 
 // import { Hono } from "hono";
 // import { supabase } from "../../_shared/supabaseClient.ts";
-// import { paymongoClient } from "../../_shared/domain/payment/paymongo/client.ts";
+// import { paymongoClient } from "../../_shared/modules/payment/paymongo/client.ts";
 //
 // const app = new Hono();
 //

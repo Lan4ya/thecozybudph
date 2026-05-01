@@ -1,6 +1,6 @@
 import searchSubstring from "@/lib/utils/searchSubstring";
 import { useMemo, useState } from "react";
-import { FilterDropdown } from "./FilterDropDown";
+import { FilterDropdown } from "./FilterDropdown";
 import { FilterDropdownItem } from "./FilterDropdownItem";
 import { useCategoriesQuery } from "@/pages/shop/hooks/useCategoriesQuery";
 

@@ -1,9 +1,9 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  eventInquirySchema,
-  type EventInquiryInput,
-} from "@TheCozyBud/types";
+  eventInquiryFormSchema,
+  type EventInquiryFormInput,
+} from "@TheCozyBud/schemas";
 import { Input } from "@/lib/ui/__shadcn__/input";
 import { Label } from "@/lib/ui/__shadcn__/label";
 import { Textarea } from "@/lib/ui/__shadcn__/textarea";
@@ -13,7 +13,7 @@ import { EVENT_TYPES, BUDGET_RANGES } from "@/pages/events/constants";
 import { Calendar, Users, MapPin, Banknote, MessageSquare } from "lucide-react";
 
 export interface EventInquiryFormProps {
-  onSubmit: (data: EventInquiryInput) => void;
+  onSubmit: (data: EventInquiryFormInput) => void;
   isSubmitting?: boolean;
 }
 
@@ -25,8 +25,8 @@ export const EventInquiryForm = ({
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<EventInquiryInput>({
-    resolver: zodResolver(eventInquirySchema),
+  } = useForm<EventInquiryFormInput>({
+    resolver: zodResolver(eventInquiryFormSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -57,7 +57,7 @@ export const EventInquiryForm = ({
             placeholder="Your full name"
             className={cn(
               "bg-popover border-border/60",
-              errors.name && "border-red-500 focus-visible:ring-red-500"
+              errors.name && "border-red-500 focus-visible:ring-red-500",
             )}
           />
           {errors.name && (
@@ -76,7 +76,7 @@ export const EventInquiryForm = ({
             placeholder="your@email.com"
             className={cn(
               "bg-popover border-border/60",
-              errors.email && "border-red-500 focus-visible:ring-red-500"
+              errors.email && "border-red-500 focus-visible:ring-red-500",
             )}
           />
           {errors.email && (
@@ -98,7 +98,7 @@ export const EventInquiryForm = ({
             placeholder="+639XXXXXXXXX"
             className={cn(
               "bg-popover border-border/60",
-              errors.phone && "border-red-500 focus-visible:ring-red-500"
+              errors.phone && "border-red-500 focus-visible:ring-red-500",
             )}
           />
           {errors.phone && (
@@ -115,7 +115,7 @@ export const EventInquiryForm = ({
             {...register("eventType")}
             className={cn(
               selectClasses,
-              errors.eventType && "border-red-500 focus-visible:ring-red-500"
+              errors.eventType && "border-red-500 focus-visible:ring-red-500",
             )}
           >
             {EVENT_TYPES.map((type) => (
@@ -147,7 +147,7 @@ export const EventInquiryForm = ({
             min={new Date().toISOString().split("T")[0]}
             className={cn(
               "bg-popover border-border/60",
-              errors.eventDate && "border-red-500 focus-visible:ring-red-500"
+              errors.eventDate && "border-red-500 focus-visible:ring-red-500",
             )}
           />
           {errors.eventDate && (
@@ -170,7 +170,7 @@ export const EventInquiryForm = ({
             placeholder="Approximate number of guests"
             className={cn(
               "bg-popover border-border/60",
-              errors.guestCount && "border-red-500 focus-visible:ring-red-500"
+              errors.guestCount && "border-red-500 focus-visible:ring-red-500",
             )}
           />
           {errors.guestCount && (
@@ -195,7 +195,7 @@ export const EventInquiryForm = ({
             placeholder="Where will the event be held?"
             className={cn(
               "bg-popover border-border/60",
-              errors.venue && "border-red-500 focus-visible:ring-red-500"
+              errors.venue && "border-red-500 focus-visible:ring-red-500",
             )}
           />
           {errors.venue && (
@@ -237,7 +237,7 @@ export const EventInquiryForm = ({
           rows={5}
           className={cn(
             "bg-popover border-border/60 resize-none",
-            errors.message && "border-red-500 focus-visible:ring-red-500"
+            errors.message && "border-red-500 focus-visible:ring-red-500",
           )}
         />
         {errors.message && (

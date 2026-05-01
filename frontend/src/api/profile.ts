@@ -4,7 +4,7 @@ import type {
   Address,
   CreateAddressInput,
   UpdateAddressInput,
-} from "@TheCozyBud/types";
+} from "@TheCozyBud/schemas";
 
 export const ProfileAPI = {
   createAddress: async (payload: CreateAddressInput): Promise<Address> => {
@@ -22,3 +22,4 @@ export const ProfileAPI = {
     return apiClient.post("/address");
   },
 };
+

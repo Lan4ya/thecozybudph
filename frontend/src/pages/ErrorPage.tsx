@@ -6,6 +6,7 @@ import { Button } from "@/lib/ui/__shadcn__/button";
 import { useNavigate } from "react-router";
 import { useEffect } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
+import { AppError } from "@/lib/axios/client";
 
 type ErrorPageProps = {
   status?: number;
@@ -25,18 +26,24 @@ export const ErrorPage = ({ status, title, message }: ErrorPageProps) => {
   const finalMessage =
     message || (status ? messages[status] : "Something went wrong.");
 
+  // Set global auth status to expired to toggle SessionExpiredModal. Token
+  // expired can happen if user tries to request something from the server and
+  // for some reason the token doesn't refresh properly, server responding with
+  // "Token expired". Ofc this prob won't happen that much since supabase auto
+  // refresh token is reliable.
   const isTokenExpired = status === 401 && finalMessage === "Token expired";
-
-  // set global auth status to expired to toggle session expired modal
   useEffect(() => {
     if (isTokenExpired) {
       useAuthStore.setState({
         status: "expired",
       });
     }
-  }, [status, finalMessage]);
+  }, [isTokenExpired]);
 
-  if (isTokenExpired) return null;
+  if (isTokenExpired) {
+    // SessionExpiredModal will render at this point so we don't need to render anything here
+    return null;
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background text-center px-6">
@@ -46,12 +53,12 @@ export const ErrorPage = ({ status, title, message }: ErrorPageProps) => {
         transition={{ duration: 0.5 }}
         className="space-y-6"
       >
-        {/* Error Title */}
+        {/* Title */}
         <h1 className="font-back-to-black text-primary text-6xl md:text-7xl">
           {title || "Error"}
         </h1>
 
-        {/* Error Message */}
+        {/* Message */}
         <p className="text-muted-foreground text-lg md:text-xl max-w-md mx-auto">
           {finalMessage}
         </p>
@@ -66,16 +73,16 @@ export const ErrorPage = ({ status, title, message }: ErrorPageProps) => {
               className="rounded-2xl"
               aria-label="Retry loading the page"
             >
-              Try Again
+              Try again
             </Button>
           ) : status === 404 || status === 401 ? (
             <Button
-              onClick={() => navigate("/", { replace: true })}
+              onClick={() => navigate(-1)}
               variant="default"
               size="lg"
               className="rounded-2xl"
             >
-              Back to Home
+              Go back
             </Button>
           ) : null}
         </div>
@@ -87,7 +94,7 @@ export const ErrorPage = ({ status, title, message }: ErrorPageProps) => {
 export function CatchAllErrorPage() {
   const error = useRouteError();
 
-  if (isRouteErrorResponse(error)) {
+  if (isRouteErrorResponse(error) || error instanceof AppError) {
     return <ErrorPage status={error.status} title={`${error.status}`} />;
   }
 

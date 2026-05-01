@@ -1,5 +1,5 @@
 import { ProductAPI } from "@/api/product";
-import type { ProductWithRelations } from "@TheCozyBud/types";
+import type { ProductWithRelations } from "@TheCozyBud/schemas";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { useProductsPageState } from "./useProductsPageState";

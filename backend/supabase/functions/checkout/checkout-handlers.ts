@@ -1,26 +1,18 @@
-import { OrderService } from "@shared/domain/order/mod.ts";
-import { PaymentService } from "@shared/domain/payment/mod.ts";
+import { OrderActions } from "@shared/modules/order/mod.ts";
+import { PaymentActions } from "@shared/modules/payment/mod.ts";
 import { zodValidatorMiddleware } from "@shared/middlewares/zodValidatorMiddleware.ts";
-import { AppEnv } from "@shared/types.d.ts";
 import {
   createOrderSchema,
-  createPaymentSchema,
+  confirmOrderSchema,
   createShippingQuoteSchema,
-} from "@shared/package-types/index.ts";
+} from "@shared/schemas/index.ts";
 import { handleSuccess, requireVariables } from "@shared/utils/mod.ts";
 import { createFactory } from "hono/factory";
+import z from "zod";
+import { AppEnv } from "@shared/types.d.ts";
 
 const factory = createFactory<AppEnv>();
 const { createHandlers } = factory;
-
-export const createShippingQuoteHandler = createHandlers(
-  zodValidatorMiddleware("json", createShippingQuoteSchema),
-  async (c) => {
-    const payload = c.req.valid("json");
-    const res = await OrderService.createShippingQuotation(payload);
-    return handleSuccess(res);
-  },
-);
 
 export const createOrderHandler = createHandlers(
   zodValidatorMiddleware("json", createOrderSchema),
@@ -28,24 +20,34 @@ export const createOrderHandler = createHandlers(
     const { claims, db } = requireVariables(c, "claims", "db");
     const profileId = claims.sub;
     const payload = c.req.valid("json");
-    const res = await OrderService.createOrder(db, profileId, payload);
+    const res = await OrderActions.createOrder(db, profileId, payload);
     return handleSuccess(res);
   },
 );
 
-export const createPaymentHandler = createHandlers(
-  zodValidatorMiddleware("json", createPaymentSchema),
+export const payOrderHandler = createHandlers(
+  zodValidatorMiddleware("json", confirmOrderSchema),
+  zodValidatorMiddleware("param", z.object({ id: z.uuid() })),
   async (c) => {
-    const { claims, db } = requireVariables(c, "claims", "db");
-    const profileId = claims.sub;
+    const { db } = requireVariables(c, "db");
     const payload = c.req.valid("json");
+    const { id: orderId } = c.req.valid("param");
     const idempotencyKey = c.req.header("Idempotency-Key");
-    const res = await PaymentService.createPayment(
+    const res = await PaymentActions.payOrder(
       db,
       payload,
-      profileId,
+      orderId,
       idempotencyKey,
     );
+    return handleSuccess(res);
+  },
+);
+
+export const createShippingQuoteHandler = createHandlers(
+  zodValidatorMiddleware("json", createShippingQuoteSchema),
+  async (c) => {
+    const payload = c.req.valid("json");
+    const res = await OrderActions.createShippingQuotation(payload);
     return handleSuccess(res);
   },
 );
@@ -53,7 +55,7 @@ export const createPaymentHandler = createHandlers(
 export const paymentWebhookHandler = createHandlers(async (c) => {
   const rawBody = await c.req.text();
   const signatureHeader = c.req.header("Paymongo-Signature");
-  const res = await PaymentService.handlePaymentWebhook(
+  const res = await PaymentActions.handlePaymentWebhook(
     rawBody,
     signatureHeader,
   );

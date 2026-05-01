@@ -1,6 +1,6 @@
 import { apiClient } from "@/lib/axios/client";
 import isDev from "@/lib/utils/isDev";
-import type { GetPaymentStatusRes } from "@TheCozyBud/types";
+import type { GetPaymentStatusRes } from "@TheCozyBud/schemas";
 
 export const PaymentAPI = {
   getStatus: async (paymentId: string): Promise<GetPaymentStatusRes> => {

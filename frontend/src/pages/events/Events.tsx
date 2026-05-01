@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { EventInquiryForm } from "./components";
-import type { EventInquiryInput } from "@TheCozyBud/types";
+import type { EventInquiryInput } from "@TheCozyBud/schemas";
 import { useToast } from "@/providers/ToastProvider";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import {
@@ -65,7 +65,7 @@ const Events = () => {
       setIsSubmitted(true);
       addToast(
         "Thank you for your inquiry! We'll be in touch soon.",
-        "success"
+        "success",
       );
     } catch (error) {
       addToast("Something went wrong. Please try again.", "error");
@@ -219,7 +219,9 @@ const Events = () => {
                     <CheckCircle className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <h4 className="font-semibold mb-1">Personalized Consultation</h4>
+                    <h4 className="font-semibold mb-1">
+                      Personalized Consultation
+                    </h4>
                     <p className="text-sm text-muted-foreground">
                       We work closely with you to understand your vision and
                       preferences.
@@ -232,7 +234,9 @@ const Events = () => {
                     <CheckCircle className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <h4 className="font-semibold mb-1">Custom Design Proposal</h4>
+                    <h4 className="font-semibold mb-1">
+                      Custom Design Proposal
+                    </h4>
                     <p className="text-sm text-muted-foreground">
                       Receive a detailed proposal with mood boards, flower
                       selections, and pricing.
@@ -281,9 +285,7 @@ const Events = () => {
                   <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <CheckCircle className="w-8 h-8 text-green-600" />
                   </div>
-                  <h3 className="text-2xl font-semibold mb-2">
-                    Inquiry Sent!
-                  </h3>
+                  <h3 className="text-2xl font-semibold mb-2">Inquiry Sent!</h3>
                   <p className="text-muted-foreground mb-6">
                     Thank you for reaching out. We&apos;ll review your request
                     and get back to you within 24-48 hours.

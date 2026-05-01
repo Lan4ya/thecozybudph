@@ -132,6 +132,27 @@ export const DropdownMenuContent = forwardRef<
         next.top = Math.round(tr.top + alignOffset);
       }
 
+      const viewportWidth = window.visualViewport?.width ?? window.innerWidth;
+      const viewportHeight =
+        window.visualViewport?.height ?? window.innerHeight;
+      const viewportPadding = 8;
+
+      if (typeof next.left === "number") {
+        const maxLeft = Math.max(
+          viewportPadding,
+          viewportWidth - contentEl.offsetWidth - viewportPadding,
+        );
+        next.left = Math.min(Math.max(next.left, viewportPadding), maxLeft);
+      }
+
+      if (typeof next.top === "number") {
+        const maxTop = Math.max(
+          viewportPadding,
+          viewportHeight - contentEl.offsetHeight - viewportPadding,
+        );
+        next.top = Math.min(Math.max(next.top, viewportPadding), maxTop);
+      }
+
       setPos(next);
     };
 
@@ -145,9 +166,13 @@ export const DropdownMenuContent = forwardRef<
 
     rafUpdate();
 
+    const visualViewport = window.visualViewport;
+
     window.addEventListener("resize", rafUpdate);
     window.addEventListener("scroll", rafUpdate, true);
     window.addEventListener("orientationchange", rafUpdate); // mobile/tablets rotating the screen
+    visualViewport?.addEventListener("resize", rafUpdate);
+    visualViewport?.addEventListener("scroll", rafUpdate);
 
     // observe DOM mutations to remeasure on content changes
     let mo: MutationObserver | null = null;
@@ -171,6 +196,8 @@ export const DropdownMenuContent = forwardRef<
       window.removeEventListener("resize", rafUpdate);
       window.removeEventListener("orientationchange", rafUpdate);
       window.removeEventListener("scroll", rafUpdate, true);
+      visualViewport?.removeEventListener("resize", rafUpdate);
+      visualViewport?.removeEventListener("scroll", rafUpdate);
       if (mo) mo.disconnect();
     };
   }, [open, side, align, sideOffset, alignOffset, triggerRef]);

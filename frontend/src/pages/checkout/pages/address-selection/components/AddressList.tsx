@@ -1,6 +1,6 @@
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { ChevronRight } from "lucide-react";
-import type { Address } from "@TheCozyBud/types";
+import type { Address } from "@TheCozyBud/schemas";
 import { Input } from "@/lib/ui/__shadcn__/input";
 import AddressListSkeleton from "@/lib/ui/skeletons/AddressListSkeleton";
 import { useAddressesQuery } from "@/pages/checkout/hooks/useAddressQuery";
@@ -57,11 +57,14 @@ const AddressList = ({
               <div className="space-y-1 text-sm text-muted-foreground">
                 <p className="line-clamp-2">{address.fullName}</p>
                 <p className="">{address.phoneNumber}</p>
-                <p className="">
-                  {address.barangay}, {address.city}, {address.province}{" "}
-                  {address.postalCode}
+                <p className="text-muted-foreground">
+                  {address.addressLine},{" "}
+                  {address.barangay.toLowerCase().startsWith("barangay")
+                    ? ""
+                    : "Barangay"}{" "}
+                  {address.barangay}, {address.city}, {address.province},{" "}
+                  {address.region}, {address.postalCode}
                 </p>
-                <p className="line-clamp-4">{address.addressLine}</p>
               </div>
 
               <Button

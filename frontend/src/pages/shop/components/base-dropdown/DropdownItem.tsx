@@ -56,7 +56,7 @@ export const DropdownMenuItem = forwardRef<
         "data-[variant=destructive]:focus:bg-destructive/10",
         "dark:data-[variant=destructive]:focus:bg-destructive/20",
         "data-[variant=destructive]:focus:text-destructive",
-        "data-[variant=destructive]:*:[svg]:!text-destructive",
+        "data-[variant=destructive]:*:[svg]:text-destructive!",
         "[&_svg]:shrink-0",
         "[&_svg:not([class*='size-'])]:size-4",
         "[&_svg:not([class*='text-'])]:text-muted-foreground",

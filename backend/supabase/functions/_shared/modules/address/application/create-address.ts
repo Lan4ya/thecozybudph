@@ -1,4 +1,4 @@
-import { Address, CreateAddressInput } from "@shared/package/types/index.ts";
+import { Address, CreateAddressInput } from "@shared/schemas/index.ts";
 import { AddressRepository } from "../address-repository.ts";
 import { DrizzleClient } from "../../../db/client.ts";
 

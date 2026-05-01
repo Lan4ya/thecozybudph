@@ -1,6 +1,5 @@
 import { apiClient } from "@/lib/axios/client";
 import isDev from "@/lib/utils/isDev";
-
 import type {
   AddCartItemInput,
   CartItem,
@@ -8,7 +7,7 @@ import type {
   DeleteCartItemsInput,
   UpdateCartItemInput,
   UpdateCartItemRes,
-} from "@TheCozyBud/types";
+} from "@TheCozyBud/schemas";
 
 export const CartAPI = {
   getItems: async (): Promise<CartItem[]> => {

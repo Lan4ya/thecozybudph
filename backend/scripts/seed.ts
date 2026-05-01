@@ -1,6 +1,6 @@
 import { createSeedClient } from "@snaplet/seed";
 import { copycat } from "@snaplet/copycat";
-import { ProductOption } from "@TheCozyBud/types";
+import { ProductOption } from "@TheCozyBud/schemas";
 
 const ADJECTIVES = [
   "Silent",

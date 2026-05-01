@@ -2,29 +2,27 @@ import { DrizzleClient } from "../../../db/client.ts";
 import { AppError } from "../../../errors/Errors.ts";
 import { getShippingQuotation } from "@shared/integrations/lalamove/get-quotation.ts";
 import {
-  CreateOrderInput,
+  cartItems,
+  CreateOrderReq,
   CreateOrderRes,
-} from "@shared/package-types/index.ts";
-import { AddressRepository } from "../../address/address-repository.ts";
-import { OrderRepository } from "../mod.ts";
-import { calculatePassOnFee } from "../../../integrations/paymongo/calculate-pass-on-fee.ts";
-import {
   orderAddressesSnapshot,
   orderItemsSnapshots,
   orders,
-} from "../../../db/schema/orders.ts";
+  InsertOrder,
+  payments,
+} from "@shared/schemas/index.ts";
+import { AddressRepository } from "../../address/address-repository.ts";
+import { OrderRepository } from "../mod.ts";
+import { calculatePassOnFee } from "../../../integrations/paymongo/calculate-pass-on-fee.ts";
 import { CartRepository } from "../../cart/cart-repository.ts";
-import { cartItems } from "../../../db/schema/carts.ts";
 import { and, eq, inArray } from "drizzle-orm";
-import { payments } from "../../../db/schema/payments.ts";
-import { InsertOrder } from "../../../db/types/orders.ts";
 
 // TODO: implement to_pay order 24hr expiration
 
 export const createOrder = async (
   db: DrizzleClient,
   profileId: string,
-  payload: CreateOrderInput,
+  payload: CreateOrderReq,
 ): Promise<CreateOrderRes> => {
   const address = await AddressRepository.getById(db, payload.addressId);
 
@@ -77,7 +75,9 @@ export const createOrder = async (
     0,
   );
   const shippingQuote = await getShippingQuotation(payload.shippingQuoteId);
-  const shippingCents = Number(shippingQuote.priceBreakdown.total);
+  const shippingCents = Math.round(
+    Number(shippingQuote.priceBreakdown.total) * 100,
+  );
   const discountCents = 0;
   const totalPriceCents = subtotalCents + shippingCents - discountCents;
   const passOnFee = calculatePassOnFee(
@@ -92,6 +92,7 @@ export const createOrder = async (
     profileId,
     subtotalCents,
     shippingCents,
+    passOnFee,
     totalCents: sellingPriceCents,
     discountCents,
     status: "to_pay",

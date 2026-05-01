@@ -2,7 +2,7 @@ import {
   CreatePaymentIntentInput,
   CreatePaymentIntentResponse,
   PaymentMethodTypes,
-} from "@shared/package-types/index.ts";
+} from "@shared/schemas/index.ts";
 import { paymongoClient } from "./client.ts";
 
 // https://developers.paymongo.com/reference/create-a-paymentintent

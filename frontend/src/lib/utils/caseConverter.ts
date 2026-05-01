@@ -1,4 +1,4 @@
-import type { SnakeToCamel } from "@TheCozyBud/types";
+import type { SnakeToCamel } from "@TheCozyBud/schemas";
 
 export function snakeToCamel<T>(obj: T): SnakeToCamel<T> {
   if (obj == null) return obj as SnakeToCamel<T>;

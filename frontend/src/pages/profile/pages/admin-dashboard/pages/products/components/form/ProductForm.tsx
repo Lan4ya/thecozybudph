@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type ProductFormInput, productFormSchema } from "@TheCozyBud/types";
+import { type ProductFormInput, productFormSchema } from "@TheCozyBud/schemas";
 import {
   Card,
   CardHeader,
@@ -33,10 +33,12 @@ import ProductVariants from "./ProductVariants";
 import { useProductsPageState } from "../../hooks/useProductsPageState";
 import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 
+// BUG: form third step inputs backspace not working
+
 const MAX_IMAGES = 3;
 
 export default function ProductForm() {
-  const { isFormOpen, editingProduct, setFormOpen } = useProductsPageState();
+  const { isFormOpen, updatingProduct, setFormOpen } = useProductsPageState();
 
   const [newSelectedFiles, setNewSelectedFiles] = useState<
     { file: File; url: string }[]
@@ -50,7 +52,7 @@ export default function ProductForm() {
   const { createProductMutation, updateProductMutation } =
     useProductMutations();
 
-  const fileFieldName = editingProduct ? "newProductImages" : "productImages";
+  const fileFieldName = updatingProduct ? "newProductImages" : "productImages";
 
   const form = useForm<
     z.input<typeof productFormSchema>,
@@ -58,14 +60,14 @@ export default function ProductForm() {
     z.output<typeof productFormSchema>
   >({
     resolver: zodResolver(productFormSchema),
-    defaultValues: editingProduct
-      ? { ...getUpdateFormDefaultValues(editingProduct) }
+    defaultValues: updatingProduct
+      ? { ...getUpdateFormDefaultValues(updatingProduct) }
       : { ...getCreateFormDefaultValues() },
   });
 
   const hasChanges = formHasChanges(
     form.watch() as ProductFormInput,
-    editingProduct,
+    updatingProduct,
     {
       imagesToDelete: imageUrlsToDelete,
       newSelectedFilesCount: newSelectedFiles.length,
@@ -85,7 +87,7 @@ export default function ProductForm() {
       />
     ),
     () => <ProductOptions />,
-    () => <ProductVariants editingProduct={editingProduct} />,
+    () => <ProductVariants updatingProduct={updatingProduct} />,
   ];
 
   const [currentFormStep, setCurrentFormStep] = useState(0);
@@ -97,51 +99,55 @@ export default function ProductForm() {
   const nextStep = async () => {
     if (isLastFormStep) return;
 
-    if (!editingProduct) {
-      switch (currentFormStep) {
-        case 0: {
-          const valid = await form.trigger([
-            "name",
-            "description",
-            "categoryName",
-            "collectionName",
-            "productImages",
-            "primaryImageIndex",
-            "basePrice",
-          ]);
-          if (!valid) {
-            console.log("Step 1 error:", form.formState.errors);
-            return;
-          }
+    switch (currentFormStep) {
+      case 0: {
+        const valid = await form.trigger(
+          updatingProduct
+            ? ["name", "description", "categoryName", "collectionName"]
+            : [
+                "name",
+                "description",
+                "categoryName",
+                "collectionName",
+                "productImages",
+                "primaryImageIndex",
+                "basePrice",
+              ],
+        );
+        if (!valid) {
+          console.log("Step 1 error:", form.formState.errors);
+          return;
+        }
 
-          if (displayImages.length === 0) {
-            form.setError("newProductImages", {
-              type: "manual",
-              message: "Product must retain at least one image",
-            });
-            return;
-          }
-          break;
+        // Even though "newProductImages" is optional for update,
+        // we still require at least one retained image after edits.
+        if (!!updatingProduct && displayImages.length === 0) {
+          form.setError("newProductImages", {
+            type: "manual",
+            message: "you must retain at least one image",
+          });
+          return;
         }
-        case 1: {
-          const valid = await form.trigger(["options"]);
-          if (!valid) {
-            console.log("Step 2 error:", form.formState.errors.options);
-            return;
-          }
-          break;
-        }
-        case 2: {
-          const valid = await form.trigger(["variants"]);
-          if (!valid) {
-            console.log("Step 3 error:", form.formState.errors.variants);
-            return;
-          }
-          break;
-        }
-        default:
-          break;
+        break;
       }
+      case 1: {
+        const valid = await form.trigger(["options"]);
+        if (!valid) {
+          console.log("Step 2 error:", form.formState.errors.options);
+          return;
+        }
+        break;
+      }
+      case 2: {
+        const valid = await form.trigger(["variants"]);
+        if (!valid) {
+          console.log("Step 3 error:", form.formState.errors.variants);
+          return;
+        }
+        break;
+      }
+      default:
+        break;
     }
 
     setCurrentFormStep((s) => s + 1);
@@ -151,20 +157,15 @@ export default function ProductForm() {
     if (currentFormStep > 0) setCurrentFormStep((s) => s - 1);
   };
 
-  // useEffect(() => {
-  //   console.log("current step: ", currentFormStep);
-  //   console.log({ isLastFormStep });
-  // }, [currentFormStep]);
-
   // Derive image display: existing minus deletions plus selected blob urls
   const displayImages = useMemo(() => {
-    const existing = editingProduct?.imageUrls ?? [];
+    const existing = updatingProduct?.imageUrls ?? [];
     const filteredExisting = existing.filter(
       (u: string) => !imageUrlsToDelete.includes(u),
     );
     const newUrls = newSelectedFiles.map((n) => n.url);
     return [...filteredExisting, ...newUrls];
-  }, [editingProduct, imageUrlsToDelete, newSelectedFiles]);
+  }, [updatingProduct, imageUrlsToDelete, newSelectedFiles]);
 
   // Reset on form isFormOpen
   useEffect(() => {
@@ -176,23 +177,23 @@ export default function ProductForm() {
     setCurrentFormStep(0);
 
     form.reset(
-      editingProduct
-        ? { ...getUpdateFormDefaultValues(editingProduct) }
+      updatingProduct
+        ? { ...getUpdateFormDefaultValues(updatingProduct) }
         : { ...getCreateFormDefaultValues() },
     );
 
     // Set initial primary index:
-    if (editingProduct) {
-      const existing = editingProduct.imageUrls ?? [];
+    if (updatingProduct) {
+      const existing = updatingProduct.imageUrls ?? [];
       const idx = existing.findIndex(
-        (u: string) => u === editingProduct.primaryImageUrl,
+        (u: string) => u === updatingProduct.primaryImageUrl,
       );
       const initial = idx >= 0 ? idx : 0;
       setPrimaryImageIndex(initial);
     } else {
       setPrimaryImageIndex(0);
     }
-  }, [isFormOpen, editingProduct, form.reset]);
+  }, [isFormOpen, updatingProduct, form.reset]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -205,7 +206,7 @@ export default function ProductForm() {
     (files: File[]) => {
       form.clearErrors(fileFieldName);
 
-      const existingCount = (editingProduct?.imageUrls ?? []).filter(
+      const existingCount = (updatingProduct?.imageUrls ?? []).filter(
         (u: string) => !imageUrlsToDelete.includes(u),
       ).length;
       const currentSelectedCount = newSelectedFiles.length;
@@ -245,7 +246,7 @@ export default function ProductForm() {
 
         // if primary not set yet, set it to first newly added image
         if (primaryImageIndex === -1 && created.length > 0) {
-          const existingLen = (editingProduct?.imageUrls ?? []).filter(
+          const existingLen = (updatingProduct?.imageUrls ?? []).filter(
             (u: string) => !imageUrlsToDelete.includes(u),
           ).length;
           const newPrimary = existingLen; // first new file index
@@ -263,14 +264,14 @@ export default function ProductForm() {
       newSelectedFiles.length,
       form.setError,
       form.setValue,
-      editingProduct,
+      updatingProduct,
       form.clearErrors,
     ],
   );
 
   const handleRemoveImage = useCallback(
     (url: string, idx: number) => {
-      const existing = editingProduct?.imageUrls ?? [];
+      const existing = updatingProduct?.imageUrls ?? [];
       const filteredExisting = existing.filter(
         (u: string) => !imageUrlsToDelete.includes(u),
       );
@@ -348,7 +349,7 @@ export default function ProductForm() {
       primaryImageIndex,
       newSelectedFiles,
       form.setValue,
-      editingProduct,
+      updatingProduct,
     ],
   );
 
@@ -358,7 +359,6 @@ export default function ProductForm() {
     setFormOpen(false); // close form immediately
 
     const files = newSelectedFiles.map((s) => s.file);
-    console.log({ files });
     let compressedFiles: File[] = [];
 
     if (files.length) {
@@ -376,14 +376,14 @@ export default function ProductForm() {
       console.log({ compressedFiles });
     }
 
-    if (fieldData.mode === "update" && editingProduct) {
+    if (fieldData.mode === "update" && updatingProduct) {
       const formData = buildUpdateProductFormData({
         ...fieldData,
         imageUrlsToDelete,
       });
-      await updateProductMutation.mutateAsync({
+      updateProductMutation.mutate({
         formData,
-        productId: editingProduct.id,
+        productId: updatingProduct.id,
       });
     }
 
@@ -394,7 +394,7 @@ export default function ProductForm() {
         primaryImageIndex,
       });
 
-      await createProductMutation.mutateAsync(formData);
+      createProductMutation.mutate(formData);
     }
   };
 
@@ -421,7 +421,7 @@ export default function ProductForm() {
         <CardHeader className="custom-container">
           <CardTitle className="">
             <div className="flex items-center gap-4">
-              {editingProduct ? (
+              {updatingProduct ? (
                 <span>Update Product</span>
               ) : (
                 <>
@@ -474,7 +474,7 @@ export default function ProductForm() {
                   <Button
                     type="button"
                     variant="secondary"
-                    disabled={!editingProduct && !hasChanges}
+                    disabled={!updatingProduct && !hasChanges}
                     onClick={nextStep}
                   >
                     Next
@@ -489,7 +489,7 @@ export default function ProductForm() {
                     variant="secondary"
                   >
                     {form.formState.isSubmitting && <Spinner />}
-                    {editingProduct ? "Update" : "Create"}
+                    {updatingProduct ? "Update" : "Create"}
                   </Button>
                 )}
               </div>

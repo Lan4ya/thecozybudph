@@ -3,17 +3,25 @@ import { useCheckoutStore } from "./store/useCheckoutStore";
 import { redirect, type LoaderFunction } from "react-router";
 
 const CheckoutLoader: LoaderFunction = async ({ params }) => {
-  const sessionId = params.sessionId;
-  const sessionIdStore = useCheckoutStore.getState().sessionId;
-  const isValidUUID = z.uuid().safeParse(sessionId).success;
+  const checkoutIds = useCheckoutStore.getState().checkoutIds;
+  const sessionIdStore = checkoutIds?.session;
+  const paymentIdStore = checkoutIds?.payment;
 
-  if (
-    !sessionId ||
-    !sessionIdStore ||
-    !isValidUUID ||
-    sessionIdStore !== sessionId
-  ) {
-    throw redirect("Not Found", { status: 404 });
+  const pmStatus = useCheckoutStore.getState().payment?.status;
+
+  if (pmStatus !== "idle" && paymentIdStore) {
+    throw redirect(`/payment/${paymentIdStore}/status`);
+  }
+
+  if (!checkoutIds?.session) {
+    throw redirect("/shop");
+  }
+
+  const { sessionId } = params;
+  const sessionIdResult = z.uuid().safeParse(sessionId);
+
+  if (!sessionIdResult.success || sessionIdStore !== sessionIdResult.data) {
+    throw new Response("Not Found", { status: 404 });
   }
 
   return null;

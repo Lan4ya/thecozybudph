@@ -1,4 +1,4 @@
-import { handleCheckoutWebhook } from "@shared/domain/paymongo/services/handle-checkout-webhook.ts";
+import { PaymentActions } from "@shared/modules/payment/mod.ts";
 import { AppEnv } from "@shared/types.d.ts";
 import { handleSuccess } from "@shared/utils/mod.ts";
 import { createFactory } from "hono/factory";
@@ -8,7 +8,10 @@ const { createHandlers } = factory;
 
 export const checkoutPaymongoWebhookHandler = createHandlers(async (c) => {
   const signatureHeader = c.req.header("Paymongo-Signature");
-  const rawRequestBody = await c.req.text();
-  const res = await handleCheckoutWebhook(rawRequestBody, signatureHeader);
+  const rawBody = await c.req.text();
+  const res = await PaymentActions.handlePaymentWebhook(
+    rawBody,
+    signatureHeader,
+  );
   return handleSuccess(res);
 });

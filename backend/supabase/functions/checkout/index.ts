@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import checkout from "./checkout-routes.ts";
-import { handleError } from "@shared/middlewares/errorHandler.ts";
+import { handleError } from "@shared/errors/errorHandler.ts";
 import { AppEnv } from "@shared/types.d.ts";
 import { applyDefaultMiddlewares } from "@shared/middlewares/defaultMiddleware.ts";
 

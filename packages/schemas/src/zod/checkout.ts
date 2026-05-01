@@ -4,6 +4,13 @@ import { createAddressSchema } from "./address.ts";
 
 // The app will allow gcash and banks as payment method type
 export const paymentMethodTypesSchema = z.enum(["gcash", "brankas"]); // brankas is online banking
+export const paymentStatusSchema = z.enum([
+  "pending",
+  "paid",
+  "failed",
+  "cancelled",
+  "refunded",
+]);
 
 export const orderItemSchema = addCartItemSchema;
 export const orderAddressSchema = createAddressSchema;

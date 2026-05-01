@@ -1,11 +1,10 @@
 import { apiClient } from "@/lib/axios/client";
 import isDev from "@/lib/utils/isDev";
-
 import {
   type Address,
   type CreateAddressInput,
   type UpdateAddressInput,
-} from "@TheCozyBud/types";
+} from "@TheCozyBud/schemas";
 
 export const AddressAPI = {
   createAddress: async (payload: CreateAddressInput): Promise<Address> => {

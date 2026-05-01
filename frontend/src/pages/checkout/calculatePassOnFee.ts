@@ -1,4 +1,4 @@
-import type { PaymentMethodTypes } from "@TheCozyBud/types";
+import type { PaymentMethodTypes } from "@TheCozyBud/schemas";
 
 // WARN: This is nothing more than a ui price preview. we won't send any sort of
 // price or fees on backend since client side code can be abused easily. All

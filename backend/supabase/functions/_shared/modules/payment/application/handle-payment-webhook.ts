@@ -1,7 +1,7 @@
-import { orders, payments, webhookEvents } from "@shared/db/schema/mod.ts";
+import { orders, payments, webhookEvents } from "@shared/schemas/index.ts";
 import { AppError } from "@shared/errors/Errors.ts";
 import { and, eq, ne } from "drizzle-orm";
-import { PayMongoWebhookEventPayload } from "@shared/package-types/index.ts";
+import { PayMongoWebhookEventPayload } from "@shared/schemas/index.ts";
 import { createDrizzle } from "@shared/db/client.ts";
 import { isDev } from "@shared/utils/isDev.ts";
 import { verifySignature } from "@shared/integrations/paymongo/verify-signature.ts";
@@ -131,11 +131,11 @@ export const handlePaymentWebhook = async (
 
         isDev && console.log("Payment update result:", updatedPayment);
 
-        // Handle order status: to_pay -> to_ship
+        // Handle order status: to_pay -> paid
         const [updatedOrder] = await tx
           .update(orders)
           .set({
-            status: "to_ship",
+            status: "paid",
           })
           .where(
             and(

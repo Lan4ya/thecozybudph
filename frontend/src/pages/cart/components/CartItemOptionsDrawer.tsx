@@ -19,6 +19,7 @@ import { useShallow } from "zustand/react/shallow";
 import { ProductImage } from "@/components/products/ProductImage";
 import { ProductAPI } from "@/api/product";
 import { useQuery } from "@tanstack/react-query";
+import isDev from "@/lib/utils/isDev";
 
 type CartItemDrawerProps = {
   cartItemId: string;
@@ -69,12 +70,12 @@ export const CartItemOptionsDrawer = ({
 
   // DEV:
   useEffect(() => {
-    if (drawerOpen) {
+    if (isDev && drawerOpen) {
       console.log("productQueryData: ", productQueryData);
     }
-  }, [drawerOpen, productQueryData]);
+  }, [drawerOpen, productQueryData, isDev]);
 
-  // reset on close
+  // Reset on close
   useEffect(() => {
     if (!drawerOpen) {
       setSelectedOptions(product.variant.attributes);
@@ -128,7 +129,7 @@ export const CartItemOptionsDrawer = ({
         </Button>
       </DrawerTrigger>
 
-      <DrawerContent className="w-full rounded-t-xl border border-border/40 pb-8">
+      <DrawerContent className="rounded-t-xl border border-border/40 pb-8">
         <VisuallyHidden>
           <DialogTitle>Add to Cart</DialogTitle>
           <DialogDescription>
@@ -307,7 +308,7 @@ export const CartItemOptionsDrawer = ({
               <motion.div whileTap={{ scale: 0.98 }}>
                 <Button
                   size="default"
-                  className="w-full h-11 text-sm font-semibold"
+                  className="h-11 text-sm font-semibold"
                   onClick={async () => {
                     if (!selectedVariant) return;
                     await onUpdateCartItem(

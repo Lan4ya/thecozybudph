@@ -6,10 +6,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
-  createAddressSchema,
+  createAddressFormSchema,
   type Address,
   type CreateAddressInput,
-} from "@TheCozyBud/types";
+} from "@TheCozyBud/schemas";
 import { useCallback } from "react";
 import { useToast } from "@/providers/ToastProvider";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -19,22 +19,22 @@ import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import { checkoutAddressesQK } from "@/pages/checkout/hooks/useAddressQuery";
 import { useCheckoutStore } from "@/pages/checkout/store/useCheckoutStore";
 
-type FormValues = z.infer<typeof createAddressSchema>;
+type FormValues = z.infer<typeof createAddressFormSchema>;
 
 const FieldError = ({ message }: { message?: string }) =>
   message ? <p className="mt-1 text-xs text-red-500">{message}</p> : null;
 
-// const defaultValues: FormValues = {
-//   fullName: `test-${crypto.randomUUID()}`,
-//   phoneNumber: "9950916583",
-//   postalCode: "1111",
-//   region: "bla",
-//   province: "bla",
-//   city: "bla",
-//   barangay: "bla",
-//   addressLine: "bla bla",
-//   isDefault: false,
-// };
+const defaultValues: FormValues = {
+  fullName: `Juan-${crypto.randomUUID()}`,
+  phoneNumber: "9950916583",
+  postalCode: "4436",
+  region: "NCR",
+  province: "",
+  city: "Quezon",
+  barangay: "Tudturan",
+  addressLine: "Camia",
+  isDefault: true,
+};
 
 const CreateAddressForm = ({ onCloseForm }: { onCloseForm: () => void }) => {
   const {
@@ -44,8 +44,8 @@ const CreateAddressForm = ({ onCloseForm }: { onCloseForm: () => void }) => {
     handleSubmit,
     formState: { errors, isValid, isDirty },
   } = useForm<FormValues>({
-    // defaultValues,
-    resolver: zodResolver(createAddressSchema),
+    defaultValues,
+    resolver: zodResolver(createAddressFormSchema),
     mode: "onChange",
   });
 
@@ -77,16 +77,16 @@ const CreateAddressForm = ({ onCloseForm }: { onCloseForm: () => void }) => {
       },
     });
 
-  const onSubmit = (address: FormValues) => {
-    createAddressMutation({ address });
-  };
-
   const toggleDefault = useCallback(() => {
     setValue("isDefault", !isDefault, {
       shouldDirty: true,
       shouldTouch: true,
     });
   }, [isDefault, setValue]);
+
+  const onSubmit = (address: FormValues) => {
+    createAddressMutation({ address });
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="" noValidate>

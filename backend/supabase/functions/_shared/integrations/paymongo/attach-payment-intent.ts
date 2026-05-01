@@ -1,7 +1,7 @@
 import {
   AttachPaymentIntentInput,
   AttachPaymentIntentResponse,
-} from "@shared/package-types/index.ts";
+} from "@shared/schemas/index.ts";
 import { paymongoClient } from "./client.ts";
 
 // https://developers.paymongo.com/reference/attach-to-paymentintent

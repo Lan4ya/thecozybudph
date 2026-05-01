@@ -1,16 +1,13 @@
 import { supabase } from "@/lib/supabase/client";
 import {
-  type DeleteProducts,
   type ProductCategory,
   type ProductCollection,
   type Product,
   type ProductWithRelations,
-  type DeleteProductsInput,
   type ProductListItem,
-} from "@TheCozyBud/types";
+} from "@TheCozyBud/schemas";
 import { snakeToCamel } from "@/lib/utils/caseConverter.ts";
 import type { ProductQueryListItemsAPI } from "@/types";
-import { apiClient } from "@/lib/axios/client";
 import {
   mapProductAndRelationsRowToProductWithRelationsDomain,
   mapProductAndVariantsRowToProductDomain,
@@ -172,25 +169,6 @@ export const ProductAPI = {
     if (!data) return null;
 
     return (data ?? []).map(mapProductAndVariantsRowToProductDomain);
-  },
-
-  update: async (
-    productFormData: FormData,
-    productId: string,
-  ): Promise<ProductWithRelations> => {
-    return await apiClient.patch(`/product/${productId}`, productFormData);
-  },
-
-  create: async (productFormData: FormData): Promise<ProductWithRelations> => {
-    return await apiClient.post("/product", productFormData);
-  },
-
-  deleteMany: async (
-    productIds: DeleteProductsInput,
-  ): Promise<DeleteProducts> => {
-    return apiClient.delete("/product", {
-      data: productIds,
-    });
   },
 
   getCategories: async (): Promise<ProductCategory[]> => {

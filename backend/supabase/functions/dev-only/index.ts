@@ -1,10 +1,11 @@
 import { AppError } from "@shared/errors/Errors.ts";
-import { handleError } from "@shared/middlewares/errorHandler.ts";
+import { handleError } from "@shared/errors/errorHandler.ts";
 import { supabaseMiddleware } from "@shared/middlewares/supabaseMiddleware.ts";
 import { isDev } from "@shared/utils/isDev.ts";
 import { Context, Hono } from "hono";
 import { logger } from "hono/logger";
 import { AppEnv } from "@shared/types.d.ts";
+import { requireVariables } from "@shared/utils/mod.ts";
 
 // WARN: This function is only for local environment only. DO NOT deploy it. It's
 // only purpose is for quick testing and are not needed in production.
@@ -26,10 +27,10 @@ dev.post("/auth/signup", async (c: Context) => {
   return c.json(data);
 });
 
-dev.post("/auth/login", async (c: Context) => {
+dev.post("/auth/login", async (c: Context<AppEnv>) => {
   if (!isDev) throw new Error("Dev ednpoint only");
 
-  const s = c.get("supabase");
+  const { supabase: s } = requireVariables(c, "supabase");
   const { email, password } = await c.req.json();
   const { data, error } = await s.auth.signInWithPassword({ email, password });
   if (error) throw error;

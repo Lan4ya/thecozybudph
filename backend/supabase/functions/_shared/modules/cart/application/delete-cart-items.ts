@@ -2,7 +2,7 @@ import { AppError } from "@shared/errors/Errors.ts";
 import {
   DeleteCartItemsInput,
   DeleteCartItemsRes,
-} from "@shared/package-types/index.ts";
+} from "@shared/schemas/index.ts";
 import { DrizzleClient } from "../../../db/client.ts";
 import { CartRepository } from "../cart-repository.ts";
 

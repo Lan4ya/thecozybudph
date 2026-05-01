@@ -1,9 +1,9 @@
 import { Input } from "@/lib/ui/__shadcn__/input";
 import type {
-  CreateProductInput,
+  CreateProductFormInput,
   ProductFormInput,
-  UpdateProductInput,
-} from "@TheCozyBud/types";
+  UpdateProductFormInput,
+} from "@TheCozyBud/schemas";
 import { useFormContext, type FieldErrors } from "react-hook-form";
 import ImageUploadInput from "./ImageUploadInput";
 import { cn } from "@/lib/utils/cn";
@@ -36,6 +36,19 @@ export const ProductDetails = ({
 
   const formValues = watch();
   const isCreateMode = formValues.mode === "create";
+
+  const createImageError =
+    (errors as FieldErrors<CreateProductFormInput>)?.productImages?.message ??
+    undefined;
+
+  const updateImageError =
+    (errors as FieldErrors<UpdateProductFormInput>)?.newProductImages
+      ?.message ?? undefined;
+  const imageErrorMessage = isCreateMode ? createImageError : updateImageError;
+
+  const basePriceError =
+    (errors as FieldErrors<CreateProductFormInput>)?.basePrice?.message ??
+    undefined;
 
   return (
     <div className="grid grid-cols-1 gap-4 md:gap-6 md:grid-cols-2 pb-4">
@@ -79,10 +92,8 @@ export const ProductDetails = ({
               }
             }}
           />
-          {"basePrice" in errors && errors.basePrice && (
-            <p className="text-xs text-red-500 mt-1">
-              {errors.basePrice.message}
-            </p>
+          {basePriceError && (
+            <p className="text-xs text-red-500 mt-1">{basePriceError}</p>
           )}
         </div>
       )}
@@ -146,7 +157,7 @@ export const ProductDetails = ({
       </div>
 
       {/* Image Upload */}
-      <div className="md:col-span-2 relative">
+      <div className="md:col-span-2">
         <ImageUploadInput
           images={displayImages}
           onSelectFiles={handleSelectFiles}
@@ -155,26 +166,9 @@ export const ProductDetails = ({
           setPrimaryImageIndex={setPrimaryImageIndex}
           maxImages={MAX_IMAGES}
         />
-        {formValues.mode === "create" &&
-          (errors as FieldErrors<CreateProductInput>)?.productImages
-            ?.message && (
-            <p className="absolute -bottom-4 text-xs text-red-500">
-              {
-                (errors as FieldErrors<CreateProductInput>).productImages
-                  ?.message
-              }
-            </p>
-          )}
-        {formValues.mode === "update" &&
-          (errors as FieldErrors<UpdateProductInput>)?.newProductImages
-            ?.message && (
-            <p className="absolute -bottom-4 text-xs text-red-500">
-              {
-                (errors as FieldErrors<UpdateProductInput>).newProductImages
-                  ?.message
-              }
-            </p>
-          )}
+        {imageErrorMessage && (
+          <p className="mt-1 text-xs text-red-500">{imageErrorMessage}</p>
+        )}
       </div>
     </div>
   );

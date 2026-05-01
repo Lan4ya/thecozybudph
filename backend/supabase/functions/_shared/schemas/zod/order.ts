@@ -1,5 +1,15 @@
 import { z } from "zod";
 
-export const orderStatusSchema = z.enum([
-  "toPay, toShip, toReceive, completed, cancelled",
-]);
+export const ORDER_STATUS = [
+  "toPay",
+  "paid",
+  "toShip",
+  "shipped",
+  "toReceive",
+  "fulfilled",
+  "cancelled",
+  "expired",
+] as const;
+
+export const orderStatusSchema = z.enum(ORDER_STATUS);
+export const orderSourceSchema = z.enum(["shop", "cart"]);

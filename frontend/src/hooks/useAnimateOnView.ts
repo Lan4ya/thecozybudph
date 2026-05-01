@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
+export type RegisterSentinel = (ref: HTMLElement | null) => void;
+
 export const useAnimateOnView = (threshold = 0.1) => {
   const [visibleMap, setVisibleMap] = useState<boolean[]>([]);
   const sentinelRefs = useRef<HTMLElement[]>([]);
@@ -32,7 +34,7 @@ export const useAnimateOnView = (threshold = 0.1) => {
     return () => observer.disconnect();
   }, [threshold]);
 
-  const registerSentinel = (el: HTMLElement | null) => {
+  const registerSentinel: RegisterSentinel = (el) => {
     if (el && !sentinelRefs.current.includes(el)) {
       sentinelRefs.current.push(el);
       setVisibleMap((prev) => [...prev, false]);

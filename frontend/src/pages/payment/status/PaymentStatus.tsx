@@ -6,7 +6,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense, useEffect } from "react";
 import { PaymentAPI } from "@/api/payment";
 import { useCheckoutStore } from "@/pages/checkout/store/useCheckoutStore";
-import type { GetPaymentStatusRes } from "@TheCozyBud/types";
+import type { GetPaymentStatusRes } from "@TheCozyBud/schemas";
 import { CheckoutPaymentStatusSkeleton } from "@/lib/ui/skeletons/CheckoutPaymentStatusSkeleton";
 import type { PaymentLoaderData } from "./PaymentStatusLoader";
 

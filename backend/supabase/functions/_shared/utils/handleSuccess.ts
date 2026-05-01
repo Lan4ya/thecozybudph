@@ -1,16 +1,23 @@
 import type {
   ApiResponseSuccess,
   SnakeToCamel,
-} from "@shared/package-types/index.ts";
-import { snakeToCamel } from "./caseConverter.ts";
+} from "@shared/schemas/index.ts";
+import { snakeToCamelKeys } from "./caseConverter.ts";
+import { isDev } from "./isDev.ts";
 
 export const handleSuccess = <T extends object | null | undefined>(
   payload: T,
   status = 200,
 ): Response => {
+  if (payload === null) {
+    return Response.json({ data: null }, { status });
+  }
+
   const body: ApiResponseSuccess<SnakeToCamel<T>> = {
-    data: snakeToCamel(payload ?? null),
+    data: snakeToCamelKeys(payload),
   };
+
+  isDev && console.log(body);
 
   return Response.json(body, { status });
 };

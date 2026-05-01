@@ -1,14 +1,24 @@
 import type {
   Address,
-  CreatePaymentInput,
   PaymentMethodTypes,
   ProductVariant,
-} from "@TheCozyBud/types";
+} from "@TheCozyBud/schemas";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-type Payment = { type: PaymentMethodTypes; total: number };
-type Source = "shop" | "cart";
+export type CheckoutPaymentStatus =
+  | "idle"
+  | "verification"
+  | "pending"
+  | "paid"
+  | "failed";
+
+type Payment = {
+  type?: PaymentMethodTypes;
+  total?: number;
+  status?: CheckoutPaymentStatus;
+} | null;
+type Source = "shop" | "cart" | null;
 
 const CHECKOUT_SESSION_NAME = "checkout-details";
 
@@ -25,57 +35,81 @@ export type OrderItemUI = {
 };
 
 type Shipping = {
+  quotationId: string;
   fee: number;
   serviceType: string;
 } | null;
 
+type CheckoutIds = {
+  session?: string;
+  order?: string;
+  payment?: string;
+} | null;
+
 type CheckoutState = {
-  source: Source | null;
-  orderItems: OrderItemUI[];
-  payment: Partial<Payment> | null;
-  address: Address | null;
-  shipping: Shipping;
-
-  setOrderItems: (oi: OrderItemUI[]) => void;
-  setPayment: (p: Partial<Payment>) => void;
-  setSource: (s: Source) => void;
-  setAddress: (a: Address) => void;
-  setShipping: (s: Shipping) => void;
-
-  sessionId: string | null;
-  setSessionId: (id: string) => void;
-
   reset: () => void;
+  checkoutIds: CheckoutIds;
+  setCheckoutIds: (id: CheckoutIds) => void;
+  source: Source;
+  setSource: (s: Source) => void;
+  orderItemsUI: OrderItemUI[];
+  setOrderItemsUI: (oi: OrderItemUI[]) => void;
+  payment: Payment;
+  setPayment: (p: Payment) => void;
+  address: Address | null;
+  setAddress: (a: Address) => void;
+  shipping: Shipping;
+  setShipping: (s: Shipping) => void;
 };
 
 export const useCheckoutStore = create<CheckoutState>()(
   persist(
-    (set) => ({
+    (set, _get, api) => ({
+      checkoutIds: null,
       source: null,
-      orderItems: [],
+      orderItemsUI: [],
       address: null,
       shipping: null,
-      payment: null,
-      sessionId: "",
+      payment: {
+        type: undefined,
+        total: undefined,
+        status: "idle",
+      },
 
       reset: () => {
-        set({ orderItems: [], source: null, payment: null, sessionId: "" });
-        sessionStorage.removeItem(CHECKOUT_SESSION_NAME);
+        api.persist.clearStorage();
+        set({
+          checkoutIds: null,
+          source: null,
+          orderItemsUI: [],
+          address: null,
+          shipping: null,
+          payment: null,
+        });
       },
+
+      setCheckoutIds: (patch) =>
+        set((state) => {
+          const prev = state.checkoutIds ?? {};
+          return { checkoutIds: { ...prev, ...patch } };
+        }),
 
       setSource: (source) => set({ source }),
 
       setAddress: (address) => set({ address }),
 
-      setSessionId: (id) => set({ sessionId: id }),
+      setShipping: (shipping) => set({ shipping: shipping }),
 
-      setShipping: (shipping) => set({ shipping }),
-
-      setOrderItems: (orderItems) => set({ orderItems }),
+      setOrderItemsUI: (orderItems) => set({ orderItemsUI: orderItems }),
 
       setPayment: (patch) =>
         set((state) => {
-          const prev = state.payment ?? {};
+          const prev = state.payment ?? {
+            type: undefined,
+            total: undefined,
+            status: "idle",
+          };
+
           return {
             payment: {
               ...prev,
@@ -86,13 +120,14 @@ export const useCheckoutStore = create<CheckoutState>()(
     }),
     {
       name: CHECKOUT_SESSION_NAME,
-      storage: createJSONStorage(() => sessionStorage),
+      storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         // only persist specific fields
-        orderItems: state.orderItems,
+        orderItemsUI: state.orderItemsUI,
         source: state.source,
-        sessionId: state.sessionId,
+        checkoutIds: state.checkoutIds,
         address: state.address,
+        payment: state.payment,
       }),
     },
   ),

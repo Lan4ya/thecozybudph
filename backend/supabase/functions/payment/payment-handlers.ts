@@ -3,7 +3,7 @@ import { zodValidatorMiddleware } from "@shared/middlewares/zodValidatorMiddlewa
 import { AppEnv } from "@shared/types.d.ts";
 import { handleSuccess, requireVariables } from "@shared/utils/mod.ts";
 import { createFactory } from "hono/factory";
-import { uuidParamSchema } from "@shared/package-types/index.ts";
+import { uuidParamSchema } from "@shared/schemas/index.ts";
 
 const factory = createFactory<AppEnv>();
 const { createHandlers } = factory;

@@ -1,0 +1,3 @@
+ALTER TABLE "orders" DROP CONSTRAINT "orders_status_check";--> statement-breakpoint
+ALTER TABLE "orders" ADD COLUMN "pass_on_fee" integer;--> statement-breakpoint
+ALTER TABLE "orders" ADD CONSTRAINT "orders_status_check" CHECK ("orders"."status" IN ('to_pay', 'paid', 'to_ship', 'shipped', 'to_receive', 'fulfilled', 'cancelled', 'expired'));

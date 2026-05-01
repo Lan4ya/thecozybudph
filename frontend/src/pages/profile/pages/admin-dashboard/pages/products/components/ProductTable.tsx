@@ -1,6 +1,6 @@
 import { ProductImage } from "@/components/products/ProductImage";
 import { ProductAPI } from "@/api/product";
-import type { ProductWithRelations } from "@TheCozyBud/types";
+import type { ProductWithRelations } from "@TheCozyBud/schemas";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { Check, Edit } from "lucide-react";
@@ -9,6 +9,7 @@ import ProductTableRowsSkeleton from "@/lib/ui/skeletons/AdminProductTableItemSk
 import { cn } from "@/lib/utils/cn";
 import { useProductsPageState } from "../hooks/useProductsPageState";
 import { formatPriceCents } from "@/lib/utils/format";
+import { MetaBadge } from "@/components/MetaBadge";
 
 export default function ProductTable() {
   const {
@@ -130,7 +131,7 @@ function ProductRow({
   });
 
   return (
-    <article className="border grid grid-cols-[auto_auto_3fr_1fr] sm:grid-cols-[auto_auto_2fr_1fr_1fr_1fr] lg:grid-cols-[auto_auto_3fr_1fr_1fr_1fr] items-center justify-items-center gap-4 px-2 py-4 rounded-lg hover:shadow-sm transition">
+    <article className="border grid grid-cols-[auto_auto_3fr_1fr] sm:grid-cols-[auto_auto_3fr_repeat(3,1fr)] xl:grid-cols-[auto_auto_3fr_repeat(5,1fr)] items-center justify-items-center gap-4 px-2 py-4 rounded-lg hover:shadow-sm transition">
       {/* Selection Toggle */}
       <div className="flex items-center">
         <div
@@ -155,7 +156,7 @@ function ProductRow({
       />
 
       {/* Details */}
-      <div className="justify-self-start flex flex-col">
+      <div className="items-start justify-self-start flex flex-col">
         <h3 className="text-sm lg:text-base font-medium truncate">
           {product.name}
         </h3>
@@ -164,19 +165,43 @@ function ProductRow({
           Price: {formatPriceCents(product.minPriceCents)}
         </p>
 
-        <span className="text-[11px] mt-1 rounded-full border bg-background px-2 py-0.5 text-muted-foreground">
-          Collection: {product.categoryName}
-        </span>
+        <MetaBadge
+          className="truncate"
+          label={"category"}
+          value={product.categoryName}
+        />
+
+        {product.collectionName && (
+          <MetaBadge
+            className="hidden sm:inline mt-1 truncate"
+            label="collection"
+            value={product.collectionName}
+          />
+        )}
       </div>
 
-      <div className="hidden sm:flex flex-col">
+      <div className="hidden xl:block text-center">
+        <p className="text-sm">Options</p>
+        <p className="text-[12.5px] text-muted-foreground">
+          {product.options.length}
+        </p>
+      </div>
+
+      <div className="hidden xl:block text-center ">
+        <p className="text-sm">Variants</p>
+        <p className="text-muted-foreground text-[12.5px]">
+          {product.variants.length}
+        </p>
+      </div>
+
+      <div className="hidden sm:block">
         <p className="text-sm">Updated</p>
-        <p className="text-[11px] text-muted-foreground">{updatedAt}</p>
+        <p className="text-[12.5px] text-muted-foreground">{updatedAt}</p>
       </div>
 
-      <div className="hidden sm:flex flex-col">
+      <div className="hidden sm:block">
         <p className="text-sm">Price</p>
-        <p className="text-[12px] text-primary">
+        <p className="text-[12.5px] text-primary">
           {formatPriceCents(product.minPriceCents)}
         </p>
       </div>

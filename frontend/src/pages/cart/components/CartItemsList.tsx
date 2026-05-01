@@ -6,7 +6,10 @@ import { useCartQuery } from "@/pages/cart/hooks/useCartQuery";
 import { DeleteCartItemDialog } from "./CartItemDeleteDialog";
 import { useCartItemMutations } from "@/pages/cart/hooks/useCartMutations";
 import isDev from "@/lib/utils/isDev";
-import { updateCartItemSchema, deleteCartItemsSchema } from "@TheCozyBud/types";
+import {
+  updateCartItemSchema,
+  deleteCartItemsSchema,
+} from "@TheCozyBud/schemas";
 import z from "zod";
 import { useToast } from "@/providers/ToastProvider";
 import CartItem from "./CartItem";

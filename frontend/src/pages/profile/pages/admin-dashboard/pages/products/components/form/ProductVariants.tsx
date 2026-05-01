@@ -1,12 +1,15 @@
 import { useFormContext } from "react-hook-form";
-import type { ProductFormInput, ProductWithRelations } from "@TheCozyBud/types";
+import type {
+  ProductFormInput,
+  ProductWithRelations,
+} from "@TheCozyBud/schemas";
 import { useMemo, useEffect } from "react";
 import { Input } from "@/lib/ui/__shadcn__/input";
 import { cn } from "@/lib/utils/cn";
 
-type Props = { editingProduct: ProductWithRelations | null };
+type Props = { updatingProduct: ProductWithRelations | null };
 
-const ProductVariants = ({ editingProduct }: Props) => {
+const ProductVariants = ({ updatingProduct }: Props) => {
   const { watch, setValue } = useFormContext<ProductFormInput>();
 
   const [mode, options, variants, basePrice] = watch([
@@ -16,8 +19,12 @@ const ProductVariants = ({ editingProduct }: Props) => {
     "basePrice",
   ]);
 
+  const normalizedCreateModeBasePrice = Math.max(0, Number(basePrice ?? 0));
+
   const initPriceCents =
-    mode === "create" ? basePrice * 100 : (editingProduct?.minPriceCents ?? 0);
+    mode === "create"
+      ? Math.round(normalizedCreateModeBasePrice * 100)
+      : (updatingProduct?.minPriceCents ?? 0);
 
   const combinations = useMemo(() => generateCombinations(options), [options]);
 
@@ -30,7 +37,6 @@ const ProductVariants = ({ editingProduct }: Props) => {
     const nextVariants = combinations.map((combo) => {
       const key = JSON.stringify(combo);
       const match = existingMap.get(key);
-      console.log("initial price cents: ", initPriceCents);
 
       if (match) return match; // keep orig
 
@@ -45,13 +51,6 @@ const ProductVariants = ({ editingProduct }: Props) => {
   }, [combinations, initPriceCents]);
 
   const variantsInForm = variants ?? [];
-
-  useEffect(() => {
-    const subscription = watch((value) => {
-      console.log("variants changed:", value.variants);
-    });
-    return () => subscription.unsubscribe();
-  }, [watch("variants")]);
 
   const handlePriceChange = (index: number, value: string) => {
     if (value === "") {
@@ -73,8 +72,9 @@ const ProductVariants = ({ editingProduct }: Props) => {
       {/* Rows */}
       {combinations.map((combo, idx) => {
         const variant = variantsInForm[idx];
+        const fallbackPriceCents = variant?.priceCents ?? initPriceCents;
         const price =
-          variant?.priceCents === undefined ? "" : variant.priceCents / 100;
+          fallbackPriceCents === undefined ? "" : fallbackPriceCents / 100;
 
         return (
           <div

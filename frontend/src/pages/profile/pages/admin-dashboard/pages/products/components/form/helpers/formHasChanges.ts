@@ -3,7 +3,7 @@ import type {
   ProductFormInput,
   ProductVariant,
   ProductWithRelations,
-} from "@TheCozyBud/types";
+} from "@TheCozyBud/schemas";
 
 export function formHasChanges(
   values: ProductFormInput,
@@ -75,8 +75,6 @@ export function formHasChanges(
 
   // Compare main fields
   if (!isEqual(original, current)) {
-    console.log("original: ", original);
-    console.log("current: ", current);
     return true;
   }
 

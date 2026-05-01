@@ -1,0 +1,1 @@
+ALTER POLICY "authenticated can update before expiry" ON "orders" TO authenticated USING (expires_at > now());

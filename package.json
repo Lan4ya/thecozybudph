@@ -4,9 +4,10 @@
   "version": "1.0.0",
   "scripts": {
     "dev:frontend": "pnpm --filter frontend dev",
-    "dev:backend": "cd backend && sudo systemctl start docker && supabase functions serve --no-verify-jwt",
+    "dev:backend": "cd backend && sudo systemctl start docker && pnpm dlx supabase functions serve --no-verify-jwt",
     "build:frontend": "pnpm --filter frontend build",
-    "build": "pnpm -r build"
+    "build": "pnpm -r build",
+    "typecheck": "tsc --noEmit -p ./frontend/tsconfig.json && tsc --noEmit -p ./packages/schemas/tsconfig.json"
   },
   "dependencies": {
     "zod": "^4.3.6"

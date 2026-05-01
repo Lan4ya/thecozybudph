@@ -19,6 +19,7 @@ export const FOOTER_HIDDEN_PATHS = [
   "/shop/products",
   "/checkout",
   "/profile/admin",
+  "/payment",
 ];
 export const PROTECTED_ROUTES = ["/profile", "/checkout"];
 

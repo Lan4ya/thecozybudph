@@ -2,7 +2,7 @@ import { Plus, X } from "lucide-react";
 import { Input } from "@/lib/ui/__shadcn__/input";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { useFieldArray, useFormContext } from "react-hook-form";
-import type { ProductFormInput } from "@TheCozyBud/types";
+import type { ProductFormInput } from "@TheCozyBud/schemas";
 // import { useEffect } from "react";
 
 export const ProductOptions = ({}) => {

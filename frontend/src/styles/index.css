@@ -8,6 +8,10 @@
     @apply border-border outline-ring/50;
   }
 
+  html {
+    scrollbar-gutter: stable;
+  }
+
   body {
     font-family: "NeueHaasGrotesk", apple-system, system-ui, sans-serif;
   }

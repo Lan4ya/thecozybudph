@@ -1,14 +1,16 @@
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
-import { cartItems, carts } from "../../db/schema/carts.ts";
-import { products, productVariants } from "../../db/schema/products.ts";
 import { AppError } from "../../errors/Errors.ts";
 import {
   AddCartItemInput,
   CartItem,
+  cartItems,
+  carts,
   ProductOption,
+  products,
   ProductVariant,
+  productVariants,
   UpdateCartItemInput,
-} from "../../package-types/index.ts";
+} from "@shared/schemas/index.ts";
 import { DrizzleClient } from "../../db/client.ts";
 
 export const CartRepository = {

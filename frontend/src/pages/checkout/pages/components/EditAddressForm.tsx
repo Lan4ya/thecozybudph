@@ -4,7 +4,7 @@ import { Button } from "@/lib/ui/__shadcn__/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { updateAddressSchema, type Address } from "@TheCozyBud/types";
+import { updateAddressSchema, type Address } from "@TheCozyBud/schemas";
 import isDev from "@/lib/utils/isDev";
 
 type FormValues = z.infer<typeof updateAddressSchema>;

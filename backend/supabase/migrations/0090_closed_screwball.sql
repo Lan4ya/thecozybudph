@@ -1,0 +1,1 @@
+ALTER TABLE "orders" ALTER COLUMN "pass_on_fee" SET NOT NULL;

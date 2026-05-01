@@ -8,7 +8,6 @@ import OrderSummary from "./components/OrderSummary";
 
 const Checkout = () => {
   return (
-    // <div className="min-h-screen pb-28">
     <div className="pb-28">
       <div className="custom-container max-w-7xl mx-auto pt-6 space-y-6">
         <TopBar />

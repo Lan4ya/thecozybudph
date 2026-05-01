@@ -1,19 +1,13 @@
-import type { ProductWithRelations } from "@TheCozyBud/types";
-import {
-  createContext,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import type { ProductWithRelations } from "@TheCozyBud/schemas";
+import { createContext, useCallback, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
 
 type AdminProductsContextType = {
   isFormOpen: boolean;
   setFormOpen: (open: boolean) => void;
-  editingProduct: ProductWithRelations | null;
+  updatingProduct: ProductWithRelations | null;
   openCreateProductForm: () => void;
-  openEditProductForm: (product: ProductWithRelations) => void;
+  openUpdateProductForm: (product: ProductWithRelations) => void;
 
   deletingProductIds: Set<string>;
   isDeletingInProgress: boolean;
@@ -30,7 +24,7 @@ export const AdminProductsContext =
 
 const AdminProductsProvider = ({ children }: { children: React.ReactNode }) => {
   const [isFormOpen, setFormOpen] = useState(false);
-  const [editingProduct, setEditingProduct] =
+  const [updatingProduct, setUpdatingProduct] =
     useState<ProductWithRelations | null>(null);
   const [deletingProductIds, setDeletingProductIds] = useState<Set<string>>(
     new Set(),
@@ -61,12 +55,12 @@ const AdminProductsProvider = ({ children }: { children: React.ReactNode }) => {
 
   const openCreateProductForm = useCallback(() => {
     setFormOpen(true);
-    setEditingProduct(null);
+    setUpdatingProduct(null);
   }, []);
 
-  const openEditProductForm = useCallback((product: ProductWithRelations) => {
+  const openUpdateProductForm = useCallback((product: ProductWithRelations) => {
     setFormOpen(true);
-    setEditingProduct(product);
+    setUpdatingProduct(product);
   }, []);
 
   const resetDeletingProductIds = useCallback(
@@ -88,9 +82,9 @@ const AdminProductsProvider = ({ children }: { children: React.ReactNode }) => {
     () => ({
       isFormOpen,
       setFormOpen,
-      editingProduct,
+      updatingProduct,
       openCreateProductForm,
-      openEditProductForm,
+      openUpdateProductForm,
 
       deletingProductIds,
       isDeletingInProgress,
@@ -104,9 +98,9 @@ const AdminProductsProvider = ({ children }: { children: React.ReactNode }) => {
     [
       isFormOpen,
       setFormOpen,
-      editingProduct,
+      updatingProduct,
       openCreateProductForm,
-      openEditProductForm,
+      openUpdateProductForm,
       deletingProductIds,
       isDeletingInProgress,
       setDeletingInProgress,

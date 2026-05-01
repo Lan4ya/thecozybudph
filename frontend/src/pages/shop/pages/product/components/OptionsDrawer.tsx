@@ -11,7 +11,7 @@ import { Textarea } from "@/lib/ui/__shadcn__/textarea";
 import React, { useState, useEffect } from "react";
 import "swiper/swiper.css";
 import { useShallow } from "zustand/react/shallow";
-import type { Product } from "@TheCozyBud/types";
+import type { Product } from "@TheCozyBud/schemas";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 
 type Mode = "addToCart" | "buyNow";

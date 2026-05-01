@@ -14,9 +14,9 @@ import { useToast } from "@/providers/ToastProvider";
 import isDev from "@/lib/utils/isDev";
 import {
   confirmOrderSchema,
-  type ConfirmOrderInput,
+  type ConfirmOrderReq,
   type PayOrderRes,
-} from "@TheCozyBud/types";
+} from "@TheCozyBud/schemas";
 import { useCheckoutStore } from "@/pages/checkout/store/useCheckoutStore";
 import type { PaymentConfirmationLoaderData } from "./PaymentConfirmationLoader";
 import { useEffect } from "react";
@@ -53,7 +53,7 @@ const PaymentConfirmation = () => {
         idempotencyKey,
       }: {
         orderId: string;
-        payload: ConfirmOrderInput;
+        payload: ConfirmOrderReq;
         idempotencyKey: string;
       }): Promise<PayOrderRes> =>
         CheckoutAPI.payOrder(orderId, payload, idempotencyKey),
@@ -102,7 +102,7 @@ const PaymentConfirmation = () => {
       },
       type: pmType!,
       checkoutSessionId: sessionId,
-    } satisfies ConfirmOrderInput;
+    } satisfies ConfirmOrderReq;
 
     // validation
     const result = confirmOrderSchema.safeParse(payload);
@@ -159,13 +159,13 @@ const PaymentConfirmation = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="fixed bottom-0 left-0 w-full z-50"
+          className="fixed bottom-0 left-0 w-full z-50 md:static md:w-auto"
         >
-          <div className=" py-4 px-6 flex items-center justify-between max-w-7xl mx-auto">
+          <div className="py-4 px-6 md:px-0 flex items-center justify-between max-w-7xl mx-auto">
             <Button
               disabled={!isValid || confirmOrderPending}
               type="submit"
-              className="h-12 w-full rounded-xl md:w-44"
+              className="h-12 w-full rounded-xl md:w-36 md:ml-auto"
             >
               {confirmOrderPending && <Spinner />}
               <Wallet />

@@ -1,19 +1,21 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "noUncheckedIndexedAccess": true,
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "NodeNext",
-    "strict": true,
+    "rootDir": "functions",
+    "paths": {
+      "@shared/*": ["./_shared/*"]
+    },
     "lib": [
-      "deno.window",
-      "deno.ns"
+      // "deno.window",
+      // "deno.ns"
     ],
-    // "jsx": "react-jsx",
-    "skipLibCheck": true
+    "allowImportingTsExtensions": true,
+    "noEmit": true
   },
   "exclude": [
     "node_modules"
-  ]
+  ],
 }

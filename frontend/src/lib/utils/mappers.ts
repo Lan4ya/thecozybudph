@@ -1,11 +1,14 @@
 import type {
-  ProductRow,
-  ProductVariantRow,
+  Database,
   Product,
   ProductOption,
   ProductWithRelations,
-} from "@TheCozyBud/types";
+} from "@TheCozyBud/schemas";
 import { parseDateString } from "./format";
+
+type ProductRow = Database["public"]["Tables"]["products"]["Row"];
+type ProductVariantRow =
+  Database["public"]["Tables"]["product_variants"]["Row"];
 
 type ProductWithVariants = ProductRow & {
   product_variants: Omit<ProductVariantRow, "product_id">[];

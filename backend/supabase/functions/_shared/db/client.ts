@@ -4,12 +4,12 @@ import { AppError } from "../errors/Errors.ts";
 
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import * as schema from "./schema/mod.ts";
+import * as schema from "../schemas/drizzle/index.ts";
 
-const connString = Deno.env.get("DB_TX_POOLER_URL")!;
+// const connString = Deno.env.get("DB_TX_POOLER_URL")!;
 
 // Use this conn string instead if the pooler url doesnt work on your machine:
-// const connString = Deno.env.get("SUPABASE_DB_URL")!;
+const connString = Deno.env.get("SUPABASE_DB_URL")!;
 
 const adminPg = postgres(connString, {
   prepare: false, // prepared statements are not supported in serverless
@@ -26,22 +26,11 @@ export type DrizzleClient = {
   rls: AdminDb["transaction"];
 };
 
-const guardAdminDb = (isAdmin: boolean) => {
-  if (isAdmin) return adminDb;
-
-  return new Proxy(adminDb, {
-    get(_, prop) {
-      throw AppError.forbidden(
-        `Forbidden`,
-        [
-          `Contract violation: You attempted to use db.admin.${String(prop)} without admin privileges.`,
-          "Ensure you have admin status before calling this via 'adminMiddleware'.",
-          "If you don't need admin privileges, use 'db.rls' instead",
-        ].join(" "),
-      );
-    },
-  });
-};
+export type DrizzleClientTransactionRLS = Parameters<
+  DrizzleClient["rls"]
+>[0] extends (tx: infer T) => unknown
+  ? T
+  : never;
 
 // -------------------- WARN --------------------
 
@@ -111,3 +100,20 @@ export function createDrizzle(
     }) as typeof adminDb.transaction,
   };
 }
+
+const guardAdminDb = (isAdmin: boolean) => {
+  if (isAdmin) return adminDb;
+
+  return new Proxy(adminDb, {
+    get(_, prop) {
+      throw AppError.forbidden(
+        `Forbidden`,
+        [
+          `Contract violation: You attempted to use db.admin.${String(prop)} without admin privileges.`,
+          "Ensure you have admin status before calling this via 'adminMiddleware'.",
+          "If you don't need admin privileges, use 'db.rls' instead",
+        ].join(" "),
+      );
+    },
+  });
+};

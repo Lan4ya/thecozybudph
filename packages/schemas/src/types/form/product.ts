@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { createProductSchema, updateProductSchema } from "@TheCozyBud/schemas";
 import { coerceNumber } from "../utils.ts";
+import { createProductSchema, updateProductSchema } from "../../zod/index.ts";
 
 const createProductFormSchema = createProductSchema.extend({
   basePrice: coerceNumber(

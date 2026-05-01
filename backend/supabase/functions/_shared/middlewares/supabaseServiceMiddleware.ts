@@ -1,7 +1,7 @@
 import { createClient } from "supabase";
 import { env } from "hono/adapter";
 import type { Context, Next } from "hono";
-import type { Database } from "@shared/package-types/index.ts";
+import type { Database } from "@shared/schemas/index.ts";
 import { AppError } from "../errors/Errors.ts";
 import { AppEnv } from "../types.d.ts";
 

@@ -3,16 +3,17 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Package } from "lucide-react";
 import { ProductImage } from "@/components/products/ProductImage";
 import { capitalizeFirstLetter, formatPriceCents } from "@/lib/utils/format";
-// import type { OrderItem } from "@TheCozyBud/types";
+// import type { OrderItem } from "@TheCozyBud/schemas";
 import { useCheckoutStore, type OrderItemUI } from "../store/useCheckoutStore";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { useState } from "react";
 import { cn } from "@/lib/utils/cn";
+import { MetaBadge } from "@/components/MetaBadge";
 
 const OrderSummary = () => {
-  const orderItems = useCheckoutStore((s) => s.orderItems);
+  const orderItemsUI = useCheckoutStore((s) => s.orderItemsUI);
 
-  const subtotalCents = orderItems.reduce(
+  const subtotalCents = orderItemsUI.reduce(
     (sum, item) => sum + item.priceCents * item.quantity,
     0,
   );
@@ -33,14 +34,14 @@ const OrderSummary = () => {
       </div>
 
       {/* Items List */}
-      <OrderList orderItems={orderItems} />
+      <OrderList orderItems={orderItemsUI} />
 
       {/* Subtotal Footer */}
       <div className="p-4 border-t border-border/30 flex justify-between items-center">
         <div className="flex-center gap-2">
           <span className="text-sm text-muted-foreground">Subtotal</span>
           <span className="text-xs text-muted-foreground border px-2 py-0.5 rounded-full">
-            {orderItems.length} item(s)
+            {orderItemsUI.length} item(s)
           </span>
         </div>
         <span className="font-semibold text-sm text-foreground">
@@ -95,12 +96,7 @@ const OrderList = ({ orderItems }: { orderItems: OrderItemUI[] }) => {
                 {Object.keys(item.attributes).length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-1">
                     {Object.entries(item.attributes).map(([key, val]) => (
-                      <span
-                        key={key}
-                        className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full"
-                      >
-                        {key}: {val}
-                      </span>
+                      <MetaBadge key={key} label={key} value={val} />
                     ))}
                   </div>
                 )}

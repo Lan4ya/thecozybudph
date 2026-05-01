@@ -1,4 +1,4 @@
-import { PaymentMethodTypes } from "@shared/package-types/index.ts";
+import { PaymentMethodTypes } from "@shared/schemas/index.ts";
 
 // Transaction fees: https://developers.paymongo.com/docs/dashboard-navigation-billing
 const BRANKAS_FIXED_CENTS_FEE = 1500; // 15php

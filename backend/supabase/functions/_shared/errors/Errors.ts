@@ -19,12 +19,12 @@ export class AppError extends Error {
     return new AppError(401, message, cause);
   }
 
-  static notFound(message: string = "Resource not found") {
-    return new AppError(404, message);
+  static notFound(message: string = "Resource not found", cause?: unknown) {
+    return new AppError(404, message, cause);
   }
 
-  static conflict(message: string = "Conflict") {
-    return new AppError(409, message);
+  static conflict(message: string = "Conflict", cause?: unknown) {
+    return new AppError(409, message, cause);
   }
 
   static internal(message: string = "Internal server error", cause?: unknown) {

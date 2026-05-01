@@ -1,35 +1,47 @@
 import { cn } from "@/lib/utils/cn";
+import {
+
+
+
+  
+  Flower,
+  Leaf,
+  Heart,
+  Truck,
+  Sparkles,
+  Gift,
+} from "lucide-react";
 
 const services = [
   {
     title: "Flower Bouquets",
     description: "Handcrafted arrangements for any occasion",
-    icon: "💐",
+    icon: Flower,
   },
   {
     title: "Event Decorations",
     description: "Stunning floral designs for your special events",
-    icon: "🌸",
+    icon: Leaf,
   },
   {
     title: "Wedding Arrangements",
     description: "Make your big day unforgettable with our blooms",
-    icon: "💒",
+    icon: Heart,
   },
   {
     title: "Same-Day Delivery",
     description: "Fresh flowers delivered right to your door",
-    icon: "🚚",
+    icon: Truck,
   },
   {
     title: "Custom Designs",
     description: "Personalized arrangements tailored to your vision",
-    icon: "✨",
+    icon: Sparkles,
   },
   {
     title: "Gift Wrapping",
     description: "Beautiful packaging for your floral gifts",
-    icon: "🎁",
+    icon: Gift,
   },
 ];
 
@@ -79,7 +91,9 @@ const ServicesSection = ({
               )}
               style={{ transitionDelay: `${index * 100}ms` }}
             >
-              <div className="text-4xl mb-4">{service.icon}</div>
+              <div className="mb-4">
+                <service.icon size={40} className="text-primary" />
+              </div>
               <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
               <p className="text-muted-foreground">{service.description}</p>
             </div>

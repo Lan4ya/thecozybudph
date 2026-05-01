@@ -1,10 +1,11 @@
 import { cn } from "@/lib/utils/cn";
+import { Flower, Sparkles, Truck, Heart } from "lucide-react";
 
 const whyChooseUs = [
-  { text: "Fresh flowers sourced daily", icon: "🌸" },
-  { text: "Creative and unique arrangements", icon: "💐" },
-  { text: "Fast and reliable delivery", icon: "🚚" },
-  { text: "Customer satisfaction guaranteed", icon: "❤️" },
+  { text: "Fresh flowers sourced daily", icon: Flower },
+  { text: "Creative and unique arrangements", icon: Sparkles },
+  { text: "Fast and reliable delivery", icon: Truck },
+  { text: "Customer satisfaction guaranteed", icon: Heart },
 ];
 
 interface WhyChooseUsSectionProps {
@@ -53,7 +54,7 @@ const WhyChooseUsSection = ({
               )}
               style={{ transitionDelay: `${index * 100}ms` }}
             >
-              <div className="text-3xl">{item.icon}</div>
+              <item.icon size={32} className="text-primary flex-shrink-0" />
               <p className="text-lg font-medium">{item.text}</p>
             </div>
           ))}

@@ -1,5 +1,5 @@
 import { useLocation } from "react-router";
-import { type Address } from "@TheCozyBud/types";
+import { type Address } from "@TheCozyBud/schemas";
 import { useState } from "react";
 import CreateAddressForm from "./components/CreateAddressForm";
 import EditAddressForm from "./components/EditAddressForm";

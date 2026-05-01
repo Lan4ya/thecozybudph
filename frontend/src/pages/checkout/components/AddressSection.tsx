@@ -8,7 +8,7 @@ import { useEffect } from "react";
 import ErrorDialogue from "@/components/ErrorDialogue";
 
 const AddressSection = () => {
-  const address = useCheckoutStore((s) => s.address);
+  const addressStore = useCheckoutStore((s) => s.address);
   const setAddress = useCheckoutStore((s) => s.setAddress);
   const { sessionId } = useParams();
 
@@ -16,11 +16,11 @@ const AddressSection = () => {
     data: defaultAddress,
     error,
     isFetching,
-    // Only fetch if there's no address in the store (i.e. user hasn't selected an address yet)
-  } = useDefaultAddressQuery({ enabled: !address });
+    // Only fetch if there's no address in the store (i.e. on first load when user haven't selected an address yet)
+  } = useDefaultAddressQuery({ enabled: !addressStore });
 
   useEffect(() => {
-    if (!address && defaultAddress) setAddress(defaultAddress);
+    if (!addressStore && defaultAddress) setAddress(defaultAddress);
   }, [defaultAddress]);
 
   if (isFetching) {
@@ -65,7 +65,7 @@ const AddressSection = () => {
           <MapPin className="size-5 text-primary" />
           <h2 className="font-semibold text-foreground">Delivery Address</h2>
         </div>
-        {address && (
+        {addressStore && (
           <NavLink
             className="flex-center text-primary hover:text-primary/90"
             to={`/checkout/${sessionId}/address-selection`}
@@ -76,25 +76,29 @@ const AddressSection = () => {
         )}
       </div>
 
-      {!address ? (
+      {!addressStore ? (
         <div className="text-sm text-muted-foreground">
-          No address yet.{" "}
+          No address yet. Please{" "}
           <NavLink
             className="text-link"
             to={`/checkout/${sessionId}/address-selection`}
             state={"selecting"}
           >
-            Create one
+            create one
           </NavLink>
         </div>
       ) : (
         <div className="space-y-1 text-sm">
-          <p className="font-medium text-foreground">{address.fullName}</p>
-          <p className="text-muted-foreground">{address.phoneNumber}</p>
-          <p className="text-muted-foreground">{address.addressLine}</p>
+          <p className="font-medium text-foreground">{addressStore.fullName}</p>
+          <p className="text-muted-foreground">{addressStore.phoneNumber}</p>
           <p className="text-muted-foreground">
-            {address.barangay}, {address.city}, {address.province}{" "}
-            {address.postalCode}
+            {addressStore.addressLine},{" "}
+            {addressStore.barangay.toLowerCase().startsWith("baran")
+              ? ""
+              : "Barangay"}{" "}
+            {addressStore.barangay}, {addressStore.city},{" "}
+            {addressStore.province}, {addressStore.region},{" "}
+            {addressStore.postalCode}
           </p>
         </div>
       )}

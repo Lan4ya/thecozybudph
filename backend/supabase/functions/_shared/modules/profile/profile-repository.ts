@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { DrizzleClient } from "../../db/client.ts";
-import { profiles } from "../../db/schema/mod.ts";
+import { profiles, UpdateProfileDBInput } from "@shared/schemas/index.ts";
 
 export const ProfileRepository = {
   updateProfile: (

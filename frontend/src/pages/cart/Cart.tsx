@@ -85,9 +85,10 @@ const Cart = () => {
 
     const sessionId = crypto.randomUUID();
 
-    useCheckoutStore.getState().setSessionId(sessionId);
-    useCheckoutStore.getState().setSource("shop");
-    useCheckoutStore.getState().setOrderItems(orderItems);
+    useCheckoutStore.getState().reset();
+    useCheckoutStore.getState().setCheckoutIds({ session: sessionId });
+    useCheckoutStore.getState().setSource("cart");
+    useCheckoutStore.getState().setOrderItemsUI(orderItems);
     navigate(`/checkout/${sessionId}`);
   };
 

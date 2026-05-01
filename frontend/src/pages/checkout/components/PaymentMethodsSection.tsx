@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { CreditCard, ChevronRight } from "lucide-react";
-import { Button } from "@/lib/ui/__shadcn__/button";
+import { CreditCard } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { useCheckoutStore } from "../store/useCheckoutStore";
-import { useAuthStore } from "@/store/useAuthStore";
-import type { PaymentMethodTypes } from "@TheCozyBud/types";
+import type { PaymentMethodTypes } from "@TheCozyBud/schemas";
 
 type PaymentMethod = {
   type: PaymentMethodTypes;

@@ -13,7 +13,7 @@ import { sql } from "drizzle-orm";
 import { orders } from "./orders.ts";
 import { authenticatedRole } from "drizzle-orm/supabase/rls";
 import { profiles } from "./profiles.ts";
-import type { PaymentStatus } from "../core-types.ts";
+import type { PaymentStatus } from "../types/index.ts";
 
 export const payments = pgTable(
   "payments",
@@ -71,11 +71,17 @@ export const payments = pgTable(
       withCheck: sql`auth.uid() = profile_id`,
     }),
 
-    pgPolicy("authenticated can insert own payment", {
+    pgPolicy("authenticated can initiate payments for active orders", {
       as: "permissive",
       to: authenticatedRole,
       for: "insert",
-      withCheck: sql`auth.uid() = profile_id`,
+      withCheck: sql`
+    auth.uid() = profile_id AND 
+    EXISTS (
+      SELECT 1 FROM orders 
+      WHERE orders.id = order_id 
+      AND orders.expires_at > now()
+    )`,
     }),
   ],
 );

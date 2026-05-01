@@ -1,5 +1,5 @@
 import z from "zod";
-import { coerceNumber } from "./utils.ts";
+import { coerceNumber } from "../types/utils.ts";
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 const MAX_IMAGES = 3;

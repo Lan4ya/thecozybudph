@@ -1,19 +1,17 @@
 import type {
   ProductWithRelations,
   ProductVariant,
-} from "@shared/package-types/index.ts";
+} from "@shared/schemas/index.ts";
+import { eq, inArray } from "drizzle-orm";
+import { DrizzleClient } from "../../db/client.ts";
 import {
   products,
   productCategories,
   productCollections,
   productVariants,
-} from "../../db/schema/products.ts";
-import { eq, inArray } from "drizzle-orm";
-import { DrizzleClient } from "../../db/client.ts";
-import {
   InsertProductWithRelations,
   UpdateProductWithRelations,
-} from "../../db/types/products.ts";
+} from "@shared/schemas/index.ts";
 
 export const ProductRepository = {
   insertProductWithRelations: async (

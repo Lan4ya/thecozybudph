@@ -1,6 +1,6 @@
 import { JwtPayload, SupabaseClient } from "supabase";
 import { DrizzleClient } from "./db/client.ts";
-import { Database } from "./package-types/supabase.types.ts";
+import { Database } from "@shared/schemas/index.ts";
 
 export type SupabaseType = SupabaseClient<Database>;
 

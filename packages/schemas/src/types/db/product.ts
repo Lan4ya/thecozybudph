@@ -1,32 +1,25 @@
-import type { Tables } from "./supabase.types.ts";
+import { InferInsertModel, InferSelectModel } from "drizzle-orm";
+import {
+  productCategories,
+  productCollections,
+  products,
+  productVariants,
+} from "../../drizzle/index.ts";
 
-export type ProductRow = Tables<"products">;
-export type ProductVariantRow = Tables<"product_variants">;
-export type ProductCollectionRow = Tables<"product_collections">;
-export type ProductCategoyRow = Tables<"product_categories">;
+export type SelectProduct = InferSelectModel<typeof products>;
+export type SelectProductVariant = InferSelectModel<typeof productVariants>;
+export type InsertProduct = InferInsertModel<typeof products>;
+export type InsertProductVariant = InferInsertModel<typeof productVariants>;
+export type UpdateProduct = Partial<InsertProduct>;
+export type InsertProductCollection = InferInsertModel<
+  typeof productCollections
+>;
+export type InsertProductCategory = InferInsertModel<typeof productCategories>;
 
-// export type CreateProductDBInput = {
-//   name: string;
-//   description: string | null;
-//   imageUrls: string[];
-//   primaryImageUrl: string;
-//   collectionName: string | null;
-//   categoryName: string | null;
-//   minPriceCents: number;
-//   maxPriceCents: number;
-//   options: ProductOption[];
-//   variants: Omit<ProductVariant, "id">[];
-// };
-//
-// export type UpdateProductDBInput = {
-//   name?: string;
-//   description?: string | null;
-//   imageUrls?: string[];
-//   primaryImageUrl?: string;
-//   collectionName?: string | null;
-//   categoryName?: string | null;
-//   minPriceCents?: number;
-//   maxPriceCents?: number;
-//   options?: ProductOption[];
-//   variants?: ProductVariant[];
-// };
+export type InsertProductWithRelations = InsertProduct & {
+  variants: Omit<InsertProductVariant, "productId">[];
+  collectionName?: InsertProductCategory["name"] | null;
+  categoryName: InsertProductCategory["name"];
+};
+
+export type UpdateProductWithRelations = Partial<InsertProductWithRelations>;

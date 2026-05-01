@@ -16,8 +16,8 @@ import {
 import { Link, useNavigate } from "react-router";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import googleIcon from "@/assets/icons/google.svg";
-import { useIsLargeScreen } from "@/hooks/useMediaQuery";
-import { signUpSchema, type SignUp } from "@TheCozyBud/types/src/schema/auth";
+import { useIsLgScreenMin } from "@/hooks/useMediaQuery";
+import { signUpFormSchema, type SignUp } from "@TheCozyBud/schemas";
 import { Input } from "@/lib/ui/__shadcn__/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { handleError } from "@/lib/utils/format";
@@ -29,7 +29,7 @@ const Signup = () => {
 
   const navigate = useNavigate();
 
-  const isLgScreen = useIsLargeScreen();
+  const isLgScreen = useIsLgScreenMin();
 
   const {
     register,
@@ -40,7 +40,7 @@ const Signup = () => {
     clearErrors,
     setError,
   } = useForm<SignUp>({
-    resolver: zodResolver(signUpSchema),
+    resolver: zodResolver(signUpFormSchema),
   });
   const [email, password] = watch(["email", "password"]);
 

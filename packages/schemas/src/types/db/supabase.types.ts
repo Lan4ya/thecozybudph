@@ -45,7 +45,7 @@ export type Database = {
           phone_number: string
           postal_code: string
           profile_id: string | null
-          province: string
+          province: string | null
           region: string
         }
         Insert: {
@@ -58,7 +58,7 @@ export type Database = {
           phone_number: string
           postal_code: string
           profile_id?: string | null
-          province: string
+          province?: string | null
           region: string
         }
         Update: {
@@ -71,7 +71,7 @@ export type Database = {
           phone_number?: string
           postal_code?: string
           profile_id?: string | null
-          province?: string
+          province?: string | null
           region?: string
         }
         Relationships: [
@@ -172,7 +172,7 @@ export type Database = {
           order_id: string
           phone_number: string
           postal_code: string
-          province: string
+          province: string | null
           region: string
         }
         Insert: {
@@ -184,7 +184,7 @@ export type Database = {
           order_id: string
           phone_number: string
           postal_code: string
-          province: string
+          province?: string | null
           region: string
         }
         Update: {
@@ -196,7 +196,7 @@ export type Database = {
           order_id?: string
           phone_number?: string
           postal_code?: string
-          province?: string
+          province?: string | null
           region?: string
         }
         Relationships: [
@@ -280,7 +280,9 @@ export type Database = {
         Row: {
           created_at: string | null
           discount_cents: number
+          expires_at: string
           id: string
+          pass_on_fee: number
           profile_id: string
           shipping_cents: number
           source: string
@@ -292,7 +294,9 @@ export type Database = {
         Insert: {
           created_at?: string | null
           discount_cents?: number
+          expires_at: string
           id?: string
+          pass_on_fee: number
           profile_id: string
           shipping_cents: number
           source: string
@@ -304,7 +308,9 @@ export type Database = {
         Update: {
           created_at?: string | null
           discount_cents?: number
+          expires_at?: string
           id?: string
+          pass_on_fee?: number
           profile_id?: string
           shipping_cents?: number
           source?: string
@@ -325,41 +331,47 @@ export type Database = {
       }
       payments: {
         Row: {
-          amount_cents: number
+          amount_cents: number | null
           created_at: string | null
           currency: string
           id: string
+          is_active: boolean
           method: string | null
           order_id: string
           paid_at: string | null
           payment_id: string | null
-          payment_intent_id: string
+          payment_intent_id: string | null
+          profile_id: string
           status: string
           updated_at: string | null
         }
         Insert: {
-          amount_cents: number
+          amount_cents?: number | null
           created_at?: string | null
           currency?: string
           id?: string
+          is_active?: boolean
           method?: string | null
           order_id: string
           paid_at?: string | null
           payment_id?: string | null
-          payment_intent_id: string
-          status: string
+          payment_intent_id?: string | null
+          profile_id: string
+          status?: string
           updated_at?: string | null
         }
         Update: {
-          amount_cents?: number
+          amount_cents?: number | null
           created_at?: string | null
           currency?: string
           id?: string
+          is_active?: boolean
           method?: string | null
           order_id?: string
           paid_at?: string | null
           payment_id?: string | null
-          payment_intent_id?: string
+          payment_intent_id?: string | null
+          profile_id?: string
           status?: string
           updated_at?: string | null
         }
@@ -369,6 +381,13 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_profile_id_profiles_id_fk"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

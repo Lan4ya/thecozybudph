@@ -3,10 +3,10 @@ import { motion } from "framer-motion";
 import { EventInquiryForm } from "@/pages/events/components";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Phone, CheckCircle } from "lucide-react";
-import type { EventInquiryInput } from "@TheCozyBud/types";
+import type { EventInquiryFormInput } from "@TheCozyBud/schemas";
 
 interface EventInquirySectionProps {
-  onSubmit: (data: EventInquiryInput) => Promise<void>;
+  onSubmit: (data: EventInquiryFormInput) => Promise<void>;
   isSubmitting: boolean;
 }
 
@@ -41,11 +41,7 @@ const ContactInfo = () => (
   </div>
 );
 
-const InquirySuccessState = ({
-  onReset,
-}: {
-  onReset: () => void;
-}) => (
+const InquirySuccessState = ({ onReset }: { onReset: () => void }) => (
   <div className="text-center py-12">
     <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
       <CheckCircle className="w-8 h-8 text-green-600" />
@@ -76,7 +72,7 @@ export const EventInquirySection = ({
 }: EventInquirySectionProps) => {
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleSubmit = async (data: EventInquiryInput) => {
+  const handleSubmit = async (data: EventInquiryFormInput) => {
     await onSubmit(data);
     setIsSubmitted(true);
   };

@@ -1,5 +1,5 @@
 import z from "zod";
-import { phMobileSchema } from "@TheCozyBud/schemas";
+import { phMobileSchema } from "../../zod/index.ts";
 
 export const createAddressFormSchema = z.object({
   fullName: z.string().trim().min(1, "full name can't be empty"),

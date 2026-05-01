@@ -14,8 +14,8 @@ import { Input } from "@/lib/ui/__shadcn__/input";
 import { Link, useNavigate } from "react-router";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import googleIcon from "@/assets/icons/google.svg";
-import { useIsLargeScreen } from "@/hooks/useMediaQuery";
-import { logInSchema, type LogIn } from "@TheCozyBud/types";
+import { useIsLgScreenMin } from "@/hooks/useMediaQuery";
+import { logInFormSchema, type LogIn } from "@TheCozyBud/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import isDev from "@/lib/utils/isDev";
@@ -36,7 +36,7 @@ const Login = () => {
     clearErrors,
     setError,
   } = useForm<LogIn>({
-    resolver: zodResolver(logInSchema),
+    resolver: zodResolver(logInFormSchema),
     defaultValues: {
       email: "admin@gmail.com",
       password: "admin123",
@@ -50,7 +50,7 @@ const Login = () => {
   const passErr = errors.password;
   const rootErr = errors.root;
 
-  const isLgScreen = useIsLargeScreen();
+  const isLgScreen = useIsLgScreenMin();
 
   const handleSignInWithOAuth = async () => {
     clearErrors();
@@ -61,7 +61,7 @@ const Login = () => {
         options: {
           redirectTo: isDev
             ? "http://localhost:5173/"
-            : "https://thecozybud.vercel.app/", // NOTE: idk yet if im deploy to vercel or cloudflare
+            : "https://thecozybud.vercel.app/", // NOTE: idk yet if im gon deploy to vercel or cloudflare
         },
       });
       if (error) throw error;

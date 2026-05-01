@@ -2,12 +2,12 @@ import { AppError } from "@shared/errors/Errors.ts";
 import { SupabaseType } from "@shared/types.d.ts";
 import {
   CreateProductInput,
+  InsertProductWithRelations,
   ProductWithRelations,
-} from "@shared/package-types/index.ts";
+} from "@shared/schemas/index.ts";
 import { ProductRepository } from "../product-repository.ts";
 import { ProductStorage } from "../product-storage.ts";
 import { DrizzleClient } from "../../../db/client.ts";
-import { InsertProductWithRelations } from "../../../db/types/products.ts";
 
 export const createProduct = async (
   db: DrizzleClient,

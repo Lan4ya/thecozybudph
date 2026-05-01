@@ -8,7 +8,6 @@
       "DOM",
       "DOM.Iterable"
     ],
-    "baseUrl": ".",
     "paths": {
       "@/*": [
         "./src/*"
@@ -35,8 +34,7 @@
     "noUncheckedSideEffectImports": true
   },
   "include": [
-    "src",
-    "../packages/schema"
+    "src"
     // "../global.d.ts"
   ]
 }

@@ -1,13 +1,19 @@
 import { motion } from "framer-motion";
-import { Truck } from "lucide-react";
+import { RotateCw, Truck } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { capitalizeFirstLetter } from "@/lib/utils/format";
 import { useQuery } from "@tanstack/react-query";
-import { LalamoveAPI } from "@/api/lalamove";
 import { useCheckoutStore } from "../store/useCheckoutStore";
 import { CheckoutShippingOptionSkeleton } from "@/lib/ui/skeletons/CheckoutShippingOption";
-import ErrorDialogue from "@/components/ErrorDialogue";
 import { useEffect } from "react";
+import { CheckoutAPI } from "@/api";
+import type { CreateQuotationsRes } from "@TheCozyBud/schemas";
+import { Button } from "@/lib/ui/__shadcn__/button";
+
+export const createShippingQuoteQK = (addressId?: string) => [
+  "shipping-quote",
+  addressId,
+];
 
 const ShippingSection = () => {
   const addressStore = useCheckoutStore((s) => s.address);
@@ -18,18 +24,22 @@ const ShippingSection = () => {
     data: quotations,
     error,
     isFetching,
+    refetch,
   } = useQuery({
-    queryKey: ["lalamove-quote", addressStore?.id] as const,
-    queryFn: () => {
+    queryKey: createShippingQuoteQK(addressStore?.id),
+    queryFn: (): Promise<CreateQuotationsRes> => {
       if (!addressStore) throw new Error("Missing address");
 
-      return LalamoveAPI.createQuotes({
+      return CheckoutAPI.createShippingQuotes({
         address: {
           addressLine: addressStore.addressLine,
           postalCode: addressStore.postalCode,
           region: addressStore.region,
           city: addressStore.city,
-          barangay: addressStore.barangay,
+          province: addressStore.province ?? undefined,
+          barangay: addressStore.barangay.toLowerCase().startsWith("barangay")
+            ? addressStore.barangay
+            : `Barangray ${addressStore.barangay}`,
         },
       });
     },
@@ -40,26 +50,24 @@ const ShippingSection = () => {
   useEffect(() => {
     if (!quotations || quotations.length === 0) return;
 
-    if (!shipping) {
-      const first = quotations[0];
+    // if (!shipping) {
+    const first = quotations[0];
 
-      setShipping({
-        fee: Number(first.priceBreakdown.total),
-        serviceType: first.serviceType,
-      });
-    }
-  }, [quotations, shipping, setShipping]);
+    setShipping({
+      fee: Number(first.priceBreakdown.total),
+      serviceType: first.serviceType,
+      quotationId: first.id,
+    });
+    // }
+  }, [quotations, setShipping]);
 
-  const handleSelect = (serviceType: string, shippingPrice: number) => {
-    setShipping({ fee: shippingPrice, serviceType });
+  const handleSelect = (
+    serviceType: string,
+    shippingPrice: number,
+    quotationId: string,
+  ) => {
+    setShipping({ quotationId, fee: shippingPrice, serviceType });
   };
-
-  if (error)
-    return (
-      <ErrorDialogue
-        msg={"Failed getting shipping options. please try again."}
-      />
-    );
 
   return (
     <motion.div
@@ -76,9 +84,18 @@ const ShippingSection = () => {
       </div>
 
       <div className="space-y-3">
-        {isFetching ? (
-          <CheckoutShippingOptionSkeleton />
-        ) : (
+        {!isFetching && error && (
+          <div className="text-destructive flex justify-baseline items-baseline gap-3 text-sm">
+            Failed loading shipping options. Please try again.
+            <Button size="icon-sm" onClick={() => refetch()}>
+              <RotateCw onClick={() => refetch()} />
+            </Button>
+          </div>
+        )}
+
+        {isFetching && <CheckoutShippingOptionSkeleton />}
+
+        {!isFetching &&
           quotations &&
           quotations.map((quote) => {
             return (
@@ -94,13 +111,14 @@ const ShippingSection = () => {
                 <div className="flex items-start gap-3">
                   <input
                     type="radio"
-                    name="shipping"
+                    name="shippingOption"
                     value={quote.serviceType}
                     checked={shipping?.serviceType === quote.serviceType}
                     onChange={() =>
                       handleSelect(
                         quote.serviceType,
                         Number(quote.priceBreakdown.total),
+                        quote.id,
                       )
                     }
                     className="mt-1 text-primary focus:ring-primary"
@@ -122,8 +140,7 @@ const ShippingSection = () => {
                 </p>
               </label>
             );
-          })
-        )}
+          })}
       </div>
     </motion.div>
   );

@@ -3,6 +3,9 @@ packages:
   - backend
   - packages/*
 
+ignoredBuiltDependencies:
+  - supabase
+
 onlyBuiltDependencies:
   - '@prisma/engines'
   - '@snaplet/seed'

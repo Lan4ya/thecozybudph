@@ -5,16 +5,15 @@ import {
   productCollections,
   products,
   productVariants,
-} from "../../db/schema/products.ts";
-import { and, eq, inArray } from "drizzle-orm";
-import { InsertPendingOrder, OrderStatusDB } from "../../db/types/orders.ts";
-import {
   orderAddressesSnapshot,
   orderItemsSnapshots,
   orders,
-} from "../../db/schema/orders.ts";
+  InsertPendingOrder,
+  DBOrderStatus,
+  cartItems,
+} from "@shared/schemas/index.ts";
+import { and, eq, inArray } from "drizzle-orm";
 import { CartRepository } from "../cart/cart-repository.ts";
-import { cartItems } from "../../db/schema/carts.ts";
 
 export const OrderRepository = {
   insertPendingOrder: (db: DrizzleClient, inserts: InsertPendingOrder) => {
@@ -74,7 +73,7 @@ export const OrderRepository = {
   updateStatus: async (
     s: SupabaseType,
     orderId: string,
-    status: OrderStatusDB,
+    status: DBOrderStatus,
   ) => {
     const { data, error } = await s
       .from("orders")
@@ -110,7 +109,7 @@ export const OrderRepository = {
     db: DrizzleClient,
     profileId: string,
     params: {
-      status: OrderStatusDB;
+      status: DBOrderStatus;
       limit: number;
       offset: number;
     },

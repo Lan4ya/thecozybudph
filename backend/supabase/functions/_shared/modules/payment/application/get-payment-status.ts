@@ -1,7 +1,7 @@
 import { DrizzleClient } from "../../../db/client.ts";
 import { AppError } from "../../../errors/Errors.ts";
 import { PaymentRepository } from "../payment-repository.ts";
-import { GetPaymentStatusRes } from "@shared/package-types/index.ts";
+import { GetPaymentStatusRes } from "@shared/schemas/index.ts";
 
 export const getPaymentStatus = async (
   db: DrizzleClient,

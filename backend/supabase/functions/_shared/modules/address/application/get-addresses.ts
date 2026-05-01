@@ -1,5 +1,5 @@
 import { DrizzleClient } from "../../../db/client.ts";
-import { Address } from "@shared/package-types/index.ts";
+import { Address } from "@shared/schemas/index.ts";
 import { AddressRepository } from "../address-repository.ts";
 
 export const getAddresses = async (

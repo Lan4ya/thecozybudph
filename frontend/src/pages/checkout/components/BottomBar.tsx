@@ -3,14 +3,94 @@ import { Button } from "@/lib/ui/__shadcn__/button";
 import { formatPriceCents } from "@/lib/utils/format";
 import { useNavigate } from "react-router";
 import { useCheckoutStore } from "../store/useCheckoutStore";
+import { useIsFetching, useMutation } from "@tanstack/react-query";
+import { CheckoutAPI } from "@/api";
+import {
+  createOrderSchema,
+  type CreateOrderReq,
+  type CreateOrderRes,
+} from "@TheCozyBud/schemas";
+import { useToast } from "@/providers/ToastProvider";
+import { Spinner } from "@/lib/ui/__shadcn__/spinner";
+import { useShallow } from "zustand/react/shallow";
+import isDev from "@/lib/utils/isDev";
+import { z } from "zod";
+import { createShippingQuoteQK } from "./ShippingSection";
 
 const BottomBar = () => {
   const navigate = useNavigate();
-  const total = useCheckoutStore((s) => s.payment)?.total;
-  const sessionId = useCheckoutStore((s) => s.sessionId);
+  const {
+    shippingQuoteId,
+    total,
+    checkoutIds,
+    setCheckoutIds,
+    source,
+    address,
+    orderItemsUI,
+    paymentMethodType,
+  } = useCheckoutStore(
+    useShallow((s) => ({
+      total: s.payment?.total,
+      checkoutIds: s.checkoutIds,
+      setCheckoutIds: s.setCheckoutIds,
+      source: s.source,
+      address: s.address,
+      orderItemsUI: s.orderItemsUI,
+      shippingQuoteId: s.shipping?.quotationId,
+      paymentMethodType: s.payment?.type,
+      setPayment: s.setPayment,
+    })),
+  );
 
-  const handlePlaceOrder = () => {
-    navigate(`/checkout/${sessionId}/payment-confirmation`);
+  const { addToast } = useToast();
+
+  const isFetchingShippingQuote =
+    useIsFetching({
+      queryKey: createShippingQuoteQK(address?.id),
+    }) > 0;
+
+  const { mutate: createOrderMutation, isPending: pendingCreateOrder } =
+    useMutation({
+      mutationFn: (payload: CreateOrderReq): Promise<CreateOrderRes> =>
+        CheckoutAPI.createOrder(payload),
+      onError: () => {
+        addToast("Something wen't wrong. please try again", "error");
+      },
+      onSuccess: (data) => {
+        setCheckoutIds({ order: data.orderId, payment: data.paymentId });
+        useCheckoutStore.getState().setPayment({ status: "verification" });
+        navigate(`/checkout/${checkoutIds?.session}/order/${data.orderId}/pay`);
+      },
+    });
+
+  const orderItems = orderItemsUI.map((o) => ({
+    productId: o.productId,
+    variantId: o.variantId,
+    quantity: o.quantity,
+    cardMessages: o.cardMessages,
+  }));
+
+  const handlePreOrder = () => {
+    const payload = {
+      source,
+      items: orderItems,
+      addressId: address?.id,
+      shippingQuoteId,
+      paymentMethodType,
+    };
+
+    // validation
+    const result = createOrderSchema.safeParse(payload);
+
+    if (!result.success) {
+      addToast("Something wen't wrong. please try again", "error");
+      if (isDev) {
+        console.error(z.flattenError(result.error).fieldErrors);
+      }
+      return;
+    }
+
+    createOrderMutation(result.data);
   };
 
   return (
@@ -27,8 +107,17 @@ const BottomBar = () => {
             {total && formatPriceCents(total)}
           </span>
         </div>
-        <Button onClick={handlePlaceOrder} className="px-8 font-semibold">
-          Pre-Order
+        <Button
+          disabled={
+            !address?.id ||
+            pendingCreateOrder ||
+            !shippingQuoteId ||
+            isFetchingShippingQuote
+          }
+          onClick={handlePreOrder}
+          className="px-8 font-semibold"
+        >
+          {pendingCreateOrder && <Spinner />} Pre-order
         </Button>
       </div>
     </motion.div>
