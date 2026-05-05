@@ -1,8 +1,14 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type KeyboardEvent,
+} from "react";
 
 // import { useToast } from "@/providers/ToastProvider";
 import { motion } from "framer-motion";
-import { useForm, FormProvider } from "react-hook-form";
+import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type ProductFormInput, productFormSchema } from "@TheCozyBud/schemas";
 import {
@@ -13,7 +19,7 @@ import {
 } from "@/lib/ui/__shadcn__/card";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
-import { X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import {
   buildUpdateProductFormData,
   buildCreateProductFormData,
@@ -31,9 +37,7 @@ import { formatFileSize } from "@/lib/utils/format";
 import { ProductOptions } from "./ProductOptions";
 import ProductVariants from "./ProductVariants";
 import { useProductsPageState } from "../../hooks/useProductsPageState";
-import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
-
-// BUG: form third step inputs backspace not working
+import isDev from "@/lib/utils/isDev";
 
 const MAX_IMAGES = 3;
 
@@ -56,13 +60,18 @@ export default function ProductForm() {
 
   const form = useForm<
     z.input<typeof productFormSchema>,
-    any,
+    unknown,
     z.output<typeof productFormSchema>
   >({
     resolver: zodResolver(productFormSchema),
     defaultValues: updatingProduct
       ? { ...getUpdateFormDefaultValues(updatingProduct) }
       : { ...getCreateFormDefaultValues() },
+  });
+
+  const optionsFieldArray = useFieldArray({
+    control: form.control,
+    name: "options",
   });
 
   const hasChanges = formHasChanges(
@@ -86,12 +95,16 @@ export default function ProductForm() {
         MAX_IMAGES={MAX_IMAGES}
       />
     ),
-    () => <ProductOptions />,
+    () => (
+      <ProductOptions
+        fields={optionsFieldArray.fields}
+        remove={optionsFieldArray.remove}
+      />
+    ),
     () => <ProductVariants updatingProduct={updatingProduct} />,
   ];
 
   const [currentFormStep, setCurrentFormStep] = useState(0);
-
   const isLastFormStep = currentFormStep === formSteps.length - 1;
 
   const FormStep = formSteps[currentFormStep];
@@ -119,8 +132,8 @@ export default function ProductForm() {
           return;
         }
 
-        // Even though "newProductImages" is optional for update,
-        // we still require at least one retained image after edits.
+        // Even though "newProductImages" is optional (as type) for update,
+        // we still require at least one retained image after edit.
         if (!!updatingProduct && displayImages.length === 0) {
           form.setError("newProductImages", {
             type: "manual",
@@ -136,6 +149,7 @@ export default function ProductForm() {
           console.log("Step 2 error:", form.formState.errors.options);
           return;
         }
+
         break;
       }
       case 2: {
@@ -155,6 +169,20 @@ export default function ProductForm() {
 
   const prevStep = () => {
     if (currentFormStep > 0) setCurrentFormStep((s) => s - 1);
+  };
+
+  const handleEnterToNextStep = (e: KeyboardEvent<HTMLFormElement>) => {
+    if (isLastFormStep || e.key !== "Enter" || e.shiftKey) return;
+    if (e.nativeEvent.isComposing) return;
+    // if (currentFormStep === 1) return;
+
+    const target = e.target as HTMLElement;
+    if (target instanceof HTMLTextAreaElement) return;
+    if (target instanceof HTMLButtonElement) return;
+    if (!updatingProduct && !hasChanges) return;
+
+    e.preventDefault();
+    void nextStep();
   };
 
   // Derive image display: existing minus deletions plus selected blob urls
@@ -354,7 +382,6 @@ export default function ProductForm() {
   );
 
   const onSubmit = async (fieldData: ProductFormInput) => {
-    console.log("submit trigger");
     // setSubmitting(true);
     setFormOpen(false); // close form immediately
 
@@ -368,8 +395,10 @@ export default function ProductForm() {
       compressedFiles =
         largeFiles.length > 0 ? await compressImages(largeFiles) : [];
 
-      console.log(largeFiles.map((f) => formatFileSize(f.size)));
-      console.log(compressedFiles.map((f) => formatFileSize(f.size)));
+      if (isDev) {
+        console.log(largeFiles.map((f) => formatFileSize(f.size)));
+        console.log(compressedFiles.map((f) => formatFileSize(f.size)));
+      }
 
       compressedFiles = [...compressedFiles, ...smallFiles];
 
@@ -379,7 +408,9 @@ export default function ProductForm() {
     if (fieldData.mode === "update" && updatingProduct) {
       const formData = buildUpdateProductFormData({
         ...fieldData,
+        primaryImageIndex,
         imageUrlsToDelete,
+        newProductImages: compressedFiles,
       });
       updateProductMutation.mutate({
         formData,
@@ -397,8 +428,6 @@ export default function ProductForm() {
       createProductMutation.mutate(formData);
     }
   };
-
-  useLockBodyScroll(isFormOpen);
 
   if (!isFormOpen) return null;
 
@@ -441,6 +470,7 @@ export default function ProductForm() {
               onSubmit={form.handleSubmit(onSubmit, (err) =>
                 console.log("Form validation errors:", err),
               )}
+              onKeyDown={handleEnterToNextStep}
             >
               <div className="max-h-[70dvh] overflow-y-auto custom-container overflow-x-visible">
                 {/* 3 Main Form Step Components */}
@@ -458,6 +488,19 @@ export default function ProductForm() {
                 >
                   Cancel
                 </Button>
+
+                {/* Add option */}
+                {currentFormStep === 1 && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() =>
+                      optionsFieldArray.append({ name: "", values: ["", ""] })
+                    }
+                  >
+                    <Plus /> Option
+                  </Button>
+                )}
 
                 {/* Prev */}
                 <Button

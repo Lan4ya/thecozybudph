@@ -1,0 +1,1 @@
+ALTER POLICY "authenticated can update own active order" ON "orders" RENAME TO "postgresRole can update active order";

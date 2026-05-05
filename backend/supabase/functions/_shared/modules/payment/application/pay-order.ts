@@ -1,5 +1,5 @@
 import {
-  ConfirmOrderReq,
+  PayOrderInput,
   orders,
   payments,
   PayOrderRes,
@@ -21,7 +21,7 @@ const APP_URL = Deno.env.get("APP_URL");
 // decided to not use DB repositories for the main op.
 export const payOrder = async (
   db: DrizzleClient,
-  payload: ConfirmOrderReq,
+  payload: PayOrderInput,
   orderId: string,
   idempotencyKey?: string,
 ): Promise<PayOrderRes> => {

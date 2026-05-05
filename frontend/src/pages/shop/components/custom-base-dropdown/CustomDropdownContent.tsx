@@ -15,7 +15,7 @@ import React, {
   useCallback,
 } from "react";
 import ReactDOM from "react-dom";
-import { DropdownMenuContext } from "./Dropdown";
+import { CustomDropdownMenuContext } from "./CustomDropdown";
 import { cn } from "@/lib/utils/cn";
 
 type Side = "top" | "right" | "bottom" | "left";
@@ -32,7 +32,7 @@ export const DropdownMenuContent = forwardRef<
     style?: React.CSSProperties;
   }>
 >((props, forwardedRef) => {
-  const ctx = useContext(DropdownMenuContext);
+  const ctx = useContext(CustomDropdownMenuContext);
   if (!ctx)
     throw new Error("DropdownMenuContent used outside DropdownMenuRoot");
 
@@ -171,6 +171,8 @@ export const DropdownMenuContent = forwardRef<
     window.addEventListener("resize", rafUpdate);
     window.addEventListener("scroll", rafUpdate, true);
     window.addEventListener("orientationchange", rafUpdate); // mobile/tablets rotating the screen
+
+    // TODO: Check if this really fixes the dropdown content positioning bug on mobile when dropdown is open and kb's appears
     visualViewport?.addEventListener("resize", rafUpdate);
     visualViewport?.addEventListener("scroll", rafUpdate);
 

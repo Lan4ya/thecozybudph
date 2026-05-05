@@ -52,7 +52,7 @@ export const updateProduct = async (
   // Handle image deletions
   if (imageUrlsToDelete?.length) {
     updatedImageUrls = updatedImageUrls.filter(
-      (url: string) => !payload.imageUrlsToDelete!.includes(url),
+      (url: string) => !payload.imageUrlsToDelete?.includes(url),
     );
 
     const filePaths = imageUrlsToDelete

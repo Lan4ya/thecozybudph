@@ -1,3 +1,13 @@
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/lib/ui/__shadcn__/select";
+
 import { Input } from "@/lib/ui/__shadcn__/input";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Search, X } from "lucide-react";
@@ -41,71 +51,68 @@ export function OrdersFilters({
   isFetching,
 }: OrdersFiltersProps) {
   return (
-    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div className="relative w-full sm:w-72">
-          <Search className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search by recipient"
-            value={searchInput}
-            onChange={(e) => onSearchInputChange(e.target.value)}
-            className="pl-9 pr-20"
-          />
-          <div className="absolute right-1 top-1/2 flex -translate-y-1/2 items-center gap-1">
-            {searchInput ? (
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon-sm"
-                onClick={onSearchReset}
-                disabled={isFetching}
-                className="size-7"
-              >
-                <X className="size-3.5" />
-              </Button>
-            ) : null}
-          </div>
+    <div className="flex flex-wrap gap-3 items-end">
+      <div className="relative w-full sm:w-auto sm:max-w-80">
+        <Search className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          placeholder="Search by recipient"
+          value={searchInput}
+          onChange={(e) => onSearchInputChange(e.target.value)}
+          className="px-9"
+        />
+        <div className="absolute right-1 top-1/2 flex -translate-y-1/2 items-center gap-1">
+          {searchInput ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              onClick={onSearchReset}
+              disabled={isFetching}
+              className="size-7"
+            >
+              <X className="size-3.5" />
+            </Button>
+          ) : null}
         </div>
+      </div>
 
-        <div className="relative">
-          <select
-            value={status ?? ""}
-            onChange={(e) =>
-              onStatusChange(
-                (e.target.value || undefined) as OrderStatus | undefined,
-              )
-            }
-            className="h-9 min-w-[7rem] cursor-pointer appearance-none rounded-md border border-input bg-background px-3 pr-8 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-          >
-            <option value="">All Status</option>
+      <Select
+        value={status ?? "all"}
+        onValueChange={(value) => {
+          onStatusChange(value === "all" ? undefined : (value as OrderStatus));
+        }}
+      >
+        <SelectTrigger className="w-40 grow-1 md:grow-0">
+          <SelectValue placeholder="" />
+        </SelectTrigger>
+        <SelectContent position="popper" sideOffset={4}>
+          <SelectGroup>
+            <SelectLabel>Status</SelectLabel>
+            <SelectItem value="all">All Status</SelectItem>
             {statusOptions.map((s) => (
-              <option key={s.value} value={s.value}>
+              <SelectItem key={s.value} value={s.value}>
                 {s.label}
-              </option>
+              </SelectItem>
             ))}
-          </select>
-          <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground">
-            ▼
-          </span>
-        </div>
-      </div>
+          </SelectGroup>
+        </SelectContent>
+      </Select>
 
-      <div className="relative">
-        <select
-          value={sortValue}
-          onChange={(e) => onSortChange(e.target.value)}
-          className="h-9 min-w-[9rem] cursor-pointer appearance-none rounded-md border border-input bg-background px-3 pr-8 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-        >
-          {sortOptions.map((s) => (
-            <option key={s.value} value={s.value}>
-              {s.label}
-            </option>
-          ))}
-        </select>
-        <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground">
-          ▼
-        </span>
-      </div>
+      <Select value={sortValue} onValueChange={onSortChange}>
+        <SelectTrigger className="w-40 grow-1 md:ml-auto md:grow-0">
+          <SelectValue placeholder="" />
+        </SelectTrigger>
+        <SelectContent position="popper" sideOffset={4}>
+          <SelectGroup>
+            <SelectLabel>Sort by</SelectLabel>
+            {sortOptions.map((s) => (
+              <SelectItem key={s.value} value={s.value}>
+                {s.label}
+              </SelectItem>
+            ))}
+          </SelectGroup>
+        </SelectContent>
+      </Select>
     </div>
   );
 }

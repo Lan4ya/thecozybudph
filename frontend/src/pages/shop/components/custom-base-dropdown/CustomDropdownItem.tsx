@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useContext, forwardRef } from "react";
-import { DropdownMenuContext } from "./Dropdown";
+import { CustomDropdownMenuContext } from "./CustomDropdown";
 import { cn } from "@/lib/utils/cn";
 
 export const DropdownMenuItem = forwardRef<
@@ -11,7 +11,7 @@ export const DropdownMenuItem = forwardRef<
   }> &
     React.HTMLAttributes<HTMLElement>
 >((props, forwardedRef) => {
-  const ctx = useContext(DropdownMenuContext);
+  const ctx = useContext(CustomDropdownMenuContext);
   if (!ctx) throw new Error("DropdownMenuItem used outside DropdownMenu");
   const {
     registerItem,
@@ -32,8 +32,8 @@ export const DropdownMenuItem = forwardRef<
     return () => unregisterItem(itemRef);
   }, [disabled]);
 
-  const index = items.findIndex((i) => i.ref === itemRef);
-  const isFocused = focusedIndex === index;
+  const currentIndex = items.findIndex((i) => i.ref === itemRef);
+  const isFocused = focusedIndex === currentIndex;
 
   return (
     <div
@@ -49,32 +49,35 @@ export const DropdownMenuItem = forwardRef<
       data-disabled={disabled ? "disabled" : undefined}
       className={cn(
         "focus:bg-accent focus:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none",
-        "data-disabled:pointer-events-none",
-        "data-disabled:opacity-50",
+        "data-[disabled]:pointer-events-none",
+        "data-[disabled]:opacity-50",
         "data-inset:pl-8 [&_svg]:pointer-events-none",
-        "data-[variant=destructive]:text-destructive",
-        "data-[variant=destructive]:focus:bg-destructive/10",
-        "dark:data-[variant=destructive]:focus:bg-destructive/20",
-        "data-[variant=destructive]:focus:text-destructive",
-        "data-[variant=destructive]:*:[svg]:text-destructive!",
+        // "data-[variant=destructive]:text-destructive",
+        // "data-[variant=destructive]:focus:bg-destructive/10",
+        // "dark:data-[variant=destructive]:focus:bg-destructive/20",
+        // "data-[variant=destructive]:focus:text-destructive",
+        // "data-[variant=destructive]:*:[svg]:text-destructive!",
         "[&_svg]:shrink-0",
         "[&_svg:not([class*='size-'])]:size-4",
         "[&_svg:not([class*='text-'])]:text-muted-foreground",
         className,
       )}
+      onMouseEnter={() => {
+        if (!disabled && !isKeyboardNav) {
+          focusItem(currentIndex);
+        }
+      }}
+      onMouseDown={(e) => {
+        if (!disabled) return;
+        e.preventDefault();
+        e.stopPropagation();
+      }}
       onClick={(e) => {
         if (disabled) {
           e.preventDefault();
           return;
         }
         onSelect?.();
-        setOpen(false);
-        triggerRef.current?.focus();
-      }}
-      onMouseEnter={() => {
-        if (!disabled && !isKeyboardNav) {
-          focusItem(index);
-        }
       }}
       {...rest}
     >

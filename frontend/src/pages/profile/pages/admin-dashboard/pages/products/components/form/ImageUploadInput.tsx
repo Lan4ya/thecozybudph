@@ -100,6 +100,7 @@ const ImageItem = ({
       </div>
 
       <Button
+        type="button"
         variant="destructive"
         onClick={() => onRemoveImage(src, idx)}
         className="size-6 absolute -top-2 -right-2 z-50 rounded-full opacity-100"

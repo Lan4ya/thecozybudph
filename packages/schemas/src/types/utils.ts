@@ -65,11 +65,16 @@ export function camelToSnakeCaseString(camel: string): string {
 }
 
 export const coerceNumber = <T extends ZodType<any, any>>(schema: T) =>
-  z.preprocess(
-    (val) =>
-      typeof val === "string" && val.trim() === "" ? undefined : Number(val),
-    schema,
-  );
+  z.preprocess((val) => {
+    if (typeof val === "string") {
+      const t = val.trim();
+      if (t === "") return undefined;
+
+      const n = Number(t);
+      return Number.isNaN(n) ? val : n;
+    }
+    return val;
+  }, schema);
 
 export const stringToArray = (schema: ZodType = z.string()) =>
   z.preprocess((val) => {

@@ -18,11 +18,9 @@ import isDev from "@/lib/utils/isDev";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import { checkoutAddressesQK } from "@/pages/checkout/hooks/useAddressQuery";
 import { useCheckoutStore } from "@/pages/checkout/store/useCheckoutStore";
+import { FieldError } from "@/pages/checkout/components/FieldError";
 
 type FormValues = z.infer<typeof createAddressFormSchema>;
-
-const FieldError = ({ message }: { message?: string }) =>
-  message ? <p className="mt-1 text-xs text-red-500">{message}</p> : null;
 
 const defaultValues: FormValues = {
   fullName: `Juan-${crypto.randomUUID()}`,

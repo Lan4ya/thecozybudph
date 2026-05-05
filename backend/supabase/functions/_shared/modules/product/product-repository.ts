@@ -140,10 +140,29 @@ export const ProductRepository = {
         productCategoryId = category?.id ?? null;
       }
 
+      let minPriceCents: number | undefined;
+      let maxPriceCents: number | undefined;
+
+      if (payloadVariants?.length) {
+        const prices = payloadVariants
+          .map((variant) => variant.priceCents)
+          .filter((p): p is number => p !== undefined);
+
+        minPriceCents = Math.min(...prices);
+        maxPriceCents = Math.max(...prices);
+      }
+
       // Update product
       const [updatedProduct] = await tx
         .update(products)
-        .set({ ...product, productCategoryId, productCollectionId })
+        .set({
+          ...product,
+          ...(minPriceCents !== undefined && maxPriceCents !== undefined
+            ? { minPriceCents, maxPriceCents }
+            : {}),
+          productCategoryId,
+          productCollectionId,
+        })
         .where(eq(products.id, productId))
         .returning();
 
@@ -153,7 +172,7 @@ export const ProductRepository = {
         .from(productVariants)
         .where(eq(productVariants.productId, productId));
 
-      const existingMap = new Map(
+      const existingVariantsMap = new Map(
         existingVariants.map((v) => [JSON.stringify(v.attributes), v]),
       );
 
@@ -168,7 +187,6 @@ export const ProductRepository = {
       const variantsToKeep: ProductVariant[] = [];
 
       for (const v of payloadVariants ?? []) {
-        // Ensure priceCents is defined (should be validated before this)
         if (v.priceCents === undefined) {
           throw new Error("priceCents is required for variants");
         }
@@ -176,8 +194,8 @@ export const ProductRepository = {
         const key = JSON.stringify(v.attributes);
         seenKeys.add(key);
 
-        if (existingMap.has(key)) {
-          const existing = existingMap.get(key)!;
+        if (existingVariantsMap.has(key)) {
+          const existing = existingVariantsMap.get(key)!;
 
           if (existing.priceCents !== v.priceCents) {
             variantsToUpdate.push({
@@ -228,7 +246,7 @@ export const ProductRepository = {
       if (variantsToInsert.length) {
         insertedVariants = (await tx
           .insert(productVariants)
-          .values(variantsToInsert) // Now this satisfies the type
+          .values(variantsToInsert)
           .returning({
             id: productVariants.id,
             priceCents: productVariants.priceCents,

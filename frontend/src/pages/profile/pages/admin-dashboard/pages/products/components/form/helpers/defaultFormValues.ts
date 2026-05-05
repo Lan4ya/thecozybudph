@@ -12,20 +12,19 @@ export function getCreateFormDefaultValues(): CreateProductFormInput {
     // collectionName: "",
     // description: "",
     // productImages: [],
-    // basePrice: "" as unknown as number,
+    // basePrice: "",
     // primaryImageIndex: 0,
     // options: [{ name: "", values: ["", ""] }],
-    name: `test-product-${Math.floor(Math.random() * 1000)}`,
-    categoryName: "Mug",
-    collectionName: "test-collection",
+    name: `product-${Math.floor(Math.random() * 100)}`,
+    categoryName: "mug",
     description:
       "Lorem ipsum dolor sit amet consectetur adipisicing elit. Libero vel magnam sint possimus eaque voluptatum alias culpa nesciunt quae necessitatibus. Excepturi corporis dicta dolor a necessitatibus totam quod ea consequatur?",
     productImages: [],
-    basePrice: "500" as unknown as number,
+    basePrice: "500",
     primaryImageIndex: 0,
     options: [
       { name: "stem count", values: ["6", "12"] },
-      { name: "color", values: ["red-blue", "red-green"] },
+      { name: "main color", values: ["red", "yellow"] },
     ],
     variants: [],
   };
@@ -49,6 +48,9 @@ export function getUpdateFormDefaultValues(
     primaryImageIndex:
       defaultPrimaryImageIndex >= 0 ? defaultPrimaryImageIndex : 0,
     options: updatingProduct.options,
-    variants: updatingProduct.variants,
+    variants: updatingProduct.variants.map((variant) => ({
+      ...variant,
+      priceCents: String(variant.priceCents / 100), // display as pesos
+    })),
   };
 }

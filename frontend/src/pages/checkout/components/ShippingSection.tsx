@@ -4,15 +4,15 @@ import { cn } from "@/lib/utils/cn";
 import { capitalizeFirstLetter } from "@/lib/utils/format";
 import { useQuery } from "@tanstack/react-query";
 import { useCheckoutStore } from "../store/useCheckoutStore";
-import { CheckoutShippingOptionSkeleton } from "@/lib/ui/skeletons/CheckoutShippingOption";
+import { CheckoutShippingOptionSkeleton } from "@/lib/ui/skeletons/CheckoutShippingOptionSkeleton";
 import { useEffect } from "react";
 import { CheckoutAPI } from "@/api";
-import type { CreateQuotationsRes } from "@TheCozyBud/schemas";
+import type { Address, CreateQuotationsRes } from "@TheCozyBud/schemas";
 import { Button } from "@/lib/ui/__shadcn__/button";
 
-export const createShippingQuoteQK = (addressId?: string) => [
+export const createShippingQuoteQK = (address: Address | null) => [
   "shipping-quote",
-  addressId,
+  address,
 ];
 
 const ShippingSection = () => {
@@ -26,12 +26,12 @@ const ShippingSection = () => {
     isFetching,
     refetch,
   } = useQuery({
-    queryKey: createShippingQuoteQK(addressStore?.id),
+    queryKey: createShippingQuoteQK(addressStore),
     queryFn: (): Promise<CreateQuotationsRes> => {
       if (!addressStore) throw new Error("Missing address");
 
       return CheckoutAPI.createShippingQuotes({
-        address: {
+        recipientAddress: {
           addressLine: addressStore.addressLine,
           postalCode: addressStore.postalCode,
           region: addressStore.region,
@@ -130,7 +130,7 @@ const ShippingSection = () => {
                     </p>
 
                     <p className="text-xs text-muted-foreground">
-                      Estimated around 5-7 business days
+                      Estimated around 4-7 business days
                     </p>
                   </div>
                 </div>

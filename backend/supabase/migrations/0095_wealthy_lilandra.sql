@@ -1,0 +1,1 @@
+ALTER TABLE "orders" ALTER COLUMN "service_type" SET NOT NULL;

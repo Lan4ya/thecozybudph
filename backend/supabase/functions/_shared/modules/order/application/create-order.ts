@@ -3,7 +3,7 @@ import { AppError } from "../../../errors/Errors.ts";
 import { getShippingQuotation } from "@shared/integrations/lalamove/get-quotation.ts";
 import {
   cartItems,
-  CreateOrderReq,
+  CreateOrderInput,
   CreateOrderRes,
   orderAddressesSnapshot,
   orderItemsSnapshots,
@@ -17,12 +17,10 @@ import { calculatePassOnFee } from "../../../integrations/paymongo/calculate-pas
 import { CartRepository } from "../../cart/cart-repository.ts";
 import { and, eq, inArray } from "drizzle-orm";
 
-// TODO: implement to_pay order 24hr expiration
-
 export const createOrder = async (
   db: DrizzleClient,
   profileId: string,
-  payload: CreateOrderReq,
+  payload: CreateOrderInput,
 ): Promise<CreateOrderRes> => {
   const address = await AddressRepository.getById(db, payload.addressId);
 
@@ -97,6 +95,7 @@ export const createOrder = async (
     discountCents,
     status: "to_pay",
     source: payload.source,
+    serviceType: payload.serviceType,
     expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000),
   } satisfies InsertOrder;
 

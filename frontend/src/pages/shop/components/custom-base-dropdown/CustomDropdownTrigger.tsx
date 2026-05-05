@@ -1,4 +1,4 @@
-import { DropdownMenuContext } from "./Dropdown";
+import { CustomDropdownMenuContext } from "./CustomDropdown";
 import React, { useContext, forwardRef, useEffect } from "react";
 
 export const DropdownMenuTrigger = forwardRef<
@@ -10,7 +10,7 @@ export const DropdownMenuTrigger = forwardRef<
     } & React.HTMLAttributes<HTMLElement>
   >
 >((props, forwardedRef) => {
-  const ctx = useContext(DropdownMenuContext);
+  const ctx = useContext(CustomDropdownMenuContext);
   if (!ctx) throw new Error("DropdownMenuTrigger used outside DropdownMenu");
 
   const { open, setOpen, triggerRef, focusItem, items, isControlled } = ctx;

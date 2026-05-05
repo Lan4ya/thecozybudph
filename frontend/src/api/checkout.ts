@@ -1,9 +1,9 @@
 import { apiClient } from "@/lib/axios/client";
 import isDev from "@/lib/utils/isDev";
 import type {
-  ConfirmOrderReq,
+  PayOrderInput,
   PayOrderRes,
-  CreateOrderReq,
+  CreateOrderInput,
   CreateOrderRes,
   CreateQuotationsRes,
   CreateShippingQuoteInput,
@@ -17,14 +17,14 @@ export const CheckoutAPI = {
     return await apiClient.post("/checkout/shipping/quotes", payload);
   },
 
-  createOrder: async (payload: CreateOrderReq): Promise<CreateOrderRes> => {
+  createOrder: async (payload: CreateOrderInput): Promise<CreateOrderRes> => {
     isDev && console.log("creating order...");
     return await apiClient.post("/checkout/order", payload);
   },
 
   payOrder: async (
     orderId: string,
-    payload: ConfirmOrderReq,
+    payload: PayOrderInput,
     idempotencyKey: string,
   ): Promise<PayOrderRes> => {
     isDev && console.log("confirming order...");

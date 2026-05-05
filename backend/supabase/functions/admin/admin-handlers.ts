@@ -7,6 +7,8 @@ import {
   productIdSchema,
   updateProductSchema,
   adminQueryOrdersSchema,
+  adminShipOrderSchema,
+  uuidParamSchema,
 } from "@shared/schemas/index.ts";
 import {
   createHandlers,
@@ -77,6 +79,37 @@ export const getOrdersHandler = createHandlers(
     const { db } = requireVariables(c, "db");
     const query = c.req.valid("query");
     const res = await AdminActions.getOrders(db, query);
+    return handleSuccess(res);
+  },
+);
+
+export const shipOrderHandler = createHandlers(
+  zodValidatorMiddleware("param", uuidParamSchema("id")),
+  zodValidatorMiddleware("json", adminShipOrderSchema),
+  async (c) => {
+    const { db } = requireVariables(c, "db");
+    const payload = c.req.valid("json");
+    const { id: orderId } = c.req.valid("param");
+    const res = await AdminActions.shipOrder(db, orderId, payload);
+    return handleSuccess(res);
+  },
+);
+
+export const cancelShipOrderHandler = createHandlers(
+  zodValidatorMiddleware("param", uuidParamSchema("id")),
+  async (c) => {
+    const { db } = requireVariables(c, "db");
+    const { id: orderId } = c.req.valid("param");
+    const res = await AdminActions.cancelShipmentOrder(db, orderId);
+    return handleSuccess(res);
+  },
+);
+
+export const getShippingOrderHandler = createHandlers(
+  zodValidatorMiddleware("param", uuidParamSchema("id")),
+  async (c) => {
+    const { id: shippingOrderId } = c.req.valid("param");
+    const res = await AdminActions.getShippingOrder(shippingOrderId);
     return handleSuccess(res);
   },
 );

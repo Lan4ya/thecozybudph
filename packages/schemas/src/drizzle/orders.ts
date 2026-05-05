@@ -13,8 +13,8 @@ import {
 import { sql } from "drizzle-orm";
 import { profiles } from "./profiles.ts";
 import { products, productVariants } from "./products.ts";
-import { OrderSource, ProductVariant } from "../types/index.ts";
-import { authenticatedRole } from "drizzle-orm/supabase/rls";
+import { OrderSource, ProductVariant, ServiceType } from "../types/index.ts";
+import { authenticatedRole, postgresRole } from "drizzle-orm/supabase/rls";
 import { DBOrderStatus } from "../types/db/order.ts";
 
 export const orders = pgTable(
@@ -24,8 +24,10 @@ export const orders = pgTable(
     profileId: uuid("profile_id")
       .notNull()
       .references(() => profiles.id, { onDelete: "set null" }),
+    shipmentOrderId: text("shipment_order_id"),
     status: text("status").$type<DBOrderStatus>().default("to_pay").notNull(),
     source: text("source").$type<OrderSource>().notNull(),
+    serviceType: text("service_type").$type<ServiceType>().notNull(),
 
     // Payment Details
     subtotalCents: integer("subtotal_cents").notNull(),
@@ -67,9 +69,9 @@ export const orders = pgTable(
       withCheck: sql`auth.uid() = profile_id`,
     }),
 
-    pgPolicy("authenticated can update own active order", {
+    pgPolicy("postgresRole can update active order", {
       as: "permissive",
-      to: authenticatedRole,
+      to: postgresRole,
       for: "update",
       using: sql`auth.uid() = profile_id AND expires_at > now()`,
       withCheck: sql`auth.uid() = profile_id AND expires_at > now()`,

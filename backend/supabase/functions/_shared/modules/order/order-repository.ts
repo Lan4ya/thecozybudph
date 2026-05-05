@@ -70,22 +70,6 @@ export const OrderRepository = {
     });
   },
 
-  updateStatus: async (
-    s: SupabaseType,
-    orderId: string,
-    status: DBOrderStatus,
-  ) => {
-    const { data, error } = await s
-      .from("orders")
-      .update({ status })
-      .eq("id", orderId)
-      .eq("status", status)
-      .select()
-      .single();
-
-    return { data, error };
-  },
-
   checkExists: (db: DrizzleClient, id: string) =>
     db.rls(async (tx) => {
       const row = await tx.query.orders.findFirst({
@@ -105,7 +89,7 @@ export const OrderRepository = {
     });
   },
 
-  getUserOrders: (
+  getOrders: (
     db: DrizzleClient,
     profileId: string,
     params: {

@@ -6,7 +6,7 @@ import React, {
   createContext,
 } from "react";
 
-interface DropdownMenuContextValue {
+interface CustomDropdownMenuContextValue {
   open: boolean;
   setOpen: (open: boolean) => void;
   triggerRef: React.RefObject<HTMLElement | null>;
@@ -23,8 +23,8 @@ interface DropdownMenuContextValue {
   isKeyboardNav: boolean;
 }
 
-export const DropdownMenuContext = createContext<
-  DropdownMenuContextValue | undefined
+export const CustomDropdownMenuContext = createContext<
+  CustomDropdownMenuContextValue | undefined
 >(undefined);
 
 export const DropdownMenu: React.FC<{
@@ -59,7 +59,16 @@ export const DropdownMenu: React.FC<{
   const registerItem = useCallback(
     (ref: React.RefObject<HTMLElement | null>, disabled = false) => {
       setItems((prev) => {
-        if (prev.find((i) => i.ref === ref)) return prev;
+        const existingIndex = prev.findIndex((i) => i.ref === ref);
+        if (existingIndex !== -1) {
+          if (prev[existingIndex]?.disabled === disabled) return prev;
+          const next = [...prev];
+          next[existingIndex] = {
+            ...next[existingIndex],
+            disabled,
+          };
+          return next;
+        }
         return [
           ...prev,
           { ref: ref as React.RefObject<HTMLElement>, disabled },
@@ -87,7 +96,7 @@ export const DropdownMenu: React.FC<{
     }
   };
 
-  // when the mouse is inside the dropdown content and ensureVisible() fires, it
+  // When the mouse is inside the dropdown content and ensureVisible() fires, it
   // scrolls the container causing mousemove/mouseover to fire too, stealing
   // the focus on the curr focused item if the mouse is on a non-disabled
   // item. this state is used to prevent mouseEnter from firing if true
@@ -106,7 +115,7 @@ export const DropdownMenu: React.FC<{
     };
   }, []);
 
-  // handle keyboard navigation
+  // Handle keyboard events
   useEffect(() => {
     if (!open) return;
 
@@ -173,7 +182,6 @@ export const DropdownMenu: React.FC<{
     };
   }, [open, items, focusedIndex]);
 
-  // handle click & focusin
   useEffect(() => {
     if (!open || !modal) return;
     function handleClickAndFocusIn(e: MouseEvent | FocusEvent) {
@@ -196,7 +204,7 @@ export const DropdownMenu: React.FC<{
   }, [open, modal]);
 
   return (
-    <DropdownMenuContext.Provider
+    <CustomDropdownMenuContext.Provider
       value={{
         open,
         setOpen,
@@ -212,7 +220,7 @@ export const DropdownMenu: React.FC<{
       }}
     >
       {children}
-    </DropdownMenuContext.Provider>
+    </CustomDropdownMenuContext.Provider>
   );
 };
 

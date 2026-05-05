@@ -4,19 +4,21 @@ import {
   orderItemsSnapshots,
   orders,
 } from "../../drizzle/index.ts";
+import { OrderStatus } from "../domain/order.ts";
+import { CamelToSnakeCase } from "../utils.ts";
 
-export const DB_ORDER_STATUS = [
-  "to_pay",
-  "paid",
-  "to_ship",
-  "shipped",
-  "to_receive",
-  "fulfilled",
-  "cancelled",
-  "expired",
-] as const;
+// export const DB_ORDER_STATUS = [
+//   "to_pay",
+//   "paid",
+//   "to_ship",
+//   "shipped",
+//   "to_receive",
+//   "fulfilled",
+//   "cancelled",
+//   "expired",
+// ] as const;
 
-export type DBOrderStatus = (typeof DB_ORDER_STATUS)[number];
+export type DBOrderStatus = CamelToSnakeCase<OrderStatus>;
 
 export type InsertOrderItemSnapshot = InferInsertModel<
   typeof orderItemsSnapshots

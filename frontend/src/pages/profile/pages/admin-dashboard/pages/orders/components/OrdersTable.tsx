@@ -2,6 +2,7 @@ import type { AdminOrderItem, AdminOrderListItem } from "@TheCozyBud/schemas";
 import { Loader2 } from "lucide-react";
 import { StatusBadge } from "./StatusBadge";
 import { formatPriceCents } from "@/lib/utils/format";
+import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 
 type OrdersTableProps = {
   orders: AdminOrderListItem[];
@@ -40,13 +41,13 @@ export function OrdersTable({
   return (
     <div className="overflow-hidden rounded-lg border bg-card shadow-sm">
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full lg:table-fixed text-sm">
           <thead className="bg-muted/40">
             <tr>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+              <th className="pr-4 pl-8 py-3 text-left font-medium text-muted-foreground">
                 ORDER
               </th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+              <th className="w-[24%] px-4 py-3 text-left font-medium text-muted-foreground">
                 RECIPIENT
               </th>
               <th className="px-4 py-3 text-left font-medium text-muted-foreground">
@@ -70,7 +71,7 @@ export function OrdersTable({
                   colSpan={6}
                   className="px-4 py-12 text-center text-muted-foreground"
                 >
-                  <Loader2 className="mx-auto mb-2 size-5 animate-spin" />
+                  <Spinner className="size-5 mx-auto" />
                   Loading orders...
                 </td>
               </tr>
@@ -101,20 +102,20 @@ export function OrdersTable({
                     selectedOrderId === order.id ? "bg-muted/30" : ""
                   }`}
                 >
-                  <td className="px-4 py-3 text-left">
+                  <td className="pr-4 pl-8 py-3 text-left">
                     <div className="font-mono text-xs text-primary">
                       {order.id.slice(0, 8)}...
                     </div>
-                    <div className="text-xs text-muted-foreground">
+                    <div className=" text-xs text-muted-foreground">
                       {order.profileId.slice(0, 8)}...
                     </div>
                   </td>
 
                   <td className="px-4 py-3 text-left">
-                    <div className="font-medium">
+                    <div className="truncate font-medium">
                       {order.address.name || "N/A"}
                     </div>
-                    <div className="text-xs text-muted-foreground">
+                    <div className="truncate text-xs text-muted-foreground">
                       {formatAddress(order)}
                     </div>
                   </td>

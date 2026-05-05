@@ -1,5 +1,4 @@
 import {
-  addresses,
   AdminOrderListItem,
   AdminQueryOrdersInput,
   AdminQueryOrdersRes,
@@ -7,8 +6,11 @@ import {
   orderAddressesSnapshot,
   orderItemsSnapshots,
   orders,
-  profiles,
 } from "@shared/schemas/index.ts";
+import {
+  camelToSnakeCaseString,
+  snakeToCamelString,
+} from "@shared/utils/caseConverter.ts";
 import {
   and,
   asc,
@@ -23,10 +25,6 @@ import {
 } from "drizzle-orm";
 import { DrizzleClient } from "../../../db/client.ts";
 import { OrderStatus } from "../../../schemas/index.ts";
-import {
-  camelToSnakeCaseString,
-  snakeToCamelString,
-} from "@shared/utils/caseConverter.ts";
 
 const ORDER_SORT_COLUMNS = {
   createdAt: orders.createdAt,

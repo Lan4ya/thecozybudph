@@ -30,6 +30,7 @@ export type AdminOrderListItem = {
 
   subtotalCents: number;
   discountCents: number;
+  passOnFee: number;
   shippingCents: number;
   totalCents: number;
 

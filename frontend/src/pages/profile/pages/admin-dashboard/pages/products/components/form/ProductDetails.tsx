@@ -4,7 +4,7 @@ import type {
   ProductFormInput,
   UpdateProductFormInput,
 } from "@TheCozyBud/schemas";
-import { useFormContext, type FieldErrors } from "react-hook-form";
+import { useFormContext, useWatch, type FieldErrors } from "react-hook-form";
 import ImageUploadInput from "./ImageUploadInput";
 import { cn } from "@/lib/utils/cn";
 
@@ -29,13 +29,17 @@ export const ProductDetails = ({
   MAX_IMAGES,
 }: ProductDetailsProps) => {
   const {
+    control,
     register,
-    watch,
     formState: { errors },
   } = useFormContext<ProductFormInput>();
 
-  const formValues = watch();
-  const isCreateMode = formValues.mode === "create";
+  const [mode, description] = useWatch({
+    name: ["mode", "description"],
+    control,
+  });
+
+  const isCreateMode = mode === "create";
 
   const createImageError =
     (errors as FieldErrors<CreateProductFormInput>)?.productImages?.message ??
@@ -69,28 +73,28 @@ export const ProductDetails = ({
           </label>
           <Input
             min={0}
-            inputMode="decimal"
+            inputMode="numeric"
             type="text"
             {...register("basePrice")}
             onPaste={(e) => {
               const text = e.clipboardData.getData("text");
-              if (!/^\d*\.?\d*$/.test(text)) e.preventDefault();
+              if (!/^\d*$/.test(text)) e.preventDefault();
             }}
-            onKeyDown={(e) => {
-              if (
-                !/[0-9.]$/.test(e.key) &&
-                ![
-                  "Backspace",
-                  "Tab",
-                  "ArrowLeft",
-                  "ArrowRight",
-                  "Delete",
-                  "Enter",
-                ].includes(e.key)
-              ) {
-                e.preventDefault();
-              }
-            }}
+            // onKeyDown={(e) => {
+            //   if (
+            //     !/^\d*$/.test(e.key) &&
+            //     ![
+            //       "Backspace",
+            //       "Tab",
+            //       "ArrowLeft",
+            //       "ArrowRight",
+            //       "Delete",
+            //       "Enter",
+            //     ].includes(e.key)
+            //   ) {
+            //     e.preventDefault();
+            //   }
+            // }}
           />
           {basePriceError && (
             <p className="text-xs text-red-500 mt-1">{basePriceError}</p>
@@ -146,12 +150,12 @@ export const ProductDetails = ({
 
           <span
             className={`ml-auto text-xs ${
-              (formValues.description?.length ?? 0) > 600
+              (description?.length ?? 0) > 600
                 ? "text-red-500"
                 : "text-muted-foreground"
             }`}
           >
-            {formValues.description?.length ?? 0}/600
+            {description?.length ?? 0}/600
           </span>
         </div>
       </div>

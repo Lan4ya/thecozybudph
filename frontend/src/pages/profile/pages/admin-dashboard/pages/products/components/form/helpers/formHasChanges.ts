@@ -1,7 +1,6 @@
 import isEqual from "fast-deep-equal";
 import type {
   ProductFormInput,
-  ProductVariant,
   ProductWithRelations,
 } from "@TheCozyBud/schemas";
 
@@ -43,9 +42,15 @@ export function formHasChanges(
   // UPDATE MODE
   if (!updatingProduct) return false;
 
-  function normalizeVariants(variants: Partial<ProductVariant>[]) {
+  function normalizeVariants(
+    variants: Array<{
+      priceCents?: string | number;
+      attributes?: Record<string, string>;
+    }>,
+  ) {
     return variants.map((v) => ({
-      priceCents: v.priceCents,
+      priceCents:
+        v.priceCents === undefined ? undefined : String(v.priceCents),
       attributes: v.attributes,
     }));
   }
@@ -78,8 +83,8 @@ export function formHasChanges(
     return true;
   }
 
-  // If any image change occurred
   if (
+    // Any image change occurred
     (stateOnlyValues?.imagesToDelete?.length ?? 0) > 0 ||
     (stateOnlyValues?.newSelectedFilesCount ?? 0) > 0
   ) {

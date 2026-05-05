@@ -9,7 +9,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "../base-dropdown";
+} from "../custom-base-dropdown";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { ChevronDown } from "lucide-react";
 import PersistSuspense from "@/components/PersistSuspense";
@@ -58,7 +58,7 @@ export const FilterDropdown = ({
   const isControlled =
     controlledValue !== undefined && setControlledValue !== undefined;
 
-  // Log warning when misusing component is being misused
+  // Log warning when component is being misused
   if ((controlledValue === undefined) !== (setControlledValue === undefined)) {
     if (isDev) {
       console.warn(
@@ -108,29 +108,26 @@ export const FilterDropdown = ({
           ref={triggerRef}
           asChild
           asControlled
-          // prevents input blur/losing focus so the "Any"
-          // placeholder wont flicker when clicking
-          onMouseDown={(e) => e.preventDefault()}
+          onMouseDown={(e) => e.preventDefault()} // Keep input focused; prevents "Any" flicker
           onClick={() => {
-            document.activeElement !== inputRef.current &&
-              inputRef.current?.focus();
-            // !open && setOpen(true);
-            setOpen(!open);
+            if (!isMobile) inputRef.current?.focus();
+            setOpen(true);
           }}
         >
           <div className="border relative flex h-[45px] w-full items-center rounded-md p-3 outline dark:outline-0 outline-ring focus-within:outline-2">
             {!isInputFocused && hasValue(filterVal) && (
               <DisplaySelectedFilters dropdownType={dropdownType} />
             )}
-            {/* NOTE: */}
-            {/* input causes dropdown content positioning bugs on mobile that is */}
-            {/* not so simple to fix, so I disabled it temporarily on mobiles. */}
             {!isMobile ? (
               <input
                 ref={inputRef}
                 value={inputValue}
+                onMouseDown={(e) => e.stopPropagation()}
                 onChange={(e) => setInputValue(e.target.value)}
-                onClick={() => !open && setOpen(true)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpen(true);
+                }}
                 onFocus={() => setInputFocus(true)}
                 onBlur={() => setInputFocus(false)}
                 className="h-full w-full placeholder-muted-foreground focus:outline-none"
@@ -142,6 +139,7 @@ export const FilterDropdown = ({
                 type="text"
               />
             ) : (
+              // Remove input on mobiles
               <div className="text-muted-foreground text-xs">
                 {hasValue(filterVal) ? null : "Any"}
               </div>
@@ -150,12 +148,10 @@ export const FilterDropdown = ({
             <Button
               variant="minimal"
               size="auto"
-              // prevents input blur (losing focus) so the "Any" placeholder
-              // wont flicker when clicking this btn
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => {
-                document.activeElement !== inputRef.current &&
-                  inputRef.current?.focus();
+              onMouseDown={(e) => e.preventDefault()} // Keep input focused; prevents "Any" flicker
+              onClick={(e) => {
+                e.stopPropagation();
+                inputRef.current?.focus();
                 setOpen(!open);
               }}
               className="ml-auto"
@@ -211,7 +207,6 @@ const FilterDropdownContentSkeleton = ({
 };
 
 // Displays selected filter value(s) inside input box.
-// Simply for ui/ux. Clicking it removes the filter
 const DisplaySelectedFilters = ({
   dropdownType,
 }: {
@@ -234,30 +229,30 @@ const DisplaySelectedFilters = ({
   }, [first, dropdownType]);
 
   return (
-    <Button
-      variant="minimal"
-      size="auto"
+    <div
+      // variant="minimal"
+      // size="auto"
       className="gap-1! text-sm absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground"
-      onClick={(e) => {
-        e.stopPropagation();
-
-        setProductQuery((prev) => {
-          const currVal = prev.filters?.[dropdownType];
-
-          const updated =
-            Array.isArray(currVal) && currVal.length >= 2
-              ? currVal.slice(1)
-              : undefined;
-
-          return {
-            ...prev,
-            filters: {
-              ...prev.filters,
-              [dropdownType]: updated,
-            },
-          };
-        });
-      }}
+      // onClick={(e) => {
+      //   e.stopPropagation();
+      //
+      //   setProductQuery((prev) => {
+      //     const currVal = prev.filters?.[dropdownType];
+      //
+      //     const updated =
+      //       Array.isArray(currVal) && currVal.length >= 2
+      //         ? currVal.slice(1)
+      //         : undefined;
+      //
+      //     return {
+      //       ...prev,
+      //       filters: {
+      //         ...prev.filters,
+      //         [dropdownType]: updated,
+      //       },
+      //     };
+      //   });
+      // }}
     >
       {smScreen && vals.length && (
         <span className="bg-background rounded-md px-2 py-1.5">
@@ -277,7 +272,7 @@ const DisplaySelectedFilters = ({
           )}
         </>
       )}
-    </Button>
+    </div>
   );
 };
 

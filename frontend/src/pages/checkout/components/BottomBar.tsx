@@ -7,7 +7,7 @@ import { useIsFetching, useMutation } from "@tanstack/react-query";
 import { CheckoutAPI } from "@/api";
 import {
   createOrderSchema,
-  type CreateOrderReq,
+  type CreateOrderInput,
   type CreateOrderRes,
 } from "@TheCozyBud/schemas";
 import { useToast } from "@/providers/ToastProvider";
@@ -51,7 +51,7 @@ const BottomBar = () => {
 
   const { mutate: createOrderMutation, isPending: pendingCreateOrder } =
     useMutation({
-      mutationFn: (payload: CreateOrderReq): Promise<CreateOrderRes> =>
+      mutationFn: (payload: CreateOrderInput): Promise<CreateOrderRes> =>
         CheckoutAPI.createOrder(payload),
       onError: () => {
         addToast("Something wen't wrong. please try again", "error");

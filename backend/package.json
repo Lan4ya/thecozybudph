@@ -4,12 +4,9 @@
   "version": "0.0.0",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "pkg:generate": "pnpm dlx supabase gen types typescript --local > ../packages/schemas/src/types/db/supabase.types.ts && mkdir -p  ./supabase/functions/_shared/schemas && rm -rf ./supabase/functions/_shared/schemas/* && cp -r ../packages/schemas/src/* ./supabase/functions/_shared/schemas/",
-    "db:apply-schemas": "pnpm exec drizzle-kit generate && pnpm dlx supabase migrations up --include-all"
-  },
-  "dependencies": {
-    "drizzle-orm": "^0.45.1",
-    "postgres": "^3.4.8"
+    "pkg:generate": "pnpm supabase gen types typescript --local > ../packages/schemas/src/types/db/supabase.types.ts && mkdir -p  ./supabase/functions/_shared/schemas && rm -rf ./supabase/functions/_shared/schemas/* && cp -r ../packages/schemas/src/* ./supabase/functions/_shared/schemas/",
+    "db:apply-schemas": "pnpm exec drizzle-kit generate && pnpm supabase migrations up --include-all",
+    "db:seed": "pnpm tsx ./scripts/seedProductsViaAdminApi.ts"
   },
   "devDependencies": {
     "@faker-js/faker": "^10.1.0",
@@ -19,6 +16,8 @@
     "dotenv": "^17.2.3",
     "drizzle-kit": "^0.31.9",
     "drizzle-seed": "^0.3.1",
+    "postgres": "^3.4.8",
+    "supabase": "^2.98.1",
     "tsx": "^4.21.0"
   }
 }

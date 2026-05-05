@@ -4,13 +4,21 @@ import { Button } from "@/lib/ui/__shadcn__/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuRadioItem,
+  DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuGroup,
 } from "@/lib/ui/__shadcn__/dropdown-menu";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, Check } from "lucide-react";
 import { useProductsFilterAndSortState } from "../hooks/useProductsFilterAndSortState";
 import type { ProductSortOption } from "../../../types";
-import { DropdownMenuRadioGroup } from "@radix-ui/react-dropdown-menu";
+import { cn } from "@/lib/utils/cn";
+
+const options: ProductSortOption[] = [
+  "Popularity",
+  "Most Recent",
+  "Highest Price",
+  "Lowest Price",
+];
 
 export function SortDropdownMenu() {
   const { productQuery, setProductQuery } = useProductsFilterAndSortState();
@@ -40,24 +48,26 @@ export function SortDropdownMenu() {
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent className="w-56">
-        <DropdownMenuRadioGroup value={sortOpt} onValueChange={handleToggle}>
-          <DropdownMenuRadioItem value="Popularity" className={focusStyle}>
-            Popularity
-          </DropdownMenuRadioItem>
+      <DropdownMenuContent className="w-40">
+        {options.map((option) => {
+          const active = sortOpt === option;
 
-          <DropdownMenuRadioItem value="Most Recent" className={focusStyle}>
-            Most Recent
-          </DropdownMenuRadioItem>
+          return (
+            <DropdownMenuItem
+              key={option}
+              onSelect={() => handleToggle(option)}
+              className={cn(
+                "cursor-pointer",
+                focusStyle,
+                // active && "bg-accent text-accent-foreground font-medium",
+              )}
+            >
+              <span className="flex-1">{option}</span>
 
-          <DropdownMenuRadioItem value="Highest Price" className={focusStyle}>
-            Highest Price
-          </DropdownMenuRadioItem>
-
-          <DropdownMenuRadioItem value="Lowest Price" className={focusStyle}>
-            Lowest Price
-          </DropdownMenuRadioItem>
-        </DropdownMenuRadioGroup>
+              {active && <Check className="size-4" />}
+            </DropdownMenuItem>
+          );
+        })}
       </DropdownMenuContent>
     </DropdownMenu>
   );

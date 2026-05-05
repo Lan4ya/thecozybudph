@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react";
-import { DropdownMenuItem } from "../base-dropdown";
+import { DropdownMenuItem } from "../custom-base-dropdown";
 import { Check } from "lucide-react";
 import { useProductsFilterAndSortState } from "../../hooks/useProductsFilterAndSortState";
 import toggleArrItem from "@/lib/utils/toggleArrItem";
@@ -26,9 +26,6 @@ type FilterDropdownItemProps =
   | ArrayFilterProps<ArrayFilterKeys>
   | NonArrayFilterProps<NonArrayFilterKeys>;
 
-// hoist icon
-const CheckIcon = <Check className="text-white size-3" />;
-
 export const FilterDropdownItem = ({
   filterKey,
   filterVal,
@@ -51,7 +48,7 @@ export const FilterDropdownItem = ({
     return productQuery.filters?.[filterKey] === filterVal;
   }, [productQuery, filterKey, filterVal]);
 
-  const handleToggle = useCallback(() => {
+  const handleSelect = useCallback(() => {
     setProductQuery((prev) => {
       // console.log("filterVal", filterVal);
 
@@ -76,17 +73,14 @@ export const FilterDropdownItem = ({
 
   return (
     <DropdownMenuItem
-      className="flex-between filter-dropdown-item-spacing focus:bg-input/30"
-      onSelect={handleToggle}
+      className="flex-between filter-dropdown-item-spacing"
+      onSelect={handleSelect}
+      onMouseDown={(e) => e.preventDefault()} // Keep input focused; prevents "Any" flicker
     >
       {filterKey === "priceRange"
         ? formatPriceRange(filterVal as ProductPriceRangeOption)
         : filterVal}
-      {isItemActive && (
-        <div className="grid place-items-center bg-accent rounded-full p-[1.2px] pr-[2.4px]">
-          {CheckIcon}
-        </div>
-      )}
+      {isItemActive && <Check className="size-4" />}
     </DropdownMenuItem>
   );
 };

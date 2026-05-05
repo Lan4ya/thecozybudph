@@ -1,2 +1,11 @@
-export { createShippingQuotation as createQuotation } from "./create-quotation.ts";
-export { getShippingQuotation as getQuotation } from "./get-quotation.ts";
+export { createShippingQuotation } from "./create-quotation.ts";
+export { getShippingQuotation } from "./get-quotation.ts";
+export { createShippingOrder } from "./create-order.ts";
+export { editShippingOrder } from "./edit-order.ts";
+export { getShippingOrder } from "./get-order.ts";
+export { cancelShippingOrder } from "./cancel-order.ts";
+export { addShippingOrderPriorityFee } from "./add-priority-fee.ts";
+export { getShippingDriver } from "./get-driver.ts";
+export { changeShippingDriver } from "./change-driver.ts";
+export { getShippingMarket } from "./get-market.ts";
+export { getShippingCity } from "./get-city.ts";

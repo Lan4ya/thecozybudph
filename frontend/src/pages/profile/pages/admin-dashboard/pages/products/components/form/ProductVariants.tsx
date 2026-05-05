@@ -1,4 +1,4 @@
-import { useFormContext } from "react-hook-form";
+import { useFormContext, useWatch } from "react-hook-form";
 import type {
   ProductFormInput,
   ProductWithRelations,
@@ -6,64 +6,58 @@ import type {
 import { useMemo, useEffect } from "react";
 import { Input } from "@/lib/ui/__shadcn__/input";
 import { cn } from "@/lib/utils/cn";
+import { FieldError } from "@/pages/checkout/components/FieldError";
 
 type Props = { updatingProduct: ProductWithRelations | null };
 
 const ProductVariants = ({ updatingProduct }: Props) => {
-  const { watch, setValue } = useFormContext<ProductFormInput>();
+  const {
+    formState: { errors },
+    setValue,
+    getValues,
+    register,
+    control,
+  } = useFormContext<ProductFormInput>();
 
-  const [mode, options, variants, basePrice] = watch([
-    "mode",
-    "options",
-    "variants",
-    "basePrice",
-  ]);
+  const [mode, variants, options, basePrice] = useWatch({
+    name: ["mode", "variants", "options", "basePrice"],
+    control,
+  });
 
-  const normalizedCreateModeBasePrice = Math.max(0, Number(basePrice ?? 0));
-
-  const initPriceCents =
+  const initPriceInput =
     mode === "create"
-      ? Math.round(normalizedCreateModeBasePrice * 100)
-      : (updatingProduct?.minPriceCents ?? 0);
+      ? basePrice
+      : String((updatingProduct?.minPriceCents ?? 0) / 100);
 
-  const combinations = useMemo(() => generateCombinations(options), [options]);
+  const combinations = useMemo(() => {
+    return generateCombinations(options);
+  }, [JSON.stringify(options)]); // Compare by value to avoid infinite re-render
 
   useEffect(() => {
-    const existing = variants ?? [];
+    const currentVariants = getValues("variants") ?? [];
+
     const existingMap = new Map(
-      existing.map((v) => [JSON.stringify(v.attributes), v]),
+      currentVariants.map((v) => [JSON.stringify(v.attributes), v]),
     );
 
     const nextVariants = combinations.map((combo) => {
       const key = JSON.stringify(combo);
       const match = existingMap.get(key);
 
-      if (match) return match; // keep orig
+      if (match) return match;
 
       const newVariant = {
         attributes: combo,
-        priceCents: initPriceCents,
+        priceCents: initPriceInput,
       };
       return newVariant;
     });
 
     setValue("variants", nextVariants, { shouldValidate: false });
-  }, [combinations, initPriceCents]);
-
-  const variantsInForm = variants ?? [];
-
-  const handlePriceChange = (index: number, value: string) => {
-    if (value === "") {
-      setValue(`variants.${index}.priceCents`, undefined);
-      return;
-    }
-    const price = Number(value);
-    setValue(`variants.${index}.priceCents`, Math.round(price * 100));
-  };
+  }, [combinations, initPriceInput, setValue, getValues]);
 
   return (
     <div className="flex flex-col rounded-lg border overflow-hidden">
-      {/* Header */}
       <div className="grid grid-cols-[3fr_1fr] bg-sidebar px-4 py-2 text-sm font-medium">
         <span>Attributes</span>
         <span>Price (PHP)</span>
@@ -71,10 +65,8 @@ const ProductVariants = ({ updatingProduct }: Props) => {
 
       {/* Rows */}
       {combinations.map((combo, idx) => {
-        const variant = variantsInForm[idx];
-        const fallbackPriceCents = variant?.priceCents ?? initPriceCents;
-        const price =
-          fallbackPriceCents === undefined ? "" : fallbackPriceCents / 100;
+        const variant = variants?.[idx];
+        const pricePHP = variant?.priceCents ?? initPriceInput;
 
         return (
           <div
@@ -95,42 +87,24 @@ const ProductVariants = ({ updatingProduct }: Props) => {
               ))}
             </div>
 
-            <Input
-              type="text"
-              inputMode="decimal"
-              className="w-full"
-              value={price}
-              onChange={(e) => handlePriceChange(idx, e.target.value)}
-              onKeyDown={restrictDecimalInput}
-              onPaste={restrictPaste}
-            />
+            <div>
+              <Input
+                type="text"
+                inputMode="numeric"
+                value={pricePHP}
+                {...register(`variants.${idx}.priceCents`)}
+              />
+
+              <FieldError
+                message={errors.variants?.[idx]?.priceCents?.message}
+              />
+            </div>
           </div>
         );
       })}
     </div>
   );
 };
-
-function restrictDecimalInput(e: React.KeyboardEvent<HTMLInputElement>) {
-  if (
-    !/[0-9.]$/.test(e.key) &&
-    ![
-      "Backspace",
-      "Tab",
-      "ArrowLeft",
-      "ArrowRight",
-      "Delete",
-      "Enter",
-    ].includes(e.key)
-  ) {
-    e.preventDefault();
-  }
-}
-
-function restrictPaste(e: React.ClipboardEvent<HTMLInputElement>) {
-  const text = e.clipboardData.getData("text");
-  if (!/^\d*\.?\d*$/.test(text)) e.preventDefault();
-}
 
 function generateCombinations(options: ProductFormInput["options"]) {
   if (!options?.length) return [];

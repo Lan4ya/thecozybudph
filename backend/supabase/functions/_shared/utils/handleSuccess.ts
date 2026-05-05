@@ -17,7 +17,7 @@ export const handleSuccess = <T extends object | null | undefined>(
     data: snakeToCamelKeys(payload),
   };
 
-  isDev && console.log(body);
+  isDev && console.log("RESPONSE:", body);
 
   return Response.json(body, { status });
 };

@@ -31,7 +31,7 @@ const AdminNavLinks = ({ onNavigate }: { onNavigate?: () => void }) => (
         onClick={onNavigate}
         className={({ isActive }) =>
           cn(
-            "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground/75 transition-colors hover:bg-input/40 hover:text-foreground",
+            "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground/75 transition-colors hover:bg-primary/10 hover:text-foreground",
             isActive && "bg-primary/10 text-primary",
           )
         }

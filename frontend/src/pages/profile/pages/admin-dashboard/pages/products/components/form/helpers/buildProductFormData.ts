@@ -3,11 +3,11 @@ import {
   capitalizeFirstLetterOfEachWord,
 } from "@/lib/utils/format";
 import type {
-  CreateProductInput,
-  UpdateProductInput,
+  CreateProductFormInput,
+  UpdateProductFormInput,
 } from "@TheCozyBud/schemas";
 
-export function buildCreateProductFormData(fields: CreateProductInput) {
+export function buildCreateProductFormData(fields: CreateProductFormInput) {
   const fd = new FormData();
 
   fd.append("name", fields.name);
@@ -43,7 +43,7 @@ export function buildCreateProductFormData(fields: CreateProductInput) {
   return fd;
 }
 
-export function buildUpdateProductFormData(fields: UpdateProductInput) {
+export function buildUpdateProductFormData(fields: UpdateProductFormInput) {
   const fd = new FormData();
 
   appendIfDefined(fd, "name", fields.name);

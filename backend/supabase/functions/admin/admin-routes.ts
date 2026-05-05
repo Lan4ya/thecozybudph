@@ -1,17 +1,20 @@
-import { Hono, Env } from "hono";
+import {
+  adminMiddleware,
+  authMiddleware,
+  drizzleMiddleware,
+  supabaseMiddleware,
+  supabaseServiceMiddleware,
+} from "@shared/middlewares/mod.ts";
+import { Env, Hono } from "hono";
 import {
   createProductHandler,
   deleteProductHandler,
-  updateProductHandler,
   getOrdersHandler,
+  cancelShipOrderHandler,
+  getShippingOrderHandler,
+  shipOrderHandler,
+  updateProductHandler,
 } from "./admin-handlers.ts";
-import {
-  supabaseMiddleware,
-  adminMiddleware,
-  authMiddleware,
-  supabaseServiceMiddleware,
-  drizzleMiddleware,
-} from "@shared/middlewares/mod.ts";
 
 const admin = new Hono<Env>();
 
@@ -24,8 +27,13 @@ admin.use(
   drizzleMiddleware(),
 );
 
+// Order
 admin.get("/order", ...getOrdersHandler);
+admin.patch("/order/:id/shipment", ...shipOrderHandler);
+admin.get("/order/:id/shipment", ...getShippingOrderHandler);
+admin.delete("/order/:id/shipment", ...cancelShipOrderHandler);
 
+// Product
 admin.post("/product", ...createProductHandler);
 admin.patch("/product/:id", ...updateProductHandler);
 admin.delete("/product", ...deleteProductHandler);

@@ -1,17 +1,21 @@
 import { Plus, X } from "lucide-react";
 import { Input } from "@/lib/ui/__shadcn__/input";
 import { Button } from "@/lib/ui/__shadcn__/button";
-import { useFieldArray, useFormContext } from "react-hook-form";
+import {
+  useFormContext,
+  useWatch,
+  type FieldArrayWithId,
+} from "react-hook-form";
 import type { ProductFormInput } from "@TheCozyBud/schemas";
 // import { useEffect } from "react";
 
-export const ProductOptions = ({}) => {
-  const { control, watch } = useFormContext<ProductFormInput>();
+type ProductOptionsProps = {
+  fields: FieldArrayWithId<ProductFormInput, "options">[];
+  remove: (index: number) => void;
+};
 
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "options",
-  });
+export const ProductOptions = ({ fields, remove }: ProductOptionsProps) => {
+  const { watch } = useFormContext<ProductFormInput>();
 
   // useEffect(() => {
   //   const subscription = watch((value) => {
@@ -29,15 +33,6 @@ export const ProductOptions = ({}) => {
           removeOption={() => remove(index)}
         />
       ))}
-
-      <div className="mb-10">
-        <Button
-          type="button"
-          onClick={() => append({ name: "", values: ["", ""] })}
-        >
-          <Plus /> Option
-        </Button>
-      </div>
     </div>
   );
 };
@@ -49,27 +44,42 @@ type Props = {
 
 export function AddOptionFields({ optionIdx, removeOption }: Props) {
   const {
+    control,
     formState: { errors },
     register,
     setValue,
-    watch,
+    getValues,
   } = useFormContext<ProductFormInput>();
 
-  const values = watch(`options.${optionIdx}.values`) || ["", ""];
+  const values =
+    useWatch({
+      control,
+      name: `options.${optionIdx}.values`,
+    }) ?? [];
 
   const optionError = errors.options?.[optionIdx];
 
   const addValue = () => {
-    setValue(`options.${optionIdx}.values`, [...values, ""], {
+    const currentValues = getValues(`options.${optionIdx}.values`) ?? [];
+    setValue(`options.${optionIdx}.values`, [...currentValues, ""], {
+      shouldDirty: true,
+      shouldTouch: true,
       shouldValidate: false,
     });
   };
 
   const removeValue = (idx: number) => {
+    const currentValues = getValues(`options.${optionIdx}.values`) ?? [];
+    if (currentValues.length <= 1) return;
+
     setValue(
       `options.${optionIdx}.values`,
-      values.filter((_, i) => i !== idx),
-      { shouldValidate: false },
+      currentValues.filter((_, i) => i !== idx),
+      {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      },
     );
   };
 
@@ -123,13 +133,13 @@ export function AddOptionFields({ optionIdx, removeOption }: Props) {
                   className="pr-8"
                 />
 
-                {valIdx > 0 && (
+                {values.length > 1 && (
                   <Button
                     type="button"
                     variant="minimal"
-                    size="sm"
+                    size="icon-sm"
                     onClick={() => removeValue(valIdx)}
-                    className="absolute right-0 top-1/2 -translate-y-1/2 "
+                    className="absolute right-1 top-1/2 -translate-y-1/2 z-10"
                   >
                     <X />
                   </Button>

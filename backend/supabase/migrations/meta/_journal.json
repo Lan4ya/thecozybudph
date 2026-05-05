@@ -659,6 +659,34 @@
       "when": 1777644308268,
       "tag": "0093_grey_chronomancer",
       "breakpoints": true
+    },
+    {
+      "idx": 94,
+      "version": "7",
+      "when": 1777806288619,
+      "tag": "0094_minor_texas_twister",
+      "breakpoints": true
+    },
+    {
+      "idx": 95,
+      "version": "7",
+      "when": 1777806531992,
+      "tag": "0095_wealthy_lilandra",
+      "breakpoints": true
+    },
+    {
+      "idx": 96,
+      "version": "7",
+      "when": 1777854118072,
+      "tag": "0096_quick_madripoor",
+      "breakpoints": true
+    },
+    {
+      "idx": 97,
+      "version": "7",
+      "when": 1777855781388,
+      "tag": "0097_material_mephistopheles",
+      "breakpoints": true
     }
   ]
 }

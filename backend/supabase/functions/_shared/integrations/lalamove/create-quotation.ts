@@ -3,70 +3,77 @@ import {
   CreateQuotationsRes,
   CreateShippingQuoteInput,
   QuoteStop,
-} from "@shared/schemas/index.ts";
-import { MARKET, sdkClient } from "./client.ts";
+  ServiceType,
+} from "@shared/schemas/types/index.ts";
 import { getCoordinates } from "../geoapify/get-coordinates.ts";
-
-// Default company address.
-const companyAddress =
-  "Pioneer Street, Mandaluyong, 1552 National Capital District, Philippines";
-
-// This is the result of the company's address from Geoapify. I decided to
-// query it in advance and hardcode it so that we can have a faster response,
-// querying only the lat and lng of dropoff address (delivery address).
-const pickupStop: QuoteStop = {
-  coordinates: {
-    lat: "14.571965",
-    lng: "121.048353",
-  },
-  address: companyAddress,
-};
-
-const SERVICE_TYPES = ["MOTORCYCLE", "SEDAN"] as const;
+import { COMPANY_ADDRESS, MARKET, sdkClient, SERVICE_TYPES } from "./client.ts";
 
 export const createShippingQuotation = async (
   payload: CreateShippingQuoteInput,
+  serviceType: ServiceType | "all" = "all",
 ): Promise<CreateQuotationsRes> => {
-  const deliveryAddress = payload.address;
+  const senderAddress = payload.senderAddress;
+  const recipientAddress = payload.recipientAddress;
 
-  const dropOffAddress = [
-    deliveryAddress.addressLine,
-    deliveryAddress.postalCode,
-    deliveryAddress.region,
-    deliveryAddress.city,
-    deliveryAddress.province,
+  let pickupAddress: string;
+
+  if (senderAddress) {
+    pickupAddress = [
+      senderAddress.addressLine,
+      senderAddress.barangay,
+      senderAddress.province,
+      senderAddress.postalCode,
+      senderAddress.city,
+      senderAddress.region,
+      "Philippines",
+    ]
+      .filter(Boolean)
+      .join(", ");
+  } else {
+    pickupAddress = COMPANY_ADDRESS;
+  }
+
+  const dropoffAddress = [
+    recipientAddress.addressLine,
+    recipientAddress.barangay,
+    recipientAddress.province,
+    recipientAddress.postalCode,
+    recipientAddress.city,
+    recipientAddress.region,
     "Philippines",
-  ].join(", ");
+  ]
+    .filter(Boolean)
+    .join(", ");
 
-  const dropoffCoords = await getCoordinates(dropOffAddress);
+  const coordinates = await Promise.all([
+    getCoordinates(pickupAddress),
+    getCoordinates(dropoffAddress),
+  ]);
 
+  const pickupStop: QuoteStop = {
+    coordinates: coordinates[0],
+    address: pickupAddress,
+  };
   const dropoffStop: QuoteStop = {
-    coordinates: dropoffCoords,
-    address: dropOffAddress,
+    coordinates: coordinates[1],
+    address: dropoffAddress,
   };
 
-  const quotationPayloadForMotorCycle =
-    Lalamove.QuotationPayloadBuilder.quotationPayload()
-      .withLanguage(`en_${MARKET}`)
-      .withServiceType(SERVICE_TYPES[0])
-      .withStops([pickupStop, dropoffStop])
-      .build();
+  const requestedServices =
+    serviceType === "all" ? SERVICE_TYPES : [serviceType];
 
-  const quotationPayloadForSedan =
-    Lalamove.QuotationPayloadBuilder.quotationPayload()
-      .withLanguage(`en_${MARKET}`)
-      .withServiceType(SERVICE_TYPES[1])
-      .withStops([pickupStop, dropoffStop])
-      .build();
+  const quotes = await Promise.all(
+    requestedServices.map((type) => {
+      const quotationPayload =
+        Lalamove.QuotationPayloadBuilder.quotationPayload()
+          .withLanguage(`en_${MARKET}`)
+          .withServiceType(type)
+          .withStops([pickupStop, dropoffStop])
+          .build();
 
-  const motorcycleQuote = await sdkClient.Quotation.create(
-    MARKET,
-    quotationPayloadForMotorCycle,
-  );
-  const sedanQuote = await sdkClient.Quotation.create(
-    MARKET,
-    quotationPayloadForSedan,
+      return sdkClient.Quotation.create(MARKET, quotationPayload);
+    }),
   );
 
-  return [motorcycleQuote, sedanQuote];
+  return quotes;
 };

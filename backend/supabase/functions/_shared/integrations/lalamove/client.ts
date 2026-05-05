@@ -9,6 +9,11 @@ const environment = isDev ? "sandbox" : "production";
 
 export const MARKET = "PH";
 
+export const SERVICE_TYPES = ["MOTORCYCLE", "SEDAN"] as const;
+
+export const COMPANY_ADDRESS =
+  "Edsa Corner Pioneer Street, Barangka Ilaya, Mandaluyong City 1550, Metro Manila, NCR, Philippines";
+
 // SDK Docs: https://github.com/lalamove/delivery-nodejs-sdk
 export const sdkClient = new Lalamove.ClientModule(
   new Lalamove.Config(PUBLIC_KEY!, SECRET_KEY!, environment),

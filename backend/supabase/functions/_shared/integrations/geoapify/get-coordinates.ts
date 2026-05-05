@@ -15,7 +15,7 @@ export interface GeocodeOptions {
 }
 
 // Geoapify works even with jumbled address but preferably the address
-// should be formatted as follows: 'street name, postal code, region, city, country'
+// should be formatted as follows: 'house number & street name (addressLine), barangay, province, postal code, city, region, country'
 export async function getCoordinates(
   address: string,
   options: GeocodeOptions = {},

@@ -284,6 +284,8 @@ export type Database = {
           id: string
           pass_on_fee: number
           profile_id: string
+          service_type: string
+          shipment_order_id: string | null
           shipping_cents: number
           source: string
           status: string
@@ -298,6 +300,8 @@ export type Database = {
           id?: string
           pass_on_fee: number
           profile_id: string
+          service_type: string
+          shipment_order_id?: string | null
           shipping_cents: number
           source: string
           status?: string
@@ -312,6 +316,8 @@ export type Database = {
           id?: string
           pass_on_fee?: number
           profile_id?: string
+          service_type?: string
+          shipment_order_id?: string | null
           shipping_cents?: number
           source?: string
           status?: string

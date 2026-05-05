@@ -14,7 +14,7 @@ import { useToast } from "@/providers/ToastProvider";
 import isDev from "@/lib/utils/isDev";
 import {
   confirmOrderSchema,
-  type ConfirmOrderReq,
+  type PayOrderInput,
   type PayOrderRes,
 } from "@TheCozyBud/schemas";
 import { useCheckoutStore } from "@/pages/checkout/store/useCheckoutStore";
@@ -53,7 +53,7 @@ const PaymentConfirmation = () => {
         idempotencyKey,
       }: {
         orderId: string;
-        payload: ConfirmOrderReq;
+        payload: PayOrderInput;
         idempotencyKey: string;
       }): Promise<PayOrderRes> =>
         CheckoutAPI.payOrder(orderId, payload, idempotencyKey),
@@ -102,7 +102,7 @@ const PaymentConfirmation = () => {
       },
       type: pmType!,
       checkoutSessionId: sessionId,
-    } satisfies ConfirmOrderReq;
+    } satisfies PayOrderInput;
 
     // validation
     const result = confirmOrderSchema.safeParse(payload);
