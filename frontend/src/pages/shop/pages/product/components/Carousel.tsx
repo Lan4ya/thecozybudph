@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Navigation, A11y, Thumbs } from "swiper/modules";
+import { Navigation, A11y } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/swiper.css";
 // import "swiper/swiper-bundle.css";
@@ -14,7 +14,7 @@ interface CarouselProps {
 
 const Carousel = ({ urls }: CarouselProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
+  const [mainSwiper, setMainSwiper] = useState<any>(null);
   if (!urls || urls.length === 0) return null;
   const isLgScreen = useIsLgScreenMin();
 
@@ -22,7 +22,7 @@ const Carousel = ({ urls }: CarouselProps) => {
   const isLastSlide = activeIndex === urls.length - 1;
 
   return (
-    <div className="flex flex-col w-full -mt-0.5 lg:mt-0 max-w-[500px] gap-4 lg:pt-0">
+    <div className="flex flex-col w-full -mt-0.5 lg:mt-0 min-[522px]:pt-10 max-w-[500px] gap-4 lg:pt-0">
       {/* Carousel */}
       <div className=" overflow-hidden relative w-full  bg-background group active:cursor-grabbing">
         {!isLgScreen && (
@@ -35,14 +35,14 @@ const Carousel = ({ urls }: CarouselProps) => {
         )}
 
         <Swiper
-          modules={[Thumbs, Navigation, A11y]}
+          modules={[Navigation, A11y]}
           spaceBetween={0}
           slidesPerView={1}
           navigation={{
             prevEl: ".custom-prev",
             nextEl: ".custom-next",
           }}
-          thumbs={{ swiper: thumbsSwiper }}
+          onSwiper={setMainSwiper}
           onSlideChange={(swiper) => {
             setActiveIndex(swiper.activeIndex);
           }}
@@ -65,8 +65,8 @@ const Carousel = ({ urls }: CarouselProps) => {
         <button
           className={`custom-prev absolute left-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 backdrop-blur-sm rounded-full flex items-center justify-center text-2xl font-bold transition-all duration-200 shadow-lg border ${
             isFirstSlide
-              ? "bg-white/10 border-accent/10 text-accent/30 cursor-not-allowed"
-              : "bg-white/20 hover:bg-white/30 border-white/30 hover:scale-110 text-accent"
+              ? "cursor-not-allowed border-white/30 bg-white/10 text-white/30"
+              : "border-white/30 bg-white/20 text-white hover:scale-110 hover:bg-white/30"
           }`}
           disabled={isFirstSlide}
         >
@@ -76,8 +76,8 @@ const Carousel = ({ urls }: CarouselProps) => {
         <button
           className={`custom-next absolute right-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 backdrop-blur-sm rounded-full flex items-center justify-center text-2xl font-bold transition-all duration-200 shadow-lg border ${
             isLastSlide
-              ? "bg-white/10 border-accent/10 text-accent/30 cursor-not-allowed"
-              : "bg-white/20 hover:bg-white/30 border-white/30 hover:scale-110 text-accent"
+              ? "cursor-not-allowed border-white/30 bg-white/10 text-white/30"
+              : "border-white/30 bg-white/20 text-white hover:scale-110 hover:bg-white/30"
           }`}
           disabled={isLastSlide}
         >
@@ -92,8 +92,8 @@ const Carousel = ({ urls }: CarouselProps) => {
 
       <ThumbnailStrip
         urls={urls}
-        onThumbsSwiper={setThumbsSwiper}
         activeIndex={activeIndex}
+        onSelect={(index) => mainSwiper?.slideTo(index)}
       />
     </div>
   );
@@ -102,38 +102,34 @@ const Carousel = ({ urls }: CarouselProps) => {
 const ThumbnailStrip = ({
   urls,
   activeIndex,
-  onThumbsSwiper,
+  onSelect,
 }: {
   urls: string[];
   activeIndex: number;
-  onThumbsSwiper: (swiper: any) => void;
+  onSelect: (index: number) => void;
 }) => {
   return (
     <div className="w-full overflow-x-auto px-6 py-4 rounded-2xl">
-      <Swiper
-        watchSlidesProgress={true}
-        onSwiper={onThumbsSwiper}
-        spaceBetween={16}
-        className="overflow-visible!"
-      >
+      <div className="flex gap-4 min-w-max">
         {urls.map((u, index) => (
-          <SwiperSlide key={index} className="size-20!">
-            <button
-              className={`w-full h-full rounded-xl overflow-hidden transition-all duration-300 border-2 ${
-                index === activeIndex
-                  ? "border-accent scale-110 shadow-lg ring-2 ring-accent/50"
-                  : "border-muted-foreground opacity-60 hover:opacity-100 hover:border-muted-foreground/80"
-              } hover:scale-105 transform-gpu`}
-            >
-              <ProductImage
-                src={u}
-                alt={`Thumbnail ${index + 1}`}
-                loading="lazy"
-              />
-            </button>
-          </SwiperSlide>
+          <button
+            key={index}
+            type="button"
+            onClick={() => onSelect(index)}
+            className={`size-20 shrink-0 rounded-xl overflow-hidden transition-all duration-300 border-2 ${
+              index === activeIndex
+                ? "border-accent scale-110 shadow-lg ring-2 ring-accent/50"
+                : "border-muted-foreground opacity-60 hover:opacity-100 hover:border-muted-foreground/80"
+            } hover:scale-105 transform-gpu`}
+          >
+            <ProductImage
+              src={u}
+              alt={`Thumbnail ${index + 1}`}
+              loading="lazy"
+            />
+          </button>
         ))}
-      </Swiper>
+      </div>
     </div>
   );
 };

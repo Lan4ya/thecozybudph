@@ -14,9 +14,6 @@ import { useAuthStore } from "@/store/useAuthStore";
 
 const NavBar = () => {
   const isMediumScreenAndBelow = useMediaQuery("(max-width: 1023px)");
-  const [isBackgroundShown, setShowBackground] = useState(false);
-
-  const pathname = useLocation().pathname;
 
   const { registerSentinel, visibleMap } = useAnimateOnView();
 
@@ -26,24 +23,6 @@ const NavBar = () => {
 
   const cartItemsCount =
     cartItems?.filter((c) => c.isAvailable && c.product).length ?? 0;
-
-  useEffect(() => {
-    if (pathname !== "/" || isMediumScreenAndBelow) {
-      setShowBackground(true);
-      return;
-    }
-
-    const handleScroll = () => {
-      const shouldShow = window.scrollY > 0;
-      setShowBackground((prev) => (prev === shouldShow ? prev : shouldShow));
-    };
-    handleScroll();
-
-    const onScroll = () => window.requestAnimationFrame(handleScroll);
-    window.addEventListener("scroll", onScroll);
-
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [pathname, isMediumScreenAndBelow]);
 
   const handleLogoClick = useCallback(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -57,7 +36,7 @@ const NavBar = () => {
         visibleMap[0]
           ? "opacity-100 translate-y-0"
           : "opacity-0 -translate-y-8",
-        isBackgroundShown && "shadow-xs bg-background backdrop-blur-sm ",
+        "shadow-xs bg-background backdrop-blur-sm",
       )}
     >
       {/* Logo */}
@@ -106,7 +85,6 @@ const NavBar = () => {
         <DesktopNavLinks
           hasSession={!!session}
           cartItemsCount={cartItemsCount}
-          isBackgroundShown={isBackgroundShown}
         />
       )}
     </nav>

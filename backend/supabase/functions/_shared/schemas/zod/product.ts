@@ -44,34 +44,6 @@ export const productBaseSchema = z.object({
     .toLowerCase()
     .optional()
     .nullable(),
-
-  // options: z.preprocess(
-  //   (val) => {
-  //     if (typeof val === "string") return JSON.parse(val);
-  //     return val;
-  //   },
-  //   z
-  //     .array(
-  //       z.object({
-  //         name: z
-  //           .string()
-  //           .trim()
-  //           .nonempty("option name is required")
-  //           .max(255, "name can't exceed 255 characters")
-  //           .toLowerCase(),
-  //         values: z
-  //           .array(
-  //             z
-  //               .string()
-  //               .trim()
-  //               .nonempty("option value is required")
-  //               .toLowerCase(),
-  //           )
-  //           .nonempty(),
-  //       }),
-  //     )
-  //     .default([]),
-  // ),
 });
 
 export const productOptionSchema = z.object({
@@ -97,12 +69,11 @@ export const productVariantSchema = z.object({
         const n = Number(t);
         if (Number.isNaN(n)) return val;
 
-        // convert pesos -> cents
-        return Math.round(n * 100);
+        return n;
       }
 
       if (typeof val === "number") {
-        return Math.round(val * 100);
+        return val;
       }
 
       return val;
@@ -191,14 +162,60 @@ export const productIdSchema = z.object({
 
 // Product Form Schemas
 
+export const validateFormPrice = (
+  label: string,
+  n: number,
+  ctx: z.RefinementCtx,
+) => {
+  if (!Number.isFinite(n)) {
+    ctx.addIssue({
+      code: "custom",
+      message: `${label} must be a valid number`,
+    });
+    return z.NEVER;
+  }
+
+  if (!Number.isInteger(n)) {
+    ctx.addIssue({
+      code: "custom",
+      message: `${label} must be a whole number`,
+    });
+    return z.NEVER;
+  }
+
+  if (n < 0) {
+    ctx.addIssue({
+      code: "custom",
+      message: `${label} can't be negative`,
+    });
+    return z.NEVER;
+  }
+
+  if (n > 1_000_000) {
+    ctx.addIssue({
+      code: "custom",
+      message: `${label} can't exceed 1,000,000`,
+    });
+    return z.NEVER;
+  }
+
+  return n;
+};
+
 const productFormVariantSchema = z.object({
   id: z.uuid("product variant id is not a valid UUID").optional(),
   priceCents: z
     .string()
     .trim()
     .min(1, "price can't be empty")
-    .refine((v) => Number(v) >= 0, "price can't be negative")
-    .refine((v) => Number(v) <= 1_000_000, "price can't exceed 1,000,000"),
+    .transform((v, ctx) => {
+      const n = Number(v);
+      validateFormPrice("price", n, ctx);
+
+      // convert pesos -> cents (API accepts cents)
+      return n * 100;
+    }),
+
   attributes: z.record(
     z.string().trim().nonempty(),
     z.string().trim().nonempty(),
@@ -222,8 +239,12 @@ export const createProductFormSchema = createProductSchema.extend({
     .string()
     .trim()
     .min(1, "base price can't be empty")
-    .refine((v) => Number(v) >= 0, "base price can't be negative")
-    .refine((v) => Number(v) <= 1_000_000, "base price can't exceed 1,000,000"),
+    .transform((v, ctx) => {
+      const n = Number(v);
+      validateFormPrice("base price", n, ctx);
+
+      return n;
+    }),
   options: z.array(productFormOptionSchema).default([]),
   variants: z
     .array(productFormVariantSchema)

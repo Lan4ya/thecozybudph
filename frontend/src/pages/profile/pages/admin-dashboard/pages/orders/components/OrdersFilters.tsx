@@ -85,6 +85,7 @@ export function OrdersFilters({
         <SelectTrigger className="w-40 grow-1 md:grow-0">
           <SelectValue placeholder="" />
         </SelectTrigger>
+
         <SelectContent position="popper" sideOffset={4}>
           <SelectGroup>
             <SelectLabel>Status</SelectLabel>

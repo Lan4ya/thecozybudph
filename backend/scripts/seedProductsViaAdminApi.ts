@@ -2,8 +2,15 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import dotenv from "dotenv";
 import { createClient } from "@supabase/supabase-js";
+import type {
+  ApiResponse,
+  ApiResponseError,
+  Database,
+} from "@TheCozyBud/schemas";
 
 dotenv.config();
+
+type CreateProductPayload = { id?: string };
 
 type SeedVariant = {
   priceCents: number;
@@ -32,7 +39,7 @@ type SeedFile = {
 
 const DEFAULT_DATA_FILE = path.resolve(
   process.cwd(),
-  "./scripts/data/products.seed.example.json",
+  "./scripts/data/products.seed.json",
 );
 
 const MIME_BY_EXT: Record<string, string> = {
@@ -109,15 +116,53 @@ const assertProductInput = (product: SeedProduct, idx: number) => {
   }
 };
 
+const parseApiResponse = async <T>(
+  response: Response,
+): Promise<ApiResponse<T> | null> => {
+  const contentType = response.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) return null;
+  return (await response.json().catch(() => null)) as ApiResponse<T> | null;
+};
+
+const handleErr = (err: ApiResponseError["error"] | unknown) => {
+  if (typeof err === "string") return err;
+
+  if (Array.isArray(err)) {
+    return err
+      .map((entry) => {
+        if (!entry || typeof entry !== "object") return String(entry);
+        const field =
+          "field" in entry && typeof entry.field === "string"
+            ? entry.field
+            : undefined;
+        const message =
+          "message" in entry && typeof entry.message === "string"
+            ? entry.message
+            : JSON.stringify(entry);
+        return field ? `${field}: ${message}` : message;
+      })
+      .join("; ");
+  }
+
+  if (err instanceof Error) return err.message;
+
+  if (err && typeof err === "object" && "message" in err) {
+    const message = (err as { message?: unknown }).message;
+    if (typeof message === "string") return message;
+  }
+
+  return JSON.stringify(err, null, 2);
+};
+
 const main = async () => {
   const {
     SUPABASE_URL,
-    SUPABASE_ANON_KEY,
+    SUPABASE_SERVICE_ROLE_KEY,
     SEED_ADMIN_EMAIL,
     SEED_ADMIN_PASSWORD,
   } = process.env;
 
-  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
     throw new Error("Missing SUPABASE_URL or SUPABASE_ANON_KEY in env");
   }
   if (!SEED_ADMIN_EMAIL || !SEED_ADMIN_PASSWORD) {
@@ -142,7 +187,11 @@ const main = async () => {
     ? path.resolve(process.cwd(), imagesDirArg)
     : path.dirname(dataPath);
 
-  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const supabase = createClient<Database>(
+    SUPABASE_URL,
+    SUPABASE_SERVICE_ROLE_KEY,
+  );
+
   const { data: authData, error: authError } =
     await supabase.auth.signInWithPassword({
       email: SEED_ADMIN_EMAIL,
@@ -159,9 +208,43 @@ const main = async () => {
   let successCount = 0;
   let failCount = 0;
 
+  parsed.products.forEach((product, idx) => assertProductInput(product, idx));
+
+  const { data: products, error: getProductsErr } = await supabase
+    .from("products")
+    .select("id");
+
+  if (getProductsErr) throw new Error(getProductsErr.message);
+
+  const productIds = products.map((p) => p.id);
+
+  if (productIds.length > 0) {
+    const deleteRes = await fetch(
+      `${SUPABASE_URL}/functions/v1/admin/product`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ productIds }),
+      },
+    );
+    const deleteJson = await parseApiResponse<string[]>(deleteRes);
+
+    if (!deleteRes.ok) {
+      const error =
+        deleteJson && "error" in deleteJson
+          ? deleteJson.error
+          : `Request failed with status ${deleteRes.status}`;
+      throw new Error(
+        `Delete failed (${deleteRes.status}): ${handleErr(error)}`,
+      );
+    }
+  }
+
   for (let i = 0; i < parsed.products.length; i++) {
     const product = parsed.products[i];
-    assertProductInput(product, i);
 
     const formData = new FormData();
     formData.append("name", product.name);
@@ -186,31 +269,40 @@ const main = async () => {
       formData.append("productImages", file);
     }
 
-    const response = await fetch(`${SUPABASE_URL}/functions/v1/admin/product`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
+    // Seed products
+    const createRes = await fetch(
+      `${SUPABASE_URL}/functions/v1/admin/product`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
       },
-      body: formData,
-    });
+    );
 
-    const json = (await response.json().catch(() => ({}))) as {
-      data?: { id?: string };
-      error?: unknown;
-    };
-
-    if (!response.ok) {
+    const json = await parseApiResponse<CreateProductPayload>(createRes);
+    if (!createRes.ok) {
       failCount++;
+      const error =
+        json && "error" in json
+          ? json.error
+          : `Request failed with status ${createRes.status}`;
       console.error(
         `[${i + 1}/${parsed.products.length}] Failed: "${product.name}"`,
-        json.error ?? response.statusText,
+        handleErr(error),
       );
       continue;
     }
 
+    const createdId =
+      json && "data" in json && json.data && typeof json.data === "object"
+        ? (json.data as CreateProductPayload).id
+        : undefined;
+
     successCount++;
     console.log(
-      `[${i + 1}/${parsed.products.length}] Created: "${product.name}" (${json.data?.id ?? "no-id"})`,
+      `[${i + 1}/${parsed.products.length}] Created: "${product.name}" (${createdId ?? "no-id"})`,
     );
   }
 

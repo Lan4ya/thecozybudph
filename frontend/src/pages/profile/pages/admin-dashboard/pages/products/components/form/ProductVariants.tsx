@@ -19,15 +19,15 @@ const ProductVariants = ({ updatingProduct }: Props) => {
     control,
   } = useFormContext<ProductFormInput>();
 
-  const [mode, variants, options, basePrice] = useWatch({
-    name: ["mode", "variants", "options", "basePrice"],
+  const [mode, options, basePrice] = useWatch({
+    name: ["mode", "options", "basePrice"],
     control,
   });
 
   const initPriceInput =
     mode === "create"
       ? basePrice
-      : String((updatingProduct?.minPriceCents ?? 0) / 100);
+      : String(updatingProduct?.minPriceCents ?? 0 / 100);
 
   const combinations = useMemo(() => {
     return generateCombinations(options);
@@ -65,9 +65,6 @@ const ProductVariants = ({ updatingProduct }: Props) => {
 
       {/* Rows */}
       {combinations.map((combo, idx) => {
-        const variant = variants?.[idx];
-        const pricePHP = variant?.priceCents ?? initPriceInput;
-
         return (
           <div
             key={idx}
@@ -91,7 +88,6 @@ const ProductVariants = ({ updatingProduct }: Props) => {
               <Input
                 type="text"
                 inputMode="numeric"
-                value={pricePHP}
                 {...register(`variants.${idx}.priceCents`)}
               />
 

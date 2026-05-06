@@ -73,7 +73,7 @@ export const FilterDropdownItem = ({
 
   return (
     <DropdownMenuItem
-      className="flex-between filter-dropdown-item-spacing"
+      className="capitalize flex-between filter-dropdown-item-spacing"
       onSelect={handleSelect}
       onMouseDown={(e) => e.preventDefault()} // Keep input focused; prevents "Any" flicker
     >

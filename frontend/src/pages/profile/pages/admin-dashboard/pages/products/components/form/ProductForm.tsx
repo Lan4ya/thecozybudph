@@ -10,7 +10,11 @@ import {
 import { motion } from "framer-motion";
 import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type ProductFormInput, productFormSchema } from "@TheCozyBud/schemas";
+import {
+  type ProductFormInput,
+  type ProductFormOutput,
+  productFormSchema,
+} from "@TheCozyBud/schemas";
 import {
   Card,
   CardHeader,
@@ -75,7 +79,7 @@ export default function ProductForm() {
   });
 
   const hasChanges = formHasChanges(
-    form.watch() as ProductFormInput,
+    form.watch() as ProductFormOutput,
     updatingProduct,
     {
       imagesToDelete: imageUrlsToDelete,
@@ -185,7 +189,7 @@ export default function ProductForm() {
     void nextStep();
   };
 
-  // Derive image display: existing minus deletions plus selected blob urls
+  // Derive image display: (existing minus deletions plus selected)
   const displayImages = useMemo(() => {
     const existing = updatingProduct?.imageUrls ?? [];
     const filteredExisting = existing.filter(
@@ -195,11 +199,10 @@ export default function ProductForm() {
     return [...filteredExisting, ...newUrls];
   }, [updatingProduct, imageUrlsToDelete, newSelectedFiles]);
 
-  // Reset on form isFormOpen
+  // Reset prev form values on open
   useEffect(() => {
     if (!isFormOpen) return;
 
-    newSelectedFiles.forEach((s) => URL.revokeObjectURL(s.url)); // cleanup previous blobs
     setNewSelectedFiles([]);
     setImageUrlsToDelete([]);
     setCurrentFormStep(0);
@@ -223,7 +226,7 @@ export default function ProductForm() {
     }
   }, [isFormOpen, updatingProduct, form.reset]);
 
-  // Cleanup on unmount
+  // Cleanup blobs on unmount
   useEffect(() => {
     return () => {
       newSelectedFiles.forEach((s) => URL.revokeObjectURL(s.url));
@@ -381,7 +384,7 @@ export default function ProductForm() {
     ],
   );
 
-  const onSubmit = async (fieldData: ProductFormInput) => {
+  const onSubmit = async (fieldData: ProductFormOutput) => {
     // setSubmitting(true);
     setFormOpen(false); // close form immediately
 
@@ -451,7 +454,7 @@ export default function ProductForm() {
           <CardTitle className="">
             <div className="flex items-center gap-4">
               {updatingProduct ? (
-                <span>Update Product</span>
+                <span>Edit Product</span>
               ) : (
                 <>
                   <span>Create Product</span>

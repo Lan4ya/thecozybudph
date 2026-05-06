@@ -158,7 +158,7 @@ export const orderItemsSnapshots = pgTable(
     priceCents: integer("price_cents").notNull(),
   },
   (table) => [
-    check("order_items_price_cents_check", sql`${table.priceCents} >= 0`),
+    check("order_items_price_cents_check", sql`${table.priceCents} > 0`),
     check("order_items_quantity_check", sql`${table.quantity} > 0`),
 
     pgPolicy("authenticated can select own order items snapshot", {

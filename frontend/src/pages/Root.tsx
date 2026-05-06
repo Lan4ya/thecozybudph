@@ -45,8 +45,7 @@ function Root() {
       <div
         className={cn(
           "flex flex-col min-h-screen",
-          pathName !== "/" &&
-            !hideNav &&
+          !hideNav &&
             // hardcoded nav bar height (getting the actual height has delay which causes jank on page load)
             "pt-[56.15px] lg:pt-[61.166px]",
         )}

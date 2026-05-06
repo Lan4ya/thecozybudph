@@ -137,7 +137,7 @@ const TagItem = ({ label, filterKey, isXlScreen }: TagItemProps) => {
       variant="outline"
       size="sm"
       key={label}
-      className={cn("group flex items-center gap-1")}
+      className={cn("group flex items-center gap-1 capitalize")}
       onClick={() => {
         if (label === "Clear") {
           clearProductQueryFilters();

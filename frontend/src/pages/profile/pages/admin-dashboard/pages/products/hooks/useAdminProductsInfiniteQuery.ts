@@ -1,8 +1,8 @@
-import { ProductAPI } from "@/api/product";
 import type { ProductWithRelations } from "@TheCozyBud/schemas";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { useProductsPageState } from "./useProductsPageState";
+import { AdminAPI } from "@/api";
 
 export const useAdminProductsInfiniteQuery = () => {
   const { searchQuery } = useProductsPageState();
@@ -22,7 +22,7 @@ export const useAdminProductsInfiniteQuery = () => {
   } = useSuspenseInfiniteQuery<ProductWithRelations[]>({
     queryKey,
     queryFn: ({ pageParam }) =>
-      ProductAPI.queryProducts({
+      AdminAPI.queryProducts({
         page: pageParam as number,
         perPage,
         search: searchQuery,

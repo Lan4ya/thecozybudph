@@ -18,7 +18,7 @@ const ProductCard = ({ productId, name, imageUrl, price }: Props) => {
 
   return (
     <div onClick={handleClick}>
-      <div className="hover:scale-102 bg-card select-none text-card-foreground rounded-lg border border-border/30 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden cursor-pointer active:scale-[0.99] active:shadow-lg">
+      <div className="hover:scale-102 bg-card select-none text-card-foreground rounded-lg border-b border border-border/10 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden cursor-pointer active:scale-[0.99] active:shadow-lg">
         <div className="relative overflow-hidden">
           <ProductImage
             loading="lazy"
@@ -28,7 +28,7 @@ const ProductCard = ({ productId, name, imageUrl, price }: Props) => {
         </div>
 
         <div className="p-2  text-center">
-          <h3 className="font-medium text-sm lg:text-base line-clamp-2 leading-tight text-foreground">
+          <h3 className="capitalize font-medium text-sm lg:text-base line-clamp-2 leading-tight text-foreground">
             {name}
           </h3>
 

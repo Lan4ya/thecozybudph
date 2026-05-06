@@ -232,7 +232,7 @@ const DisplaySelectedFilters = ({
     <div
       // variant="minimal"
       // size="auto"
-      className="gap-1! text-sm absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground"
+      className="capitalize gap-1! text-sm absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground"
       // onClick={(e) => {
       //   e.stopPropagation();
       //

@@ -10,9 +10,8 @@ import {
 import PersistSuspense from "@/components/PersistSuspense";
 import { RouteLoaderSpinner } from "@/components/RouteLoaderSpinner";
 import { ArrowLeft } from "lucide-react";
-import { useIsLgScreenMin, useMediaQuery } from "@/hooks/useMediaQuery";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useEffect, useMemo, useState } from "react";
-import { motion } from "framer-motion";
 import { Star, Heart, Shield } from "lucide-react";
 import { useToast } from "@/providers/ToastProvider";
 import { cn } from "@/lib/utils/cn";
@@ -61,7 +60,6 @@ const ProductInner = () => {
   });
 
   const isSmScreenMax = useMediaQuery("(max-width: 518px)");
-  const isLgScreenMin = useIsLgScreenMin();
 
   const { addToast } = useToast();
   const session = useAuthStore((s) => s.session);
@@ -197,7 +195,7 @@ const ProductInner = () => {
           {/* Product Header */}
           <div className="flex items-center justify-between">
             <div className="flex-center gap-4">
-              <h1 className="text-lg lg:text-xl font-semibold text-foreground">
+              <h1 className="text-lg lg:text-xl font-semibold text-foreground capitalize">
                 {product.name}
               </h1>
 
@@ -273,7 +271,7 @@ const ProductInner = () => {
         {/* Description */}
         <div className="space-y-4 py-6 ">
           <h3 className="font-semibold">Description</h3>
-          <div className="text-sm text-muted-foreground">
+          <div className="first-letter:capitalize text-sm text-muted-foreground">
             {product.description ?? "No product description"}
           </div>
         </div>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
 
 import { Skeleton } from "@/lib/ui/__shadcn__/skeleton";
-import TCB_1 from "@/assets/thecozybud/TCB_1_C.png";
 import TCB_1_Cropped from "@/assets/thecozybud/TCB_1_Cropped.jpg";
 import TCB_3 from "@/assets/thecozybud/TCB_3.png";
 import TCB_5 from "@/assets/thecozybud/TCB_5.jpg";
@@ -15,16 +15,14 @@ import { cn } from "@/lib/utils/cn";
 import { useIsLgScreenMin } from "@/hooks/useMediaQuery";
 
 const imgSrcs = [TCB_1_Cropped, TCB_6, TCB_7, TCB_5, TCB_3];
+const TRANSITION_MS = 1000;
 
 const Hero = () => {
   const { registerSentinel, visibleMap } = useAnimateOnView();
   const isLgScreenMin = useIsLgScreenMin();
 
   return (
-    <section
-      className="flex w-full items-center justify-center  lg:mb-6 lg:h-screen"
-      aria-label="Hero"
-    >
+    <section aria-label="Hero" className="custom-container w-full">
       {isLgScreenMin ? (
         <DesktopHeroInner
           registerSentinel={registerSentinel}
@@ -39,8 +37,6 @@ const Hero = () => {
     </section>
   );
 };
-
-const TRANSITION_MS = 1550;
 
 const MobileHeroInner = ({
   registerSentinel,
@@ -57,7 +53,7 @@ const MobileHeroInner = ({
   useEffect(() => {
     const id = setInterval(() => {
       setIndex((i) => i + 1);
-    }, 6_000);
+    }, 15000);
 
     return () => clearInterval(id);
   }, []);
@@ -69,7 +65,7 @@ const MobileHeroInner = ({
         setIndex(1);
       }, TRANSITION_MS);
     }
-  }, [index]);
+  }, [index, slides.length]);
 
   useEffect(() => {
     if (!transition) {
@@ -81,65 +77,68 @@ const MobileHeroInner = ({
     }
   }, [transition]);
 
-  if (index === 0) {
-    // reached ghost LAST
-    setTimeout(() => {
-      setTransition(false);
-      setIndex(slides.length - 2);
-    }, TRANSITION_MS);
-  }
-
-  // const realIndex =
-  //   index === 0 ? slides.length - 2 : index === slides.length - 1 ? 1 : index;
-
   return (
-    <div className=" text-center flex-center flex-col gap-15 mt-30">
+    <div className="mx-auto flex w-full max-w-[560px] flex-col gap-8 pt-8 pb-24">
       <div
         ref={registerSentinel}
         className={cn(
-          "transition-all duration-900 ease-out flex flex-col gap-1 lg:gap-6 ",
+          "rounded-3xl border border-accent/10 bg-accent/5 px-5 py-6 text-center transition-all duration-900 ease-out",
           visibleMap[0]
-            ? "opacity-100 translate-y-0"
-            : "opacity-0 translate-y-8",
+            ? "translate-y-0 opacity-100"
+            : "translate-y-8 opacity-0",
         )}
       >
-        <h1 className="font-ivy-ora-display font-semibold  text-accent text-2xl md:text-3xl lg:text-4xl 2xl:text-5xl">
-          BLOSSOMING ELEGANCE
-        </h1>
-
-        <p className="font-ivy-ora-display max-w-[350px] fold-semibold sm:text-lg md:text-xl lg:text-xl 2xl:text-2xl sm:max-w-[270px] md:max-w-[390px] lg:max-w-[540px]">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur
-          quod dolore voluptates. Amet, veritatis officia. Tenetur voluptate
-          {/* Fresh, handcrafted arrangements designed to elevate everyday moments. */}
+        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.25em] text-accent/70">
+          The Cozy Bud
         </p>
+        <h1 className="font-ivy-ora-display text-3xl font-semibold text-accent">
+          Floral stories, styled for every moment
+        </h1>
+        <p className="mx-auto mt-3 max-w-[38ch] text-sm text-muted-foreground">
+          Fresh handcrafted arrangements with modern elegance, thoughtful
+          detail, and same-day convenience.
+        </p>
+        <div className="mt-5 flex items-center justify-center gap-3">
+          <Link
+            to="/shop"
+            className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary/90"
+          >
+            Shop now
+          </Link>
+          <Link
+            to="/about"
+            className="rounded-xl border border-accent/20 px-4 py-2 text-sm font-semibold text-accent transition hover:bg-accent/5"
+          >
+            Our story
+          </Link>
+        </div>
       </div>
 
-      {/* HERO IMG*/}
       <div
         ref={registerSentinel}
         className={cn(
-          "transition-all duration-900 ease-out h-full w-full overflow-hidden",
+          "overflow-hidden rounded-3xl border border-accent/10 shadow-xl bg-card transition-all duration-900 ease-out",
           visibleMap[1]
-            ? "opacity-100 translate-y-0"
-            : "opacity-0 translate-y-8",
+            ? "translate-y-0 opacity-100"
+            : "translate-y-8 opacity-0",
         )}
       >
         <div
-          className={`flex transition-transform h-full duration-[${TRANSITION_MS}ms] `}
+          className="flex h-full transition-transform"
           style={{
             transform: `translateX(-${index * 100}%)`,
             transitionDuration: transition ? `${TRANSITION_MS}ms` : "0ms",
           }}
         >
           {slides.map((src, i) => (
-            <div key={i} className="relative w-full h-full shrink-0 aspect-7/6">
+            <div key={i} className="relative h-full w-full shrink-0 aspect-4/5">
               {!imgLoaded && <Skeleton className="h-full w-full bg-card" />}
               <img
                 src={src}
                 loading={i === index ? "eager" : "lazy"}
                 decoding="async"
                 onLoad={() => setImgLoaded(true)}
-                className="w-full h-full object-cover pointer-events-none select-none"
+                className="pointer-events-none h-full w-full select-none object-cover"
               />
             </div>
           ))}
@@ -153,57 +152,106 @@ const DesktopHeroInner = ({
   registerSentinel,
   visibleMap,
 }: {
-  registerSentinel: (ref: HTMLElement | null) => void;
+  registerSentinel: RegisterSentinel;
   visibleMap: boolean[];
 }) => {
   const [loaded, setLoaded] = useState(false);
 
   return (
-    <div className={cn("relative h-full w-full overflow-hidden")}>
-      {!loaded && <Skeleton className="h-full w-full rounded-none bg-card" />}
-      <img
+    <div className="mx-auto grid w-full max-w-[1420px] items-center gap-10 py-30 pb-32 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] xl:gap-14">
+      <div
         ref={registerSentinel}
-        src={TCB_1}
-        alt="hero"
         className={cn(
-          "pointer-events-none select-none h-full w-full transition-all duration-900 ease-out object-cover",
-          loaded && visibleMap[0]
-            ? "opacity-100 translate-y-0"
-            : "opacity-0 -translate-y-8",
+          "space-y-6 transition-all duration-900 ease-out",
+          visibleMap[0]
+            ? "translate-y-0 opacity-100"
+            : "translate-y-8 opacity-0",
         )}
-        loading="eager"
-        decoding="async"
-        onLoad={() => setLoaded(true)}
-      />
+      >
+        <p className="text-xs font-semibold uppercase tracking-[0.32em] text-accent/70">
+          The Cozy Bud
+        </p>
 
-      <HeroText registerSentinel={registerSentinel} visibleMap={visibleMap} />
-    </div>
-  );
-};
+        <h1 className="font-ivy-ora-display text-5xl leading-tight text-accent xl:text-6xl">
+          Modern floral design for meaningful days
+        </h1>
 
-export const HeroText = ({
-  registerSentinel,
-  visibleMap,
-}: {
-  registerSentinel: (ref: HTMLElement | null) => void;
-  visibleMap: boolean[];
-}) => {
-  return (
-    <div
-      ref={(el) => registerSentinel(el)}
-      className={cn(
-        "absolute top-[40%] left-[7%] flex flex-col gap-1 text-white md:top-[45%] md:left-[7%] lg:left-[4%] lg:top-[40%] lg:gap-6 transition-all duration-900 ease-out",
-        visibleMap[1] ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
-      )}
-    >
-      <h1 className="font-ivy-ora-display font-medium lg:font-bold text-accent max-[395px]:text-base text-[22px] sm:text-2xl md:text-3xl lg:text-4xl 2xl:text-5xl">
-        BLOSSOMING ELEGANCE
-      </h1>
-      <p className="font-ivy-ora-display max-w-[280px] fold-semibold sm:text-lg md:text-xl lg:text-xl 2xl:text-2xl sm:max-w-[270px] md:max-w-[390px] lg:max-w-[540px]">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur
-        quod dolore voluptates. Amet, veritatis officia. Tenetur voluptate
-        {/* Fresh, handcrafted arrangements designed to elevate everyday moments. */}
-      </p>
+        <p className="max-w-[52ch] text-lg text-muted-foreground">
+          Elevated arrangements crafted with intention. From everyday gifting to
+          milestone celebrations, each bouquet is curated to feel timeless and
+          personal.
+        </p>
+
+        <div className="flex items-center gap-3">
+          <Link
+            to="/shop"
+            className="rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary/90"
+          >
+            Explore collection
+          </Link>
+          <Link
+            to="/about"
+            className="rounded-xl border border-accent/20 px-5 py-3 text-sm font-semibold text-accent transition hover:bg-accent/5"
+          >
+            Meet CozyBud
+          </Link>
+        </div>
+
+        <div className="grid max-w-[540px] grid-cols-3 gap-3 pt-2">
+          <div className="rounded-2xl border border-accent/10 bg-accent/5 px-4 py-3">
+            <p className="text-sm font-semibold text-accent">
+              Everlasting form
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Naturally preserved blooms
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-accent/10 bg-accent/5 px-4 py-3">
+            <p className="text-sm font-semibold text-accent">
+              Softly aged palette
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Muted tones that evolve gracefully
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-accent/10 bg-accent/5 px-4 py-3">
+            <p className="text-sm font-semibold text-accent">
+              Designed to linger
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Pieces meant for long-term display
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        ref={registerSentinel}
+        className={cn(
+          "relative transition-all duration-900 ease-out",
+          visibleMap[1]
+            ? "translate-y-0 opacity-100"
+            : "translate-y-8 opacity-0",
+        )}
+      >
+        <div className="absolute -inset-6 -z-10 rounded-[2.5rem] bg-gradient-to-br from-primary/10 via-accent/10 to-transparent blur-2xl" />
+        <div className="overflow-hidden rounded-[2.5rem] border border-accent/10 bg-card shadow-2xl">
+          {!loaded && <Skeleton className="h-[620px] w-full bg-card" />}
+          <img
+            src={TCB_1_Cropped}
+            alt="CozyBud floral arrangement"
+            className={cn(
+              "pointer-events-none h-[620px] w-full select-none object-cover transition-opacity duration-300",
+              loaded ? "opacity-100" : "opacity-0",
+            )}
+            loading="eager"
+            decoding="async"
+            onLoad={() => setLoaded(true)}
+          />
+        </div>
+      </div>
     </div>
   );
 };

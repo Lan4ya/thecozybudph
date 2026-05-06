@@ -16,11 +16,9 @@ const navItems = [
 
 export const DesktopNavLinks = ({
   cartItemsCount,
-  isBackgroundShown,
   hasSession,
 }: {
   cartItemsCount: number;
-  isBackgroundShown: boolean;
   hasSession: boolean;
 }) => {
   const [hovered, setHovered] = useState<string | null>(null);
@@ -51,8 +49,8 @@ export const DesktopNavLinks = ({
             <NavLink
               to={href}
               className={cn(
-                "text-primary-foreground hover:text-primary-foreground/70 text-lg font-medium transition-colors",
-                isBackgroundShown && "text-foreground hover:text-primary/70",
+                "text-foreground hover:text-primary-foreground/70 text-lg font-medium transition-colors",
+                "text-foreground hover:text-primary/70",
               )}
             >
               {label}
@@ -87,8 +85,8 @@ export const DesktopNavLinks = ({
         <NavLink
           to="/cart"
           className={cn(
-            "text-primary-foreground hover:text-primary-foreground/70 transition-colors relative",
-            isBackgroundShown && "text-foreground hover:text-primary/70",
+            "text-primary-foreground transition-colors relative",
+            "text-foreground hover:text-primary/70",
           )}
         >
           <div className="absolute -right-3.5 -top-[9px] flex-center text-secondary-foreground text-[9px] font-medium bg-secondary size-5 rounded-full select-none">

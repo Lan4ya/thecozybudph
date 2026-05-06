@@ -1,0 +1,2 @@
+ALTER TABLE "order_items_snapshots" DROP CONSTRAINT "order_items_price_cents_check";--> statement-breakpoint
+ALTER TABLE "order_items_snapshots" ADD CONSTRAINT "order_items_price_cents_check" CHECK ("order_items_snapshots"."price_cents" > 0);

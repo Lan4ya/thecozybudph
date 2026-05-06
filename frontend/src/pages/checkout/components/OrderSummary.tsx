@@ -91,7 +91,7 @@ const OrderList = ({ orderItems }: { orderItems: OrderItemUI[] }) => {
               </div>
 
               <div className="flex-1 min-w-0">
-                <h3 className="line-clamp-2 text-sm">{item.name}</h3>
+                <h3 className="capitalize line-clamp-2 text-sm">{item.name}</h3>
 
                 {Object.keys(item.attributes).length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-1">
@@ -105,8 +105,8 @@ const OrderList = ({ orderItems }: { orderItems: OrderItemUI[] }) => {
                   <span className="text-sm font-semibold text-primary shrink-0">
                     {formatPriceCents(item.priceCents * item.quantity)}
                   </span>
-                  <span className="text-xs text-muted-foreground">
-                    Qty: {item.quantity}
+                  <span className="text-sm text-muted-foreground">
+                    Quantity: {item.quantity}
                   </span>
                 </div>
               </div>

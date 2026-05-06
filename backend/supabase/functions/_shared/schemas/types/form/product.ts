@@ -5,7 +5,11 @@ import {
   updateProductFormSchema,
 } from "../../zod/index.ts";
 
-export type CreateProductFormInput = z.infer<typeof createProductFormSchema>;
-export type UpdateProductFormInput = z.infer<typeof updateProductFormSchema>;
+export type CreateProductFormInput = z.input<typeof createProductFormSchema>;
+export type CreateProductFormOutput = z.output<typeof createProductFormSchema>;
 
-export type ProductFormInput = z.infer<typeof productFormSchema>;
+export type UpdateProductFormInput = z.input<typeof updateProductFormSchema>;
+export type UpdateProductFormOutput = z.output<typeof updateProductFormSchema>;
+
+export type ProductFormInput = z.input<typeof productFormSchema>;
+export type ProductFormOutput = z.output<typeof productFormSchema>;

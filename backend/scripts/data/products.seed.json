@@ -1,0 +1,310 @@
+{
+  "products": [
+    {
+      "name": "moonlight sonata",
+      "description": "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Non molestiae necessitatibus numquam explicabo dolores quaerat facilis sit autem illum iure soluta provident, consequatur accusantium aspernatur odio, doloremque doloribus, officia rerum!",
+      "categoryName": "vase",
+      "collectionName": "midnight dawn",
+      "options": [
+        {
+          "name": "stem count",
+          "values": [
+            "3",
+            "6"
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "priceCents": 250000,
+          "attributes": {
+            "stem count": "3"
+          }
+        },
+        {
+          "priceCents": 450000,
+          "attributes": {
+            "stem count": "6"
+          }
+        }
+      ],
+      "primaryImageIndex": 0,
+      "images": [
+        "./images/moonlight-sonata.jpg",
+        "./images/moonlight-sonata-2.jpg"
+      ]
+    },
+    {
+      "name": "crimson heirloom",
+      "description": "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Non molestiae necessitatibus numquam explicabo dolores quaerat facilis sit autem illum iure soluta provident, consequatur accusantium aspernatur odio, doloremque doloribus, officia rerum!",
+      "categoryName": "mug",
+      "options": [
+        {
+          "name": "stem count",
+          "values": [
+            "1",
+            "3"
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "priceCents": 50000,
+          "attributes": {
+            "stem count": "1"
+          }
+        },
+        {
+          "priceCents": 70000,
+          "attributes": {
+            "stem count": "3"
+          }
+        }
+      ],
+      "primaryImageIndex": 0,
+      "images": [
+        "./images/crimson-heirloom.jpg",
+        "./images/crimson-heirloom-2.jpg",
+        "./images/crimson-heirloom-3.jpg"
+      ]
+    },
+    {
+      "name": "indigo solstice",
+      "description": "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Non molestiae necessitatibus numquam explicabo dolores quaerat facilis sit autem illum iure soluta provident, consequatur accusantium aspernatur odio, doloremque doloribus, officia rerum!",
+      "categoryName": "bouquet",
+      "options": [
+        {
+          "name": "stem count",
+          "values": [
+            "1",
+            "3"
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "priceCents": 70000,
+          "attributes": {
+            "stem count": "1"
+          }
+        },
+        {
+          "priceCents": 90000,
+          "attributes": {
+            "stem count": "3"
+          }
+        }
+      ],
+      "primaryImageIndex": 0,
+      "images": [
+        "./images/indigo-solstice.jpeg",
+        "./images/indigo-solstice-3.jpg",
+        "./images/indigo-solstice-2.jpg"
+      ]
+    },
+    {
+      "name": "golden times",
+      "description": "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Non molestiae necessitatibus numquam explicabo dolores quaerat facilis sit autem illum iure soluta provident, consequatur accusantium aspernatur odio, doloremque doloribus, officia rerum!",
+      "categoryName": "bouquet",
+      "options": [
+        {
+          "name": "stem count",
+          "values": [
+            "1",
+            "3"
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "priceCents": 68000,
+          "attributes": {
+            "stem count": "1"
+          }
+        },
+        {
+          "priceCents": 92000,
+          "attributes": {
+            "stem count": "3"
+          }
+        }
+      ],
+      "primaryImageIndex": 0,
+      "images": [
+        "./images/golden-times.jpg",
+        "./images/golden-times-2.jpg",
+        "./images/golden-times-3.jpg"
+      ]
+    },
+    {
+      "name": "imperial velvet",
+      "description": "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Non molestiae necessitatibus numquam explicabo dolores quaerat facilis sit autem illum iure soluta provident, consequatur accusantium aspernatur odio, doloremque doloribus, officia rerum!",
+      "categoryName": "vase",
+      "collectionName": "midnight dawn",
+      "options": [
+        {
+          "name": "stem count",
+          "values": [
+            "3",
+            "6"
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "priceCents": 110000,
+          "attributes": {
+            "stem count": "3"
+          }
+        },
+        {
+          "priceCents": 136000,
+          "attributes": {
+            "stem count": "6"
+          }
+        }
+      ],
+      "primaryImageIndex": 0,
+      "images": [
+        "./images/imperial-velvet.jpg",
+        "./images/imperial-velvet-2.jpg",
+        "./images/imperial-velvet-3.jpg"
+      ]
+    },
+    {
+      "name": "lunar serenade",
+      "description": "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Non molestiae necessitatibus numquam explicabo dolores quaerat facilis sit autem illum iure soluta provident, consequatur accusantium aspernatur odio, doloremque doloribus, officia rerum!",
+      "categoryName": "bouquet",
+      "options": [
+        {
+          "name": "stem count",
+          "values": [
+            "1",
+            "3"
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "priceCents": 200000,
+          "attributes": {
+            "stem count": "1"
+          }
+        },
+        {
+          "priceCents": 300000,
+          "attributes": {
+            "stem count": "3"
+          }
+        }
+      ],
+      "primaryImageIndex": 0,
+      "images": [
+        "./images/lunar-serenade.jpg",
+        "./images/lunar-serenade-2.jpg",
+        "./images/lunar-serenade-3.jpg"
+      ]
+    },
+    {
+      "name": "petal prelude",
+      "description": "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Non molestiae necessitatibus numquam explicabo dolores quaerat facilis sit autem illum iure soluta provident, consequatur accusantium aspernatur odio, doloremque doloribus, officia rerum!",
+      "categoryName": "bouquet",
+      "options": [
+        {
+          "name": "stem count",
+          "values": [
+            "1",
+            "3"
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "priceCents": 52000,
+          "attributes": {
+            "stem count": "1"
+          }
+        },
+        {
+          "priceCents": 73000,
+          "attributes": {
+            "stem count": "3"
+          }
+        }
+      ],
+      "primaryImageIndex": 0,
+      "images": [
+        "./images/petal-prelude.jpg",
+        "./images/petal-prelude-2.jpg"
+      ]
+    },
+    {
+      "name": "rhapsody in rose",
+      "description": "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Non molestiae necessitatibus numquam explicabo dolores quaerat facilis sit autem illum iure soluta provident, consequatur accusantium aspernatur odio, doloremque doloribus, officia rerum!",
+      "categoryName": "bouquet",
+      "options": [
+        {
+          "name": "stem count",
+          "values": [
+            "1",
+            "3"
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "priceCents": 56000,
+          "attributes": {
+            "stem count": "1"
+          }
+        },
+        {
+          "priceCents": 76000,
+          "attributes": {
+            "stem count": "3"
+          }
+        }
+      ],
+      "primaryImageIndex": 0,
+      "images": [
+        "./images/rhapsody-in-rose.jpg",
+        "./images/rhapsody-in-rose-2.jpg"
+      ]
+    },
+    {
+      "name": "stardust symphony",
+      "description": "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Non molestiae necessitatibus numquam explicabo dolores quaerat facilis sit autem illum iure soluta provident, consequatur accusantium aspernatur odio, doloremque doloribus, officia rerum!",
+      "categoryName": "vase",
+      "collectionName": "midnight dawn",
+      "options": [
+        {
+          "name": "stem count",
+          "values": [
+            "3",
+            "6"
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "priceCents": 114000,
+          "attributes": {
+            "stem count": "3"
+          }
+        },
+        {
+          "priceCents": 142000,
+          "attributes": {
+            "stem count": "6"
+          }
+        }
+      ],
+      "primaryImageIndex": 0,
+      "images": [
+        "./images/stardust-symphony.jpg",
+        "./images/stardust-symphony-2.jpg",
+        "./images/stardust-symphony-3.jpg"
+      ]
+    }
+  ]
+}

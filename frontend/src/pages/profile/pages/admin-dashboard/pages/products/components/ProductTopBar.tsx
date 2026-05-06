@@ -18,7 +18,6 @@ const ProductTopBar = () => {
     searchQuery,
     openCreateProductForm,
     deletingProductIds,
-    setDeletingInProgress,
     resetDeletingProductIds,
   } = useProductsPageState();
 
@@ -66,13 +65,10 @@ const ProductTopBar = () => {
 
     const idsToDelete = Array.from(deletingProductIds);
 
-    setDeletingInProgress(true);
-
     deleteProductMutation.mutate(
       { productIds: idsToDelete },
       {
         onSettled: () => {
-          setDeletingInProgress(false);
           resetDeletingProductIds();
           queryClient.resetQueries({ queryKey: ["cart"] });
         },

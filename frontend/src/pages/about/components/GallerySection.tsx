@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Navigation, A11y, Thumbs } from "swiper/modules";
+import { Navigation, A11y } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/swiper.css";
 
@@ -15,7 +15,16 @@ import eventPic2 from "@/assets/thecozybud/event_pic_2.jpg";
 import eventPic3 from "@/assets/thecozybud/event_pic_3.jpg";
 import eventPic4 from "@/assets/thecozybud/event_pic_4.jpg";
 
-const galleryImages = [TCB_5, TCB_6, TCB_7, TCB_3, eventPic1, eventPic2, eventPic3, eventPic4];
+const galleryImages = [
+  TCB_5,
+  TCB_6,
+  TCB_7,
+  TCB_3,
+  eventPic1,
+  eventPic2,
+  eventPic3,
+  eventPic4,
+];
 
 interface GallerySectionProps {
   registerSentinel: (ref: HTMLElement | null) => void;
@@ -44,7 +53,7 @@ const GallerySection = ({
             "text-center mb-12 transition-all duration-900 ease-out",
             visibleMap[titleIndex]
               ? "opacity-100 translate-y-0"
-              : "opacity-0 translate-y-8"
+              : "opacity-0 translate-y-8",
           )}
         >
           <h2 className="font-ivy-ora-display text-3xl lg:text-4xl font-semibold mb-4">
@@ -61,13 +70,13 @@ const GallerySection = ({
             "max-w-2xl mx-auto transition-all duration-900 ease-out",
             visibleMap[carouselIndex]
               ? "opacity-100 translate-y-0"
-              : "opacity-0 translate-y-8"
+              : "opacity-0 translate-y-8",
           )}
         >
           {/* Gallery Carousel */}
           <div className="overflow-hidden relative w-full bg-background rounded-xl group active:cursor-grabbing">
             <Swiper
-              modules={[Thumbs, Navigation, A11y]}
+              modules={[Navigation, A11y]}
               spaceBetween={0}
               slidesPerView={1}
               navigation={{
@@ -124,7 +133,7 @@ const GallerySection = ({
                 key={i}
                 className={cn(
                   "w-2.5 h-2.5 rounded-full bg-gray-400 transition-colors",
-                  i === activeGalleryIndex && "bg-accent"
+                  i === activeGalleryIndex && "bg-accent",
                 )}
               />
             ))}
@@ -136,3 +145,4 @@ const GallerySection = ({
 };
 
 export default GallerySection;
+

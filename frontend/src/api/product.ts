@@ -3,15 +3,11 @@ import {
   type ProductCategory,
   type ProductCollection,
   type Product,
-  type ProductWithRelations,
   type ProductListItem,
 } from "@TheCozyBud/schemas";
 import { snakeToCamel } from "@/lib/utils/caseConverter.ts";
 import type { ProductQueryListItemsAPI } from "@/types";
-import {
-  mapProductAndRelationsRowToProductWithRelationsDomain,
-  mapProductAndVariantsRowToProductDomain,
-} from "@/lib/utils/mappers";
+import { mapProductAndVariantsRowToProductDomain } from "@/lib/utils/mappers";
 import isDev from "@/lib/utils/isDev";
 
 export const ProductAPI = {
@@ -107,40 +103,6 @@ export const ProductAPI = {
 
     // console.log("products: ", productListItems);
     return productListItems;
-  },
-
-  // Queries the full information of products along with it's relations
-  // (variants, collections, categories) to display in admin dashboard
-  queryProducts: async ({
-    page = 0,
-    perPage = 12,
-    search,
-  }: {
-    page: number;
-    perPage: number;
-    search?: string;
-  }): Promise<ProductWithRelations[]> => {
-    let query = supabase
-      .from("products")
-      .select(
-        "*, product_variants(attributes, id, price_cents), product_categories(name), product_collections(name)",
-      )
-      .range(page * perPage, (page + 1) * perPage - 1)
-      .order("created_at", { ascending: false })
-      .order("id", { ascending: false });
-
-    if (search) {
-      query = query.ilike("name", `%${search}%`);
-    }
-
-    const { data, error } = await query;
-
-    if (error) throw error;
-    if (!data) return [];
-
-    return data.map((d) =>
-      mapProductAndRelationsRowToProductWithRelationsDomain(d),
-    );
   },
 
   getById: async (productId: string): Promise<Product | null> => {

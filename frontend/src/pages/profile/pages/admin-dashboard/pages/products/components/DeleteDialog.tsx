@@ -11,7 +11,6 @@ import { DialogClose, DialogTrigger } from "@radix-ui/react-dialog";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import { cn } from "@/lib/utils/cn";
 
-// TODO: disable select and edit button on the product that's being deleted
 export function DeleteProductDialog({
   onConfirm,
   deleteLoading,

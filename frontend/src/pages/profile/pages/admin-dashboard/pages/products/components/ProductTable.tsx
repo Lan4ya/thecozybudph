@@ -1,5 +1,4 @@
 import { ProductImage } from "@/components/products/ProductImage";
-import { ProductAPI } from "@/api/product";
 import type { ProductWithRelations } from "@TheCozyBud/schemas";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
@@ -10,6 +9,8 @@ import { cn } from "@/lib/utils/cn";
 import { useProductsPageState } from "../hooks/useProductsPageState";
 import { formatPriceCents } from "@/lib/utils/format";
 import { MetaBadge } from "@/components/MetaBadge";
+import { useProductMutations } from "../hooks/useProductsMutations";
+import { AdminAPI } from "@/api";
 
 export default function ProductTable() {
   const {
@@ -18,6 +19,8 @@ export default function ProductTable() {
     toggleDeletingProductId,
     searchQuery,
   } = useProductsPageState();
+
+  const { deleteProductMutation } = useProductMutations();
 
   const perPage = 12;
   const DAY = 1000 * 60 * 60 * 24;
@@ -34,7 +37,7 @@ export default function ProductTable() {
   } = useSuspenseInfiniteQuery<ProductWithRelations[]>({
     queryKey,
     queryFn: ({ pageParam }) =>
-      ProductAPI.queryProducts({
+      AdminAPI.queryProducts({
         page: pageParam as number,
         perPage,
         search: searchQuery,
@@ -96,7 +99,8 @@ export default function ProductTable() {
           onUpdate={() => openUpdateProductForm(p)}
           onToggle={() => toggleDeletingProductId(p.id)}
           product={p}
-          isDeleting={deletingProductIds.has(p.id)}
+          isSelected={deletingProductIds.has(p.id)}
+          isDeleting={deleteProductMutation.isPending}
         />
       ))}
 
@@ -116,12 +120,14 @@ type ProductRowProps = {
   onUpdate: () => void;
   onToggle: () => void;
   isDeleting: boolean;
+  isSelected: boolean;
 };
 
 function ProductRow({
   product,
   onUpdate,
   isDeleting,
+  isSelected,
   onToggle,
 }: ProductRowProps) {
   const updatedAt = new Date(product.updatedAt).toLocaleDateString(undefined, {
@@ -134,17 +140,20 @@ function ProductRow({
     <article className="border grid grid-cols-[auto_auto_3fr_1fr] sm:grid-cols-[auto_auto_3fr_repeat(3,1fr)] xl:grid-cols-[auto_auto_3fr_repeat(5,1fr)] items-center justify-items-center gap-4 px-2 py-4 rounded-lg hover:shadow-sm transition">
       {/* Selection Toggle */}
       <div className="flex items-center">
-        <div
+        <button
+          type="button"
           onClick={onToggle}
+          disabled={isDeleting && isSelected}
           className={cn(
             "flex-center size-6 border-2 rounded-md cursor-pointer transition-all",
-            isDeleting
+            isSelected
               ? "border-primary bg-primary text-primary-foreground"
               : "border-muted-foreground/70 bg-background hover:border-primary",
           )}
+          aria-label={`${isDeleting ? "Deleting" : "Select"} ${product.name}`}
         >
-          {isDeleting && <Check className="size-3" />}
-        </div>
+          {isSelected && <Check className="size-3" />}
+        </button>
       </div>
 
       {/* Image */}
@@ -157,34 +166,29 @@ function ProductRow({
 
       {/* Details */}
       <div className="items-start justify-self-start flex flex-col">
-        <h3 className="text-sm lg:text-base font-medium truncate">
+        <h3 className="capitalize text-sm lg:text-base font-medium truncate">
           {product.name}
         </h3>
 
-        <p className="sm:hidden text-xs font-semibold text-primary">
+        <p className="sm:hidden mt-1 text-xs font-semibold text-primary">
           Price: {formatPriceCents(product.minPriceCents)}
         </p>
 
-        <MetaBadge
-          className="truncate"
-          label={"category"}
-          value={product.categoryName}
-        />
-
-        {product.collectionName && (
+        <div className="flex-center gap-2 mt-2">
           <MetaBadge
-            className="hidden sm:inline mt-1 truncate"
-            label="collection"
-            value={product.collectionName}
+            className="truncate"
+            label={"category"}
+            value={product.categoryName}
           />
-        )}
-      </div>
 
-      <div className="hidden xl:block text-center">
-        <p className="text-sm">Options</p>
-        <p className="text-[12.5px] text-muted-foreground">
-          {product.options.length}
-        </p>
+          {product.collectionName && (
+            <MetaBadge
+              className="hidden lg:inline truncate"
+              label="collection"
+              value={product.collectionName}
+            />
+          )}
+        </div>
       </div>
 
       <div className="hidden xl:block text-center ">
@@ -194,16 +198,23 @@ function ProductRow({
         </p>
       </div>
 
-      <div className="hidden sm:block">
-        <p className="text-sm">Updated</p>
-        <p className="text-[12.5px] text-muted-foreground">{updatedAt}</p>
-      </div>
-
-      <div className="hidden sm:block">
-        <p className="text-sm">Price</p>
+      <div className="text-center hidden sm:block">
+        <p className="text-sm">Min Price</p>
         <p className="text-[12.5px] text-primary">
           {formatPriceCents(product.minPriceCents)}
         </p>
+      </div>
+
+      <div className="text-center hidden sm:block">
+        <p className="text-sm">Max Price</p>
+        <p className="text-[12.5px] text-primary">
+          {formatPriceCents(product.maxPriceCents)}
+        </p>
+      </div>
+
+      <div className="hidden sm:block">
+        <p className="text-sm">Updated</p>
+        <p className="text-[12.5px] text-muted-foreground">{updatedAt}</p>
       </div>
 
       {/* Edit */}
@@ -212,6 +223,7 @@ function ProductRow({
           variant="outline"
           size="sm"
           onClick={onUpdate}
+          disabled={isSelected}
           aria-label={`Edit ${product.name}`}
         >
           <Edit className="size-4" />

@@ -1,11 +1,23 @@
 import isEqual from "fast-deep-equal";
 import type {
-  ProductFormInput,
+  ProductFormOutput,
   ProductWithRelations,
 } from "@TheCozyBud/schemas";
 
+function normalizeVariants(
+  variants: Array<{
+    priceCents?: string | number;
+    attributes?: Record<string, string>;
+  }>,
+) {
+  return variants.map((v) => ({
+    priceCents: v.priceCents === undefined ? undefined : String(v.priceCents),
+    attributes: v.attributes,
+  }));
+}
+
 export function formHasChanges(
-  values: ProductFormInput,
+  values: ProductFormOutput,
   updatingProduct: ProductWithRelations | null,
   stateOnlyValues?: {
     imagesToDelete?: string[];
@@ -41,19 +53,6 @@ export function formHasChanges(
 
   // UPDATE MODE
   if (!updatingProduct) return false;
-
-  function normalizeVariants(
-    variants: Array<{
-      priceCents?: string | number;
-      attributes?: Record<string, string>;
-    }>,
-  ) {
-    return variants.map((v) => ({
-      priceCents:
-        v.priceCents === undefined ? undefined : String(v.priceCents),
-      attributes: v.attributes,
-    }));
-  }
 
   const original = {
     name: updatingProduct.name,
