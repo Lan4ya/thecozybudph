@@ -1,7 +1,3 @@
-import {
-  capitalizeFirstLetter,
-  capitalizeFirstLetterOfEachWord,
-} from "@/lib/utils/format";
 import type {
   CreateProductFormOutput,
   UpdateProductFormOutput,
@@ -22,17 +18,12 @@ export function buildCreateProductFormData(fields: CreateProductFormOutput) {
 
   fd.append("primaryImageIndex", String(fields.primaryImageIndex));
 
-  appendIfDefined(
-    fd,
-    "description",
-    fields.description && capitalizeFirstLetter(fields.description),
-  );
+  appendIfDefined(fd, "description", fields.description && fields.description);
 
   appendIfDefined(
     fd,
     "collectionName",
-    fields.collectionName &&
-      capitalizeFirstLetterOfEachWord(fields.collectionName),
+    fields.collectionName && fields.collectionName,
   );
 
   // for (const pair of fd.entries()) {
@@ -52,23 +43,18 @@ export function buildUpdateProductFormData(fields: UpdateProductFormOutput) {
 
   fd.append("variants", JSON.stringify(fields.variants));
 
-  appendIfDefined(
-    fd,
-    "description",
-    fields.description && capitalizeFirstLetter(fields.description),
-  );
+  appendIfDefined(fd, "description", fields.description && fields.description);
 
   appendIfDefined(
     fd,
     "categoryName",
-    fields.categoryName && capitalizeFirstLetterOfEachWord(fields.categoryName),
+    fields.categoryName && fields.categoryName,
   );
 
   appendIfDefined(
     fd,
     "collectionName",
-    fields.collectionName &&
-      capitalizeFirstLetterOfEachWord(fields.collectionName),
+    fields.collectionName && fields.collectionName,
   );
 
   appendIfDefined(fd, "primaryImageIndex", fields.primaryImageIndex);

@@ -5,6 +5,7 @@ import { useSearchParams } from "react-router";
 type AdminProductsContextType = {
   isFormOpen: boolean;
   setFormOpen: (open: boolean) => void;
+
   updatingProduct: ProductWithRelations | null;
   openCreateProductForm: () => void;
   openUpdateProductForm: (product: ProductWithRelations) => void;

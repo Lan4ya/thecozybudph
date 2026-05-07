@@ -8,8 +8,8 @@ export const createAddressSchema = z.object({
   region: z.string().trim().min(1, "region can't be empty"),
   city: z.string().trim().min(1, "city can't be empty"),
   province: z.preprocess(
-    (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
-    z.string().optional(),
+    (v) => (typeof v === "string" && v.trim() === "" ? null : v),
+    z.string().nullable().optional(),
   ),
   postalCode: z
     .string()

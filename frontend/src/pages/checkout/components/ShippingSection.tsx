@@ -55,7 +55,7 @@ const ShippingSection = () => {
 
     setShipping({
       fee: Number(first.priceBreakdown.total),
-      serviceType: first.serviceType,
+      serviceType: first.serviceType.toLowerCase(),
       quotationId: first.id,
     });
     // }
@@ -66,7 +66,11 @@ const ShippingSection = () => {
     shippingPrice: number,
     quotationId: string,
   ) => {
-    setShipping({ quotationId, fee: shippingPrice, serviceType });
+    setShipping({
+      quotationId,
+      fee: shippingPrice,
+      serviceType: serviceType.toLowerCase(),
+    });
   };
 
   return (
@@ -98,12 +102,13 @@ const ShippingSection = () => {
         {!isFetching &&
           quotations &&
           quotations.map((quote) => {
+            const normalizedServiceType = quote.serviceType.toLowerCase();
             return (
               <label
                 key={quote.id}
                 className={cn(
                   "flex items-start justify-between p-3 rounded-lg border cursor-pointer transition-all",
-                  shipping?.serviceType === quote.serviceType
+                  shipping?.serviceType === normalizedServiceType
                     ? "border-primary bg-primary/5"
                     : "border-border/40 hover:border-primary/50",
                 )}
@@ -112,11 +117,11 @@ const ShippingSection = () => {
                   <input
                     type="radio"
                     name="shippingOption"
-                    value={quote.serviceType}
-                    checked={shipping?.serviceType === quote.serviceType}
+                    value={normalizedServiceType}
+                    checked={shipping?.serviceType === normalizedServiceType}
                     onChange={() =>
                       handleSelect(
-                        quote.serviceType,
+                        normalizedServiceType,
                         Number(quote.priceBreakdown.total),
                         quote.id,
                       )
@@ -126,7 +131,7 @@ const ShippingSection = () => {
 
                   <div>
                     <p className="font-medium text-foreground">
-                      {capitalizeFirstLetter(quote.serviceType)}
+                      {capitalizeFirstLetter(normalizedServiceType)}
                     </p>
 
                     <p className="text-xs text-muted-foreground">

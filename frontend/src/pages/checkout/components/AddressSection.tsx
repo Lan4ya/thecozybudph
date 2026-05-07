@@ -20,8 +20,8 @@ const AddressSection = () => {
   } = useDefaultAddressQuery({ enabled: !addressStore });
 
   useEffect(() => {
-    if (!addressStore && defaultAddress) setAddress(defaultAddress);
-  }, [defaultAddress]);
+    if (defaultAddress && !addressStore) setAddress(defaultAddress);
+  }, [defaultAddress, addressStore, setAddress]);
 
   if (isFetching) {
     return (
@@ -52,6 +52,17 @@ const AddressSection = () => {
         msg={"Failed getting delivery address. please try again."}
       />
     );
+
+  const parts = [
+    addressStore?.addressLine,
+    addressStore?.barangay?.toLowerCase().startsWith("barangay")
+      ? addressStore?.barangay
+      : `Barangay ${addressStore?.barangay}`,
+    addressStore?.city,
+    addressStore?.province,
+    addressStore?.region,
+    addressStore?.postalCode,
+  ].filter(Boolean);
 
   return (
     <motion.div
@@ -91,15 +102,7 @@ const AddressSection = () => {
         <div className="space-y-1 text-sm">
           <p className="font-medium text-foreground">{addressStore.fullName}</p>
           <p className="text-muted-foreground">{addressStore.phoneNumber}</p>
-          <p className="text-muted-foreground">
-            {addressStore.addressLine},{" "}
-            {addressStore.barangay.toLowerCase().startsWith("baran")
-              ? ""
-              : "Barangay"}{" "}
-            {addressStore.barangay}, {addressStore.city},{" "}
-            {addressStore.province}, {addressStore.region},{" "}
-            {addressStore.postalCode}
-          </p>
+          <p className="text-muted-foreground">{parts.join(", ")}</p>
         </div>
       )}
     </motion.div>

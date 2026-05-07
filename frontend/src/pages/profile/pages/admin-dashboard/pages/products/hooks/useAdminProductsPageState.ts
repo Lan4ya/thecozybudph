@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { AdminProductsContext } from "../providers/AdminProductsProvider";
 
-export const useProductsPageState = () => {
+export const useAdminProductsPageState = () => {
   const ctx = useContext(AdminProductsContext);
   if (!ctx)
     throw new Error(

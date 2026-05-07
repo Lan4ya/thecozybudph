@@ -1,20 +1,19 @@
 import { useState } from "react";
-import { NavLink, useLocation } from "react-router";
+import { NavLink } from "react-router";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import {
   BarChart3,
   CalendarDays,
-  Menu,
   Package,
   ShoppingCart,
   Users,
 } from "lucide-react";
-import { Button } from "@/lib/ui/__shadcn__/button";
 import { Drawer, DrawerContent } from "@/lib/ui/__shadcn__/drawer";
 import { cn } from "@/lib/utils/cn";
+import { useAdminDashboardStore } from "../hooks/useAdminDashboardStore";
 
-const adminNavLinks = [
+export const adminNavLinks = [
   { label: "Products", to: "/profile/admin/products", icon: Package },
   { label: "Orders", to: "/profile/admin/orders", icon: ShoppingCart },
   { label: "Users", to: "/profile/admin/users", icon: Users },
@@ -44,37 +43,15 @@ const AdminNavLinks = ({ onNavigate }: { onNavigate?: () => void }) => (
 );
 
 export const AdminSidebar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const pathname = useLocation().pathname;
-  const activeLabel =
-    adminNavLinks.find(({ to }) => pathname.startsWith(to))?.label ??
-    "Products";
+  const { isSidebarOpen, setSidebarOpen } = useAdminDashboardStore();
 
   return (
     <>
-      <header className="lg:hidden sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
-        <div className="custom-container grid grid-cols-3 justify-between items-center  py-3">
-          <Button
-            type="button"
-            variant="outline"
-            size="icon-sm"
-            className="shrink-0"
-            onClick={() => setIsOpen(true)}
-          >
-            <Menu className="size-4" />
-            <span className="sr-only">Open admin navigation</span>
-          </Button>
-          <p className="text-lg font-semibold justify-self-center">
-            {activeLabel}
-          </p>
-          <div className="text-sm text-muted-foreground justify-self-end">
-            {" "}
-            0 {activeLabel}
-          </div>
-        </div>
-      </header>
-
-      <Drawer open={isOpen} onOpenChange={setIsOpen} direction="left">
+      <Drawer
+        open={isSidebarOpen}
+        onOpenChange={setSidebarOpen}
+        direction="left"
+      >
         <DrawerContent
           aria-describedby={undefined}
           className="h-full max-w-[300px] p-0"
@@ -88,7 +65,7 @@ export const AdminSidebar = () => {
               <p className="text-sm text-muted">Manage your storefront</p>
             </div>
             <div className="flex-1 overflow-y-auto p-3">
-              <AdminNavLinks onNavigate={() => setIsOpen(false)} />
+              <AdminNavLinks onNavigate={() => setSidebarOpen(false)} />
             </div>
           </div>
         </DrawerContent>

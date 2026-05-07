@@ -3,13 +3,13 @@ import { Input } from "@/lib/ui/__shadcn__/input";
 import { cn } from "@/lib/utils/cn";
 import { Search, Plus } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
-import { useProductsPageState } from "../hooks/useProductsPageState";
+import { useAdminProductsPageState } from "../hooks/useAdminProductsPageState";
 import { useToast } from "@/providers/ToastProvider";
 import { DeleteProductDialog } from "./DeleteDialog";
 import { useProductMutations } from "../hooks/useProductsMutations";
 import { useQueryClient } from "@tanstack/react-query";
 
-const ProductTopBar = () => {
+const ProductFilters = () => {
   const { deleteProductMutation } = useProductMutations();
   const queryClient = useQueryClient();
 
@@ -19,7 +19,7 @@ const ProductTopBar = () => {
     openCreateProductForm,
     deletingProductIds,
     resetDeletingProductIds,
-  } = useProductsPageState();
+  } = useAdminProductsPageState();
 
   const { addToast } = useToast();
 
@@ -79,7 +79,7 @@ const ProductTopBar = () => {
   const isDeletingMode = deletingProductIds.size > 0;
 
   return (
-    <div className="flex items-center justify-between rounded-lg">
+    <div className="flex items-center justify-between">
       {isDeletingMode ? (
         <div className="flex gap-2">
           <Button size="sm" variant="outline" onClick={resetDeletingProductIds}>
@@ -133,4 +133,4 @@ const ProductTopBar = () => {
   );
 };
 
-export default ProductTopBar;
+export default ProductFilters;

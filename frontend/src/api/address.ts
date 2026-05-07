@@ -11,7 +11,7 @@ export const AddressAPI = {
     return apiClient.post("/address", payload);
   },
 
-  udpateAddress: async (
+  updateAddress: async (
     payload: UpdateAddressInput,
     addressId: string,
   ): Promise<Address> => {

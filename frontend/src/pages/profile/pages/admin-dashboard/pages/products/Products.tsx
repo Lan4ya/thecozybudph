@@ -3,13 +3,12 @@ import ProductTable from "./components/ProductTable";
 import ProductForm from "./components/form/ProductForm";
 import ProductTableRowsSkeleton from "../../../../../../lib/ui/skeletons/AdminProductTableItemSkeleton";
 import AdminProductsProvider from "./providers/AdminProductsProvider";
-import ProductTopBar from "./components/ProductTopBar";
-
+import ProductFilters from "./components/ProductTopBar";
 export default function Products() {
   return (
     <AdminProductsProvider>
-      <div className="space-y-6">
-        <ProductTopBar />
+      <div className="lg:py-6 space-y-6">
+        <ProductFilters />
 
         <PersistSuspense fallback={<ProductTableRowsSkeleton />}>
           <ProductTable />

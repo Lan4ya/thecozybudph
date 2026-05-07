@@ -40,13 +40,14 @@ import ProductDetails from "./ProductDetails";
 import { formatFileSize } from "@/lib/utils/format";
 import { ProductOptions } from "./ProductOptions";
 import ProductVariants from "./ProductVariants";
-import { useProductsPageState } from "../../hooks/useProductsPageState";
+import { useAdminProductsPageState } from "../../hooks/useAdminProductsPageState";
 import isDev from "@/lib/utils/isDev";
 
 const MAX_IMAGES = 3;
 
 export default function ProductForm() {
-  const { isFormOpen, updatingProduct, setFormOpen } = useProductsPageState();
+  const { isFormOpen, updatingProduct, setFormOpen } =
+    useAdminProductsPageState();
 
   const [newSelectedFiles, setNewSelectedFiles] = useState<
     { file: File; url: string }[]

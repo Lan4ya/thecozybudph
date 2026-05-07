@@ -1,11 +1,11 @@
 import type { ProductWithRelations } from "@TheCozyBud/schemas";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
-import { useProductsPageState } from "./useProductsPageState";
+import { useAdminProductsPageState } from "./useAdminProductsPageState";
 import { AdminAPI } from "@/api";
 
 export const useAdminProductsInfiniteQuery = () => {
-  const { searchQuery } = useProductsPageState();
+  const { searchQuery } = useAdminProductsPageState();
   const perPage = 12;
   const DAY = 1000 * 60 * 60 * 24;
   const queryKey = searchQuery

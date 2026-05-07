@@ -21,6 +21,7 @@ const BottomBar = () => {
   const navigate = useNavigate();
   const {
     shippingQuoteId,
+    serviceType,
     total,
     checkoutIds,
     setCheckoutIds,
@@ -37,6 +38,7 @@ const BottomBar = () => {
       address: s.address,
       orderItemsUI: s.orderItemsUI,
       shippingQuoteId: s.shipping?.quotationId,
+      serviceType: s.shipping?.serviceType,
       paymentMethodType: s.payment?.type,
       setPayment: s.setPayment,
     })),
@@ -77,6 +79,7 @@ const BottomBar = () => {
       addressId: address?.id,
       shippingQuoteId,
       paymentMethodType,
+      serviceType,
     };
 
     // validation

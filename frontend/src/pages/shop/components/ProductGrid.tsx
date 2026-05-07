@@ -2,8 +2,15 @@ import { useRef, useEffect } from "react";
 import ProductCard from "@/components/products/ProductCard";
 import { ShopProductGridSkeleton } from "@/lib/ui/skeletons/ShopProductGridItemsSkeleton";
 import { useProductsSuspenseInfiniteQuery } from "@/pages/shop/hooks/useProductsSuspenseInfiniteQuery";
+import ProductCardDetailed from "@/components/products/ProductCardDetailed";
+import { cn } from "@/lib/utils/cn";
+import type { ProductListItem } from "@TheCozyBud/schemas";
 
-const ProductGrid = () => {
+export type ProductCardProps = {
+  cardType: "default" | "detailed";
+};
+
+const ProductGrid = ({ cardType }: ProductCardProps) => {
   const {
     error,
     isFetching,
@@ -40,16 +47,27 @@ const ProductGrid = () => {
     );
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 xl:gap-8 2xl:gap-10 ">
-      {products.map((p) => (
-        <ProductCard
-          key={p.id}
-          productId={p.id}
-          name={p.name}
-          imageUrl={p.primaryImageUrl}
-          price={p.minPriceCents}
-        />
-      ))}
+    <div
+      className={cn(
+        "grid",
+        cardType === "default"
+          ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 xl:gap-8 2xl:gap-10"
+          : "grid-cols-[repeat(auto-fit,minmax(400px,1fr))] sm:grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-10",
+      )}
+    >
+      {products.map((p) =>
+        cardType === "default" ? (
+          <ProductCard
+            key={p.id}
+            productId={p.id}
+            name={p.name}
+            imageUrl={p.primaryImageUrl}
+            price={p.minPriceCents}
+          />
+        ) : (
+          <ProductCardDetailed key={p.id} product={p} />
+        ),
+      )}
 
       {isFetchingNextPage && <ShopProductGridSkeleton />}
 

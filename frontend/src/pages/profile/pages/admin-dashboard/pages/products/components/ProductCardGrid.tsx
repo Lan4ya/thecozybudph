@@ -5,7 +5,7 @@ import { formatPriceCents } from "@/lib/utils/format";
 import { cn } from "@/lib/utils/cn";
 import { Check, Edit } from "lucide-react";
 import ProductTableRowsSkeleton from "@/lib/ui/skeletons/AdminProductTableItemSkeleton";
-import { useProductsPageState } from "../hooks/useProductsPageState";
+import { useAdminProductsPageState } from "../hooks/useAdminProductsPageState";
 import { useAdminProductsInfiniteQuery } from "../hooks/useAdminProductsInfiniteQuery";
 
 export default function ProductCardGrid() {
@@ -14,7 +14,7 @@ export default function ProductCardGrid() {
     deletingProductIds,
     toggleDeletingProductId,
     searchQuery,
-  } = useProductsPageState();
+  } = useAdminProductsPageState();
 
   const { products, sentinelRef, error, isFetching, isFetchingNextPage } =
     useAdminProductsInfiniteQuery();

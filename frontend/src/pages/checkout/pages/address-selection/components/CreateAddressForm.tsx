@@ -16,7 +16,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AddressAPI } from "@/api/address";
 import isDev from "@/lib/utils/isDev";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
-import { checkoutAddressesQK } from "@/pages/checkout/hooks/useAddressQuery";
+import {
+  checkoutAddressesQK,
+  checkoutDefaultAddressQK,
+} from "@/pages/checkout/hooks/useAddressQuery";
 import { useCheckoutStore } from "@/pages/checkout/store/useCheckoutStore";
 import { FieldError } from "@/pages/checkout/components/FieldError";
 
@@ -51,7 +54,7 @@ const CreateAddressForm = ({ onCloseForm }: { onCloseForm: () => void }) => {
 
   const { addToast } = useToast();
   const queryClient = useQueryClient();
-  const setCheckoutAddress = useCheckoutStore((state) => state.setAddress);
+  const setAddress = useCheckoutStore((state) => state.setAddress);
 
   const { mutate: createAddressMutation, isPending: createLoading } =
     useMutation({
@@ -70,7 +73,8 @@ const CreateAddressForm = ({ onCloseForm }: { onCloseForm: () => void }) => {
         );
 
         addToast("Address created", "success");
-        setCheckoutAddress(newAddress);
+        setAddress(newAddress);
+        queryClient.invalidateQueries({ queryKey: [checkoutDefaultAddressQK] });
         onCloseForm();
       },
     });

@@ -92,7 +92,7 @@ export const AddressRepository = {
         // automatically as fallback but it's a sloppy UX. Instead control the
         // UI to not let users be able to unset a default, making this just a
         // guard and should never be triggered. This behavior is similar to
-        // Shoppees address update.
+        // Shoppee's address update feature.
         throw AppError.badRequest(
           "Cannot unset default address. Set another address as default instead.",
         );

@@ -16,7 +16,10 @@ import { AddressAPI } from "@/api/address";
 import { useToast } from "@/providers/ToastProvider";
 import { cn } from "@/lib/utils/cn";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
-import { checkoutAddressesQK } from "@/pages/checkout/hooks/useAddressQuery";
+import {
+  checkoutAddressesQK,
+  checkoutDefaultAddressQK,
+} from "@/pages/checkout/hooks/useAddressQuery";
 import { useCheckoutStore } from "@/pages/checkout/store/useCheckoutStore";
 
 type EditAddressFormValues = z.infer<typeof updateAddressFormSchema>;
@@ -35,25 +38,33 @@ const EditAddressForm = ({
     register,
     setValue,
     handleSubmit,
-    watch,
     control,
     formState: { errors, isValid, isDirty },
   } = useForm<EditAddressFormValues>({
     defaultValues: {
-      ...updatingAddress,
-      province: updatingAddress.province ?? undefined,
+      fullName: updatingAddress.fullName,
+      phoneNumber: updatingAddress.phoneNumber,
+      postalCode: updatingAddress.postalCode,
+      region: updatingAddress.region,
+      city: updatingAddress.city,
+      province: updatingAddress.province ?? "",
+      barangay: updatingAddress.barangay,
+      addressLine: updatingAddress.addressLine,
+      isDefault: updatingAddress.isDefault,
     },
     resolver: zodResolver(updateAddressFormSchema),
     mode: "onChange",
   });
 
-  const isDefault = useWatch({ control, name: "isDefault" });
-  const phoneNumber = watch("phoneNumber");
+  const [isDefault, phoneNumber] = useWatch({
+    control,
+    name: ["isDefault", "phoneNumber"],
+  });
   const displayPhoneNumber = phoneNumber?.replace(/^\+63/, "") ?? "";
 
   const { addToast } = useToast();
   const queryClient = useQueryClient();
-  const setCheckoutAddress = useCheckoutStore((state) => state.setAddress);
+  const setAddress = useCheckoutStore((state) => state.setAddress);
 
   const { mutate: updateAddressMutation, isPending: updateLoading } =
     useMutation({
@@ -63,7 +74,7 @@ const EditAddressForm = ({
       }: {
         address: UpdateAddressInput;
         addressId: string;
-      }) => AddressAPI.udpateAddress(address, addressId),
+      }) => AddressAPI.updateAddress(address, addressId),
       onError: (err: Error) => {
         isDev && console.error(err.message);
         addToast("Something wen't wrong. Please try again later.", "error");
@@ -84,7 +95,8 @@ const EditAddressForm = ({
         );
 
         addToast("Saved address", "success");
-        setCheckoutAddress(updatingAddress);
+        setAddress(newAddress);
+        queryClient.invalidateQueries({ queryKey: [checkoutDefaultAddressQK] });
         onCloseForm();
       },
     });
@@ -105,14 +117,17 @@ const EditAddressForm = ({
   }, [isDefault, setValue]);
 
   const onSubmit = (address: EditAddressFormValues) => {
-    // console.log("submit address payload", address);
+    console.log("submit address payload", address);
     updateAddressMutation({ address, addressId: updatingAddress.id });
   };
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit, (err) => {
-        isDev && console.log(err);
+        if (isDev) {
+          console.log(err);
+          addToast(JSON.stringify(err), "error");
+        }
       })}
       noValidate
     >

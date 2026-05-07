@@ -1,6 +1,6 @@
 import GridStyleButtons from "./components/GridStyleButtons";
 import { useProductsFilterAndSortState } from "@/pages/shop/hooks/useProductsFilterAndSortState";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { SortDropdownMenu } from "./components/SortDropDown";
 import Search from "./components/filters/Search";
 import PriceRange from "./components/filters/PriceRange";
@@ -8,18 +8,22 @@ import Categories from "./components/filters/Categories";
 import Collections from "./components/filters/Collection";
 import PersistSuspense from "@/components/PersistSuspense";
 import { ShopProductGridSkeleton } from "../../lib/ui/skeletons/ShopProductGridItemsSkeleton";
-import Tags from "./components/FilterTags";
+import FilterTags from "./components/FilterTags";
 import { useIsXlScreenMin } from "@/hooks/useMediaQuery";
-import ProductGrid from "./components/ProductGrid";
+import ProductGrid, { type ProductCardProps } from "./components/ProductGrid";
 import { ErrorBoundary } from "react-error-boundary";
 import isDev from "@/lib/utils/isDev";
 import { useNavigate } from "react-router";
+import { Sparkles } from "lucide-react";
 
 const Shop = () => {
   const { productQuery, hasProductQueryFilters } =
     useProductsFilterAndSortState();
   const isXLScreen = useIsXlScreenMin();
   const navigate = useNavigate();
+
+  const [cardType, setCardType] =
+    useState<ProductCardProps["cardType"]>("default");
 
   useEffect(() => {
     isDev && console.log("product query: ", productQuery);
@@ -28,14 +32,14 @@ const Shop = () => {
 
   return (
     <div className="max-w-[1600px] mx-auto min-h-screen w-full">
-      <header className="custom-container mt-2 mb-8 md:mb-14 md:mt-4">
-        <h1 className="flex gap-2 items-center font-medium text-xl lg:text-2xl border-b border-accent/50 pb-3">
-          Shop
+      <header className="custom-container mb-8 md:mb-14 md:mt-4">
+        <h1 className="flex justify-center items-center lg:justify-start font-ivy-ora-display text-primary gap-2 font-bold text-2xl lg:text-3xl border-b border-accent/50 pb-4 pt-6 lg:pt-8">
+          Shop <Sparkles />
         </h1>
       </header>
 
-      <main className="custom-container mt-2 mb-35 flex flex-col gap-10 lg:gap-15">
-        <div className="flex flex-col gap-4 lg:gap-6">
+      <main className="custom-container mt-2 mb-35 flex flex-col gap-18">
+        <div className="flex flex-col gap-6">
           <div className="xl:flex xl:gap-6 items-end">
             <div className="grid grid-cols-2 md:grid-cols-4  gap-x-4 md:gap-x-6  gap-y-4">
               <Search />
@@ -48,19 +52,23 @@ const Shop = () => {
               <div className="2xl:ml-60 flex items-center gap-3">
                 <SortDropdownMenu />
                 <div className="h-7 w-px bg-muted-foreground" />
-                <GridStyleButtons />
+                <GridStyleButtons
+                  onCardTypeChange={(cardType) => setCardType(cardType)}
+                />
               </div>
             )}
           </div>
 
-          <div className="flex-between items-center mt-1">
-            <Tags />
+          <div className="flex justify-between items-center xl:block">
+            <FilterTags />
 
             {!isXLScreen && (
               <div className="flex items-center gap-3">
                 <SortDropdownMenu />
                 <div className="h-7 w-px bg-muted-foreground" />
-                <GridStyleButtons />
+                <GridStyleButtons
+                  onCardTypeChange={(cardType) => setCardType(cardType)}
+                />
               </div>
             )}
           </div>
@@ -83,7 +91,7 @@ const Shop = () => {
             )}
             onReset={() => navigate(0)}
           >
-            <ProductGrid />
+            <ProductGrid cardType={cardType} />
           </ErrorBoundary>
         </PersistSuspense>
       </main>

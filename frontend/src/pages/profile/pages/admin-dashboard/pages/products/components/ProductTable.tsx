@@ -6,7 +6,7 @@ import { Check, Edit } from "lucide-react";
 import { useEffect, useRef } from "react";
 import ProductTableRowsSkeleton from "@/lib/ui/skeletons/AdminProductTableItemSkeleton";
 import { cn } from "@/lib/utils/cn";
-import { useProductsPageState } from "../hooks/useProductsPageState";
+import { useAdminProductsPageState } from "../hooks/useAdminProductsPageState";
 import { formatPriceCents } from "@/lib/utils/format";
 import { MetaBadge } from "@/components/MetaBadge";
 import { useProductMutations } from "../hooks/useProductsMutations";
@@ -18,7 +18,7 @@ export default function ProductTable() {
     deletingProductIds,
     toggleDeletingProductId,
     searchQuery,
-  } = useProductsPageState();
+  } = useAdminProductsPageState();
 
   const { deleteProductMutation } = useProductMutations();
 
@@ -137,7 +137,7 @@ function ProductRow({
   });
 
   return (
-    <article className="border grid grid-cols-[auto_auto_3fr_1fr] sm:grid-cols-[auto_auto_3fr_repeat(3,1fr)] xl:grid-cols-[auto_auto_3fr_repeat(5,1fr)] items-center justify-items-center gap-4 px-2 py-4 rounded-lg hover:shadow-sm transition">
+    <article className="border grid grid-cols-[auto_auto_3fr_1fr] sm:grid-cols-[auto_auto_3fr_repeat(3,1fr)] lg:grid-cols-[auto_auto_3fr_repeat(4,1fr)] xl:grid-cols-[auto_auto_3fr_repeat(5,1fr)] items-center justify-items-center gap-4 lg:gap-6 px-2 py-4 rounded-lg hover:shadow-sm transition">
       {/* Selection Toggle */}
       <div className="flex items-center">
         <button
@@ -183,7 +183,7 @@ function ProductRow({
 
           {product.collectionName && (
             <MetaBadge
-              className="hidden lg:inline truncate"
+              className="hidden xl:inline truncate"
               label="collection"
               value={product.collectionName}
             />
@@ -212,7 +212,7 @@ function ProductRow({
         </p>
       </div>
 
-      <div className="hidden sm:block">
+      <div className="hidden lg:block">
         <p className="text-sm">Updated</p>
         <p className="text-[12.5px] text-muted-foreground">{updatedAt}</p>
       </div>

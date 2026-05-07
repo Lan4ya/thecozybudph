@@ -24,7 +24,22 @@ export const ProductAPI = {
 
     let query = supabase
       .from("products")
-      .select(`id, name, primary_image_url, min_price_cents, max_price_cents`)
+      .select(
+        `
+          id,
+          name,
+          primary_image_url,
+          min_price_cents,
+          max_price_cents,
+          description,
+          product_collections (
+          name
+          ),
+          product_categories (
+          name
+          )
+          `,
+      )
       .range(page * perPage, (page + 1) * perPage - 1);
 
     // console.log("API Filters: ", filters);
@@ -99,7 +114,16 @@ export const ProductAPI = {
 
     if (error) throw error;
 
-    const productListItems = snakeToCamel(data);
+    const productListItems = data.map((item) => ({
+      id: item.id,
+      name: item.name,
+      primaryImageUrl: item.primary_image_url,
+      minPriceCents: item.min_price_cents,
+      maxPriceCents: item.max_price_cents,
+      description: item.description ?? null,
+      category: item.product_categories?.name ?? null,
+      collection: item.product_collections?.name ?? null,
+    }));
 
     // console.log("products: ", productListItems);
     return productListItems;

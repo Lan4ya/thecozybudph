@@ -35,53 +35,59 @@ const AddressList = ({
 
   return (
     <ul className="flex flex-col gap-5">
-      {addresses.map((address) => (
-        <li
-          key={address.id}
-          className="hover:shadow-md cursor-pointer bg-card rounded-xl p-5 shadow-sm border border-border/30"
-          onClick={() => onSelect(address)}
-        >
-          <div className="flex gap-5">
-            <div className="shrink-0">
-              <Input
-                readOnly
-                type="radio"
-                name="address"
-                value={address.id}
-                checked={checkoutAddress?.id === address.id}
-                className="cursor-pointer "
-              />
-            </div>
+      {addresses.map((address) => {
+        const parts = [
+          address.addressLine,
+          address.barangay?.toLowerCase().startsWith("barangay")
+            ? address.barangay
+            : `Barangay ${address.barangay}`,
+          address.city,
+          address.province,
+          address.region,
+          address.postalCode,
+        ].filter(Boolean);
 
-            <div className="flex-1 flex justify-between mb-3">
-              <div className="space-y-1 text-sm text-muted-foreground">
-                <p className="line-clamp-2">{address.fullName}</p>
-                <p className="">{address.phoneNumber}</p>
-                <p className="text-muted-foreground">
-                  {address.addressLine},{" "}
-                  {address.barangay.toLowerCase().startsWith("barangay")
-                    ? ""
-                    : "Barangay"}{" "}
-                  {address.barangay}, {address.city}, {address.province},{" "}
-                  {address.region}, {address.postalCode}
-                </p>
+        return (
+          <li
+            key={address.id}
+            className="hover:shadow-md cursor-pointer bg-card rounded-xl p-5 shadow-sm border border-border/30"
+            onClick={() => onSelect(address)}
+          >
+            <div className="flex gap-5">
+              <div className="shrink-0">
+                <Input
+                  readOnly
+                  type="radio"
+                  name="address"
+                  value={address.id}
+                  checked={checkoutAddress?.id === address.id}
+                  className="cursor-pointer "
+                />
               </div>
 
-              <Button
-                onClick={(e) => {
-                  onEdit(address);
-                  e.stopPropagation();
-                }}
-                variant="minimal"
-                size="sm"
-                className="text-primary gap-1"
-              >
-                Edit <ChevronRight className="size-4" />
-              </Button>
+              <div className="flex-1 flex justify-between mb-3">
+                <div className="space-y-1 text-sm text-muted-foreground">
+                  <p className="line-clamp-2">{address.fullName}</p>
+                  <p className="">{address.phoneNumber}</p>
+                  <p className="text-muted-foreground">{parts.join(", ")}</p>
+                </div>
+
+                <Button
+                  onClick={(e) => {
+                    onEdit(address);
+                    e.stopPropagation();
+                  }}
+                  variant="minimal"
+                  size="sm"
+                  className="hover:text-primary/90 text-primary gap-1"
+                >
+                  Edit <ChevronRight className="size-4" />
+                </Button>
+              </div>
             </div>
-          </div>
-        </li>
-      ))}
+          </li>
+        );
+      })}{" "}
     </ul>
   );
 };

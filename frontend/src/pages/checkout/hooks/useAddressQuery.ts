@@ -2,10 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import type { Address } from "@TheCozyBud/schemas";
 import { AddressAPI } from "@/api/address";
 
-export const checkouotDefaultAddressQK = "checkout-default-address";
+export const checkoutDefaultAddressQK = "checkout-default-address";
 
 export const getDefaultAddressQueryOptions = {
-  queryKey: [checkouotDefaultAddressQK],
+  queryKey: [checkoutDefaultAddressQK],
   queryFn: AddressAPI.getDefaultAddress,
   meta: { persist: true }, // persist localStorage,
 };

@@ -60,29 +60,10 @@ export const productOptionSchema = z.object({
 
 export const productVariantSchema = z.object({
   id: z.uuid("product variant id is not a valid UUID").optional(),
-  priceCents: z.preprocess(
-    (val) => {
-      if (typeof val === "string") {
-        const t = val.trim();
-        if (t === "") return undefined;
-
-        const n = Number(t);
-        if (Number.isNaN(n)) return val;
-
-        return n;
-      }
-
-      if (typeof val === "number") {
-        return val;
-      }
-
-      return val;
-    },
-    z
-      .number("price cents is required")
-      .positive("price cents must be greater than 0")
-      .max(100_000_000, "price cents can't exceed 100,000,000"),
-  ),
+  priceCents: z
+    .int("price cents must be an integer")
+    .positive("price cents must be greater than 0")
+    .max(100_000_000, "price cents can't exceed 100,000,000"),
 
   attributes: z.record(
     z.string().trim().nonempty(),
@@ -164,9 +145,11 @@ export const productIdSchema = z.object({
 
 export const validateFormPrice = (
   label: string,
-  n: number,
+  numStr: string,
   ctx: z.RefinementCtx,
-) => {
+): number => {
+  const n = Number(numStr.replace(/,/g, ""));
+
   if (!Number.isFinite(n)) {
     ctx.addIssue({
       code: "custom",
@@ -183,10 +166,10 @@ export const validateFormPrice = (
     return z.NEVER;
   }
 
-  if (n < 0) {
+  if (n < 1) {
     ctx.addIssue({
       code: "custom",
-      message: `${label} can't be negative`,
+      message: `${label} must be greater than 0`,
     });
     return z.NEVER;
   }
@@ -209,8 +192,7 @@ const productFormVariantSchema = z.object({
     .trim()
     .min(1, "price can't be empty")
     .transform((v, ctx) => {
-      const n = Number(v);
-      validateFormPrice("price", n, ctx);
+      const n = validateFormPrice("price", v, ctx);
 
       // convert pesos -> cents (API accepts cents)
       return n * 100;
@@ -240,9 +222,7 @@ export const createProductFormSchema = createProductSchema.extend({
     .trim()
     .min(1, "base price can't be empty")
     .transform((v, ctx) => {
-      const n = Number(v);
-      validateFormPrice("base price", n, ctx);
-
+      const n = validateFormPrice("price", v, ctx);
       return n;
     }),
   options: z.array(productFormOptionSchema).default([]),

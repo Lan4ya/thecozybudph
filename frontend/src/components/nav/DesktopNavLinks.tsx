@@ -50,7 +50,7 @@ export const DesktopNavLinks = ({
               to={href}
               className={cn(
                 "text-foreground hover:text-primary-foreground/70 text-lg font-medium transition-colors",
-                "text-foreground hover:text-primary/70",
+                "text-foreground hover:text-primary/90",
               )}
             >
               {label}
@@ -86,7 +86,7 @@ export const DesktopNavLinks = ({
           to="/cart"
           className={cn(
             "text-primary-foreground transition-colors relative",
-            "text-foreground hover:text-primary/70",
+            "text-foreground hover:text-primary/90",
           )}
         >
           <div className="absolute -right-3.5 -top-[9px] flex-center text-secondary-foreground text-[9px] font-medium bg-secondary size-5 rounded-full select-none">

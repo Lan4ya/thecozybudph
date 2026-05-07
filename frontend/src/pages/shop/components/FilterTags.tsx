@@ -7,7 +7,7 @@ import { useProductsFilterAndSortState } from "../hooks/useProductsFilterAndSort
 import { useIsXlScreenMin } from "@/hooks/useMediaQuery";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import toggleArrItem from "@/lib/utils/toggleArrItem";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
   Popover,
   PopoverContent,
@@ -19,8 +19,8 @@ import { formatPriceRange } from "./filters/PriceRange";
 
 const xIcon = <X className="size-4" />;
 
-const Tags = () => {
-  const [isClearFilterItemsBtnShown, showClearFilterItemsBtn] = useState(false);
+const FilterTags = () => {
+  // const [isClearFilterItemsBtnShown, showClearFilterItemsBtn] = useState(false);
   const { productQuery, hasProductQueryFilters } =
     useProductsFilterAndSortState();
   const isXlScreen = useIsXlScreenMin();
@@ -50,7 +50,7 @@ const Tags = () => {
   }, [productQuery]);
 
   return (
-    <div className="xl:h-10 -mt-2 text-muted-foreground flex gap-5 text-sm items-center flex-1">
+    <div className="group-tags text-muted-foreground flex items-center gap-5 text-sm">
       {!isXlScreen ? (
         <Popover>
           {/* @ts-ignore */}
@@ -78,7 +78,7 @@ const Tags = () => {
             {hasProductQueryFilters ? (
               <>
                 {flattenedFilters.map(({ key, val }) => (
-                  <TagItem
+                  <FilterTagItem
                     key={`${key}-${val}`}
                     label={val}
                     filterKey={key as keyof ProductFiltersDomain}
@@ -87,7 +87,7 @@ const Tags = () => {
                 ))}
 
                 {queryCount >= 2 && (
-                  <TagItem label="Clear" isXlScreen={isXlScreen} />
+                  <FilterTagItem label="Clear" isXlScreen={isXlScreen} />
                 )}
               </>
             ) : (
@@ -96,15 +96,12 @@ const Tags = () => {
           </PopoverContent>
         </Popover>
       ) : (
-        <>
-          <TagIcon className="text-muted-foreground" />
-          <div
-            onMouseEnter={() => showClearFilterItemsBtn(true)}
-            onMouseLeave={() => showClearFilterItemsBtn(false)}
-            className="flex gap-3 w-full"
-          >
+        // Desktop
+        <div className="flex h-10 items-center gap-3">
+          <TagIcon className="size-5 text-muted-foreground" />
+          <div className="flex items-center gap-3">
             {flattenedFilters.map(({ key, val }) => (
-              <TagItem
+              <FilterTagItem
                 key={`${key}-${String(val)}`}
                 label={String(val)}
                 filterKey={key as keyof ProductFiltersDomain}
@@ -112,23 +109,27 @@ const Tags = () => {
               />
             ))}
 
-            {queryCount >= 2 && isClearFilterItemsBtnShown && (
-              <TagItem label="Clear" isXlScreen={isXlScreen} />
+            {queryCount >= 2 && (
+              <FilterTagItem label="Clear" isXlScreen={isXlScreen} />
             )}
           </div>
-        </>
+        </div>
       )}
     </div>
   );
 };
 
-type TagItemProps = {
+type FilterTagItemProps = {
   label: string;
   filterKey?: keyof ProductFiltersDomain;
   isXlScreen: boolean;
 };
 
-const TagItem = ({ label, filterKey, isXlScreen }: TagItemProps) => {
+const FilterTagItem = ({
+  label,
+  filterKey,
+  isXlScreen,
+}: FilterTagItemProps) => {
   const { setProductQuery, clearProductQueryFilters } =
     useProductsFilterAndSortState();
 
@@ -186,4 +187,4 @@ const TagItem = ({ label, filterKey, isXlScreen }: TagItemProps) => {
   );
 };
 
-export default Tags;
+export default FilterTags;
