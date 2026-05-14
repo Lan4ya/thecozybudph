@@ -1,5 +1,4 @@
 import { Card, CardContent } from "@/lib/ui/__shadcn__/card";
-import { Star } from "lucide-react";
 import no_pic from "@/assets/thecozybud/no_pic.png";
 import { useAnimationFrame } from "framer-motion";
 import { useRef } from "react";
@@ -63,7 +62,7 @@ export const ReviewCarousel = () => {
   });
 
   return (
-    <section className="custom-container py-24 mx-auto max-w-[1420px] w-full flex flex-col gap-6 overflow-hidden">
+    <section className="custom-container py-18 lg:py-24 mx-auto max-w-[1420px] w-full flex flex-col gap-6 overflow-hidden">
       <div className="space-y-6 w-full ">
         <p className="text-xs font-semibold uppercase tracking-[0.32em] text-accent/70">
           Testimonials

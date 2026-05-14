@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import LOGO from "@/assets/thecozybud/logo_transparent_oneline1.png";
 // import LOGOS from "@/assets/thecozybud/logo_transparent_oneline1.svg";
 import { ShoppingCart } from "lucide-react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { cn } from "@/lib/utils/cn";
-import { NavLink, useLocation } from "react-router";
+import { NavLink } from "react-router";
 import { useAnimateOnView } from "@/hooks/useAnimateOnView";
 import { MobileDrawer } from "./MobileDrawer";
 import { DesktopNavLinks } from "./DesktopNavLinks";

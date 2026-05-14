@@ -116,7 +116,7 @@ const Cart = () => {
               >
                 <span
                   className={cn(
-                    "text-base lg:text-lg w-8",
+                    "text-primary hover:text-primary/90 text-sm lg:text-base w-8",
                     isEditingCart && "text-primary",
                   )}
                 >

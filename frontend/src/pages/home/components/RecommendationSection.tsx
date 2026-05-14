@@ -18,7 +18,7 @@ const Recommendations = () => {
     <section
       aria-labelledby="recommendations-heading"
       className={cn(
-        "custom-container py-24 max-w-[1420px] mx-auto flex w-full flex-col gap-5 md:gap-6",
+        "custom-container py-18 lg:py-24 max-w-[1420px] mx-auto flex w-full flex-col gap-5 md:gap-6",
         // if there's session a component below this component (MembersOnlySection) disappears and so we'll pass the margin here
         session && "mb-24",
       )}
@@ -44,7 +44,7 @@ const Recommendations = () => {
         </p>
       </div>
 
-      <div className="mx-auto grid w-full grid-cols-1 gap-4 min-[420px]:grid-cols-2 sm:gap-5 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 xl:gap-8 2xl:gap-10">
+      <div className="mx-auto grid w-full grid-cols-2 gap-4 min-[600px]:grid-cols-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 xl:gap-8 2xl:gap-10">
         {data.map((d) => (
           <ProductCard
             key={d.id}

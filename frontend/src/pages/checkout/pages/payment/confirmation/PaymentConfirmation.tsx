@@ -13,7 +13,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/providers/ToastProvider";
 import isDev from "@/lib/utils/isDev";
 import {
-  confirmOrderSchema,
+  payOrderSchema,
   type PayOrderInput,
   type PayOrderRes,
 } from "@TheCozyBud/schemas";
@@ -107,7 +107,7 @@ const PaymentConfirmation = () => {
     } satisfies PayOrderInput;
 
     // validation
-    const result = confirmOrderSchema.safeParse(payload);
+    const result = payOrderSchema.safeParse(payload);
 
     if (!result.success) {
       isDev && console.error(z.flattenError(result.error).fieldErrors);

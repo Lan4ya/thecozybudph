@@ -6,7 +6,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 export const cartQueryOptions = {
   queryKey: ["cart"],
   queryFn: CartAPI.getItems,
-  staleTime: 0,
+  meta: { persist: true },
 };
 
 export const useCartSuspenseQuery = () => {

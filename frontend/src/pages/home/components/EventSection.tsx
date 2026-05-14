@@ -19,7 +19,7 @@ const EventSection = () => {
 
   return (
     <section className="bg-primary/5">
-      <div className="space-y-12 w-full py-24 custom-container justify-between  gap-5 md:gap-10 lg:grid lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:items-center lg:[grid-template-areas:'carousel_text'] max-w-[1420px] mx-auto ">
+      <div className="space-y-12 w-full py-18 lg:py-24 custom-container justify-between  gap-5 md:gap-10 lg:grid lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:items-center lg:[grid-template-areas:'carousel_text'] max-w-[1420px] mx-auto ">
         <div className="space-y-6 lg:text-right">
           {/* Eyebrow */}
           <p className="text-xs font-semibold uppercase tracking-[0.32em] text-accent/70">

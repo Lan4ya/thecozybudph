@@ -122,7 +122,7 @@ const CartItem = ({
 
           <div className="flex-1 min-w-0 flex flex-col">
             {/* Name & Edit Btn*/}
-            <div className="flex items-center justify-between">
+            <div className="capitalize flex items-center justify-between">
               <h3 className={"font-medium line-clamp-2 "}>{product.name}</h3>
 
               <div className="flex tems-center">
@@ -138,6 +138,7 @@ const CartItem = ({
                       <Button
                         size="sm"
                         variant="minimal"
+                        className="text-muted-foreground"
                         onClick={(e) => {
                           e.stopPropagation();
                           setIsEditing(true);

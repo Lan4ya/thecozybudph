@@ -78,7 +78,7 @@ const MobileHeroInner = ({
   }, [transition]);
 
   return (
-    <div className="mx-auto flex w-full max-w-[560px] flex-col gap-8 pt-8 pb-24">
+    <div className="mx-auto flex w-full max-w-[560px] flex-col gap-8 pt-8 pb-18">
       <div
         ref={registerSentinel}
         className={cn(
@@ -236,7 +236,7 @@ const DesktopHeroInner = ({
             : "translate-y-8 opacity-0",
         )}
       >
-        <div className="absolute -inset-6 -z-10 rounded-[2.5rem] bg-gradient-to-br from-primary/10 via-accent/10 to-transparent blur-2xl" />
+        <div className="absolute -inset-6 -z-10 rounded-[2.5rem] bg-linear-to-br from-primary/10 via-accent/10 to-transparent blur-2xl" />
         <div className="overflow-hidden rounded-[2.5rem] border border-accent/10 bg-card shadow-2xl">
           {!loaded && <Skeleton className="h-[620px] w-full bg-card" />}
           <img
