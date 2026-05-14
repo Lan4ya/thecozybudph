@@ -1,14 +1,14 @@
 import { useLocation, useSearchParams } from "react-router";
 import { createContext, useCallback, useEffect, useMemo } from "react";
-import type { ProductQueryDomain } from "@/types";
+import type { ProductQueryUI } from "@/types";
 import { parseProductQueryParams } from "@/pages/shop/utils/parseProductQueryParams";
 
 type ProductQueryStateContextType = {
-  productQuery: ProductQueryDomain;
+  productQuery: ProductQueryUI;
   setProductQuery: (
     updates:
-      | Partial<ProductQueryDomain>
-      | ((filters: ProductQueryDomain) => Partial<ProductQueryDomain>),
+      | Partial<ProductQueryUI>
+      | ((filters: ProductQueryUI) => Partial<ProductQueryUI>),
   ) => void;
   hasProductQueryFilters: boolean;
   clearProductQueryFilters: () => void;
@@ -25,8 +25,7 @@ export function ProductQueryStateProvider({
   const [searchParams, setSearchParams] = useSearchParams();
   const pathname = useLocation().pathname;
 
-  const productQuery: ProductQueryDomain =
-    parseProductQueryParams(searchParams);
+  const productQuery: ProductQueryUI = parseProductQueryParams(searchParams);
 
   // default sort search param
   useEffect(() => {
@@ -39,10 +38,10 @@ export function ProductQueryStateProvider({
   const setProductQuery = useCallback(
     (
       updates:
-        | Partial<ProductQueryDomain>
-        | ((pq: ProductQueryDomain) => Partial<ProductQueryDomain>),
+        | Partial<ProductQueryUI>
+        | ((pq: ProductQueryUI) => Partial<ProductQueryUI>),
     ) => {
-      const qp: ProductQueryDomain = parseProductQueryParams(searchParams);
+      const qp: ProductQueryUI = parseProductQueryParams(searchParams);
       const nextQp = typeof updates === "function" ? updates(qp) : updates;
 
       // Handle filters

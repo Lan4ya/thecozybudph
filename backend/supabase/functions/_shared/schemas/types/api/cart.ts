@@ -4,7 +4,7 @@ import {
   updateCartItemSchema,
   deleteCartItemsSchema,
 } from "../../zod/cart.ts";
-import { CartItem } from "../domain/index.ts";
+import type { CartItem } from "../domain/index.ts";
 
 export type AddCartItemInput = z.infer<typeof addCartItemSchema>;
 export type UpdateCartItemInput = z.infer<typeof updateCartItemSchema>;

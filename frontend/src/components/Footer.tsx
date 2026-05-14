@@ -1,5 +1,12 @@
 import { NavLink } from "react-router";
-import { Flower2, Mail, Phone, MapPin, Instagram, Facebook } from "lucide-react";
+import {
+  Flower2,
+  Mail,
+  Phone,
+  MapPin,
+  Instagram,
+  Facebook,
+} from "lucide-react";
 
 const footerLinks = {
   shop: [
@@ -144,12 +151,10 @@ const Footer = () => {
               Stay in Bloom
             </h3>
             <p className="text-sm text-secondary-foreground/80 mb-4">
-              Subscribe for seasonal updates, new arrivals, and exclusive offers.
+              Subscribe for seasonal updates, new arrivals, and exclusive
+              offers.
             </p>
-            <form
-              className="flex gap-2"
-              onSubmit={(e) => e.preventDefault()}
-            >
+            <form className="flex gap-2" onSubmit={(e) => e.preventDefault()}>
               <input
                 type="email"
                 placeholder="Your email"

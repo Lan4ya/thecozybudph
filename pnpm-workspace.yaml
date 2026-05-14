@@ -3,6 +3,12 @@ packages:
   - backend
   - packages/*
 
+allowBuilds:
+  '@prisma/engines': true
+  '@snaplet/seed': true
+  esbuild: true
+  supabase: true
+
 ignoredBuiltDependencies:
   - supabase
 

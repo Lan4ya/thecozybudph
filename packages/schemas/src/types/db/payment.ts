@@ -1,4 +1,4 @@
-import { InferInsertModel } from "drizzle-orm";
+import type { InferInsertModel } from "drizzle-orm";
 import { payments } from "../../drizzle/index.ts";
 
 export type InsertPayment = Omit<

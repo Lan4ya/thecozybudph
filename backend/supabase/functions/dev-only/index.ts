@@ -8,7 +8,7 @@ import { AppEnv } from "@shared/types.d.ts";
 import { requireVariables } from "@shared/utils/mod.ts";
 
 // WARN: This function is only for local environment only. DO NOT deploy it. It's
-// only purpose is for quick testing and are not needed in production.
+// only purpose is for quick testing and is not needed in production.
 const dev = new Hono<AppEnv>().basePath("dev-only");
 
 dev.use("*", supabaseMiddleware());

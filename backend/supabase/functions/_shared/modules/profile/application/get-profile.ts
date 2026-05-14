@@ -1,10 +1,10 @@
 import { AppError } from "@shared/errors/Errors.ts";
-import { SupabaseType } from "@shared/types.d.ts";
-import { snakeToCamelKeys } from "../../../utils/caseConverter.ts";
+import { SupabaseDB } from "@shared/types.d.ts";
+import { snakeToCamelKeys } from "../../../utils/mod.ts";
 import { ProfileRepository } from "../profile-repository.ts";
 
 export const getProfile = async (
-  supabase: SupabaseType,
+  supabase: SupabaseDB,
   profileId: string,
 ): Promise<Profile> => {
   const { data: profile, error: getProfileErr } =

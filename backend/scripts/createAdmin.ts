@@ -22,33 +22,24 @@ if (!email || !password) {
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 async function createAdmin() {
-  // create user
+  // Create user and set role to admin
   const {
     data: { user },
-    error: signUpError,
+    error: createError,
   } = await supabase.auth.admin.createUser({
     email,
     password,
     email_confirm: true, // auto-confirm so no manual step needed
+    app_metadata: { role: "admin" },
   });
 
-  if (signUpError) {
-    console.error("Error creating user:", signUpError);
+  if (createError) {
+    console.error("Error creating user:", createError);
     process.exit(1);
   }
 
   if (!user) {
     console.error("Invariant error: createUser returned no data");
-    process.exit(1);
-  }
-
-  // set role to admin
-  const { error } = await supabase.auth.admin.updateUserById(user.id, {
-    app_metadata: { role: "admin" },
-  });
-
-  if (error) {
-    console.error("Error setting role:", error);
     process.exit(1);
   }
 

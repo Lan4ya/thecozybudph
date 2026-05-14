@@ -19,7 +19,7 @@ import {
 } from "@TheCozyBud/schemas";
 import { useCheckoutStore } from "@/pages/checkout/store/useCheckoutStore";
 import type { PaymentConfirmationLoaderData } from "./PaymentConfirmationLoader";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 
 // NOTE: Maybe make this a global comp along with PaymentStatus.tsx so 'My Purchases' page can reuse this.
@@ -90,6 +90,8 @@ const PaymentConfirmation = () => {
     }
   }, [userEmail]);
 
+  const paymentIdempotencyKeyRef = useRef<string | null>(null);
+
   const onSubmit: SubmitHandler<{ email: string }> = (data) => {
     const { email } = data;
     const paymentId = useCheckoutStore.getState().checkoutIds?.payment!;
@@ -113,7 +115,10 @@ const PaymentConfirmation = () => {
       return;
     }
 
-    const idempotencyKey = crypto.randomUUID();
+    // Reuse the same key for retries of the same submit intent.
+    const idempotencyKey =
+      paymentIdempotencyKeyRef.current ?? crypto.randomUUID();
+    paymentIdempotencyKeyRef.current = idempotencyKey;
     payOrderMutation({ orderId, payload: result.data, idempotencyKey });
   };
 

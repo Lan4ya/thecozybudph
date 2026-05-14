@@ -17,9 +17,16 @@ export const CheckoutAPI = {
     return await apiClient.post("/checkout/shipping/quotes", payload);
   },
 
-  createOrder: async (payload: CreateOrderInput): Promise<CreateOrderRes> => {
+  createOrder: async (
+    payload: CreateOrderInput,
+    idempotencyKey: string,
+  ): Promise<CreateOrderRes> => {
     isDev && console.log("creating order...");
-    return await apiClient.post("/checkout/order", payload);
+    return await apiClient.post("/checkout/order", payload, {
+      headers: {
+        "Idempotency-Key": idempotencyKey,
+      },
+    });
   },
 
   payOrder: async (

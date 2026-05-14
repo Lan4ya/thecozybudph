@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { phMobileSchema } from "./common.ts";
 
-// Address API Schemas
+// API Schemas
 
 export const createAddressSchema = z.object({
   fullName: z.string().trim().min(1, "full name can't be empty"),
@@ -29,7 +29,7 @@ export const addressIdSchema = z.object({
 
 // -----------------------------------------------------------------
 
-// Address Form Schemas
+// Form Schemas
 
 export const createAddressFormSchema = z.object({
   fullName: z.string().trim().min(1, "full name can't be empty"),

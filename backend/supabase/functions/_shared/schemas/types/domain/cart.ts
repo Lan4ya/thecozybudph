@@ -1,4 +1,4 @@
-import { ProductOption, ProductVariant } from "./product.ts";
+import type { ProductOption, ProductVariant } from "./product.ts";
 
 export type CartItem = {
   id: string;

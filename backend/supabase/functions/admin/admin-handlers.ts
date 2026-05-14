@@ -10,11 +10,12 @@ import {
   adminShipOrderSchema,
   uuidParamSchema,
 } from "@shared/schemas/index.ts";
-import {
-  createHandlers,
-  handleSuccess,
-  requireVariables,
-} from "@shared/utils/mod.ts";
+import { handleSuccess, requireVariables } from "@shared/utils/mod.ts";
+import { createFactory } from "hono/factory";
+import { AppEnv } from "@shared/types.d.ts";
+
+const factory = createFactory<AppEnv>();
+const { createHandlers } = factory;
 
 export const createProductHandler = createHandlers(
   zodValidatorMiddleware("form", createProductSchema),

@@ -1,0 +1,1 @@
+ALTER TABLE "image_snapshots" ADD COLUMN "ref_count" integer DEFAULT 0 NOT NULL;

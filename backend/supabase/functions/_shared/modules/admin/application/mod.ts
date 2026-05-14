@@ -1,7 +1,7 @@
-import { cancelShipmentOrder } from "./cancel-shipment-order.ts";
-import { getOrders } from "./get-orders.ts";
-import { getShippingOrder } from "./get-shipping-order.ts";
-import { shipOrder } from "./ship-order.ts";
+import { cancelShipmentOrder } from "./admin-cancel-shipment-order.ts";
+import { getOrders } from "./admin-get-orders.ts";
+import { getShippingOrder } from "./admin-get-shipping-order.ts";
+import { shipOrder } from "./admin-ship-order.ts";
 
 export const AdminActions = {
   getOrders,

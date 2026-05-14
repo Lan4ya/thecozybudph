@@ -16,6 +16,7 @@ import { useShallow } from "zustand/react/shallow";
 import isDev from "@/lib/utils/isDev";
 import { z } from "zod";
 import { createShippingQuoteQK } from "./ShippingSection";
+import { useRef } from "react";
 
 const BottomBar = () => {
   const navigate = useNavigate();
@@ -45,20 +46,27 @@ const BottomBar = () => {
   );
 
   const { addToast } = useToast();
+  const orderIdempotencyKeyRef = useRef<string | null>(null);
 
   const isFetchingShippingQuote =
     useIsFetching({
-      queryKey: createShippingQuoteQK(address?.id),
+      queryKey: createShippingQuoteQK(address),
     }) > 0;
 
   const { mutate: createOrderMutation, isPending: pendingCreateOrder } =
     useMutation({
-      mutationFn: (payload: CreateOrderInput): Promise<CreateOrderRes> =>
-        CheckoutAPI.createOrder(payload),
+      mutationFn: (payload: CreateOrderInput): Promise<CreateOrderRes> => {
+        // Reuse the same key for retries of the same submit intent.
+        const key =
+          orderIdempotencyKeyRef.current ?? crypto.randomUUID();
+        orderIdempotencyKeyRef.current = key;
+        return CheckoutAPI.createOrder(payload, key);
+      },
       onError: () => {
         addToast("Something wen't wrong. please try again", "error");
       },
       onSuccess: (data) => {
+        orderIdempotencyKeyRef.current = null;
         setCheckoutIds({ order: data.orderId, payment: data.paymentId });
         useCheckoutStore.getState().setPayment({ status: "verification" });
         navigate(`/checkout/${checkoutIds?.session}/order/${data.orderId}/pay`);
@@ -70,6 +78,7 @@ const BottomBar = () => {
     variantId: o.variantId,
     quantity: o.quantity,
     cardMessages: o.cardMessages,
+    primaryImageUrl: o.imageUrl,
   }));
 
   const handlePreOrder = () => {

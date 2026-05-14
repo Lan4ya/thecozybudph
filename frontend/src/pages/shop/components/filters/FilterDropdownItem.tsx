@@ -5,21 +5,21 @@ import { useProductsFilterAndSortState } from "../../hooks/useProductsFilterAndS
 import toggleArrItem from "@/lib/utils/toggleArrItem";
 import {
   type ArrayFilterKeys,
-  type ProductFiltersDomain,
+  type ProductFiltersUI,
   type NonArrayFilterKeys,
-  type ProductPriceRangeOption,
+  type ProductPriceRangeOptionsUIsUI,
 } from "../../../../types";
 import { arrayFiltersKeys } from "../../../../types";
 import { formatPriceRange } from "./PriceRange";
 
 type ArrayFilterProps<K extends ArrayFilterKeys> = {
   filterKey: K;
-  filterVal: Extract<ProductFiltersDomain[K], readonly unknown[]>[number];
+  filterVal: Extract<ProductFiltersUI[K], readonly unknown[]>[number];
 };
 
 type NonArrayFilterProps<K extends NonArrayFilterKeys> = {
   filterKey: K;
-  filterVal: ProductFiltersDomain[K];
+  filterVal: ProductFiltersUI[K];
 };
 
 type FilterDropdownItemProps =
@@ -78,7 +78,7 @@ export const FilterDropdownItem = ({
       onMouseDown={(e) => e.preventDefault()} // Keep input focused; prevents "Any" flicker
     >
       {filterKey === "priceRange"
-        ? formatPriceRange(filterVal as ProductPriceRangeOption)
+        ? formatPriceRange(filterVal as ProductPriceRangeOptionsUIsUI)
         : filterVal}
       {isItemActive && <Check className="size-4" />}
     </DropdownMenuItem>

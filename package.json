@@ -3,16 +3,11 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "dev:frontend": "pnpm --filter frontend dev",
+    "dev:frontend": "pnpm -F frontend dev",
     "dev:backend": "cd backend && sudo systemctl start docker && pnpm supabase functions serve --no-verify-jwt",
-    "build:frontend": "pnpm --filter frontend build",
+    "build:frontend": "pnpm -F frontend build",
     "build": "pnpm -r build",
-    "typecheck": "tsc --noEmit -p ./frontend/tsconfig.json && tsc --noEmit -p ./packages/schemas/tsconfig.json",
-    "pkg:generate": "pnpm --filter backend pkg:generate",
-    "db:apply-schemas": "pnpm --filter backend db:apply-schemas",
-    "db:seed": "pnpm --filter backend db:seed"
-  },
-  "dependencies": {
-    "zod": "^4.3.6"
+    "type": "pnpm -F backend check:supabase-functions && tsc --noEmit -p ./frontend/tsconfig.json && tsc --noEmit -p ./packages/schemas/tsconfig.json",
+    "pkg:generate": "pnpm -F backend pkg:generate"
   }
 }

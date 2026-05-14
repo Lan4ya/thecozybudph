@@ -4,7 +4,7 @@ import {
   payments,
   PayOrderRes,
 } from "@shared/schemas/index.ts";
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull, or } from "drizzle-orm";
 import { DrizzleClient } from "../../../db/client.ts";
 import { AppError } from "../../../errors/Errors.ts";
 import {
@@ -15,16 +15,17 @@ import {
 import { isDev } from "../../../utils/isDev.ts";
 import { OrderRepository } from "../../order/order-repository.ts";
 
-const APP_URL = Deno.env.get("APP_URL");
-
-// Since this is a transactional workflow with external API's involved, I
-// decided to not use DB repositories for the main op.
 export const payOrder = async (
   db: DrizzleClient,
-  payload: PayOrderInput,
-  orderId: string,
-  idempotencyKey?: string,
+  params: {
+    payload: PayOrderInput;
+    orderId: string;
+    idempotencyKey?: string;
+    appURL: string;
+  },
 ): Promise<PayOrderRes> => {
+  const { appURL, idempotencyKey, payload, orderId } = params;
+
   if (!idempotencyKey) {
     throw AppError.badRequest("Missing Idempotency-Key");
   }
@@ -39,6 +40,7 @@ export const payOrder = async (
         .update(orders)
         .set({ status: "expired" })
         .where(eq(orders.id, orderId));
+
       await tx
         .update(payments)
         .set({ status: "failed" })
@@ -56,26 +58,81 @@ export const payOrder = async (
       columns: {
         id: true,
         status: true,
+        paymentIntentId: true,
       },
     });
 
     if (!existingPayment) throw AppError.notFound("Payment not found");
 
     if (existingPayment.status === "paid") {
-      // Resolve idempotency
+      // idempotency
       return {
         paymentId: existingPayment.id,
         paymentUrl: null,
         status: existingPayment.status,
+        // message: "Payment already completed",
       };
     }
 
-    if (existingPayment.status === "failed") {
-      // Deactivate
-      await tx
-        .update(payments)
-        .set({ isActive: false })
-        .where(eq(payments.id, existingPayment.id));
+    if (existingPayment.status === "processing") {
+      throw AppError.conflict("Payment is currently being processed");
+    }
+
+    // Atomic claim: only one request may transition this payment into
+    // "processing" before calling external payment APIs.
+    const [claimedPayment] = await tx
+      .update(payments)
+      .set({ status: "processing" })
+      .where(
+        and(
+          eq(payments.id, existingPayment.id),
+          eq(payments.orderId, orderId),
+          eq(payments.isActive, true),
+          or(
+            eq(payments.status, "failed"),
+            and(
+              eq(payments.status, "pending"),
+              isNull(payments.paymentIntentId),
+            ),
+          ),
+        ),
+      )
+      .returning({ id: payments.id });
+
+    if (!claimedPayment) {
+      const latestPayment = await tx.query.payments.findFirst({
+        where: and(
+          eq(payments.id, payload.paymentId),
+          eq(payments.orderId, orderId),
+          eq(payments.isActive, true),
+        ),
+        columns: {
+          id: true,
+          status: true,
+          paymentIntentId: true,
+        },
+      });
+
+      if (!latestPayment) throw AppError.notFound("Payment not found");
+
+      if (latestPayment.status === "paid") {
+        return {
+          paymentId: latestPayment.id,
+          paymentUrl: null,
+          status: latestPayment.status,
+        };
+      }
+
+      if (
+        latestPayment.status === "processing" ||
+        (latestPayment.status === "pending" && !!latestPayment.paymentIntentId)
+      ) {
+        throw AppError.conflict(
+          "Payment attempt already started for this order.",
+        );
+      }
+
+      throw AppError.conflict("Unable to claim payment for processing.");
     }
 
     try {
@@ -103,11 +160,11 @@ export const payOrder = async (
         paymentMethodId: paymentMethod.id,
         returnUrl: isDev
           ? `http://localhost:5173/${returnUrl}`
-          : `${APP_URL!}/${returnUrl}`,
+          : `${appURL!}/${returnUrl}`,
       });
 
       // Commit paymongo details
-      await tx
+      const [committedPayment] = await tx
         .update(payments)
         .set({
           paymentIntentId: paymentIntent.id,
@@ -115,10 +172,20 @@ export const payOrder = async (
           amountCents: paymentIntent.attributes.amount,
           status: "pending",
         })
-        .where(eq(payments.id, existingPayment.id));
+        .where(
+          and(
+            eq(payments.id, claimedPayment.id),
+            eq(payments.status, "processing"),
+          ),
+        )
+        .returning({ id: payments.id });
+
+      if (!committedPayment) {
+        throw AppError.conflict("Payment status changed before commit.");
+      }
 
       return {
-        paymentId: existingPayment.id,
+        paymentId: claimedPayment.id,
         paymentUrl: attached.attributes.next_action.redirect.url,
         status: "pending",
       };
@@ -129,7 +196,12 @@ export const payOrder = async (
         .set({
           status: "failed",
         })
-        .where(eq(payments.id, existingPayment.id));
+        .where(
+          and(
+            eq(payments.id, claimedPayment.id),
+            eq(payments.status, "processing"),
+          ),
+        );
 
       throw err;
     }

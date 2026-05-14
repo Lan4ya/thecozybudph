@@ -9,6 +9,12 @@ export const AddressRepository = {
     addressInsert: InsertAddress & { profileId: string },
   ) => {
     return await db.rls(async (tx) => {
+      // Acquires a transaction-scoped advisory lock keyed by profileId.
+      // Ensures only one transaction at a time can operate on this profile’s addresses,
+      // preventing race conditions (e.g., multiple concurrent inserts bypassing the 10-address limit).
+      await tx.execute(sql` select
+        pg_advisory_xact_lock(hashtext(${addressInsert.profileId})) `);
+
       // Count existing addresses for this profile
       const [countResult] = await tx
         .select({ c: sql<number>`count(*)` })
@@ -16,9 +22,9 @@ export const AddressRepository = {
         .where(eq(addresses.profileId, addressInsert.profileId!))
         .execute();
 
-      // console.log({ countResult });
+      const count = Number(countResult.c);
 
-      if (countResult.c >= 10) {
+      if (count >= 10) {
         throw AppError.badRequest("Cannot have more than 10 addresses");
       }
 
@@ -36,7 +42,7 @@ export const AddressRepository = {
       }
 
       // auto default if there's no any other address yet
-      const isDefault = countResult.c === 0 || addressInsert.isDefault;
+      const isDefault = count === 0 || addressInsert.isDefault;
 
       // Insert new address
       const [inserted] = await tx

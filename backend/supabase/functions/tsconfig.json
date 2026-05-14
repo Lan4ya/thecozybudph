@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "useUnknownInCatchVariables": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "allowJs": false,
+    "lib": [
+      "deno.window",
+      "deno.ns",
+      "esnext"
+    ],
+    "types": []
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}

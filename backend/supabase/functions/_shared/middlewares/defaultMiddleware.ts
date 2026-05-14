@@ -7,12 +7,12 @@ import { AppEnv } from "../types.d.ts";
 import { isDev } from "../utils/isDev.ts";
 import { devRequestLogger } from "./logger.ts";
 
-const APP_URL = Deno.env.get("APP_URL");
+// Sane default configs. Should be applied in the app before the routes.
+export const defaultAppMiddlewares = (app: Hono<AppEnv>) => {
+  const APP_URL = Deno.env.get("APP_URL");
 
-// Apply sane default middlewares on all routes on all edge functions.
-export function applyDefaultMiddlewares(app: Hono<AppEnv>) {
   if (isDev) {
-    app.use("*", devRequestLogger);
+    app.use("*", devRequestLogger());
   }
 
   app.use(logger());
@@ -21,7 +21,7 @@ export function applyDefaultMiddlewares(app: Hono<AppEnv>) {
     "*",
     cors({
       origin: [
-        "http://127.0.0.1:5173", // dev only
+        "http://127.0.0.1:5173", // dev
         APP_URL!,
       ],
       credentials: true,
@@ -72,4 +72,4 @@ export function applyDefaultMiddlewares(app: Hono<AppEnv>) {
         "anonymous",
     }),
   );
-}
+};

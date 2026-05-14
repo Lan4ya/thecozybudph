@@ -108,7 +108,7 @@ file_size_limit = "50MiB"
 # [storage.image_transformation]
 # enabled = true
 
-[storage.buckets.products]
+[storage.buckets.product_snapshots]
 public = true
 allowed_mime_types = ["image/png", "image/webp", "image/jpeg"]
 

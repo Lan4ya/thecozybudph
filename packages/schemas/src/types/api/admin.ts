@@ -15,7 +15,7 @@ import {
   serviceTypeSchema,
   shippingQuoteSchema,
 } from "../../zod/index.ts";
-import { AdminOrderListItem } from "../domain/admin.ts";
+import type { AdminOrderListItem } from "../domain/admin.ts";
 
 export type AdminQueryOrdersInput = z.infer<typeof adminQueryOrdersSchema>;
 

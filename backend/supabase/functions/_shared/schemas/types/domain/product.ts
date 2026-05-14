@@ -34,6 +34,9 @@ export interface ProductListItem {
   primaryImageUrl: string;
   minPriceCents: number;
   maxPriceCents: number;
+  description: string | null;
+  collection: string | null;
+  category: string | null;
 }
 
 export type ProductCategory = {

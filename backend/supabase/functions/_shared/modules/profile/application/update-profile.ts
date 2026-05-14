@@ -1,10 +1,10 @@
 import { AppError } from "@shared/errors/Errors.ts";
-import { SupabaseType } from "@shared/types.d.ts";
-import { snakeToCamelKeys } from "@shared/utils/caseConverter.ts";
+import { SupabaseDB } from "@shared/types.d.ts";
+import { snakeToCamelKeys } from "@shared/utils/mod.ts";
 import { ProfileRepository } from "../profile-repository.ts";
 
 export const updateProfile = async (
-  supabase: SupabaseType,
+  supabase: SupabaseDB,
   payload: UpdateProfileInput,
   profileId: string,
 ): Promise<Profile> => {

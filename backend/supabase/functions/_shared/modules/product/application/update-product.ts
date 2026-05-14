@@ -4,14 +4,14 @@ import {
   UpdateProductWithRelations,
 } from "@shared/schemas/index.ts";
 import { AppError } from "@shared/errors/Errors.ts";
-import { SupabaseType } from "@shared/types.d.ts";
+import { SupabaseDB } from "@shared/types.d.ts";
 import { ProductRepository } from "../product-repository.ts";
 import { ProductStorage } from "../product-storage.ts";
 import { DrizzleClient } from "../../../db/client.ts";
 
 export const updateProduct = async (
   db: DrizzleClient,
-  supabase: SupabaseType,
+  supabase: SupabaseDB,
   productId: string,
   payload: UpdateProductInput,
 ): Promise<ProductWithRelations> => {
@@ -20,6 +20,7 @@ export const updateProduct = async (
   if (!existingProduct) throw AppError.notFound("Product not found");
 
   let updatedImageUrls = existingProduct.imageUrls ?? [];
+  let updatedImageHashes = existingProduct.imageHashes ?? [];
 
   // Guard on final image count
   const finalImageCount =
@@ -35,47 +36,60 @@ export const updateProduct = async (
   const { primaryImageIndex, imageUrlsToDelete, newProductImages, ...rest } =
     payload;
 
-  // Handle image uploads
-  let cleanupUploads = async () => {};
-  if (newProductImages?.length) {
-    const { urls, cleanup } = await ProductStorage.uploadImages(
-      supabase,
-      "products",
-      newProductImages,
-    );
-    updatedImageUrls = [...updatedImageUrls, ...urls];
-    cleanupUploads = async () => {
-      await cleanup();
-    };
-  }
-
-  // Handle image deletions
-  if (imageUrlsToDelete?.length) {
-    updatedImageUrls = updatedImageUrls.filter(
-      (url: string) => !payload.imageUrlsToDelete?.includes(url),
-    );
-
-    const filePaths = imageUrlsToDelete
-      .map((url: string) => url.match(/\/products\/([^?]+)/)?.[1])
-      .filter(Boolean) as string[];
-
-    if (filePaths.length > 0) {
-      const deleteError = await ProductStorage.deleteImages(
-        supabase,
-        filePaths,
-      );
-      if (deleteError)
-        console.error("Failed to delete some images:", deleteError);
-    }
-  }
-
-  const productUpdates: UpdateProductWithRelations = {
-    ...rest,
-    imageUrls: updatedImageUrls,
-    primaryImageUrl: updatedImageUrls[primaryImageIndex ?? 0],
-  };
-
+  let uploadCleanup: (() => Promise<void>) | undefined;
   try {
+    // Handle image uploads
+    if (newProductImages?.length) {
+      const { urls, hashes, cleanup } = await ProductStorage.uploadImages(
+        supabase,
+        "products",
+        newProductImages,
+      );
+
+      uploadCleanup = cleanup;
+
+      updatedImageUrls = [...updatedImageUrls, ...urls];
+      updatedImageHashes = [...updatedImageHashes, ...hashes];
+    }
+
+    // Handle image deletions
+    if (imageUrlsToDelete?.length) {
+      const remainingUrls: string[] = [];
+      const remainingHashes: string[] = [];
+
+      updatedImageUrls.forEach((url: string, index: number) => {
+        if (!payload.imageUrlsToDelete?.includes(url)) {
+          remainingUrls.push(url);
+          remainingHashes.push(updatedImageHashes[index]);
+        }
+      });
+
+      updatedImageUrls = remainingUrls;
+      updatedImageHashes = remainingHashes;
+
+      const filePaths = imageUrlsToDelete
+        .map((url: string) => url.match(/\/products\/([^?]+)/)?.[1])
+        .filter(Boolean) as string[];
+
+      if (filePaths.length > 0) {
+        const deleteError = await ProductStorage.deleteImages(
+          supabase,
+          "products",
+          filePaths,
+        );
+        if (deleteError)
+          console.error("Failed to delete some images:", deleteError);
+      }
+    }
+
+    const productUpdates: UpdateProductWithRelations = {
+      ...rest,
+      imageUrls: updatedImageUrls,
+      imageHashes: updatedImageHashes,
+      primaryImageUrl: updatedImageUrls[primaryImageIndex ?? 0],
+      primaryImageHash: updatedImageHashes[primaryImageIndex ?? 0],
+    };
+
     const updatedProductWithRelations =
       await ProductRepository.updateProductWithRelations(
         db,
@@ -85,9 +99,11 @@ export const updateProduct = async (
 
     return updatedProductWithRelations;
   } catch (error) {
-    await cleanupUploads().catch((err) => {
-      console.error("Image cleanup failed after update error", err);
-    });
+    if (uploadCleanup) {
+      await uploadCleanup().catch((err) => {
+        console.error("Image cleanup failed after update error", err);
+      });
+    }
 
     throw AppError.internal("Failed to update product", { cause: error });
   }

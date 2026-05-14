@@ -54,7 +54,7 @@ export const handlePaymentWebhook = async (
 
   console.log({ webhook_pi_id: paymentIntentId });
 
-  const db = createDrizzle(true);
+  const db = createDrizzle({ isAdmin: true });
 
   return await db.admin.transaction(async (tx) => {
     // Idempotency guard

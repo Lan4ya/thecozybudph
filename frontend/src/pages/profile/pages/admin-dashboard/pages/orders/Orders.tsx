@@ -101,12 +101,9 @@ export default function Orders() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 py-6">
       <header className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Orders</h1>
-        <div className="text-sm text-muted-foreground">
-          {total} user{total !== 1 ? "s" : ""}
-        </div>
       </header>
 
       <OrdersFilters

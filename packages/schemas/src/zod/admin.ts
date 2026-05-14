@@ -32,29 +32,17 @@ export const adminShipOrderSchema = z.object({
 });
 
 export const createShippingQuoteSchema = z.object({
-  senderAddress: z
-    .object({
-      region: z.string().trim().min(1, "region can't be empty"),
-      city: z.string().trim().min(1, "city can't be empty"),
-      province: z.string().optional(),
-      postalCode: z
-        .string()
-        .trim()
-        .regex(/^\d{4}$/, "postal code must be exactly 4 digits"),
-      barangay: z.string().trim().min(1, "barangay can't be empty"),
-      addressLine: z.string().trim().min(1, "address line can't be empty"),
+  senderAddress: createAddressSchema
+    .omit({
+      phoneNumber: true,
+      fullName: true,
+      isDefault: true,
     })
     .optional(),
-  recipientAddress: z.object({
-    region: z.string().trim().min(1, "region can't be empty"),
-    city: z.string().trim().min(1, "city can't be empty"),
-    province: z.string().optional(),
-    postalCode: z
-      .string()
-      .trim()
-      .regex(/^\d{4}$/, "postal code must be exactly 4 digits"),
-    barangay: z.string().trim().min(1, "barangay can't be empty"),
-    addressLine: z.string().trim().min(1, "address line can't be empty"),
+  recipientAddress: createAddressSchema.omit({
+    phoneNumber: true,
+    fullName: true,
+    isDefault: true,
   }),
   serviceType: serviceTypeSchema.optional(),
 });

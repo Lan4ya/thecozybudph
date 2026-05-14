@@ -3,10 +3,14 @@ import { PaymentActions } from "@shared/modules/payment/mod.ts";
 import { zodValidatorMiddleware } from "@shared/middlewares/zodValidatorMiddleware.ts";
 import {
   createOrderSchema,
-  confirmOrderSchema,
+  payOrderSchema,
   createShippingQuoteSchema,
 } from "@shared/schemas/index.ts";
-import { handleSuccess, requireVariables } from "@shared/utils/mod.ts";
+import {
+  handleSuccess,
+  requireBindings,
+  requireVariables,
+} from "@shared/utils/mod.ts";
 import { createFactory } from "hono/factory";
 import z from "zod";
 import { AppEnv } from "@shared/types.d.ts";
@@ -17,28 +21,39 @@ const { createHandlers } = factory;
 export const createOrderHandler = createHandlers(
   zodValidatorMiddleware("json", createOrderSchema),
   async (c) => {
-    const { claims, db } = requireVariables(c, "claims", "db");
+    const { supabaseService, claims, db } = requireVariables(
+      c,
+      "supabaseService",
+      "claims",
+      "db",
+    );
     const profileId = claims.sub;
     const payload = c.req.valid("json");
-    const res = await OrderActions.createOrder(db, profileId, payload);
+    const idempotencyKey = c.req.header("Idempotency-Key");
+    const res = await OrderActions.createOrder(db, supabaseService, {
+      profileId,
+      payload,
+      idempotencyKey,
+    });
     return handleSuccess(res);
   },
 );
 
 export const payOrderHandler = createHandlers(
-  zodValidatorMiddleware("json", confirmOrderSchema),
+  zodValidatorMiddleware("json", payOrderSchema),
   zodValidatorMiddleware("param", z.object({ id: z.uuid() })),
   async (c) => {
     const { db } = requireVariables(c, "db");
+    const { APP_URL } = requireBindings(c, "APP_URL");
     const payload = c.req.valid("json");
     const { id: orderId } = c.req.valid("param");
     const idempotencyKey = c.req.header("Idempotency-Key");
-    const res = await PaymentActions.payOrder(
-      db,
+    const res = await PaymentActions.payOrder(db, {
       payload,
       orderId,
       idempotencyKey,
-    );
+      appURL: APP_URL,
+    });
     return handleSuccess(res);
   },
 );

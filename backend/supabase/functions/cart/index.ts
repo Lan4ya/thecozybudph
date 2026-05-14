@@ -2,11 +2,11 @@ import { Hono } from "hono";
 import cart from "./cart-routes.ts";
 import { handleError } from "@shared/errors/errorHandler.ts";
 import { AppEnv } from "@shared/types.d.ts";
-import { applyDefaultMiddlewares } from "@shared/middlewares/defaultMiddleware.ts";
+import { defaultAppMiddlewares } from "@shared/middlewares/defaultMiddleware.ts";
 
 const app = new Hono<AppEnv>().basePath("cart");
 
-applyDefaultMiddlewares(app);
+defaultAppMiddlewares(app);
 
 app.route("/", cart);
 

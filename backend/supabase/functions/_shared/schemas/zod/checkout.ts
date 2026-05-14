@@ -6,6 +6,7 @@ import { createAddressSchema } from "./address.ts";
 export const paymentMethodTypesSchema = z.enum(["gcash", "brankas"]); // brankas is online banking
 export const serviceTypeSchema = z.enum(["motorcycle", "sedan"]);
 export const paymentStatusSchema = z.enum([
+  "processing",
   "pending",
   "paid",
   "failed",
@@ -20,14 +21,20 @@ export const orderSourceSchema = z.object({
 });
 
 export const createOrderSchema = orderSourceSchema.extend({
-  items: z.array(orderItemSchema).min(1, "order must have at least one item"),
+  items: z
+    .array(
+      orderItemSchema.extend({
+        primaryImageUrl: z.url("primaryImageUrl is not a valid url"),
+      }),
+    )
+    .min(1, "order must have at least one item"),
   addressId: z.uuid("addressId is not a valid UUID"),
   shippingQuoteId: z.string().trim().min(1, "shippingQuoteId can't be empty"),
   paymentMethodType: paymentMethodTypesSchema,
   serviceType: serviceTypeSchema,
 });
 
-export const confirmOrderSchema = z.object({
+export const payOrderSchema = z.object({
   paymentId: z.uuid("paymentId is not a valid UUID"),
   billing: z.object({
     name: z.string().trim().min(1, "name is required"),

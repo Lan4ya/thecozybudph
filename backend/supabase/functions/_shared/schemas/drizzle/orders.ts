@@ -9,13 +9,18 @@ import {
   varchar,
   pgPolicy,
   index,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { profiles } from "./profiles.ts";
 import { products, productVariants } from "./products.ts";
-import { OrderSource, ProductVariant, ServiceType } from "../types/index.ts";
+import type {
+  OrderSource,
+  ProductVariant,
+  ServiceType,
+} from "../types/index.ts";
 import { authenticatedRole, postgresRole } from "drizzle-orm/supabase/rls";
-import { DBOrderStatus } from "../types/db/order.ts";
+import type { DBOrderStatus } from "../types/db/order.ts";
 
 export const orders = pgTable(
   "orders",
@@ -186,5 +191,36 @@ export const orderItemsSnapshots = pgTable(
         )
       `,
     }),
+  ],
+);
+
+export const orderCreationRequests = pgTable(
+  "order_creation_requests",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    profileId: uuid("profile_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    idempotencyKey: text("idempotency_key").notNull(),
+    status: text("status").default("processing").notNull(),
+    orderId: uuid("order_id").references(() => orders.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("order_creation_requests_profile_key_unique").on(
+      table.profileId,
+      table.idempotencyKey,
+    ),
+    index("idx_order_creation_requests_profile_status").on(
+      table.profileId,
+      table.status,
+    ),
+    check(
+      "order_creation_requests_status_check",
+      sql`${table.status} IN ('processing', 'completed', 'failed')`,
+    ),
   ],
 );

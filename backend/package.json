@@ -6,9 +6,21 @@
     "build": "tsc -p tsconfig.json",
     "pkg:generate": "pnpm supabase gen types typescript --local > ../packages/schemas/src/types/db/supabase.types.ts && mkdir -p  ./supabase/functions/_shared/schemas && rm -rf ./supabase/functions/_shared/schemas/* && cp -r ../packages/schemas/src/* ./supabase/functions/_shared/schemas/",
     "db:apply-schemas": "pnpm exec drizzle-kit generate && pnpm supabase migrations up --include-all",
-    "db:seed": "pnpm tsx ./scripts/seedProductsViaAdminApi.ts"
+    "db:seed": "pnpm tsx ./scripts/seedProductsViaAdminApi.ts",
+    "db:init-bucket": "pnpm tsx ./scripts/createInitialBuckets.ts",
+    "test:supabase": "deno test --config ./supabase/functions/tests/deno.json ./supabase/functions/tests/*-test.ts --allow-all --no-check",
+    "check:supabase-function:admin": "deno check --config ./supabase/functions/admin/deno.json ./supabase/functions/admin/index.ts",
+    "check:supabase-function:address": "deno check --config ./supabase/functions/address/deno.json ./supabase/functions/address/index.ts",
+    "check:supabase-function:cart": "deno check --config ./supabase/functions/cart/deno.json ./supabase/functions/cart/index.ts",
+    "check:supabase-function:checkout": "deno check --config ./supabase/functions/checkout/deno.json ./supabase/functions/checkout/index.ts",
+    "check:supabase-function:payment": "deno check --config ./supabase/functions/payment/deno.json ./supabase/functions/payment/index.ts",
+    "check:supabase-function:profile": "deno check --config ./supabase/functions/profile/deno.json ./supabase/functions/profile/index.ts",
+    "check:supabase-function:webhook": "deno check --config ./supabase/functions/webhook/deno.json ./supabase/functions/webhook/index.ts",
+    "check:supabase-function:dev-only": "deno check --config ./supabase/functions/dev-only/deno.json ./supabase/functions/dev-only/index.ts",
+    "check:supabase-functions": "pnpm run check:supabase-function:admin && pnpm run check:supabase-function:address && pnpm run check:supabase-function:cart && pnpm run check:supabase-function:checkout && pnpm run check:supabase-function:payment && pnpm run check:supabase-function:profile && pnpm run check:supabase-function:webhook && pnpm run check:supabase-function:dev-only"
   },
   "devDependencies": {
+    "@TheCozyBud/schemas": "workspace:*",
     "@faker-js/faker": "^10.1.0",
     "@snaplet/copycat": "^6.0.0",
     "@snaplet/seed": "^0.98.0",

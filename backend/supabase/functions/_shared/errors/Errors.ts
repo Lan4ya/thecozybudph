@@ -1,9 +1,9 @@
 export class AppError extends Error {
-  statusCode: number;
+  status: number;
 
   constructor(statusCode: number, message: string, cause?: unknown) {
     super(message, { cause });
-    this.statusCode = statusCode;
+    this.status = statusCode;
     Error.captureStackTrace(this, this.constructor);
   }
 

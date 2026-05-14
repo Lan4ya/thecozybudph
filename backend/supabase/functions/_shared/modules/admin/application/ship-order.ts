@@ -1,12 +1,13 @@
 import { DrizzleClient } from "../../../db/client.ts";
 import { AppError } from "../../../errors/Errors.ts";
-import { createShippingOrder } from "../../../integrations/lalamove/create-order.ts";
-import { createShippingQuotation } from "../../../integrations/lalamove/create-quotation.ts";
+import {
+  createShippingOrder,
+  createShippingQuotation,
+} from "../../../integrations/lalamove/mod.ts";
 import { AdminShipOrderInput } from "../../../schemas/index.ts";
 import { OrderRepository } from "../../order/mod.ts";
-import { AdminRepository } from "../admin-repository.ts";
 
-export const shipOrder = async (
+export const ShipOrder = async (
   db: DrizzleClient,
   orderId: string,
   payload: AdminShipOrderInput,
@@ -57,7 +58,7 @@ export const shipOrder = async (
     // metadata?: Record<string, unknown> | undefined;
   });
 
-  const status = await AdminRepository.updateStatus(db, {
+  const status = await OrderRepository.updateStatus(db, {
     orderId,
     status: "to_ship",
     shippingOrderId: shippingOrder.id,

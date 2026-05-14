@@ -2,8 +2,8 @@ import type {
   ApiResponseSuccess,
   SnakeToCamel,
 } from "@shared/schemas/index.ts";
-import { snakeToCamelKeys } from "./caseConverter.ts";
 import { isDev } from "./isDev.ts";
+import { snakeToCamelKeys } from "./string.ts";
 
 export const handleSuccess = <T extends object | null | undefined>(
   payload: T,

@@ -2,6 +2,7 @@ import {
   authMiddleware,
   drizzleMiddleware,
   supabaseMiddleware,
+  supabaseServiceMiddleware,
 } from "@shared/middlewares/mod.ts";
 import { Env, Hono } from "hono";
 import {
@@ -18,7 +19,12 @@ checkout.post("/webhook", ...paymentWebhookHandler);
 
 // Protected
 const protectedRoutes = new Hono<Env>();
-protectedRoutes.use("*", supabaseMiddleware(), authMiddleware());
+protectedRoutes.use(
+  "*",
+  supabaseMiddleware(),
+  authMiddleware(),
+  supabaseServiceMiddleware(),
+);
 
 protectedRoutes.post("/order", drizzleMiddleware(), ...createOrderHandler);
 protectedRoutes.post("/order/:id/pay", drizzleMiddleware(), ...payOrderHandler);

@@ -1,9 +1,3 @@
-const GEOAPIFY_API_KEY = Deno.env.get("GEOAPIFY_API_KEY");
-
-if (!GEOAPIFY_API_KEY) {
-  throw new Error("Missing GEOAPIFY_API_KEY");
-}
-
 export interface Coordinates {
   lat: string;
   lng: string;
@@ -20,13 +14,18 @@ export async function getCoordinates(
   address: string,
   options: GeocodeOptions = {},
 ): Promise<Coordinates> {
+  const apiKey = Deno.env.get("GEOAPIFY_API_KEY");
+  if (!apiKey) {
+    throw new Error("Missing GEOAPIFY_API_KEY");
+  }
+
   if (!address || address.trim().length < 5) {
     throw new Error("Invalid address input");
   }
 
   const url = new URL("https://api.geoapify.com/v1/geocode/search");
   url.searchParams.set("text", address);
-  url.searchParams.set("apiKey", GEOAPIFY_API_KEY!);
+  url.searchParams.set("apiKey", apiKey);
   url.searchParams.set("limit", String(options.limit ?? 1));
 
   const res = await fetch(url.toString(), {

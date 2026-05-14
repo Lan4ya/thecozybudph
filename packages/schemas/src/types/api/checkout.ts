@@ -1,9 +1,9 @@
 import type { PaymentStatus } from "./payment.ts";
 import z from "zod";
-import { createOrderSchema, confirmOrderSchema } from "../../zod/checkout.ts";
+import { createOrderSchema, payOrderSchema } from "../../zod/checkout.ts";
 
 export type CreateOrderInput = z.infer<typeof createOrderSchema>;
-export type PayOrderInput = z.infer<typeof confirmOrderSchema>;
+export type PayOrderInput = z.infer<typeof payOrderSchema>;
 
 export type CreatePaymentRes = {
   redirectUrls: {

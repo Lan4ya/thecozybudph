@@ -11,7 +11,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { pgRole } from "drizzle-orm/pg-core/roles";
-import { ProductOption, ProductVariant } from "../types/index.ts";
+import type { ProductOption, ProductVariant } from "../types/index.ts";
 
 export const publicRole = pgRole("public").existing();
 
@@ -55,6 +55,11 @@ export const products = pgTable(
     description: text("description"),
     imageUrls: text("image_urls").array().notNull(),
     primaryImageUrl: text("primary_image_url").notNull(),
+    imageHashes: text("image_hashes")
+      .array()
+      .notNull()
+      .default(sql`'{}'`),
+    primaryImageHash: text("primary_image_hash").notNull(),
     minPriceCents: integer("min_price_cents").notNull(),
     maxPriceCents: integer("max_price_cents").notNull(),
 

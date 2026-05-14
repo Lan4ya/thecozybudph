@@ -1,0 +1,1 @@
+ALTER TABLE "products" RENAME COLUMN "image_hashes" TO "primary_image_hash";

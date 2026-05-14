@@ -35,26 +35,34 @@ export const payments = pgTable(
     paidAt: timestamp("paid_at", { withTimezone: true }),
 
     // Paymongo Details
-    paymentIntentId: text("payment_intent_id"),
-    paymentId: text("payment_id"),
+    paymentIntentId: text("payment_intent_id").unique(),
+    paymentId: text("payment_id").unique(),
     amountCents: integer("amount_cents"),
     method: text("method"),
   },
   (t) => [
+    check(
+      "payments_status_check",
+      sql`${t.status} IN ('processing', 'pending', 'paid', 'failed', 'cancelled', 'refunded')`,
+    ),
+
+    check("payments_amount_cents_check", sql`${t.amountCents} >= 0`),
+
     uniqueIndex("payments_unique_active_per_order_profile")
       .on(t.orderId, t.profileId)
       .where(sql`${t.isActive} = true`),
 
+    uniqueIndex("payments_unique_refunded_per_order")
+      .on(t.orderId)
+      .where(sql`${t.status} = 'refunded'`),
+
+    uniqueIndex("payments_unique_pending_per_order")
+      .on(t.orderId)
+      .where(sql`${t.status} = 'pending'`),
+
     uniqueIndex("payments_unique_paid_per_order")
       .on(t.orderId)
       .where(sql`${t.status} = 'paid'`),
-
-    check("payments_amount_cents_check", sql`${t.amountCents} >= 0`),
-
-    check(
-      "payments_status_check",
-      sql`${t.status} IN ('pending', 'paid', 'failed', 'cancelled', 'refunded')`,
-    ),
 
     pgPolicy("authenticated can select own payment", {
       as: "permissive",

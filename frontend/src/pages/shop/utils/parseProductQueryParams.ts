@@ -1,6 +1,6 @@
 import type {
   ProductQueryDomain,
-  ProductPriceRangeOption,
+  ProductPriceRangeOptionsUI,
   ProductSortOption,
 } from "@/types";
 
@@ -19,7 +19,7 @@ export function parseProductQueryParams(
   if (collectionNames.length) filters.collectionNames = collectionNames;
 
   const priceRange = params.get("priceRange");
-  if (priceRange) filters.priceRange = priceRange as ProductPriceRangeOption;
+  if (priceRange) filters.priceRange = priceRange as ProductPriceRangeOptionsUI;
 
   const sort = params.get("sort") as ProductSortOption | null;
 

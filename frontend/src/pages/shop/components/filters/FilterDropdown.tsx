@@ -17,16 +17,13 @@ import { Skeleton } from "@/lib/ui/__shadcn__/skeleton";
 import { useProductsFilterAndSortState } from "../../hooks/useProductsFilterAndSortState";
 import { useIsSmScreenMax, useMediaQuery } from "@/hooks/useMediaQuery";
 import type {
-  ProductFiltersDomain,
-  ProductPriceRangeOption,
+  ProductFiltersUI,
+  ProductPriceRangeOptionsUI,
 } from "../../../../types";
 import isDev from "@/lib/utils/isDev";
 import { formatPriceRange } from "./PriceRange";
 
-type DropdownFilterLabels = Exclude<
-  keyof ProductFiltersDomain,
-  "search" | "sort"
->;
+type DropdownFilterLabels = Exclude<keyof ProductFiltersUI, "search" | "sort">;
 
 const filterLabels: Record<DropdownFilterLabels, string> = {
   priceRange: "Price range",
@@ -223,7 +220,7 @@ const DisplaySelectedFilters = ({
   const [first, ...rest] = vals;
   const normalizedFirst = useMemo(() => {
     if (dropdownType === "priceRange") {
-      return formatPriceRange(first as ProductPriceRangeOption);
+      return formatPriceRange(first as ProductPriceRangeOptionsUI);
     }
     return first;
   }, [first, dropdownType]);

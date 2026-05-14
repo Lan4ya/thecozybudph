@@ -1,0 +1,1 @@
+ALTER TABLE "image_snapshots" ADD CONSTRAINT "image_snapshots_ref_count_non_negative" CHECK ("image_snapshots"."ref_count" >= 0);

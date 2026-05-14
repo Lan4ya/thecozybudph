@@ -1,16 +1,5 @@
-import { Hono } from "hono";
-import admin from "./admin-routes.ts";
-import { handleError } from "@shared/errors/errorHandler.ts";
-import { AppEnv } from "@shared/types.d.ts";
-import { applyDefaultMiddlewares } from "@shared/middlewares/defaultMiddleware.ts";
+import { buildApp } from "@shared/factory/mod.ts";
+import { buildAdminRoutes } from "./admin-routes.ts";
 
-const app = new Hono<AppEnv>().basePath("admin");
-
-applyDefaultMiddlewares(app);
-
-app.route("/", admin);
-
-app.onError((err) => handleError(err));
-app.notFound((c) => c.text("Not Found", 404));
-
-Deno.serve(app.fetch);
+export const adminApp = buildApp("admin", buildAdminRoutes());
+Deno.serve(adminApp.fetch);

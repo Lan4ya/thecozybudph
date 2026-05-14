@@ -1,7 +1,7 @@
 import { X, Tags as TagIcon } from "lucide-react";
 import type {
-  ProductFiltersDomain,
-  ProductPriceRangeOption,
+  ProductFiltersUI,
+  ProductPriceRangeOptionsUI,
 } from "../../../types";
 import { useProductsFilterAndSortState } from "../hooks/useProductsFilterAndSortState";
 import { useIsXlScreenMin } from "@/hooks/useMediaQuery";
@@ -20,7 +20,6 @@ import { formatPriceRange } from "./filters/PriceRange";
 const xIcon = <X className="size-4" />;
 
 const FilterTags = () => {
-  // const [isClearFilterItemsBtnShown, showClearFilterItemsBtn] = useState(false);
   const { productQuery, hasProductQueryFilters } =
     useProductsFilterAndSortState();
   const isXlScreen = useIsXlScreenMin();
@@ -81,7 +80,7 @@ const FilterTags = () => {
                   <FilterTagItem
                     key={`${key}-${val}`}
                     label={val}
-                    filterKey={key as keyof ProductFiltersDomain}
+                    filterKey={key as keyof ProductFiltersUI}
                     isXlScreen={isXlScreen}
                   />
                 ))}
@@ -104,7 +103,7 @@ const FilterTags = () => {
               <FilterTagItem
                 key={`${key}-${String(val)}`}
                 label={String(val)}
-                filterKey={key as keyof ProductFiltersDomain}
+                filterKey={key as keyof ProductFiltersUI}
                 isXlScreen={isXlScreen}
               />
             ))}
@@ -121,7 +120,7 @@ const FilterTags = () => {
 
 type FilterTagItemProps = {
   label: string;
-  filterKey?: keyof ProductFiltersDomain;
+  filterKey?: keyof ProductFiltersUI;
   isXlScreen: boolean;
 };
 
@@ -176,7 +175,7 @@ const FilterTagItem = ({
       }}
     >
       {filterKey === "priceRange"
-        ? formatPriceRange(label as ProductPriceRangeOption)
+        ? formatPriceRange(label as ProductPriceRangeOptionsUI)
         : label}
       {isXlScreen ? (
         <span className="hidden group-hover:inline-block">{xIcon}</span>

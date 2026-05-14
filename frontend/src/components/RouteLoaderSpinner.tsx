@@ -11,7 +11,7 @@ export const RouteLoaderSpinner = ({
         role="status"
         aria-label="Loading"
         className={cn(
-          "size-12! lg:size-15! text-primary animate-spin",
+          "size-8! lg:size-10! text-primary animate-spin",
           className,
         )}
         {...props}

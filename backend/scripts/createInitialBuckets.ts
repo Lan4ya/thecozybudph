@@ -2,7 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import dotenv from "dotenv";
 dotenv.config();
 
-// Usage: cd backend && pnpx tsx createInitialBuckets.ts
+// Usage: pnpx tsx ./scripts/createInitialBuckets.ts
 
 const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = process.env;
 
@@ -13,7 +13,7 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-const BUCKET_NAMES = ["products", "events"];
+const BUCKET_NAMES = ["products", "events", "image_snapshots"];
 
 const createBucket = async (bucketName: string) => {
   const { error } = await supabase.storage.createBucket(bucketName, {

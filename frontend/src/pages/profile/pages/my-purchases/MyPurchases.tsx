@@ -114,9 +114,8 @@ const MyPurchases = () => {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 md:px-6 lg:px-8">
-      {/* Header */}
-      <div className="mb-8">
+    <div className="max-w-[1600px] w-full mx-auto space-y-6 px-4 py-6 md:px-6 lg:px-8">
+      <div className="pb-2">
         <h1 className="text-2xl font-semibold text-foreground">My Purchases</h1>
         <p className="text-sm text-muted-foreground mt-1">
           View and track your orders
@@ -124,7 +123,7 @@ const MyPurchases = () => {
       </div>
 
       {/* Status Tabs */}
-      <div className="mb-6 overflow-x-auto -mx-4 px-4">
+      <div className="overflow-x-auto pb-4 pr-4">
         <div className="flex gap-2 min-w-max" role="tablist">
           {ORDER_STATUS_TABS.map(({ status, label }) => (
             <button

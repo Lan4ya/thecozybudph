@@ -1,4 +1,4 @@
-import { OrderStatus } from "./order.ts";
+import type { OrderStatus } from "./order.ts";
 
 export type AdminOrderItem = {
   orderId: string;

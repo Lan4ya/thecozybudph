@@ -23,12 +23,14 @@ export const productBaseSchema = z.object({
     .max(255, "name can't exceed 255 characters")
     .toLowerCase(),
 
-  description: z
-    .string()
-    .trim()
-    .max(600, "description can't exceed 600 characters")
-    .optional()
-    .nullable(),
+  description: z.preprocess(
+    (v) => (typeof v === "string" && v.trim() === "" ? null : v),
+    z
+      .string()
+      .max(600, "description can't exceed 600 characters")
+      .optional()
+      .nullable(),
+  ),
 
   categoryName: z
     .string()
@@ -37,13 +39,15 @@ export const productBaseSchema = z.object({
     .max(100, "category can't exceed 100 characters")
     .toLowerCase(),
 
-  collectionName: z
-    .string()
-    .trim()
-    .max(100, "collection name can't exceed 100 characters")
-    .toLowerCase()
-    .optional()
-    .nullable(),
+  collectionName: z.preprocess(
+    (v) => (typeof v === "string" && v.trim() === "" ? null : v),
+    z
+      .string()
+      .max(100, "collection name can't exceed 100 characters")
+      .toLowerCase()
+      .optional()
+      .nullable(),
+  ),
 });
 
 export const productOptionSchema = z.object({
@@ -99,19 +103,19 @@ export const createProductSchema = productBaseSchema.extend({
 export const updateProductSchema = productBaseSchema.partial().extend({
   newProductImages: z.preprocess(
     (val) => {
-      if (val === undefined) return undefined;
+      if (!val) return [];
       return Array.isArray(val) ? val : [val];
     },
     z
       .array(imageFileSchema)
       .max(MAX_IMAGES, `you can upload up to ${MAX_IMAGES} images only`)
-      .optional(),
+      .default([]),
   ),
 
   imageUrlsToDelete: z.preprocess((val) => {
-    if (val === undefined) return undefined;
+    if (!val) return [];
     return Array.isArray(val) ? val : [val];
-  }, z.array(z.url()).optional()),
+  }, z.array(z.url()).default([])),
 
   primaryImageIndex: z.coerce
     .number()

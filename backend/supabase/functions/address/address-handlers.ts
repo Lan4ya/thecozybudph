@@ -5,11 +5,12 @@ import {
   createAddressSchema,
   updateAddressSchema,
 } from "@shared/schemas/index.ts";
-import {
-  handleSuccess,
-  createHandlers,
-  requireVariables,
-} from "@shared/utils/mod.ts";
+import { handleSuccess, requireVariables } from "@shared/utils/mod.ts";
+import { createFactory } from "hono/factory";
+import { AppEnv } from "@shared/types.d.ts";
+
+const factory = createFactory<AppEnv>();
+const { createHandlers } = factory;
 
 export const createAddressHandler = createHandlers(
   zodValidatorMiddleware("json", createAddressSchema),

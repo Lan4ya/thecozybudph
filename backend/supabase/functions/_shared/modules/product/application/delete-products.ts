@@ -4,11 +4,11 @@ import { isDev } from "@shared/utils/isDev.ts";
 import { DrizzleClient } from "../../../db/client.ts";
 import { ProductRepository } from "../product-repository.ts";
 import { ProductStorage } from "../product-storage.ts";
-import { SupabaseType } from "../../../types.d.ts";
+import { SupabaseDB } from "../../../types.d.ts";
 
 export const deleteProducts = async (
   db: DrizzleClient,
-  supabase: SupabaseType,
+  supabase: SupabaseDB,
   payload: DeleteProductsInput,
 ): Promise<DeleteProducts> => {
   const { productIds } = payload;
@@ -43,7 +43,11 @@ export const deleteProducts = async (
       .filter((p): p is string => p !== null);
 
     if (filePaths.length > 0) {
-      const error = await ProductStorage.deleteImages(supabase, filePaths);
+      const error = await ProductStorage.deleteImages(
+        supabase,
+        "products",
+        filePaths,
+      );
       if (error) {
         console.error("Failed to delete some images:", error);
         // Not gonna throw an err even if storage cleanup fails, instead we
@@ -57,11 +61,8 @@ export const deleteProducts = async (
     productIds,
   );
 
-  if (deletedProducts.length === 0) {
-    throw AppError.notFound("Products not found");
-  }
-
   const deletedProductIds: string[] =
     deletedProducts.map((d) => String(d.id)) ?? [];
+
   return { deletedProductIds };
 };

@@ -78,7 +78,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="w-full px-4 py-6 md:px-6 lg:px-8">
+    <div className="min-h-screen w-full px-4 py-6 md:px-6 lg:px-8">
       {/* Container */}
       <div className="max-w-5xl mx-auto space-y-6">
         {/* Header */}

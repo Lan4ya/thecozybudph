@@ -1,18 +1,17 @@
-import { SupabaseType } from "@shared/types.d.ts";
-import { DrizzleClient } from "../../db/client.ts";
 import {
+  cartItems,
+  DBOrderStatus,
+  InsertPendingOrder,
+  orderAddressesSnapshot,
+  orderItemsSnapshots,
+  orders,
   productCategories,
   productCollections,
   products,
   productVariants,
-  orderAddressesSnapshot,
-  orderItemsSnapshots,
-  orders,
-  InsertPendingOrder,
-  DBOrderStatus,
-  cartItems,
 } from "@shared/schemas/index.ts";
 import { and, eq, inArray } from "drizzle-orm";
+import { DrizzleClient } from "../../db/client.ts";
 import { CartRepository } from "../cart/cart-repository.ts";
 
 export const OrderRepository = {
@@ -94,17 +93,23 @@ export const OrderRepository = {
     profileId: string,
     params: {
       status: DBOrderStatus;
-      limit: number;
-      offset: number;
+      limit?: number;
+      offset?: number;
     },
   ) => {
     return db.rls((tx) => {
-      const { status, limit, offset } = params;
+      const { status, limit = 20, offset = 0 } = params;
       return tx.query.orders.findMany({
         where: and(
           eq(orders.profileId, profileId),
           status ? eq(orders.status, status) : undefined,
         ),
+        columns: {
+          profileId: false,
+          shipmentOrderId: false,
+          source: false,
+          updatedAt: false,
+        },
         orderBy: (orders, { desc }) => [desc(orders.createdAt)],
         limit,
         offset,
@@ -123,6 +128,8 @@ export const OrderRepository = {
 
           name: products.name,
           primaryImageUrl: products.primaryImageUrl,
+          imageUrls: products.imageUrls,
+          primaryImageHash: products.primaryImageHash,
 
           collection: productCollections.name,
           category: productCategories.name,
@@ -139,5 +146,22 @@ export const OrderRepository = {
         )
         .where(inArray(productVariants.id, variantIds));
     });
+  },
+
+  updateStatus: async (
+    db: DrizzleClient,
+    params: {
+      orderId: string;
+      status: DBOrderStatus;
+      shippingOrderId?: string;
+    },
+  ) => {
+    const { orderId, ...rest } = params;
+    const [row] = await db.admin
+      .update(orders)
+      .set(rest)
+      .where(eq(orders.id, orderId))
+      .returning({ status: orders.status });
+    return row.status;
   },
 };

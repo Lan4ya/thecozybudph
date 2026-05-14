@@ -2,9 +2,9 @@ import searchSubstring from "@/lib/utils/searchSubstring";
 import { useMemo, useState } from "react";
 import { FilterDropdown } from "./FilterDropdown";
 import { FilterDropdownItem } from "./FilterDropdownItem";
-import type { ProductPriceRangeOption } from "../../../../types";
+import type { ProductPriceRangeOptionsUIsUI } from "../../../../types";
 
-const PRICE_RANGES: ProductPriceRangeOption[] = [
+const PRICE_RANGES: ProductPriceRangeOptionsUIsUI[] = [
   "0-2000",
   "2000-4000",
   "4000-6000",
@@ -13,7 +13,7 @@ const PRICE_RANGES: ProductPriceRangeOption[] = [
   "10000+",
 ];
 
-export const formatPriceRange = (range: ProductPriceRangeOption) => {
+export const formatPriceRange = (range: ProductPriceRangeOptionsUIsUI) => {
   // console.log("formatPriceRange input:", range);
   if (!PRICE_RANGES.includes(range)) return undefined;
 

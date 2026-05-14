@@ -1,5 +1,25 @@
 import { SnakeToCamel, CamelToSnake } from "@shared/schemas/index.ts";
 
+export const formatPrice = (price = 0) => {
+  const hasCentavos = !Number.isInteger(price);
+
+  return price.toLocaleString("en-PH", {
+    style: "currency",
+    currency: "PHP",
+    minimumFractionDigits: hasCentavos ? 2 : 0,
+    maximumFractionDigits: hasCentavos ? 2 : 0,
+  });
+};
+
+export const formatSupabasePublicUrl = (url: string, isDev: boolean) => {
+  if (!url) return url;
+
+  return isDev
+    ? // replace internal docker host + port with localhost mapped port so the browser can access it
+      url.replace("kong:8000", "127.0.0.1:54321")
+    : url;
+};
+
 export function snakeToCamelKeys<T>(obj: T): SnakeToCamel<T> {
   if (obj == null) return obj as SnakeToCamel<T>;
 

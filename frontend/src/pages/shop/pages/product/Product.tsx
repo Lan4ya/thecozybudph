@@ -150,7 +150,7 @@ const ProductInner = () => {
       name: product.name,
       priceCents: selectedVariant?.priceCents ?? product.minPriceCents,
       attributes: selectedVariant?.attributes ?? {},
-      imageUrl: product.imageUrls[0] ?? "",
+      imageUrl: product.primaryImageUrl ?? "",
     };
 
     const sessionId = crypto.randomUUID();

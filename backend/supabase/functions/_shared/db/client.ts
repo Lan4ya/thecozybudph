@@ -1,15 +1,15 @@
 import { sql } from "drizzle-orm";
-import { JwtPayload } from "supabase";
-import { AppError } from "../errors/Errors.ts";
+import { createClient, JwtPayload } from "supabase";
 
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "../schemas/drizzle/index.ts";
+import { Database } from "../schemas/index.ts";
+import { SupabaseDB } from "../types.d.ts";
 
-// const connString = Deno.env.get("DB_TX_POOLER_URL")!;
-
-// Use this conn string instead if the pooler url doesnt work on your machine:
-const connString = Deno.env.get("SUPABASE_DB_URL")!;
+// Fallback to SUPABASE_DB_URL which works on every env
+const connString =
+  Deno.env.get("DB_TX_POOLER_URL") || Deno.env.get("SUPABASE_DB_URL")!;
 
 const adminPg = postgres(connString, {
   prepare: false, // prepared statements are not supported in serverless
@@ -34,31 +34,37 @@ export type DrizzleClientTransactionRLS = Parameters<
 
 // -------------------- WARN --------------------
 
-/*
- * 1. Never use this function directly. Instead access the db through
- * 'drizzleMiddleware' to have proper auth, ensuring safe usage.
- * The only exception would be operations that forces you to access adminDb without auth (e.g. webhooks).
- *
- * 2. Always use rls unless you need to do an operation that requires admin priviliges (e.g. product creation/deletion).
- * 'rls' respects Row Level Security Policies while 'admin' bypasses it.
- * Althouth rls is a transaction (causes no problem) it's the only way (afaik) to integrate
- * supabase's built-in rls policy execution 'auth.uid()' with drizzle.
- *
- * 3. As of this writing, this wrapper function is not yet built-in to
- * 'drizzle-orm/supabase'. This is a just an implementation of the snippet
- * provided in the docs, but it'll soon be built-in as per the docs:
- * https://orm.drizzle.team/docs/rls
- * https://github.com/orgs/supabase/discussions/23224
+/*  
+
+ *  NEVER use this function directly. Always access drizzle client through
+ *  dependency injection (DI) using 'drizzleMiddleware' to have proper auth.
+
+
+ *  @rls is a transaction. Although we are always forced to use transactions
+ *  even on simple CRUD that doesn't need transactions, it's the only way
+ *  (afaik currently) to integrate supabase's internal rls policy check
+ *  (auth.uid() === foo.id) with drizzle. This is what you'd use 95% of the
+ *  time
+
+
+ *  @admin uses a direct Postgres connection with full database privileges,
+ *  bypassing Supabase Row Level Security (RLS) policies entirely. Use this 
+ *  mindfully ONLY on operations that needs elevated actions
+
+
+ *  Info: As of this writing, this wrapper function is not yet built-in to
+ *  'drizzle-orm/supabase'. This is a just an implementation of the snippet
+ *  provided in the docs, but it'll soon be built-in as per the docs:
+ *  https://orm.drizzle.team/docs/rls
+ *  https://github.com/orgs/supabase/discussions/23224
+
  */
 
 // -------------------- WARN --------------------
 
-export function createDrizzle(
-  isAdmin: boolean,
-  token?: JwtPayload,
-): DrizzleClient {
+export function createDrizzle(token?: JwtPayload): DrizzleClient {
   return {
-    admin: guardAdminDb(isAdmin),
+    admin: adminDb,
     rls: ((
       transaction: Parameters<typeof adminDb.transaction>[0],
       ...rest: Parameters<typeof adminDb.transaction>[1][]
@@ -100,20 +106,3 @@ export function createDrizzle(
     }) as typeof adminDb.transaction,
   };
 }
-
-const guardAdminDb = (isAdmin: boolean) => {
-  if (isAdmin) return adminDb;
-
-  return new Proxy(adminDb, {
-    get(_, prop) {
-      throw AppError.forbidden(
-        `Forbidden`,
-        [
-          `Contract violation: You attempted to use db.admin.${String(prop)} without admin privileges.`,
-          "Ensure you have admin status before calling this via 'adminMiddleware'.",
-          "If you don't need admin privileges, use 'db.rls' instead",
-        ].join(" "),
-      );
-    },
-  });
-};

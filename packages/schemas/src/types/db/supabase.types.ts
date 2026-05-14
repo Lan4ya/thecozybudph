@@ -162,6 +162,66 @@ export type Database = {
           },
         ]
       }
+      idempotency_keys: {
+        Row: {
+          created_at: string | null
+          error_payload: Json | null
+          expires_at: string | null
+          id: string
+          idempotency_key: string
+          operation: string
+          profile_id: string
+          request_hash: string
+          response_payload: Json | null
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_payload?: Json | null
+          expires_at?: string | null
+          id?: string
+          idempotency_key: string
+          operation: string
+          profile_id: string
+          request_hash: string
+          response_payload?: Json | null
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          error_payload?: Json | null
+          expires_at?: string | null
+          id?: string
+          idempotency_key?: string
+          operation?: string
+          profile_id?: string
+          request_hash?: string
+          response_payload?: Json | null
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      image_snapshots: {
+        Row: {
+          created_at: string
+          hash: string
+          ref_count: number
+        }
+        Insert: {
+          created_at?: string
+          hash: string
+          ref_count?: number
+        }
+        Update: {
+          created_at?: string
+          hash?: string
+          ref_count?: number
+        }
+        Relationships: []
+      }
       order_address_snapshots: {
         Row: {
           address_line: string
@@ -205,6 +265,51 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_creation_requests: {
+        Row: {
+          created_at: string | null
+          id: string
+          idempotency_key: string
+          order_id: string | null
+          profile_id: string
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          idempotency_key: string
+          order_id?: string | null
+          profile_id: string
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          idempotency_key?: string
+          order_id?: string | null
+          profile_id?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_creation_requests_order_id_orders_id_fk"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_creation_requests_profile_id_profiles_id_fk"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -462,11 +567,13 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          image_hashes: string[]
           image_urls: string[]
           max_price_cents: number
           min_price_cents: number
           name: string
           options: Json
+          primary_image_hash: string
           primary_image_url: string
           product_category_id: string | null
           product_collection_id: string | null
@@ -476,11 +583,13 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          image_hashes?: string[]
           image_urls: string[]
           max_price_cents: number
           min_price_cents: number
           name: string
           options: Json
+          primary_image_hash: string
           primary_image_url: string
           product_category_id?: string | null
           product_collection_id?: string | null
@@ -490,11 +599,13 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          image_hashes?: string[]
           image_urls?: string[]
           max_price_cents?: number
           min_price_cents?: number
           name?: string
           options?: Json
+          primary_image_hash?: string
           primary_image_url?: string
           product_category_id?: string | null
           product_collection_id?: string | null

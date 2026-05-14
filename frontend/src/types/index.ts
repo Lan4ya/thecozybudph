@@ -1,11 +1,12 @@
 import type { CartItem, Expand } from "@TheCozyBud/schemas";
 
-export interface ProductQueryListItemsAPI {
-  filters?: ProductFilters;
-  sort?: ProductSortOption;
-  page?: number;
-  perPage?: number;
-}
+// Product API
+
+export type ProductSortOption =
+  | "Popularity"
+  | "Most Recent"
+  | "Highest Price"
+  | "Lowest Price";
 
 export interface ProductFilters {
   search?: string;
@@ -14,21 +15,16 @@ export interface ProductFilters {
   priceRange?: { min: number; max?: number };
 }
 
-export interface ProductQueryDomain {
-  filters?: ProductFiltersDomain;
+export interface ProductQueryListItemsAPI {
+  filters?: ProductFilters;
   sort?: ProductSortOption;
   page?: number;
   perPage?: number;
 }
 
-export interface ProductFiltersDomain {
-  search?: string;
-  categories?: string[];
-  collectionNames?: string[];
-  priceRange?: ProductPriceRangeOption;
-}
+// Product UI
 
-export type ProductPriceRangeOption =
+export type ProductPriceRangeOptionsUI =
   | "0-2000"
   | "2000-4000"
   | "4000-6000"
@@ -36,30 +32,38 @@ export type ProductPriceRangeOption =
   | "8000-10000"
   | "10000+";
 
-export type ProductSortOption =
-  | "Popularity"
-  | "Most Recent"
-  | "Highest Price"
-  | "Lowest Price";
+export interface ProductQueryUI {
+  filters?: ProductFiltersUI;
+  sort?: ProductSortOption;
+  page?: number;
+  perPage?: number;
+}
+
+export interface ProductFiltersUI {
+  search?: string;
+  categories?: string[];
+  collectionNames?: string[];
+  priceRange?: ProductPriceRangeOptionsUI;
+}
 
 export type ObjectFilterKeys = keyof {
-  [K in keyof ProductFiltersDomain as Exclude<
-    ProductFiltersDomain[K],
+  [K in keyof ProductFiltersUI as Exclude<
+    ProductFiltersUI[K],
     undefined
   > extends object
-    ? Exclude<ProductFiltersDomain[K], undefined> extends any[]
+    ? Exclude<ProductFiltersUI[K], undefined> extends any[]
       ? never
       : K
-    : never]: ProductFiltersDomain[K];
+    : never]: ProductFiltersUI[K];
 };
 
 export type ArrayFilterKeys = keyof {
-  [K in keyof ProductFiltersDomain as Exclude<
-    ProductFiltersDomain[K],
+  [K in keyof ProductFiltersUI as Exclude<
+    ProductFiltersUI[K],
     undefined
   > extends unknown[]
     ? K
-    : never]: ProductFiltersDomain[K];
+    : never]: ProductFiltersUI[K];
 };
 
 export const arrayFiltersKeys: ArrayFilterKeys[] = [
@@ -68,7 +72,7 @@ export const arrayFiltersKeys: ArrayFilterKeys[] = [
 ] as const;
 
 export type NonArrayFilterKeys = Exclude<
-  keyof ProductFiltersDomain,
+  keyof ProductFiltersUI,
   ArrayFilterKeys
 >;
 

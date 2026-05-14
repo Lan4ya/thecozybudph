@@ -21,7 +21,7 @@ if (!email || !password) {
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-async function createAdmin() {
+async function createUser() {
   // create user
   const {
     data: { user },
@@ -47,4 +47,4 @@ async function createAdmin() {
   // console.log("token: ", user.session);
 }
 
-createAdmin();
+createUser();

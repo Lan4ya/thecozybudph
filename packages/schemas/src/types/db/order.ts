@@ -1,11 +1,11 @@
-import { InferInsertModel, InferSelectModel } from "drizzle-orm";
+import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import {
   orderAddressesSnapshot,
   orderItemsSnapshots,
   orders,
 } from "../../drizzle/index.ts";
-import { OrderStatus } from "../domain/order.ts";
-import { CamelToSnakeCase } from "../utils.ts";
+import type { OrderStatus } from "../domain/order.ts";
+import type { CamelToSnakeCase } from "../utils.ts";
 
 // export const DB_ORDER_STATUS = [
 //   "to_pay",
