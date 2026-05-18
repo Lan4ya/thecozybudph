@@ -1,5 +1,7 @@
 # Copilot Instructions for `thecozybudph`
 
+When editing zod or drizzle schemas, always edit them through ./packages/schemas/src/ and then run pkg:generate in ./backend/package.json to copy it over to ./backend/supabase/functions/_shared/schemas/
+
 ## Build, test, lint, and local dev commands
 
 Use **pnpm** (not npm) and Node **24+**.
