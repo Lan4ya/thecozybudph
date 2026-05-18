@@ -1,31 +1,26 @@
-import { zodValidatorMiddleware } from "@shared/middlewares/zodValidatorMiddleware.ts";
+import { RouteHandler } from "@hono/zod-openapi";
 import { AppEnv } from "@shared/types.d.ts";
-import { createFactory } from "hono/factory";
+import { requireVariables } from "@shared/utils/mod.ts";
 import { ProfileActions } from "@shared/modules/profile/mod.ts";
-import { handleSuccess, requireVariables } from "@shared/utils/mod.ts";
-import { updateProfileSchema } from "@shared/schemas/index.ts";
+import { getProfileRoute, updateProfileRoute } from "./profile-routes.ts";
 
-const factory = createFactory<AppEnv>();
-const { createHandlers } = factory;
-
-export const getProfileHandler = createHandlers(async (c) => {
-  const { claims, supabase } = requireVariables(c, "claims", "supabase");
+export const getProfileHandler: RouteHandler<
+  typeof getProfileRoute,
+  AppEnv
+> = async (c) => {
+  const { claims, db } = requireVariables(c, "claims", "db");
   const profileId = claims.sub;
-  const res = await ProfileActions.getProfile(supabase, profileId);
-  return handleSuccess(res);
-});
+  const res = await ProfileActions.getProfile(db, profileId);
+  return c.json({ data: res }, 200);
+};
 
-export const updateProfileHandler = createHandlers(
-  zodValidatorMiddleware("json", updateProfileSchema),
-  async (c) => {
-    const { claims, supabase } = requireVariables(c, "claims", "supabase");
-    const profileId = claims.sub;
-    const payload = c.req.valid("json");
-    const res = await ProfileActions.updateProfile(
-      supabase,
-      payload,
-      profileId,
-    );
-    return handleSuccess(res);
-  },
-);
+export const updateProfileHandler: RouteHandler<
+  typeof updateProfileRoute,
+  AppEnv
+> = async (c) => {
+  const { claims, db } = requireVariables(c, "claims", "db");
+  const profileId = claims.sub;
+  const payload = c.req.valid("json");
+  const res = await ProfileActions.updateProfile(db, payload, profileId);
+  return c.json({ data: res }, 200);
+};

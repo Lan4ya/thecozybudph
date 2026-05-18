@@ -27,6 +27,27 @@ export const addressIdSchema = z.object({
   id: z.uuid("invalid address id"),
 });
 
+export const addressSchema = createAddressSchema.extend({
+  id: z.string().uuid(),
+});
+
+// Response schemas
+export const getAddressesResponseSchema = z.object({
+  data: z.array(addressSchema),
+});
+
+export const getAddressResponseSchema = z.object({
+  data: addressSchema.nullable(),
+});
+
+export const createAddressResponseSchema = z.object({
+  data: addressSchema,
+});
+
+export const updateAddressResponseSchema = z.object({
+  data: addressSchema,
+});
+
 // -----------------------------------------------------------------
 
 // Form Schemas

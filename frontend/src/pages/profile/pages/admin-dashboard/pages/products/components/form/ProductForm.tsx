@@ -14,7 +14,7 @@ import {
   type ProductFormInput,
   type ProductFormOutput,
   productFormSchema,
-} from "@TheCozyBud/schemas";
+} from "@cozybud/schemas";
 import {
   Card,
   CardHeader,

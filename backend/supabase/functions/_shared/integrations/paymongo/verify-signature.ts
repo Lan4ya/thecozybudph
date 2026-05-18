@@ -2,8 +2,8 @@ import { Buffer } from "node:buffer";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { AppError } from "../../errors/Errors.ts";
 
-// If you create a new webhook, make sure to update the webhook secret key in .env
-// since this will always fail if the app is using the wrong/outdated key.
+// Note: If you create a new webhook, make sure to update the webhook secret key in .env
+// since the verifySignature will always fail if the app is using the wrong/outdated key.
 const WEBHOOK_SECRET = Deno.env.get("PAYMONGO_CHECKOUT_WEBHOOK_SECRET");
 
 // Scroll to number 3 Securing a Webhook:

@@ -1,5 +1,5 @@
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import type { CartItem } from "@TheCozyBud/schemas";
+import type { CartItem } from "@cozybud/schemas";
 import { CartAPI } from "@/api/cart";
 import { useAuthStore } from "@/store/useAuthStore";
 

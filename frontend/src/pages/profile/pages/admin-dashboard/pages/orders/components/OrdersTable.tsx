@@ -1,4 +1,4 @@
-import type { AdminOrderItem, AdminOrderListItem } from "@TheCozyBud/schemas";
+import type { AdminOrderItem, AdminOrderListItem } from "@cozybud/schemas";
 import { Loader2 } from "lucide-react";
 import { StatusBadge } from "./StatusBadge";
 import { formatPriceCents } from "@/lib/utils/format";

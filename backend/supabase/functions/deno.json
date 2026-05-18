@@ -1,0 +1,36 @@
+{
+  "workspace": [
+    "./admin",
+    "./address",
+    "./cart",
+    "./order",
+    "./profile",
+    "./dev-only",
+    "./_shared"
+  ],
+  "compilerOptions": {
+    "strict": true
+  },
+  "tasks": {
+    "type-all": "deno check ./**/index.ts ./_shared/**/*.ts",
+    "update-all": "deno update --recursive",
+    "update-all:latest": "deno update --latest --recursive"
+  },
+  "imports": {
+    "@hono/swagger-ui": "npm:@hono/swagger-ui@^0.6.1",
+    "@hono/zod-openapi": "npm:@hono/zod-openapi@^1.4.0",
+    "@shared/": "./_shared/",
+    "supabase": "npm:@supabase/supabase-js@^2.106.0",
+    "hono": "npm:hono@^4.12.19",
+    "@hono/zod-validator": "npm:@hono/zod-validator@0.8.0",
+    "hono-rate-limiter": "npm:hono-rate-limiter@0.5.3",
+    "zod": "npm:zod@^4.4.3",
+    "axios": "npm:axios@^1.16.1",
+    "drizzle-orm": "npm:drizzle-orm@0.45.2",
+    "drizzle-kit": "npm:drizzle-kit@0.31.10",
+    "drizzle-zod": "npm:drizzle-zod@0.8.3",
+    "postgres": "npm:postgres@3.4.9",
+    "p-limit": "npm:p-limit@^7.3.0",
+    "@lalamove/lalamove-js": "npm:@lalamove/lalamove-js@^1.1.0"
+  }
+}

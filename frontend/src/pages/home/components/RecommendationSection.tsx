@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils/cn";
 const Recommendations = () => {
   const { data, error, isFetching } = useSuspenseQuery({
     queryKey: ["homepage-product-recommendations"],
-    queryFn: () => ProductAPI.queryListItems({ perPage: 10 }),
+    queryFn: () => ProductAPI.queryProducts({ perPage: 10 }),
   });
 
   const session = useAuthStore((s) => s.session);

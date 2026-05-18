@@ -4,9 +4,9 @@ import { Button } from "@/lib/ui/__shadcn__/button";
 import { Card, CardContent } from "@/lib/ui/__shadcn__/card";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense, useEffect } from "react";
-import { PaymentAPI } from "@/api/payment";
+import { OrderAPI } from "@/api/index";
 import { useCheckoutStore } from "@/pages/checkout/store/useCheckoutStore";
-import type { GetPaymentStatusRes } from "@TheCozyBud/schemas";
+import type { GetPaymentStatusRes } from "@cozybud/schemas";
 import { CheckoutPaymentStatusSkeleton } from "@/lib/ui/skeletons/CheckoutPaymentStatusSkeleton";
 import type { PaymentLoaderData } from "./PaymentStatusLoader";
 
@@ -45,7 +45,8 @@ const PaymentStatusInner = ({ id }: { id: string }) => {
 
   const { data, isFetching } = useSuspenseQuery({
     queryKey: ["payment-status", id],
-    queryFn: (): Promise<GetPaymentStatusRes> => PaymentAPI.getStatus(id),
+    queryFn: (): Promise<GetPaymentStatusRes> =>
+      OrderAPI.getOrderPaymentStatus(id),
     staleTime: 0,
   });
 

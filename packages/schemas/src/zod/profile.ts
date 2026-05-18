@@ -11,3 +11,28 @@ export const updateProfileSchema = z.object({
     .max(255, "name can't exceed 255 characters")
     .optional(),
 });
+
+export const profileSchema = z.object({
+  id: z.uuid(),
+  name: z.string().nullable(),
+  phone: z.string().nullable(),
+  email: z.email(),
+});
+
+// API response wrapper
+export const apiResponseSchema = <T extends z.ZodType>(dataSchema: T) =>
+  z.object({
+    data: dataSchema,
+  });
+
+// Response schemas (wrapped with `data`)
+export const getProfileResponseSchema = apiResponseSchema(profileSchema);
+export const updateProfileResponseSchema = apiResponseSchema(profileSchema);
+
+// Error response schema remains the same
+export const errorResponseSchema = z.object({
+  error: z.union([
+    z.string(),
+    z.array(z.object({ message: z.string(), field: z.string().optional() })),
+  ]),
+});

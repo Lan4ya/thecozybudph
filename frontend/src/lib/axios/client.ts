@@ -1,6 +1,6 @@
 import axios from "axios";
 import { supabase } from "@/lib/supabase/client";
-import type { ApiResponseError, ApiResponseSuccess } from "@TheCozyBud/schemas";
+import type { ApiResponseError, ApiResponseSuccess } from "@cozybud/schemas";
 import isDev from "../utils/isDev";
 
 const { VITE_SUPABASE_URL } = import.meta.env;

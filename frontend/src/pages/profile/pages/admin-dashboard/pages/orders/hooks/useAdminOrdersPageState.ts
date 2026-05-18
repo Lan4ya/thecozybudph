@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import type { OrderStatus, AdminQueryOrdersInput } from "@TheCozyBud/schemas";
+import type { OrderStatus, AdminQueryOrdersInput } from "@cozybud/schemas";
 
 export const useAdminOrdersPageState = () => {
   const [query, setQuery] = useState<AdminQueryOrdersInput>({

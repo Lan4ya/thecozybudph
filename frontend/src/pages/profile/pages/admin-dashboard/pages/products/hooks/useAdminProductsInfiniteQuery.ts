@@ -1,4 +1,4 @@
-import type { ProductWithRelations } from "@TheCozyBud/schemas";
+import type { ProductWithRelations } from "@cozybud/schemas";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { useAdminProductsPageState } from "./useAdminProductsPageState";

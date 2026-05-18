@@ -1,39 +1,38 @@
 import z from "zod";
-// import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-// import { orders } from "../../drizzle/orders.ts";
-import { orderSourceSchema, orderStatusSchema } from "../../zod/order.ts";
+import {
+  customerOrderStatus,
+  orderSourceSchema,
+  orderStatusSchema,
+} from "../../zod/order.ts";
 
-// export const insertOrderSchema = createInsertSchema(orders);
-// export const selectOrderSchema = createSelectSchema(orders);
-// export type OrderDBA = z.infer<typeof selectOrderSchema>;
-// export type OrderDB = z.infer<typeof insertOrderSchema>;
-export type OrderStatus = z.infer<typeof orderStatusSchema>;
 export type OrderSource = z.infer<typeof orderSourceSchema>;
+export type OrderStatus = z.infer<typeof orderStatusSchema>;
 
-export type Order = {
+export type CustomerOrderStatus = z.infer<typeof customerOrderStatus>;
+
+export type CustomerOrder = {
   id: string;
   profileId: string;
-  source: OrderSource;
   subtotalCents: number;
   shippingCents: number;
   totalCents: number;
   createdAt: Date;
   updatedAt: Date;
-  status: OrderStatus;
+  status: CustomerOrderStatus;
   discountCents: number;
 };
 
-export type OrderItem = {
-  id: string;
-  cardMessages: string[];
-  quantity: number;
-  category: string;
-  collection: string | null;
-  name: string;
+export type CustomerOrderItem = {
   orderId: string;
-  priceCents: number;
-  primaryImageUrl: string;
+  id: string;
   productId: string | null;
   productVariantId: string | null;
+  quantity: number;
+  cardMessages: string[];
+  name: string;
+  collection: string | null;
+  category: string;
+  primaryImageUrl: string;
   variantAttributes: Record<string, string>;
+  priceCents: number;
 };

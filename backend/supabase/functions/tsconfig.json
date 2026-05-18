@@ -6,15 +6,11 @@
     "useUnknownInCatchVariables": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
+    "vertbatimModuleSyntax": true,
     "allowJs": false,
+    "composite": true,
     "lib": [
-      "deno.window",
-      "deno.ns",
       "esnext"
-    ],
-    "types": []
-  },
-  "exclude": [
-    "node_modules"
-  ]
+    ]
+  }
 }

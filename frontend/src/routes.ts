@@ -15,6 +15,7 @@ import { Shop, ShopProduct } from "./pages/shop";
 import TermsOfService from "./pages/terms-of-service/TermsOfService.tsx";
 import FAQ from "./pages/FAQ/FAQ.tsx";
 import MyPurchases from "./pages/profile/pages/my-purchases/MyPurchases.tsx";
+import OrderDetails from "./pages/profile/pages/my-purchases/OrderDetails.tsx";
 import Settings from "./pages/profile/pages/settings/Settings.tsx";
 import {
   AdminDashboardLoader,
@@ -68,7 +69,13 @@ const router = createBrowserRouter([
         path: "profile",
         children: [
           { index: true, Component: Profile },
-          { path: "my-purchases", Component: MyPurchases },
+          {
+            path: "my-purchases",
+            children: [
+              { index: true, Component: MyPurchases },
+              { path: ":orderId", Component: OrderDetails },
+            ],
+          },
           { path: "settings", Component: Settings },
           {
             path: "admin",

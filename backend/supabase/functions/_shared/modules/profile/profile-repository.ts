@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { DrizzleClient } from "../../db/client.ts";
 import { profiles, UpdateProfileDBInput } from "@shared/schemas/index.ts";
 
@@ -9,25 +9,21 @@ export const ProfileRepository = {
     profileId: string,
   ) => {
     return db.rls(async (tx) => {
-      const [updated] = await tx
+      const updated = await tx
         .update(profiles)
         .set(updates)
         .where(eq(profiles.id, profileId))
         .returning();
 
-      return updated ?? null;
+      return updated.length ? updated[0] : null;
     });
   },
 
-  getProfileById: (db: DrizzleClient, profileId: string) => {
+  getProfileById: (db: DrizzleClient, id: string) => {
     return db.rls(async (tx) => {
-      const [profile] = await tx
-        .select()
-        .from(profiles)
-        .where(eq(profiles.id, profileId))
-        .limit(1);
-
-      return profile ?? null;
+      return await tx.query.profiles.findFirst({
+        where: and(eq(profiles.id, id)),
+      });
     });
   },
 };

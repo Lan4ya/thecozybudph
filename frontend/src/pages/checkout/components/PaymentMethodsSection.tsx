@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { CreditCard } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { useCheckoutStore } from "../store/useCheckoutStore";
-import type { PaymentMethodTypes } from "@TheCozyBud/schemas";
+import type { PaymentMethodTypes } from "@cozybud/schemas";
 
 type PaymentMethod = {
   type: PaymentMethodTypes;

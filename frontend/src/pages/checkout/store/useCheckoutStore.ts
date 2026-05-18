@@ -2,7 +2,7 @@ import type {
   Address,
   PaymentMethodTypes,
   ProductVariant,
-} from "@TheCozyBud/schemas";
+} from "@cozybud/schemas";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 

@@ -4,7 +4,7 @@ import {
   type ProductCollection,
   type Product,
   type ProductListItem,
-} from "@TheCozyBud/schemas";
+} from "@cozybud/schemas";
 import { snakeToCamel } from "@/lib/utils/caseConverter.ts";
 import type { ProductQueryListItemsAPI } from "@/types";
 import { mapProductAndVariantsRowToProductDomain } from "@/lib/utils/mappers";
@@ -12,16 +12,12 @@ import isDev from "@/lib/utils/isDev";
 
 export const ProductAPI = {
   // Queries the minimum information of products to display in shop
-  queryListItems: async ({
+  queryProducts: async ({
     filters,
     sort,
     page = 0,
     perPage = 12,
-  }: ProductQueryListItemsAPI & { noDummyProduct?: boolean }): Promise<
-    ProductListItem[]
-  > => {
-    console.log({ page });
-
+  }: ProductQueryListItemsAPI): Promise<ProductListItem[]> => {
     let query = supabase
       .from("products")
       .select(
@@ -42,8 +38,6 @@ export const ProductAPI = {
       )
       .range(page * perPage, (page + 1) * perPage - 1);
 
-    // console.log("API Filters: ", filters);
-
     // Handle filters
     if (filters?.search) {
       query = query.ilike("name", `%${filters.search}%`);
@@ -58,7 +52,6 @@ export const ProductAPI = {
     }
 
     const priceRange = filters?.priceRange;
-    // console.log("Price Range Filter: ", priceRange);
 
     if (priceRange) {
       // convert to cents for comparison

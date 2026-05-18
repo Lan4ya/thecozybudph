@@ -25,9 +25,53 @@ export const updateCartItemSchema = z.object({
   quantity: itemQuantitySchema.optional(),
   cardMessages: cardMessagesSchema,
 });
-
 export const cartItemIdSchema = z.object({
   id: z.uuid("cartItemId is not a valid UUID"),
+});
+
+export const cartItemSchema = z.object({
+  id: z.string().uuid(),
+  quantity: z.number(),
+  cardMessages: z.array(z.string()),
+  isAvailable: z.boolean(),
+  product: z.object({
+    id: z.string().uuid().nullable(),
+    options: z.array(
+      z.object({
+        name: z.string(),
+        values: z.array(z.string()),
+      }),
+    ),
+    name: z.string(),
+    primaryImageUrl: z.string().url(),
+    variant: z.object({
+      id: z.string().uuid(),
+      priceCents: z.number(),
+      attributes: z.record(z.string(), z.string()),
+    }),
+  }),
+});
+
+// Response schemas
+export const getCartItemsResponseSchema = z.object({
+  data: z.array(cartItemSchema),
+});
+
+export const addCartItemResponseSchema = z.object({
+  data: cartItemSchema,
+});
+
+export const updateCartItemResponseSchema = z.object({
+  data: z.object({
+    item: cartItemSchema,
+    deletedItemId: z.string().uuid().nullable(),
+  }),
+});
+
+export const deleteCartItemsResponseSchema = z.object({
+  data: z.object({
+    deletedItemIds: z.array(z.string().uuid()),
+  }),
 });
 
 export const deleteCartItemsSchema = z.object({

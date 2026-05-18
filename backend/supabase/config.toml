@@ -192,7 +192,7 @@ port = 587
 user = "env(GOOGLE_APP_USERNAME)"
 pass = "env(GOOGLE_APP_PASSWORD)"
 admin_email = "env(GOOGLE_APP_USERNAME)"
-sender_name = "TheCozyBud"
+sender_name = "cozybud"
 
 # Uncomment to customize email template
 # [auth.email.template.invite]
@@ -382,16 +382,16 @@ entrypoint = "./functions/cart/index.ts"
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/cart/*.html" ]
 
-[functions.checkout]
+[functions.order]
 enabled = true
 verify_jwt = true
-import_map = "./functions/checkout/deno.json"
+import_map = "./functions/order/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
-entrypoint = "./functions/checkout/index.ts"
+entrypoint = "./functions/order/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
-# static_files = [ "./functions/checkout/*.html" ]
+# static_files = [ "./functions/order/*.html" ]
 
 
 [functions.address]
@@ -415,14 +415,3 @@ entrypoint = "./functions/profile/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/profile/*.html" ]
-
-[functions.payment]
-enabled = true
-verify_jwt = true
-import_map = "./functions/payment/deno.json"
-# Uncomment to specify a custom file path to the entrypoint.
-# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
-entrypoint = "./functions/payment/index.ts"
-# Specifies static files to be bundled with the function. Supports glob patterns.
-# For example, if you want to serve static HTML pages in your function:
-# static_files = [ "./functions/payment/*.html" ]

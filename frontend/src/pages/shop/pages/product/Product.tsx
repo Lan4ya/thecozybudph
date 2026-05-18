@@ -6,7 +6,7 @@ import {
   type Product as ProductType,
   addCartItemSchema,
   orderItemSchema,
-} from "@TheCozyBud/schemas";
+} from "@cozybud/schemas";
 import PersistSuspense from "@/components/PersistSuspense";
 import { RouteLoaderSpinner } from "@/components/RouteLoaderSpinner";
 import { ArrowLeft } from "lucide-react";

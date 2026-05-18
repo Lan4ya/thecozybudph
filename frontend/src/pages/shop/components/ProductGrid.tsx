@@ -4,7 +4,7 @@ import { ShopProductGridSkeleton } from "@/lib/ui/skeletons/ShopProductGridItems
 import { useProductsSuspenseInfiniteQuery } from "@/pages/shop/hooks/useProductsSuspenseInfiniteQuery";
 import ProductCardDetailed from "@/components/products/ProductCardDetailed";
 import { cn } from "@/lib/utils/cn";
-import type { ProductListItem } from "@TheCozyBud/schemas";
+import type { ProductListItem } from "@cozybud/schemas";
 
 export type ProductCardProps = {
   cardType: "default" | "detailed";

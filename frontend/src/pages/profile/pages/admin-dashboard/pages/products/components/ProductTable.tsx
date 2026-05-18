@@ -1,5 +1,5 @@
 import { ProductImage } from "@/components/products/ProductImage";
-import type { ProductWithRelations } from "@TheCozyBud/schemas";
+import type { ProductWithRelations } from "@cozybud/schemas";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { Check, Edit } from "lucide-react";

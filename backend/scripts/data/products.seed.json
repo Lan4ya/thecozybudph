@@ -1,6 +1,279 @@
 {
   "products": [
     {
+      "name": "satin poppy",
+      "description": "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Non molestiae necessitatibus numquam explicabo dolores quaerat facilis sit autem illum iure soluta provident, consequatur accusantium aspernatur odio, doloremque doloribus, officia rerum!",
+      "categoryName": "vase",
+      "collectionName": "first bloom",
+      "options": [
+        {
+          "name": "stem count",
+          "values": [
+            "3",
+            "6"
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "priceCents": 238000,
+          "attributes": {
+            "stem count": "3"
+          }
+        },
+        {
+          "priceCents": 428000,
+          "attributes": {
+            "stem count": "6"
+          }
+        }
+      ],
+      "primaryImageIndex": 0,
+      "images": [
+        "./images/satin-poppy.jpg",
+        "./images/satin-poppy2.jpg",
+        "./images/satin-poppy3.jpg"
+      ]
+    },
+    {
+      "name": "amber zinnia",
+      "description": "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Non molestiae necessitatibus numquam explicabo dolores quaerat facilis sit autem illum iure soluta provident, consequatur accusantium aspernatur odio, doloremque doloribus, officia rerum!",
+      "categoryName": "mug",
+      "collectionName": "sunlit studio",
+      "options": [
+        {
+          "name": "stem count",
+          "values": [
+            "3",
+            "6"
+          ]
+        },
+        {
+          "name": "wrap style",
+          "values": [
+            "linen",
+            "silk"
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "priceCents": 255000,
+          "attributes": {
+            "stem count": "3",
+            "wrap style": "linen"
+          }
+        },
+        {
+          "priceCents": 265000,
+          "attributes": {
+            "stem count": "3",
+            "wrap style": "silk"
+          }
+        },
+        {
+          "priceCents": 445000,
+          "attributes": {
+            "stem count": "6",
+            "wrap style": "linen"
+          }
+        },
+        {
+          "priceCents": 455000,
+          "attributes": {
+            "stem count": "6",
+            "wrap style": "silk"
+          }
+        }
+      ],
+      "primaryImageIndex": 0,
+      "images": [
+        "./images/amber-zinnia.jpg",
+        "./images/amber-zinnia2.jpg",
+        "./images/amber-zinnia3.jpg"
+      ]
+    },
+    {
+      "name": "orchid veil",
+      "description": "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Non molestiae necessitatibus numquam explicabo dolores quaerat facilis sit autem illum iure soluta provident, consequatur accusantium aspernatur odio, doloremque doloribus, officia rerum!",
+      "categoryName": "mug",
+      "collectionName": "glasshouse",
+      "options": [
+        {
+          "name": "stem count",
+          "values": [
+            "3",
+            "6"
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "priceCents": 249000,
+          "attributes": {
+            "stem count": "3"
+          }
+        },
+        {
+          "priceCents": 439000,
+          "attributes": {
+            "stem count": "6"
+          }
+        }
+      ],
+      "primaryImageIndex": 0,
+      "images": [
+        "./images/orchid-veil.jpg",
+        "./images/orchid-veil2.jpg",
+        "./images/orchid-veil3.jpg"
+      ]
+    },
+    {
+      "name": "blush camellia",
+      "description": "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Non molestiae necessitatibus numquam explicabo dolores quaerat facilis sit autem illum iure soluta provident, consequatur accusantium aspernatur odio, doloremque doloribus, officia rerum!",
+      "categoryName": "vase",
+      "collectionName": "first bloom",
+      "options": [
+        {
+          "name": "stem count",
+          "values": [
+            "3",
+            "6"
+          ]
+        },
+        {
+          "name": "wrap style",
+          "values": [
+            "linen",
+            "silk"
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "priceCents": 257000,
+          "attributes": {
+            "stem count": "3",
+            "wrap style": "linen"
+          }
+        },
+        {
+          "priceCents": 267000,
+          "attributes": {
+            "stem count": "3",
+            "wrap style": "silk"
+          }
+        },
+        {
+          "priceCents": 447000,
+          "attributes": {
+            "stem count": "6",
+            "wrap style": "linen"
+          }
+        },
+        {
+          "priceCents": 457000,
+          "attributes": {
+            "stem count": "6",
+            "wrap style": "silk"
+          }
+        }
+      ],
+      "primaryImageIndex": 0,
+      "images": [
+        "./images/blush-camellia.jpg"
+      ]
+    },
+    {
+      "name": "opal tulip",
+      "description": "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Non molestiae necessitatibus numquam explicabo dolores quaerat facilis sit autem illum iure soluta provident, consequatur accusantium aspernatur odio, doloremque doloribus, officia rerum!",
+      "categoryName": "vase",
+      "collectionName": "sunlit studio",
+      "options": [
+        {
+          "name": "stem count",
+          "values": [
+            "3",
+            "6"
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "priceCents": 244000,
+          "attributes": {
+            "stem count": "3"
+          }
+        },
+        {
+          "priceCents": 434000,
+          "attributes": {
+            "stem count": "6"
+          }
+        }
+      ],
+      "primaryImageIndex": 0,
+      "images": [
+        "./images/opal-tulip.jpg"
+      ]
+    },
+    {
+      "name": "peony lumiere",
+      "description": "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Non molestiae necessitatibus numquam explicabo dolores quaerat facilis sit autem illum iure soluta provident, consequatur accusantium aspernatur odio, doloremque doloribus, officia rerum!",
+      "categoryName": "vase",
+      "collectionName": "first bloom",
+      "options": [
+        {
+          "name": "stem count",
+          "values": [
+            "3",
+            "6"
+          ]
+        },
+        {
+          "name": "wrap style",
+          "values": [
+            "linen",
+            "silk"
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "priceCents": 258000,
+          "attributes": {
+            "stem count": "3",
+            "wrap style": "linen"
+          }
+        },
+        {
+          "priceCents": 268000,
+          "attributes": {
+            "stem count": "3",
+            "wrap style": "silk"
+          }
+        },
+        {
+          "priceCents": 448000,
+          "attributes": {
+            "stem count": "6",
+            "wrap style": "linen"
+          }
+        },
+        {
+          "priceCents": 458000,
+          "attributes": {
+            "stem count": "6",
+            "wrap style": "silk"
+          }
+        }
+      ],
+      "primaryImageIndex": 0,
+      "images": [
+        "./images/peony-lumiere.jpg"
+      ]
+    },
+    {
       "name": "moonlight sonata",
       "description": "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Non molestiae necessitatibus numquam explicabo dolores quaerat facilis sit autem illum iure soluta provident, consequatur accusantium aspernatur odio, doloremque doloribus, officia rerum!",
       "categoryName": "vase",

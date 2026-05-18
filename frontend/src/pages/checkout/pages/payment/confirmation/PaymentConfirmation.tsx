@@ -8,7 +8,7 @@ import { Input } from "@/lib/ui/__shadcn__/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import z from "zod";
-import { CheckoutAPI } from "@/api";
+import { OrderAPI } from "@/api";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/providers/ToastProvider";
 import isDev from "@/lib/utils/isDev";
@@ -16,7 +16,7 @@ import {
   payOrderSchema,
   type PayOrderInput,
   type PayOrderRes,
-} from "@TheCozyBud/schemas";
+} from "@cozybud/schemas";
 import { useCheckoutStore } from "@/pages/checkout/store/useCheckoutStore";
 import type { PaymentConfirmationLoaderData } from "./PaymentConfirmationLoader";
 import { useEffect, useRef } from "react";
@@ -56,7 +56,7 @@ const PaymentConfirmation = () => {
         payload: PayOrderInput;
         idempotencyKey: string;
       }): Promise<PayOrderRes> =>
-        CheckoutAPI.payOrder(orderId, payload, idempotencyKey),
+        OrderAPI.payOrder(orderId, payload, idempotencyKey),
       onError: (err) => {
         isDev && console.error(err.message);
         addToast("Payment failed. Please try again.", "error");

@@ -1,6 +1,7 @@
 import { Database } from "@shared/schemas/index.ts";
 import { JwtPayload, SupabaseClient } from "supabase";
 import { DrizzleClient } from "./db/client.ts";
+import { Context } from "hono";
 
 export type SupabaseDB = SupabaseClient<Database>;
 
@@ -24,3 +25,5 @@ export type AppEnv = {
   Bindings: Bindings;
   Variables: Variables;
 };
+
+export type AppContext = Context<AppEnv>;

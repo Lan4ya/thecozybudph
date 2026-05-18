@@ -4,7 +4,7 @@ import {
   type Address,
   type CreateAddressInput,
   type UpdateAddressInput,
-} from "@TheCozyBud/schemas";
+} from "@cozybud/schemas";
 
 export const AddressAPI = {
   createAddress: async (payload: CreateAddressInput): Promise<Address> => {

@@ -7,10 +7,6 @@
     "lib": [
       "ES2022"
     ],
-    "baseUrl": ".",
-    "types": [
-      "node"
-    ],
     "allowImportingTsExtensions": true,
     "noEmit": true
   },

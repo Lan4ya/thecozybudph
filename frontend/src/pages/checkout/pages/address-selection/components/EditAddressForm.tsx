@@ -8,7 +8,7 @@ import {
   updateAddressFormSchema,
   type Address,
   type UpdateAddressInput,
-} from "@TheCozyBud/schemas";
+} from "@cozybud/schemas";
 import isDev from "@/lib/utils/isDev";
 import { useCallback } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";

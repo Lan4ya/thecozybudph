@@ -4,7 +4,7 @@ import { LalamoveActions } from "@shared/integrations/lalamove/mod.ts";
 import { CreateOrderInput, InsertOrder } from "@shared/schemas/index.ts";
 import { AddressRepository } from "../../address/address-repository.ts";
 import { calculatePricing } from "../calculate-pricing.ts";
-import { OrderRepository } from "../mod.ts";
+import { OrderRepository } from "../order-repository.ts";
 
 type VariantDetails = Awaited<
   ReturnType<typeof OrderRepository.getDetailsByVariantIds>

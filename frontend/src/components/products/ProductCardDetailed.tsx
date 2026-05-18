@@ -1,7 +1,7 @@
 import { formatPriceCents } from "@/lib/utils/format";
 import { useNavigate } from "react-router";
 import { ProductImage } from "./ProductImage";
-import type { ProductListItem } from "@TheCozyBud/schemas";
+import type { ProductListItem } from "@cozybud/schemas";
 
 type Props = {
   product: ProductListItem;

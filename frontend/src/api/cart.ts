@@ -7,7 +7,7 @@ import type {
   DeleteCartItemsInput,
   UpdateCartItemInput,
   UpdateCartItemRes,
-} from "@TheCozyBud/schemas";
+} from "@cozybud/schemas";
 
 export const CartAPI = {
   getItems: async (): Promise<CartItem[]> => {

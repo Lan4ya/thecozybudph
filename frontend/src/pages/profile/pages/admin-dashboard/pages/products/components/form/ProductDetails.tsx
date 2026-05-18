@@ -3,7 +3,7 @@ import type {
   CreateProductFormInput,
   ProductFormInput,
   UpdateProductFormInput,
-} from "@TheCozyBud/schemas";
+} from "@cozybud/schemas";
 import { useFormContext, useWatch, type FieldErrors } from "react-hook-form";
 import ImageUploadInput from "./ImageUploadInput";
 import { cn } from "@/lib/utils/cn";

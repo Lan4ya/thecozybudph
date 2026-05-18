@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   eventInquiryFormSchema,
   type EventInquiryFormInput,
-} from "@TheCozyBud/schemas";
+} from "@cozybud/schemas";
 import { Input } from "@/lib/ui/__shadcn__/input";
 import { Label } from "@/lib/ui/__shadcn__/label";
 import { Textarea } from "@/lib/ui/__shadcn__/textarea";

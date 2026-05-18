@@ -85,4 +85,6 @@ dev.get("/products", async (c: Context) => {
 dev.notFound((c) => c.text("Not Found"));
 dev.onError((err) => handleError(err));
 
-Deno.serve(dev.fetch);
+if (import.meta.main) {
+  Deno.serve(dev.fetch);
+}

@@ -16,7 +16,7 @@ import { Link, useNavigate } from "react-router";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import googleIcon from "@/assets/icons/google.svg";
 import { useIsLgScreenMin } from "@/hooks/useMediaQuery";
-import { signUpFormSchema, type SignUp } from "@TheCozyBud/schemas";
+import { signUpFormSchema, type SignUp } from "@cozybud/schemas";
 import { Input } from "@/lib/ui/__shadcn__/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { handleError } from "@/lib/utils/format";

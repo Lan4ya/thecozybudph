@@ -1,7 +1,7 @@
 import type {
   CreateProductFormOutput,
   UpdateProductFormOutput,
-} from "@TheCozyBud/schemas";
+} from "@cozybud/schemas";
 
 export function buildCreateProductFormData(fields: CreateProductFormOutput) {
   const fd = new FormData();

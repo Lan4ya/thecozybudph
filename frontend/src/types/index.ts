@@ -1,4 +1,4 @@
-import type { CartItem, Expand } from "@TheCozyBud/schemas";
+import type { CartItem, Expand } from "@cozybud/schemas";
 
 // Product API
 

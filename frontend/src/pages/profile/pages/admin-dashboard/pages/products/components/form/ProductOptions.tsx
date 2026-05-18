@@ -6,7 +6,7 @@ import {
   useWatch,
   type FieldArrayWithId,
 } from "react-hook-form";
-import type { ProductFormInput } from "@TheCozyBud/schemas";
+import type { ProductFormInput } from "@cozybud/schemas";
 // import { useEffect } from "react";
 
 type ProductOptionsProps = {

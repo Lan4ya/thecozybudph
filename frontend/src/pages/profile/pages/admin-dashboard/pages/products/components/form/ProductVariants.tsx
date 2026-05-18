@@ -1,8 +1,5 @@
 import { useFormContext, useWatch } from "react-hook-form";
-import type {
-  ProductFormInput,
-  ProductWithRelations,
-} from "@TheCozyBud/schemas";
+import type { ProductFormInput, ProductWithRelations } from "@cozybud/schemas";
 import { useMemo, useEffect } from "react";
 import { Input } from "@/lib/ui/__shadcn__/input";
 import { cn } from "@/lib/utils/cn";

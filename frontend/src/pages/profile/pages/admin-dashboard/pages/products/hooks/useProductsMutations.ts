@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AdminAPI } from "@/api/admin";
 import { useToast } from "@/providers/ToastProvider";
-import type { ProductWithRelations } from "@TheCozyBud/schemas";
+import type { ProductWithRelations } from "@cozybud/schemas";
 import isDev from "@/lib/utils/isDev";
 
 type ProductsQueryData = {

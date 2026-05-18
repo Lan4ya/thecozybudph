@@ -1,25 +1,209 @@
-import { Hono, Env } from "hono";
+import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import {
-  supabaseMiddleware,
   authMiddleware,
   drizzleMiddleware,
+  supabaseMiddleware,
 } from "@shared/middlewares/mod.ts";
 import {
+  addCartItemResponseSchema,
+  addCartItemSchema,
+  cartItemIdSchema,
+  deleteCartItemsResponseSchema,
+  deleteCartItemsSchema,
+  errorResponseSchema,
+  getCartItemsResponseSchema,
+  updateCartItemResponseSchema,
+  updateCartItemSchema,
+} from "@shared/schemas/index.ts";
+import { AppEnv } from "@shared/types.d.ts";
+import {
   addCartItemsHandler,
-  getCartItemsHandler,
   deleteCartItemsHandler,
+  getCartItemsHandler,
   updateCartItemsVariantHandler,
 } from "./cart-handlers.ts";
 
-const cart = new Hono<Env>();
+export const getCartItemsRoute = createRoute({
+  method: "get",
+  path: "/items",
+  middleware: [
+    supabaseMiddleware(),
+    authMiddleware(),
+    drizzleMiddleware(),
+  ] as const,
+  responses: {
+    200: {
+      description: "Get user's cart items",
+      content: {
+        "application/json": {
+          schema: getCartItemsResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+  },
+  tags: ["Cart"],
+});
 
-cart.use("*", supabaseMiddleware());
-cart.use("*", authMiddleware());
-cart.use("*", drizzleMiddleware());
+export const addCartItemRoute = createRoute({
+  method: "post",
+  path: "/items",
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: addCartItemSchema,
+        },
+      },
+    },
+  },
+  middleware: [
+    supabaseMiddleware(),
+    authMiddleware(),
+    drizzleMiddleware(),
+  ] as const,
+  responses: {
+    200: {
+      description: "Add item to cart",
+      content: {
+        "application/json": {
+          schema: addCartItemResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+    422: {
+      description: "Validation error",
+      content: {
+        "application/json": {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+  },
+  tags: ["Cart"],
+});
 
-cart.get("/items", ...getCartItemsHandler);
-cart.post("/items", ...addCartItemsHandler);
-cart.patch("/items/:id", ...updateCartItemsVariantHandler);
-cart.delete("/items", ...deleteCartItemsHandler);
+export const updateCartItemRoute = createRoute({
+  method: "patch",
+  path: "/items/{id}",
+  request: {
+    params: cartItemIdSchema,
+    body: {
+      content: {
+        "application/json": {
+          schema: updateCartItemSchema,
+        },
+      },
+    },
+  },
+  middleware: [
+    supabaseMiddleware(),
+    authMiddleware(),
+    drizzleMiddleware(),
+  ] as const,
+  responses: {
+    200: {
+      description: "Update cart item",
+      content: {
+        "application/json": {
+          schema: updateCartItemResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+    404: {
+      description: "Cart item not found",
+      content: {
+        "application/json": {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+    422: {
+      description: "Validation error",
+      content: {
+        "application/json": {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+  },
+  tags: ["Cart"],
+});
+
+export const deleteCartItemsRoute = createRoute({
+  method: "delete",
+  path: "/items",
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: deleteCartItemsSchema,
+        },
+      },
+    },
+  },
+  middleware: [
+    supabaseMiddleware(),
+    authMiddleware(),
+    drizzleMiddleware(),
+  ] as const,
+  responses: {
+    200: {
+      description: "Delete cart items",
+      content: {
+        "application/json": {
+          schema: deleteCartItemsResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+    422: {
+      description: "Validation error",
+      content: {
+        "application/json": {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+  },
+  tags: ["Cart"],
+});
+
+const cart = new OpenAPIHono<AppEnv>();
+
+cart.openapi(getCartItemsRoute, getCartItemsHandler);
+cart.openapi(addCartItemRoute, addCartItemsHandler);
+cart.openapi(updateCartItemRoute, updateCartItemsVariantHandler);
+cart.openapi(deleteCartItemsRoute, deleteCartItemsHandler);
 
 export default cart;

@@ -11,7 +11,7 @@ import {
 import { Input } from "@/lib/ui/__shadcn__/input";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Search, X } from "lucide-react";
-import type { AdminQueryOrdersInput, OrderStatus } from "@TheCozyBud/schemas";
+import type { AdminQueryOrdersInput, OrderStatus } from "@cozybud/schemas";
 
 type StatusOption = {
   value: OrderStatus;

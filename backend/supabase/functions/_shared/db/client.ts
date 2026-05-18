@@ -4,39 +4,22 @@ import { createClient, JwtPayload } from "supabase";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "../schemas/drizzle/index.ts";
-import { Database } from "../schemas/index.ts";
-import { SupabaseDB } from "../types.d.ts";
+import { Database } from "@shared/schemas/index.ts";
 
 // Fallback to SUPABASE_DB_URL which works on every env
-const connString =
-  Deno.env.get("DB_TX_POOLER_URL") || Deno.env.get("SUPABASE_DB_URL")!;
+// const connString =
+//   Deno.env.get("DB_TX_POOLER_URL") || Deno.env.get("SUPABASE_DB_URL")!;
+const connString = Deno.env.get("SUPABASE_DB_URL")!;
 
-const adminPg = postgres(connString, {
+export const adminPg = postgres(connString, {
   prepare: false, // prepared statements are not supported in serverless
 });
-
-export const adminDb = drizzle(adminPg, {
-  schema,
-});
-
-type AdminDb = typeof adminDb;
-
-export type DrizzleClient = {
-  admin: AdminDb;
-  rls: AdminDb["transaction"];
-};
-
-export type DrizzleClientTransactionRLS = Parameters<
-  DrizzleClient["rls"]
->[0] extends (tx: infer T) => unknown
-  ? T
-  : never;
 
 // -------------------- WARN --------------------
 
 /*  
 
- *  NEVER use this function directly. Always access drizzle client through
+ *  NEVER use these functions directly. Always access drizzle client through
  *  dependency injection (DI) using 'drizzleMiddleware' to have proper auth.
 
 
@@ -62,7 +45,48 @@ export type DrizzleClientTransactionRLS = Parameters<
 
 // -------------------- WARN --------------------
 
-export function createDrizzle(token?: JwtPayload): DrizzleClient {
+type AdminDb = typeof adminDb;
+
+export type DrizzleClient = {
+  admin: AdminDb;
+  rls: AdminDb["transaction"];
+};
+
+export type DrizzleClientTransactionRLS = Parameters<
+  DrizzleClient["rls"]
+>[0] extends (tx: infer T) => unknown
+  ? T
+  : never;
+
+export const supabase = createClient<Database>(
+  Deno.env.get("SUPABASE_URL")!,
+  Deno.env.get("SUPABASE_ANON_KEY")!,
+  {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+    },
+  },
+);
+
+export const supabaseService = createClient<Database>(
+  Deno.env.get("SUPABASE_URL")!,
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+    },
+  },
+);
+
+export const adminDb = drizzle(adminPg, {
+  schema,
+});
+
+export function createDrizzle(token: JwtPayload): DrizzleClient {
   return {
     admin: adminDb,
     rls: ((

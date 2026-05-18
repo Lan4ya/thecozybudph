@@ -10,7 +10,7 @@ export const devRequestLogger =
     try {
       if (contentType.includes("application/json")) {
         const body = await req.json();
-        console.log("[REQ JSON]", body);
+        console.log("[REQUEST JSON]", body);
       } else if (contentType.includes("multipart/form-data")) {
         const formData = await req.formData();
 
@@ -22,13 +22,13 @@ export const devRequestLogger =
               : value;
         }
 
-        console.log("[REQ FORM]", logged);
+        console.log("[REQUEST FORM]", logged);
       } else if (contentType.includes("application/x-www-form-urlencoded")) {
         const text = await req.text();
-        console.log("[REQ URLENCODED]", text);
+        console.log("[REQUEST URLENCODED]", text);
       }
     } catch (err) {
-      console.warn("[REQ BODY PARSE FAILED]", err);
+      console.warn("[REQUEST BODY PARSE FAILED]", err);
     }
 
     await next();

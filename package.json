@@ -1,13 +1,29 @@
 {
-  "name": "TheCozyBud",
+  "name": "cozybud",
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "dev:frontend": "pnpm -F frontend dev",
-    "dev:backend": "cd backend && sudo systemctl start docker && pnpm supabase functions serve --no-verify-jwt",
-    "build:frontend": "pnpm -F frontend build",
-    "build": "pnpm -r build",
-    "type": "pnpm -F backend check:supabase-functions && tsc --noEmit -p ./frontend/tsconfig.json && tsc --noEmit -p ./packages/schemas/tsconfig.json",
-    "pkg:generate": "pnpm -F backend pkg:generate"
+    "dev:sb": "cd backend && pnpm exec supabase start && pnpm exec supabase functions serve --no-verify-jwt",
+    "dev:fe": "pnpm -F frontend dev",
+    "dev": "concurrently \"pnpm dev:sb\" \"pnpm dev:fe\"",
+    "build:fe": "pnpm -F frontend build",
+    "type:sb": "pnpm -F backend type:sb",
+    "type:fe": "tsc --noEmit -p ./frontend/tsconfig.json",
+    "type:pkg": "tsc --noEmit -p ./packages/schemas/tsconfig.json",
+    "type": "pnpm type:sb && pnpm type:fe && pnpm type:pkg",
+    "pkg:generate": "pnpm -F backend pkg:generate",
+    "db:migrate": "pnpm -F backend db:migrate",
+    "db:seed": "pnpm -F backend db:seed",
+    "test:sb": "pnpm -F backend test:sb",
+    "add:sb": "pnpm -F backend add:sb",
+    "update:sb": "pnpm -F backend update:sb",
+    "update:latest:sb": "pnpm -F backend update:latest:sb",
+    "add:sb:tests": "pnpm -F backend add:sb:tests",
+    "update:sb:tests": "pnpm -F backend update:sb:tests",
+    "update:latest:sb:tests": "pnpm -F backend update:latest:sb:tests"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "supabase": "^2.98.2"
   }
 }

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { AdminAPI } from "@/api";
-import type { AdminQueryOrdersInput } from "@TheCozyBud/schemas";
+import type { AdminQueryOrdersInput } from "@cozybud/schemas";
 
 export const useAdminOrdersQuery = (query: AdminQueryOrdersInput) => {
   const queryKey = ["admin-orders", query] as const;

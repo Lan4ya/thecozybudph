@@ -6,8 +6,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useCheckoutStore } from "../store/useCheckoutStore";
 import { CheckoutShippingOptionSkeleton } from "@/lib/ui/skeletons/CheckoutShippingOptionSkeleton";
 import { useEffect } from "react";
-import { CheckoutAPI } from "@/api";
-import type { Address, CreateQuotationsRes } from "@TheCozyBud/schemas";
+import { OrderAPI } from "@/api";
+import type { Address, CreateQuotationsRes } from "@cozybud/schemas";
 import { Button } from "@/lib/ui/__shadcn__/button";
 
 export const createShippingQuoteQK = (address: Address | null) => [
@@ -30,7 +30,7 @@ const ShippingSection = () => {
     queryFn: (): Promise<CreateQuotationsRes> => {
       if (!addressStore) throw new Error("Missing address");
 
-      return CheckoutAPI.createShippingQuotes({
+      return OrderAPI.createShippingQuotes({
         recipientAddress: {
           addressLine: addressStore.addressLine,
           postalCode: addressStore.postalCode,

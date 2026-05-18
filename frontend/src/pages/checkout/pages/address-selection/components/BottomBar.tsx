@@ -1,7 +1,7 @@
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
-import type { Address } from "@TheCozyBud/schemas";
+import type { Address } from "@cozybud/schemas";
 import { checkoutAddressesQK } from "@/pages/checkout/hooks/useAddressQuery";
 
 const BottomBar = ({ onCreate }: { onCreate: () => void }) => {

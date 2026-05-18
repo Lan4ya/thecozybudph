@@ -9,7 +9,7 @@ import {
   createAddressFormSchema,
   type Address,
   type CreateAddressInput,
-} from "@TheCozyBud/schemas";
+} from "@cozybud/schemas";
 import { useCallback } from "react";
 import { useToast } from "@/providers/ToastProvider";
 import { useMutation, useQueryClient } from "@tanstack/react-query";

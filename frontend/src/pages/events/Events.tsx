@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { EventInquiryForm } from "./components";
-import type { EventInquiryInput } from "@TheCozyBud/schemas";
+import type { EventInquiryInput } from "@cozybud/schemas";
 import { useToast } from "@/providers/ToastProvider";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import {

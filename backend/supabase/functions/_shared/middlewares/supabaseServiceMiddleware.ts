@@ -14,9 +14,18 @@ export const supabaseServiceMiddleware =
       "SUPABASE_SERVICE_ROLE_KEY",
     );
 
+    const authHeader = c.req.header("Authorization");
+
     const supabaseService = createClient<Database>(
       SUPABASE_URL,
       SUPABASE_SERVICE_ROLE_KEY,
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+          detectSessionInUrl: false,
+        },
+      },
     );
 
     c.set("supabaseService", supabaseService);

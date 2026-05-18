@@ -4,23 +4,23 @@ import { formatSupabasePublicUrl, isDev } from "@shared/utils/mod.ts";
 
 export const ProductStorage = {
   deleteImages: async (
-    supabase: SupabaseDB,
+    supabaseService: SupabaseDB,
     bucket: string,
     paths: string[],
   ) => {
-    const { error } = await supabase.storage.from(bucket).remove(paths);
+    const { error } = await supabaseService.storage.from(bucket).remove(paths);
     return error;
   },
 
   downloadImages: async (
-    supabase: SupabaseDB,
+    supabaseService: SupabaseDB,
     bucket: string,
     paths: string[],
   ) => {
     const limit = pLimit(10);
     const downloads = paths.map((path) =>
       limit(async () => {
-        const { data, error } = await supabase.storage
+        const { data, error } = await supabaseService.storage
           .from(bucket)
           .download(path);
 
@@ -34,7 +34,11 @@ export const ProductStorage = {
     return blobs;
   },
 
-  uploadImages: async (supabase: SupabaseDB, bucket: string, files: File[]) => {
+  uploadImages: async (
+    supabaseService: SupabaseDB,
+    bucket: string,
+    files: File[],
+  ) => {
     const limit = pLimit(5);
 
     const uploads = files.map((file) =>
@@ -48,7 +52,7 @@ export const ProductStorage = {
           .map((b) => b.toString(16).padStart(2, "0"))
           .join("");
 
-        const { error } = await supabase.storage
+        const { error } = await supabaseService.storage
           .from(bucket)
           .upload(path, file);
 
@@ -56,7 +60,7 @@ export const ProductStorage = {
 
         const {
           data: { publicUrl },
-        } = supabase.storage.from(bucket).getPublicUrl(path);
+        } = supabaseService.storage.from(bucket).getPublicUrl(path);
 
         return {
           path,
@@ -83,7 +87,7 @@ export const ProductStorage = {
       hashes,
       cleanup: async () => {
         if (!paths.length) return;
-        await ProductStorage.deleteImages(supabase, bucket, paths);
+        await ProductStorage.deleteImages(supabaseService, bucket, paths);
       },
     };
   },

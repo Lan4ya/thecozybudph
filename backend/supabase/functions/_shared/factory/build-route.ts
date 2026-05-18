@@ -6,7 +6,8 @@ import {
   supabaseServiceMiddleware,
 } from "@shared/middlewares/mod.ts";
 
-import { Hono, MiddlewareHandler } from "hono";
+import { OpenAPIHono } from "@hono/zod-openapi";
+import { MiddlewareHandler, Hono } from "hono";
 import { AppEnv } from "../types.d.ts";
 
 export const middlewareRegistry = {

@@ -1,14 +1,14 @@
-import type { Hono } from "hono";
+import type { OpenAPIHono } from "@hono/zod-openapi";
+import { AppEnv } from "@shared/types.d.ts";
 import { rateLimiter } from "hono-rate-limiter";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
-import { AppEnv } from "../types.d.ts";
 import { isDev } from "../utils/isDev.ts";
 import { devRequestLogger } from "./logger.ts";
 
 // Sane default configs. Should be applied in the app before the routes.
-export const defaultAppMiddlewares = (app: Hono<AppEnv>) => {
+export const defaultAppMiddlewares = (app: OpenAPIHono<AppEnv>) => {
   const APP_URL = Deno.env.get("APP_URL");
 
   if (isDev) {
@@ -29,35 +29,40 @@ export const defaultAppMiddlewares = (app: Hono<AppEnv>) => {
     }),
   );
 
-  app.use(
-    secureHeaders({
-      contentSecurityPolicy: {
-        defaultSrc: ["'self'"],
-        baseUri: ["'self'"],
-        childSrc: ["'self'"],
-        connectSrc: ["'self'"],
-        fontSrc: ["'self'", "https:", "data:"],
-        formAction: ["'self'"],
-        frameAncestors: ["'self'"],
-        frameSrc: ["'self'"],
-        imgSrc: ["'self'", "data:"],
-        manifestSrc: ["'self'"],
-        mediaSrc: ["'self'"],
-        objectSrc: ["'none'"],
-        reportTo: "endpoint-1",
-        // reportUri: "/csp-report",
-        sandbox: ["allow-same-origin", "allow-scripts"],
-        scriptSrc: ["'self'"],
-        scriptSrcAttr: ["'none'"],
-        scriptSrcElem: ["'self'"],
-        styleSrc: ["'self'", "https:", "'unsafe-inline'"],
-        styleSrcAttr: ["none"],
-        styleSrcElem: ["'self'", "https:", "'unsafe-inline'"],
-        upgradeInsecureRequests: [],
-        workerSrc: ["'self'"],
-      },
-    }),
-  );
+  // app.use("*", (c, next) => {
+  //   const isSwaggerUI = c.req.path.includes("/ui");
+  //
+  //   if (isSwaggerUI) {
+  //     return next();
+  //   }
+  //
+  //   return secureHeaders({
+  //     contentSecurityPolicy: {
+  //       defaultSrc: ["'self'"],
+  //       baseUri: ["'self'"],
+  //       childSrc: ["'self'"],
+  //       connectSrc: ["'self'"],
+  //       fontSrc: ["'self'", "https:", "data:"],
+  //       formAction: ["'self'"],
+  //       frameAncestors: ["'self'"],
+  //       frameSrc: ["'self'"],
+  //       imgSrc: ["'self'", "data:"],
+  //       manifestSrc: ["'self'"],
+  //       mediaSrc: ["'self'"],
+  //       objectSrc: ["'none'"],
+  //       reportTo: "endpoint-1",
+  //       sandbox: ["allow-same-origin", "allow-scripts"],
+  //       scriptSrcAttr: ["'none'"],
+  //       styleSrcAttr: ["none"],
+  //       styleSrcElem: ["'self'", "https:", "'unsafe-inline'"],
+  //       upgradeInsecureRequests: [],
+  //       workerSrc: ["'self'"],
+  //       styleSrc: ["'self'", "'unsafe-inline'"],
+  //       scriptSrc: ["'self'"],
+  //       scriptSrcElem: ["'self'"],
+  //     },
+  //   })(c, next);
+  // });
 
   app.use(
     "*",

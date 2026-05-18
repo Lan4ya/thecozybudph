@@ -4,7 +4,7 @@ import {
   type DeleteProductsInput,
   type AdminQueryOrdersInput,
   type AdminQueryOrdersRes,
-} from "@TheCozyBud/schemas";
+} from "@cozybud/schemas";
 import { apiClient } from "@/lib/axios/client";
 import { supabase } from "@/lib/supabase/client";
 import { mapProductAndRelationsRowToProductWithRelationsDomain } from "@/lib/utils/mappers";

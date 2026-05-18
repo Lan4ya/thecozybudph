@@ -1,4 +1,4 @@
-import type { ProductWithRelations } from "@TheCozyBud/schemas";
+import type { ProductWithRelations } from "@cozybud/schemas";
 import { createContext, useCallback, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
 

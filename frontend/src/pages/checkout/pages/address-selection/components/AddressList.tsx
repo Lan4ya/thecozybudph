@@ -1,6 +1,6 @@
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { ChevronRight } from "lucide-react";
-import type { Address } from "@TheCozyBud/schemas";
+import type { Address } from "@cozybud/schemas";
 import { Input } from "@/lib/ui/__shadcn__/input";
 import AddressListSkeleton from "@/lib/ui/skeletons/AddressListSkeleton";
 import { useAddressesQuery } from "@/pages/checkout/hooks/useAddressQuery";

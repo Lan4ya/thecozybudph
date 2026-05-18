@@ -4,15 +4,18 @@ import {
   createShippingOrder,
   createShippingQuotation,
 } from "../../../integrations/lalamove/mod.ts";
-import { AdminShipOrderInput } from "../../../schemas/index.ts";
+import { AdminShipOrderInput, orders } from "../../../schemas/index.ts";
 import { OrderRepository } from "../../order/mod.ts";
+import { eq } from "drizzle-orm";
 
 export const shipOrder = async (
   db: DrizzleClient,
   orderId: string,
   payload: AdminShipOrderInput,
 ) => {
-  const order = await OrderRepository.getById(db, orderId);
+  const order = await db.admin.query.orders.findFirst({
+    where: eq(orders.id, orderId),
+  });
   if (!order) throw AppError.notFound("Order not found");
 
   const { remarks, address: recipientFullAddress } = payload.recipient;

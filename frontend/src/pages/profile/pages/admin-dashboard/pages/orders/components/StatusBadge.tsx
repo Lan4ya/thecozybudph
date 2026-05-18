@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils/cn";
-import type { OrderStatus } from "@TheCozyBud/schemas";
+import type { OrderStatus } from "@cozybud/schemas";
 
 const statusMap: Record<OrderStatus, { label: string; className: string }> = {
   toPay: {

@@ -1,4 +1,4 @@
-import z from "zod";
+import { z } from "@hono/zod-openapi";
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 const MAX_IMAGES = 3;
@@ -13,7 +13,8 @@ export const imageFileSchema = z
   })
   .refine((file) => file.size <= MAX_FILE_SIZE, {
     message: "image must be under 50MB",
-  });
+  })
+  .openapi({ type: "string", format: "binary" });
 
 export const productBaseSchema = z.object({
   name: z
@@ -30,7 +31,9 @@ export const productBaseSchema = z.object({
       .max(600, "description can't exceed 600 characters")
       .optional()
       .nullable(),
-  ),
+  ).openapi({
+    type: "string",
+  }),
 
   categoryName: z
     .string()
@@ -47,7 +50,9 @@ export const productBaseSchema = z.object({
       .toLowerCase()
       .optional()
       .nullable(),
-  ),
+  ).openapi({
+    type: "string",
+  }),
 });
 
 export const productOptionSchema = z.object({
@@ -85,19 +90,49 @@ export const createProductSchema = productBaseSchema.extend({
       .array(imageFileSchema)
       .min(1, "you must upload at least 1 image")
       .max(MAX_IMAGES, `you can upload up to ${MAX_IMAGES} images only`),
-  ),
+  ).openapi({
+    type: "array",
+    items: { type: "string", format: "binary" },
+  }),
 
-  primaryImageIndex: z.coerce.number().min(0, "primaryImageIndex out of range"),
+  primaryImageIndex: z.coerce
+    .number()
+    .min(0, "primaryImageIndex out of range")
+    .openapi({ type: "number", minimum: 0 }),
 
   options: z.preprocess((val) => {
     if (typeof val === "string") return JSON.parse(val);
     return val;
-  }, z.array(productOptionSchema).nonempty("product options must atleast have one item")),
+  }, z.array(productOptionSchema).nonempty("product options must atleast have one item")).openapi({
+    type: "array",
+    items: {
+      type: "object",
+      properties: {
+        name: { type: "string" },
+        values: { type: "array", items: { type: "string" } },
+      },
+      required: ["name", "values"],
+    },
+  }),
 
   variants: z.preprocess(
     (val) => (typeof val === "string" ? JSON.parse(val) : val),
     z.array(productVariantSchema).nonempty("product variants can't be empty"),
-  ),
+  ).openapi({
+    type: "array",
+    items: {
+      type: "object",
+      properties: {
+        id: { type: "string", format: "uuid" },
+        priceCents: { type: "number" },
+        attributes: {
+          type: "object",
+          additionalProperties: { type: "string" },
+        },
+      },
+      required: ["priceCents", "attributes"],
+    },
+  }),
 });
 
 export const updateProductSchema = productBaseSchema.partial().extend({
@@ -110,12 +145,18 @@ export const updateProductSchema = productBaseSchema.partial().extend({
       .array(imageFileSchema)
       .max(MAX_IMAGES, `you can upload up to ${MAX_IMAGES} images only`)
       .default([]),
-  ),
+  ).openapi({
+    type: "array",
+    items: { type: "string", format: "binary" },
+  }),
 
   imageUrlsToDelete: z.preprocess((val) => {
     if (!val) return [];
     return Array.isArray(val) ? val : [val];
-  }, z.array(z.url()).default([])),
+  }, z.array(z.url()).default([])).openapi({
+    type: "array",
+    items: { type: "string", format: "uri" },
+  }),
 
   primaryImageIndex: z.coerce
     .number()
@@ -125,12 +166,36 @@ export const updateProductSchema = productBaseSchema.partial().extend({
   options: z.preprocess((val) => {
     if (typeof val === "string") return JSON.parse(val);
     return val;
-  }, z.array(productOptionSchema).default([])),
+  }, z.array(productOptionSchema).default([])).openapi({
+    type: "array",
+    items: {
+      type: "object",
+      properties: {
+        name: { type: "string" },
+        values: { type: "array", items: { type: "string" } },
+      },
+      required: ["name", "values"],
+    },
+  }),
 
   variants: z.preprocess(
     (val) => (typeof val === "string" ? JSON.parse(val) : val),
     z.array(productVariantSchema).default([]),
-  ),
+  ).openapi({
+    type: "array",
+    items: {
+      type: "object",
+      properties: {
+        id: { type: "string", format: "uuid" },
+        priceCents: { type: "number" },
+        attributes: {
+          type: "object",
+          additionalProperties: { type: "string" },
+        },
+      },
+      required: ["priceCents", "attributes"],
+    },
+  }),
 });
 
 export const deleteProductsSchema = z.object({
@@ -141,6 +206,36 @@ export const deleteProductsSchema = z.object({
 
 export const productIdSchema = z.object({
   id: z.uuid("productId is not a valid UUID"),
+});
+
+export const productSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  description: z.string().nullable(),
+  imageUrls: z.array(z.string().url()),
+  primaryImageUrl: z.string().url(),
+  minPriceCents: z.number(),
+  maxPriceCents: z.number(),
+  options: z.array(productOptionSchema),
+  variants: z.array(productVariantSchema.extend({ id: z.string().uuid() })),
+  categoryName: z.string().nullable(),
+  collectionName: z.string().nullable(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+
+export const createProductResponseSchema = z.object({
+  data: productSchema,
+});
+
+export const updateProductResponseSchema = z.object({
+  data: productSchema,
+});
+
+export const deleteProductsResponseSchema = z.object({
+  data: z.object({
+    deletedProductIds: z.array(z.string().uuid()),
+  }),
 });
 
 // -----------------------------------------------------------------------------

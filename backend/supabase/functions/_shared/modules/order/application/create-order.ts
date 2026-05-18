@@ -14,8 +14,6 @@ import {
 } from "./create-order-snapshots.ts";
 import { persistCreateOrderTransaction } from "./create-order-transaction.ts";
 
-// copilot --resume=0811d5d5-1f01-4554-be73-07a91d0f15c3
-
 export const createOrder = async (
   db: DrizzleClient,
   supabaseService: SupabaseDB,

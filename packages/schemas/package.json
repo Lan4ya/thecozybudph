@@ -1,18 +1,27 @@
 {
-  "name": "@TheCozyBud/schemas",
+  "name": "@cozybud/schemas",
   "version": "1.0.0",
   "main": "src/index.ts",
-  "types": "src/index.ts",
   "type": "module",
   "scripts": {
-    "build": "tsc -p tsconfig.json"
+    "build": "tsc -p tsconfig.json",
+    "doc:profile": "openapi-typescript http://localhost:54321/functions/v1/profile/doc -o ./src/types/api/openapi/profile.ts",
+    "doc:address": "openapi-typescript http://localhost:54321/functions/v1/address/doc -o ./src/types/api/openapi/address.ts",
+    "doc:admin": "openapi-typescript http://localhost:54321/functions/v1/admin/doc -o ./src/types/api/openapi/admin.ts",
+    "doc:order": "openapi-typescript http://localhost:54321/functions/v1/order/doc -o ./src/types/api/openapi/order.ts",
+    "doc:cart": "openapi-typescript http://localhost:54321/functions/v1/cart/doc -o ./src/types/api/openapi/cart.ts",
+    "doc": "node ./generate-openapi.js"
   },
   "dependencies": {
+    "@hono/zod-openapi": "^0.19.10",
     "drizzle-orm": "^0.45.1",
     "drizzle-zod": "^0.8.3",
+    "hono": "^4.10.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@lalamove/lalamove-js": "^1.1.0"
+    "@lalamove/lalamove-js": "^1.1.0",
+    "execa": "^9.6.1",
+    "openapi-typescript": "^7.13.0"
   }
 }

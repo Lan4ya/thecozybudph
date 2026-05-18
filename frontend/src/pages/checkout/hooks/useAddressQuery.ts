@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import type { Address } from "@TheCozyBud/schemas";
+import type { Address } from "@cozybud/schemas";
 import { AddressAPI } from "@/api/address";
 
 export const checkoutDefaultAddressQK = "checkout-default-address";

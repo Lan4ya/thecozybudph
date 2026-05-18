@@ -19,8 +19,9 @@ export const supabaseMiddleware =
         headers: authHeader ? { Authorization: authHeader } : undefined,
       },
       auth: {
-        persistSession: false, // Strictly disables trying to write to server disk storage/cookies
-        autoRefreshToken: false, // Prevents background network thread stalls on server runtimes
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
       },
     });
 

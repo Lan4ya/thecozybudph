@@ -111,3 +111,10 @@ export const stringToObject = <T extends ZodType>(schema: T) =>
   z.object({
     [key]: z.uuid(),
   });
+
+export type Expect<T extends true> = T;
+
+export type Equal<A, B> =
+  (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2
+    ? true
+    : false;

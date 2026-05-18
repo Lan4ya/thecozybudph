@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Package } from "lucide-react";
 import { ProductImage } from "@/components/products/ProductImage";
 import { capitalizeFirstLetter, formatPriceCents } from "@/lib/utils/format";
-// import type { OrderItem } from "@TheCozyBud/schemas";
+// import type { OrderItem } from "@cozybud/schemas";
 import { useCheckoutStore, type OrderItemUI } from "../store/useCheckoutStore";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { useState } from "react";

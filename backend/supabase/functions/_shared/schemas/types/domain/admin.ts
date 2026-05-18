@@ -4,7 +4,7 @@ export type AdminOrderItem = {
   orderId: string;
   name: string;
   image: string | null;
-  attributes: unknown;
+  attributes: Record<string, string>;
   quantity: number;
   cardMessages: string[];
   priceCents: number;

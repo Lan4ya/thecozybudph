@@ -15,7 +15,7 @@ import { Link, useNavigate } from "react-router";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import googleIcon from "@/assets/icons/google.svg";
 import { useIsLgScreenMin } from "@/hooks/useMediaQuery";
-import { logInFormSchema, type LogIn } from "@TheCozyBud/schemas";
+import { logInFormSchema, type LogIn } from "@cozybud/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import isDev from "@/lib/utils/isDev";

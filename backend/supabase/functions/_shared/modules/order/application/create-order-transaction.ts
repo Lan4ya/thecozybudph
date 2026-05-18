@@ -11,9 +11,12 @@ import {
   payments,
 } from "@shared/schemas/index.ts";
 import { and, eq, inArray } from "drizzle-orm";
-import { PreparedOrderAddress, PreparedOrderItem } from "./create-order-prep.ts";
+import {
+  PreparedOrderAddress,
+  PreparedOrderItem,
+} from "./create-order-prep.ts";
 
-export const persistCreateOrderTransaction = async (
+export const persistCreateOrderTransaction = (
   db: DrizzleClient,
   params: {
     profileId: string;
@@ -23,7 +26,8 @@ export const persistCreateOrderTransaction = async (
     snapshotUrlByHash: Map<string, string>;
   },
 ): Promise<CreateOrderRes> => {
-  const { order, orderAddress, orderItems, profileId, snapshotUrlByHash } = params;
+  const { order, orderAddress, orderItems, profileId, snapshotUrlByHash } =
+    params;
 
   return db.rls(async (tx) => {
     const [pendingOrder] = await tx

@@ -1,7 +1,8 @@
 packages:
   - frontend
-  - backend
-  - packages/*
+  - backend/**
+  - packages/**
+  - '!**/node_modules/**' # Do not scan nested node_modules
 
 allowBuilds:
   '@prisma/engines': true

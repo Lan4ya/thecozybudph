@@ -1,5 +1,46 @@
-import { buildApp } from "@shared/factory/mod.ts";
-import { buildAdminRoutes } from "./admin-routes.ts";
+import { swaggerUI } from "@hono/swagger-ui";
+import { OpenAPIHono } from "@hono/zod-openapi";
+import { handleError } from "@shared/errors/errorHandler.ts";
+import { ValidationError } from "@shared/errors/Errors.ts";
+import { adminMiddleware } from "@shared/middlewares/adminMiddleware.ts";
+import { defaultAppMiddlewares } from "@shared/middlewares/defaultMiddleware.ts";
+import { formatZodError } from "@shared/middlewares/zodValidatorMiddleware.ts";
+import { AppEnv } from "@shared/types.d.ts";
+import { isDev } from "@shared/utils/isDev.ts";
+import routes from "./admin-routes.ts";
 
-export const adminApp = buildApp("admin", buildAdminRoutes());
-Deno.serve(adminApp.fetch);
+const app = new OpenAPIHono<AppEnv>({
+  defaultHook: (result) => {
+    if (!result.success) {
+      const errors = formatZodError(result.error);
+      throw new ValidationError(errors);
+    }
+  },
+}).basePath("admin");
+
+// Apply default middlewares/configs
+defaultAppMiddlewares(app);
+
+// Serve the OpenAPI document
+app.use("/doc/*", ...(isDev ? [] : [adminMiddleware()]));
+app.doc("/doc", {
+  openapi: "3.0.0",
+  info: {
+    title: "Admin API",
+    version: "1.0.0",
+  },
+});
+
+// Serve Swagger UI
+app.get("/ui", swaggerUI({ url: "doc" }));
+
+app.route("/", routes);
+
+app.onError((err) => handleError(err));
+app.notFound((c) => c.text("Not Found", 404));
+
+export default app;
+
+if (import.meta.main) {
+  Deno.serve(app.fetch);
+}

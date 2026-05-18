@@ -3,20 +3,17 @@ import {
   CreateQuotationsRes,
   CreateShippingQuoteInput,
   QuoteStop,
-  ServiceType,
 } from "@shared/schemas/types/index.ts";
 import { getCoordinates } from "../geoapify/get-coordinates.ts";
 import { COMPANY_ADDRESS, MARKET, sdkClient, SERVICE_TYPES } from "./client.ts";
 
 export const createShippingQuotation = async (
   payload: CreateShippingQuoteInput,
-  serviceType: ServiceType | "all" = "all",
 ): Promise<CreateQuotationsRes> => {
   const senderAddress = payload.senderAddress;
   const recipientAddress = payload.recipientAddress;
 
   let pickupAddress: string;
-
   if (senderAddress) {
     pickupAddress = [
       senderAddress.addressLine,
@@ -59,8 +56,9 @@ export const createShippingQuotation = async (
     address: dropoffAddress,
   };
 
-  const requestedServices =
-    serviceType === "all" ? SERVICE_TYPES : [serviceType];
+  const requestedServices = payload.serviceType
+    ? [payload.serviceType.toUpperCase()]
+    : SERVICE_TYPES;
 
   const quotes = await Promise.all(
     requestedServices.map((type) => {

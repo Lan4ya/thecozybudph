@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { EventInquiryForm } from "@/pages/events/components";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Phone, CheckCircle } from "lucide-react";
-import type { EventInquiryFormInput } from "@TheCozyBud/schemas";
+import type { EventInquiryFormInput } from "@cozybud/schemas";
 
 interface EventInquirySectionProps {
   onSubmit: (data: EventInquiryFormInput) => Promise<void>;

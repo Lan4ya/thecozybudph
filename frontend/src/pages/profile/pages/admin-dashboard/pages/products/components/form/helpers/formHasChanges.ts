@@ -1,8 +1,5 @@
 import isEqual from "fast-deep-equal";
-import type {
-  ProductFormOutput,
-  ProductWithRelations,
-} from "@TheCozyBud/schemas";
+import type { ProductFormOutput, ProductWithRelations } from "@cozybud/schemas";
 
 function normalizeVariants(
   variants: Array<{

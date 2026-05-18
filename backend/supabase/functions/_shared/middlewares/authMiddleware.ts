@@ -24,7 +24,7 @@ export const authMiddleware =
     const { data, error } = await supabase.auth.getClaims(token);
     const claims: JwtPayload | undefined = data?.claims;
 
-    // isDev && console.log("claims: ", claims);
+    // console.log("claims: ", claims);
 
     if (error || !claims) {
       throw AppError.unauthorized(

@@ -6,7 +6,6 @@
     "moduleResolution": "Bundler",
     "rootDir": "src",
     "noEmit": true,
-    // Requires explicit extensions in imports; so imports won't break after they've been copied in supabase edge (Deno env)
     "verbatimModuleSyntax": true,
     "noEmitOnError": true,
     "allowImportingTsExtensions": true

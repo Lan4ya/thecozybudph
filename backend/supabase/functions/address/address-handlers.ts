@@ -1,50 +1,52 @@
+import { RouteHandler } from "@hono/zod-openapi";
 import { AddressActions } from "@shared/modules/address/mod.ts";
-import { zodValidatorMiddleware } from "@shared/middlewares/zodValidatorMiddleware.ts";
-import {
-  addressIdSchema,
-  createAddressSchema,
-  updateAddressSchema,
-} from "@shared/schemas/index.ts";
-import { handleSuccess, requireVariables } from "@shared/utils/mod.ts";
-import { createFactory } from "hono/factory";
 import { AppEnv } from "@shared/types.d.ts";
+import { requireVariables } from "@shared/utils/mod.ts";
+import {
+  createAddressRoute,
+  getAddressesRoute,
+  getDefaultAddressRoute,
+  updateAddressRoute,
+} from "./address-routes.ts";
 
-const factory = createFactory<AppEnv>();
-const { createHandlers } = factory;
+export const createAddressHandler: RouteHandler<
+  typeof createAddressRoute,
+  AppEnv
+> = async (c) => {
+  const payload = c.req.valid("json");
+  const { db, claims } = requireVariables(c, "db", "claims");
+  const profileId = claims.sub;
+  const res = await AddressActions.createAddress(db, payload, profileId);
+  return c.json({ data: res }, 200);
+};
 
-export const createAddressHandler = createHandlers(
-  zodValidatorMiddleware("json", createAddressSchema),
-  async (c) => {
-    const payload = c.req.valid("json");
-    const { db, claims } = requireVariables(c, "db", "claims");
-    const profileId = claims.sub;
-    const res = await AddressActions.createAddress(db, payload, profileId);
-    return handleSuccess(res);
-  },
-);
+export const updateAddressHandler: RouteHandler<
+  typeof updateAddressRoute,
+  AppEnv
+> = async (c) => {
+  const { db } = requireVariables(c, "db");
+  const payload = c.req.valid("json");
+  const { id } = c.req.valid("param");
+  const res = await AddressActions.updateAddress(db, id, payload);
+  return c.json({ data: res }, 200);
+};
 
-export const updateAddressHandler = createHandlers(
-  zodValidatorMiddleware("param", addressIdSchema),
-  zodValidatorMiddleware("json", updateAddressSchema),
-  async (c) => {
-    const { db } = requireVariables(c, "db");
-    const payload = c.req.valid("json");
-    const { id } = c.req.valid("param");
-    const res = await AddressActions.updateAddress(db, id, payload);
-    return handleSuccess(res);
-  },
-);
-
-export const getDefaultAddressesHandler = createHandlers(async (c) => {
+export const getDefaultAddressesHandler: RouteHandler<
+  typeof getDefaultAddressRoute,
+  AppEnv
+> = async (c) => {
   const { db, claims } = requireVariables(c, "db", "claims");
   const profileId = claims.sub;
   const res = await AddressActions.getDefaultAddress(db, profileId);
-  return handleSuccess(res);
-});
+  return c.json({ data: res }, 200);
+};
 
-export const getAddressesHandler = createHandlers(async (c) => {
+export const getAddressesHandler: RouteHandler<
+  typeof getAddressesRoute,
+  AppEnv
+> = async (c) => {
   const { db, claims } = requireVariables(c, "db", "claims");
   const profileId = claims.sub;
   const res = await AddressActions.getAddresses(db, profileId);
-  return handleSuccess(res);
-});
+  return c.json({ data: res }, 200);
+};

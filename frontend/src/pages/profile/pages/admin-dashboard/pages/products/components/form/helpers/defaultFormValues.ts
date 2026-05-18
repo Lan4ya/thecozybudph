@@ -2,7 +2,7 @@ import type {
   CreateProductFormInput,
   ProductWithRelations,
   UpdateProductFormInput,
-} from "@TheCozyBud/schemas";
+} from "@cozybud/schemas";
 
 export function getCreateFormDefaultValues(): CreateProductFormInput {
   return {

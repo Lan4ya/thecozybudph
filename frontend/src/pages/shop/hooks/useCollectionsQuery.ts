@@ -1,6 +1,6 @@
 import { ProductAPI } from "@/api/product";
 import { useQuery } from "@tanstack/react-query";
-import type { ProductCollection } from "@TheCozyBud/schemas";
+import type { ProductCollection } from "@cozybud/schemas";
 
 export const useCollectionsQuery = () => {
   const {

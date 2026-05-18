@@ -3,7 +3,7 @@ import type {
   Product,
   ProductOption,
   ProductWithRelations,
-} from "@TheCozyBud/schemas";
+} from "@cozybud/schemas";
 import { parseDateString } from "./format";
 
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];

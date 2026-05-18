@@ -1,10 +1,10 @@
 import { Context } from "hono";
 import { env } from "hono/adapter";
 import { AppError } from "../errors/Errors.ts";
-import { AppEnv, Bindings, Variables } from "../types.d.ts";
+import { Bindings, Variables } from "../types.d.ts";
 
 export function requireVariables<T extends keyof Variables>(
-  c: Context<AppEnv>,
+  c: Context,
   ...keys: T[]
 ): Required<Pick<Variables, T>> {
   const result = {} as Required<Pick<Variables, T>>;
@@ -31,7 +31,7 @@ export function requireVariables<T extends keyof Variables>(
 }
 
 export function requireBindings<T extends keyof Bindings>(
-  c: Context<AppEnv>,
+  c: Context,
   ...keys: T[]
 ): Required<Pick<Bindings, T>> {
   const result = {} as Required<Pick<Bindings, T>>;

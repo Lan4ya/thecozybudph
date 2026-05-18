@@ -75,7 +75,7 @@ export const useProductsSuspenseInfiniteQuery = () => {
       }
 
       try {
-        return await ProductAPI.queryListItems({
+        return await ProductAPI.queryProducts({
           page: pageParam as number,
           perPage,
           sort: productQuery?.sort ?? "Popularity",

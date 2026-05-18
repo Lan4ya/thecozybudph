@@ -11,7 +11,7 @@ import { DrizzleClient } from "../../../db/client.ts";
 
 export const createProduct = async (
   db: DrizzleClient,
-  supabase: SupabaseDB,
+  supabaseService: SupabaseDB,
   payload: CreateProductInput,
 ): Promise<ProductWithRelations> => {
   const { primaryImageIndex, productImages, ...rest } = payload;
@@ -21,7 +21,7 @@ export const createProduct = async (
   try {
     // Upload images
     const { urls, hashes, cleanup } = await ProductStorage.uploadImages(
-      supabase,
+      supabaseService,
       "products",
       productImages,
     );

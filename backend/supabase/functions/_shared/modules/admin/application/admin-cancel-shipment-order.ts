@@ -2,6 +2,8 @@ import { DrizzleClient } from "../../../db/client.ts";
 import { AppError } from "../../../errors/Errors.ts";
 import { cancelShippingOrder } from "../../../integrations/lalamove/cancel-order.ts";
 import { OrderRepository } from "../../order/mod.ts";
+import { orders } from "../../../schemas/index.ts";
+import { eq } from "drizzle-orm";
 
 // About shipping order status:
 //
@@ -19,7 +21,9 @@ export const cancelShipmentOrder = async (
   db: DrizzleClient,
   orderId: string,
 ) => {
-  const order = await OrderRepository.getById(db, orderId);
+  const order = await db.admin.query.orders.findFirst({
+    where: eq(orders.id, orderId),
+  });
 
   if (!order) throw AppError.notFound("Order not found");
 

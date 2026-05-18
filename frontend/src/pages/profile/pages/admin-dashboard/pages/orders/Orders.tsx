@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAdminOrdersPageState } from "./hooks/useAdminOrdersPageState";
 import { useAdminOrdersQuery } from "./hooks/useAdminOrdersQuery";
-import type { AdminOrderListItem, OrderStatus } from "@TheCozyBud/schemas";
+import type { AdminOrderListItem, OrderStatus } from "@cozybud/schemas";
 import { OrdersFilters } from "./components/OrdersFilters";
 import { OrdersTable } from "./components/OrdersTable";
 import { OrdersPagination } from "./components/OrdersPagination";

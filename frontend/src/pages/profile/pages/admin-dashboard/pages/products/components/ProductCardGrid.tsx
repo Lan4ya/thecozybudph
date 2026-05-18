@@ -1,4 +1,4 @@
-import type { ProductWithRelations } from "@TheCozyBud/schemas";
+import type { ProductWithRelations } from "@cozybud/schemas";
 import { ProductImage } from "@/components/products/ProductImage";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { formatPriceCents } from "@/lib/utils/format";

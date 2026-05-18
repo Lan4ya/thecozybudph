@@ -1,13 +1,111 @@
-import { Hono, Env } from "hono";
-import { supabaseMiddleware, authMiddleware } from "@shared/middlewares/mod.ts";
+import { createRoute } from "@hono/zod-openapi";
+import { authMiddleware } from "@shared/middlewares/authMiddleware.ts";
+import { drizzleMiddleware } from "@shared/middlewares/drizzleMiddleware.ts";
+import { supabaseMiddleware } from "@shared/middlewares/supabaseMiddleware.ts";
+import {
+  errorResponseSchema,
+  getProfileResponseSchema,
+  updateProfileResponseSchema,
+  updateProfileSchema,
+} from "@shared/schemas/index.ts";
+import { OpenAPIHono } from "@hono/zod-openapi";
 import { getProfileHandler, updateProfileHandler } from "./profile-handlers.ts";
+import { AppEnv } from "@shared/types.d.ts";
 
-const profile = new Hono<Env>();
+export const getProfileRoute = createRoute({
+  method: "get",
+  path: "/",
+  middleware: [
+    supabaseMiddleware(),
+    authMiddleware(),
+    drizzleMiddleware(),
+  ] as const,
+  responses: {
+    200: {
+      description: "Get authenticated user's profile",
+      content: {
+        "application/json": {
+          schema: getProfileResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+    404: {
+      description: "Profile not found",
+      content: {
+        "application/json": {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+  },
+  tags: ["Profile"],
+});
 
-profile.use("*", supabaseMiddleware());
-profile.use("*", authMiddleware());
+export const updateProfileRoute = createRoute({
+  method: "patch",
+  path: "/",
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: updateProfileSchema,
+        },
+      },
+    },
+  },
+  middleware: [
+    supabaseMiddleware(),
+    authMiddleware(),
+    drizzleMiddleware(),
+  ] as const,
+  responses: {
+    200: {
+      description: "Update authenticated user's profile",
+      content: {
+        "application/json": {
+          schema: updateProfileResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+    404: {
+      description: "Profile not found",
+      content: {
+        "application/json": {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+    422: {
+      description: "Validation error",
+      content: {
+        "application/json": {
+          schema: errorResponseSchema,
+        },
+      },
+    },
+  },
+  tags: ["Profile"],
+});
 
-profile.get("/", ...getProfileHandler);
-profile.patch("/", ...updateProfileHandler); // no id in params since it's derived from JWT
+const profile = new OpenAPIHono<AppEnv>();
 
-export default profile;
+profile.openapi(getProfileRoute, getProfileHandler);
+profile.openapi(updateProfileRoute, updateProfileHandler);
+
+export { profile };

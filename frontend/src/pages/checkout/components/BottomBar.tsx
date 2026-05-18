@@ -4,12 +4,12 @@ import { formatPriceCents } from "@/lib/utils/format";
 import { useNavigate } from "react-router";
 import { useCheckoutStore } from "../store/useCheckoutStore";
 import { useIsFetching, useMutation } from "@tanstack/react-query";
-import { CheckoutAPI } from "@/api";
+import { OrderAPI } from "@/api";
 import {
   createOrderSchema,
   type CreateOrderInput,
   type CreateOrderRes,
-} from "@TheCozyBud/schemas";
+} from "@cozybud/schemas";
 import { useToast } from "@/providers/ToastProvider";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import { useShallow } from "zustand/react/shallow";
@@ -57,10 +57,9 @@ const BottomBar = () => {
     useMutation({
       mutationFn: (payload: CreateOrderInput): Promise<CreateOrderRes> => {
         // Reuse the same key for retries of the same submit intent.
-        const key =
-          orderIdempotencyKeyRef.current ?? crypto.randomUUID();
+        const key = orderIdempotencyKeyRef.current ?? crypto.randomUUID();
         orderIdempotencyKeyRef.current = key;
-        return CheckoutAPI.createOrder(payload, key);
+        return OrderAPI.createOrder(payload, key);
       },
       onError: () => {
         addToast("Something wen't wrong. please try again", "error");
