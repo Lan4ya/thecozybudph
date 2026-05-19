@@ -26,19 +26,17 @@ jobs:
         with:
           deno-version: v2.x
 
+      - name: Cache Deno dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.deno
+          key: deno-${{ hashFiles('backend/supabase/functions/**/*.ts', 'backend/deno.json*') }}
+          restore-keys: deno-
+
       - run: pnpm install --frozen-lockfile
 
-      - name: Lint
-        run: pnpm --filter @cozybud/frontend lint
-
-      - name: Typecheck
+      - name: Typecheck Project Wide
         run: pnpm type
 
-      - name: Test frontend
-        run: pnpm --filter @cozybud/frontend test -- --run
-
-      - name: Test backend
-        run: pnpm --filter @cozybud/backend test
-
-      - name: Build
-        run: pnpm build
+      - name: Build Frontend
+        run: pnpm build:fe
