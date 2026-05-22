@@ -1,15 +1,15 @@
 import Lalamove from "@lalamove/lalamove-js";
 import {
-  CreateQuotationsRes,
   CreateShippingQuoteInput,
-  QuoteStop,
+  Stop,
+  CreateShippingQuoteData,
 } from "@shared/schemas/types/index.ts";
 import { getCoordinates } from "../geoapify/get-coordinates.ts";
 import { COMPANY_ADDRESS, MARKET, sdkClient, SERVICE_TYPES } from "./client.ts";
 
 export const createShippingQuotation = async (
   payload: CreateShippingQuoteInput,
-): Promise<CreateQuotationsRes> => {
+): Promise<CreateShippingQuoteData[]> => {
   const senderAddress = payload.senderAddress;
   const recipientAddress = payload.recipientAddress;
 
@@ -47,11 +47,11 @@ export const createShippingQuotation = async (
     getCoordinates(dropoffAddress),
   ]);
 
-  const pickupStop: QuoteStop = {
+  const pickupStop: Stop = {
     coordinates: coordinates[0],
     address: pickupAddress,
   };
-  const dropoffStop: QuoteStop = {
+  const dropoffStop: Stop = {
     coordinates: coordinates[1],
     address: dropoffAddress,
   };

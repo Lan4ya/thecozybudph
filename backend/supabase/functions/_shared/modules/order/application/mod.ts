@@ -1,4 +1,3 @@
-import { createShippingQuotation } from "@shared/integrations/lalamove/mod.ts";
 import { createOrder } from "./create-order.ts";
 import { queryOrders } from "./query-orders.ts";
 import { getOrder } from "./get-order.ts";
@@ -10,8 +9,7 @@ export const OrderActions = {
   createOrder,
   queryOrders,
   getOrder,
-  createShippingQuotation,
   payOrder,
   handlePaymentWebhook,
-  getPaymentStatus: getOrderPaymentStatus,
+  getOrderPaymentStatus,
 };

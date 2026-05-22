@@ -3,6 +3,5 @@ export * from "./drizzleMiddleware.ts";
 export * from "./adminMiddleware.ts";
 export * from "./supabaseMiddleware.ts";
 export * from "./supabaseServiceMiddleware.ts";
-export * from "./zodValidatorMiddleware.ts";
 export * from "./defaultMiddleware.ts";
 export * from "./logger.ts";

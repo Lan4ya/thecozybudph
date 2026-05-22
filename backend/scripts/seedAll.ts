@@ -2,7 +2,7 @@ import { execa } from "execa";
 
 // Order matters
 const steps = [
-  "storage:init-bucket",
+  "storage:init",
   "db:seed:users",
   "db:seed:admin",
   "db:seed:products",

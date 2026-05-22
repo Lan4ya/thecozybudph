@@ -31,7 +31,7 @@ export const prepareCreateOrderData = async (
   payload: CreateOrderInput,
 ): Promise<PreparedCreateOrderData> => {
   const address = await AddressRepository.getById(db, payload.addressId);
-  if (!address) throw AppError.notFound("Address not found");
+  if (!address) throw AppError.notFound({ message: "Address not found" });
 
   const { id: _id, ...orderAddress } = address;
 
@@ -54,16 +54,16 @@ export const prepareCreateOrderData = async (
 
   const missingIds = payloadVariantIds.filter((id) => !existingVariantMap.has(id));
   if (missingIds.length) {
-    throw AppError.badRequest(
-      `The following product variant ids are not available: ${missingIds.join(", ")}`,
-    );
+    throw AppError.badRequest({
+      message: `The following product variant ids are not available: ${missingIds.join(", ")}`,
+    });
   }
 
   const orderItems: PreparedOrderItem[] = payload.items.map((item) => {
     const variant = existingVariantMap.get(item.variantId);
 
     if (!variant) {
-      throw AppError.badRequest(`Variant not found: ${item.variantId}`);
+      throw AppError.badRequest({ message: `Variant not found: ${item.variantId}` });
     }
 
     return {

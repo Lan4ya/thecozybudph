@@ -1,7 +1,7 @@
 import app from "@functions/profile/index.ts";
 import { assert, assertEquals } from "@std/assert";
 import { afterAll, beforeAll, describe, it } from "@std/testing/bdd";
-import { getTestToken } from "../helpers/get-test-token.ts";
+import { getTestToken } from "../helpers/utils.ts";
 
 type JsonRequestInit = {
   method?: string;

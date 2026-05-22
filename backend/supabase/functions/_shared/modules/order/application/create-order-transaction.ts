@@ -42,10 +42,10 @@ export const persistCreateOrderTransaction = (
         const snapshotUrl = snapshotUrlByHash.get(primaryImageHash);
 
         if (!snapshotUrl) {
-          throw AppError.internal(
-            "Snapshot URL missing",
-            `No snapshot URL found for hash: ${primaryImageHash}`,
-          );
+          throw AppError.internal({
+            message: "Snapshot URL missing",
+            cause: `No snapshot URL found for hash: ${primaryImageHash}`,
+          });
         }
 
         return {

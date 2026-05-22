@@ -14,9 +14,9 @@ export const deleteCartItems = async (
   const cart = await CartRepository.getCartByProfileId(db, profileId);
 
   if (!cart?.id) {
-    throw AppError.internal(
-      "Invariant violation: get cart by profile id returned no data",
-    );
+    throw AppError.internal({
+      message: "Invariant violation: get cart by profile id returned no data",
+    });
   }
 
   const data = await CartRepository.deleteCartItems(

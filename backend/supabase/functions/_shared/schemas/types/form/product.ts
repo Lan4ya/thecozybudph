@@ -1,8 +1,8 @@
 import { z } from "zod";
-import {
+import type {
   createProductFormSchema,
-  productFormSchema,
   updateProductFormSchema,
+  productFormSchema,
 } from "../../zod/index.ts";
 
 export type CreateProductFormInput = z.input<typeof createProductFormSchema>;

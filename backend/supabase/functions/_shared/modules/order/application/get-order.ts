@@ -21,10 +21,10 @@ function mapToCustomerStatus(status: string): CustomerOrderStatus {
     case "cancelled":
       return "cancelled";
     default:
-      throw AppError.internal(
-        "Internal server error",
-        `Invariant violation: Invalid customer order status: ${status}`,
-      );
+      throw AppError.internal({
+        message: "Internal server error",
+        cause: `Invariant violation: Invalid customer order status: ${status}`,
+      });
   }
 }
 
@@ -36,11 +36,11 @@ export const getOrder = async (
   const order = await OrderRepository.getOrder(db, orderId);
 
   if (!order) {
-    throw AppError.notFound("Order not found");
+    throw AppError.notFound({ message: "Order not found" });
   }
 
   if (order.profileId !== profileId) {
-    throw AppError.forbidden("You don't have access to this order");
+    throw AppError.forbidden({ message: "You don't have access to this order" });
   }
 
   return {

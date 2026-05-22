@@ -4,7 +4,7 @@ import {
   createProductSchema,
   updateProductSchema,
   deleteProductsSchema,
-} from "../../zod/index.ts";
+} from "../../zod/api/index.ts";
 
 export type ProductBase = z.infer<typeof productBaseSchema>;
 

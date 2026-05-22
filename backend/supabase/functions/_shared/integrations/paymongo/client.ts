@@ -36,7 +36,7 @@ paymongoClient.interceptors.response.use(
       const message = err.response?.data || err.message;
 
       return Promise.reject(
-        new AppError(status, "Paymongo request failed", message),
+        new AppError({ status, message: "Paymongo request failed", cause: message }),
       );
     }
 

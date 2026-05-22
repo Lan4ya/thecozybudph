@@ -1,4 +1,5 @@
-import app from "@functions/order/index.ts";
+import adminApp from "@functions/admin/index.ts";
+import orderApp from "@functions/order/index.ts";
 import { createDrizzle, supabaseService } from "@shared/db/client.ts";
 import { AppError } from "@shared/errors/Errors.ts";
 import { createShippingQuotation } from "@shared/integrations/lalamove/create-shipping-quotation.ts";
@@ -10,18 +11,18 @@ import {
   orders,
   payments,
   products,
-  PayOrderRes,
 } from "@shared/schemas/index.ts";
 import { assert, assertEquals } from "@std/assert";
-import { beforeAll, describe, it } from "@std/testing/bdd";
-import { eq } from "drizzle-orm";
-import { getTestToken } from "../helpers/get-test-token.ts";
+import { afterAll, beforeAll, describe, it } from "@std/testing/bdd";
+import { eq, inArray } from "drizzle-orm";
+import { getTestToken, getTestAdminToken } from "../helpers/utils.ts";
 import {
   createShippingQuotationInput,
   genCreateAddressInput,
   genCreateOrderInput,
   genCreateProductInput,
   genPayOrderInput,
+  genAdminShipOrderInput,
 } from "../helpers/inputs.ts";
 
 type JsonRequestInit = {
@@ -30,184 +31,209 @@ type JsonRequestInit = {
   body?: unknown;
 };
 
-type Fixture = {
-  productId: string;
-  addressId: string;
-  variantId: string;
-  shippingQuoteId: string;
-};
-
-describe("Orders API", () => {
-  let token = "";
-  let db: ReturnType<typeof createDrizzle>;
+describe("Admin Orders API", () => {
+  let userToken = "";
+  let adminToken = "";
+  let userDb: ReturnType<typeof createDrizzle>;
   let profileId = "";
 
-  const getUserContext = async () => {
-    const token = await getTestToken();
-    const { data } = await supabaseService.auth.getClaims(token);
-    if (!data) throw AppError.forbidden("Invalid token");
+  const createdProductIds: string[] = [];
+  const createdAddressIds: string[] = [];
+  const createdOrderIds: string[] = [];
+  const createdPaymentIds: string[] = [];
 
-    const jwt = data.claims;
-    return {
-      token,
-      db: createDrizzle(jwt),
-      profileId: jwt.sub,
-    };
-  };
-
-  const apiRequest = async (path: string, init: JsonRequestInit = {}) => {
+  const adminRequest = async (path: string, init: JsonRequestInit = {}) => {
     const headers = new Headers(init.headers);
-    headers.set("Authorization", `Bearer ${token}`);
+    headers.set("Authorization", `Bearer ${adminToken}`);
 
-    const body =
-      init.body === undefined ? undefined : JSON.stringify(init.body);
-    if (body !== undefined) {
+    let body: string | undefined;
+    if (init.body !== undefined && init.body !== null) {
       headers.set("Content-Type", "application/json");
+      body = JSON.stringify(init.body);
     }
 
-    return await app.request(path, {
+    return await adminApp.request(path, {
       method: init.method,
       headers,
       body,
     });
   };
 
-  const seedFixture = async (): Promise<Fixture> => {
+  const userRequest = async (path: string, init: JsonRequestInit = {}) => {
+    const headers = new Headers(init.headers);
+    headers.set("Authorization", `Bearer ${userToken}`);
+
+    let body: string | undefined;
+    if (init.body !== undefined && init.body !== null) {
+      headers.set("Content-Type", "application/json");
+      body = JSON.stringify(init.body);
+    }
+
+    return await orderApp.request(path, {
+      method: init.method,
+      headers,
+      body,
+    });
+  };
+
+  const createSeedOrder = async (pay = false) => {
+    // 1. Setup fixture
     const product = await createProduct(
-      db,
+      userDb,
       supabaseService,
       genCreateProductInput(),
     );
-    const address = await createAddress(db, genCreateAddressInput(), profileId);
+    createdProductIds.push(product.id);
+
+    const address = await createAddress(userDb, genCreateAddressInput(), profileId);
+    createdAddressIds.push(address.id);
+
     const [quotation] = await createShippingQuotation(
       createShippingQuotationInput(),
     );
 
-    return {
-      productId: product.id,
-      addressId: address.id,
-      variantId: product.variants[0].id,
-      shippingQuoteId: quotation.id,
-    };
-  };
-
-  const createOrder = async (fixture: Fixture) => {
-    const res = await apiRequest("/order", {
+    // 2. Create order
+    const createRes = await userRequest("/order", {
       method: "POST",
       body: genCreateOrderInput({
-        addressId: fixture.addressId,
-        productId: fixture.productId,
-        variantId: fixture.variantId,
-        shippingQuoteId: fixture.shippingQuoteId,
+        addressId: address.id,
+        productId: product.id,
+        variantId: product.variants[0].id,
+        shippingQuoteId: quotation.id,
       }),
-      headers: {
-        "Idempotency-Key": crypto.randomUUID(),
-      },
+      headers: { "Idempotency-Key": crypto.randomUUID() },
     });
+    assertEquals(createRes.status, 200);
+    const orderData = (await createRes.json()).data as CreateOrderRes;
+    createdOrderIds.push(orderData.orderId);
+    createdPaymentIds.push(orderData.paymentId);
 
-    assertEquals(res.status, 200);
+    // 3. Pay order if requested
+    if (pay) {
+      const payRes = await userRequest(`/order/${orderData.orderId}/pay`, {
+        method: "POST",
+        body: genPayOrderInput({ paymentId: orderData.paymentId }),
+        headers: { "Idempotency-Key": crypto.randomUUID() },
+      });
+      assertEquals(payRes.status, 200);
+    }
 
-    const body = (await res.json()) as { data: CreateOrderRes };
-    assert(body.data.orderId);
-    assert(body.data.paymentId);
-
-    return body.data;
-  };
-
-  const cleanup = async (ids: {
-    paymentId?: string;
-    orderId?: string;
-    addressId?: string;
-    productId?: string;
-  }) => {
-    await db.admin.transaction(async (tx) => {
-      if (ids.paymentId) {
-        await tx.delete(payments).where(eq(payments.id, ids.paymentId));
-      }
-
-      if (ids.orderId) {
-        await tx.delete(orders).where(eq(orders.id, ids.orderId));
-      }
-
-      if (ids.addressId) {
-        await tx.delete(addresses).where(eq(addresses.id, ids.addressId));
-      }
-
-      if (ids.productId) {
-        await tx.delete(products).where(eq(products.id, ids.productId));
-      }
-    });
+    return orderData;
   };
 
   beforeAll(async () => {
-    const ctx = await getUserContext();
-    token = ctx.token;
-    db = ctx.db;
-    profileId = ctx.profileId;
+    userToken = await getTestToken();
+    adminToken = await getTestAdminToken();
+
+    const { data } = await supabaseService.auth.getClaims(userToken);
+    profileId = data!.claims.sub;
+    userDb = createDrizzle(data!.claims);
   });
 
-  it("creates an order", async () => {
-    const fixture = await seedFixture();
-
-    try {
-      const order = await createOrder(fixture);
-      assertEquals(!!order.orderId, true);
-      assertEquals(!!order.paymentId, true);
-    } finally {
-      await cleanup(fixture);
+  afterAll(async () => {
+    if (
+      createdPaymentIds.length ||
+      createdOrderIds.length ||
+      createdAddressIds.length ||
+      createdProductIds.length
+    ) {
+      await userDb.admin.transaction(async (tx) => {
+        for (const paymentId of createdPaymentIds) {
+          await tx.delete(payments).where(eq(payments.id, paymentId));
+        }
+        for (const orderId of createdOrderIds) {
+          await tx.delete(orders).where(eq(orders.id, orderId));
+        }
+        for (const addressId of createdAddressIds) {
+          await tx.delete(addresses).where(eq(addresses.id, addressId));
+        }
+        for (const productId of createdProductIds) {
+          await tx.delete(products).where(eq(products.id, productId));
+        }
+      });
     }
   });
 
-  it("queries user orders", async () => {
-    const fixture = await seedFixture();
+  describe("Security", () => {
+    it("returns 401 Unauthorized when no token is provided", async () => {
+      const res = await adminApp.request("/admin/order", { method: "GET" });
+      assertEquals(res.status, 401);
+    });
 
-    try {
-      const order = await createOrder(fixture);
+    it("returns 403 Forbidden for non-admin users", async () => {
+      const headers = { Authorization: `Bearer ${userToken}` };
+      const res = await adminApp.request("/admin/order", { method: "GET", headers });
+      assertEquals(res.status, 403);
+    });
+  });
 
-      const queryRes = await apiRequest("/order", {
-        method: "GET",
-      });
-
-      assertEquals(queryRes.status, 200);
-
-      const queryBody = (await queryRes.json()) as {
-        data: Array<{ id: string }>;
-      };
-
-      assertEquals(Array.isArray(queryBody.data), true);
-
-      const found = queryBody.data.find((o) => o.id === order.orderId);
+  describe("Order Management", () => {
+    it("queries all orders", async () => {
+      const seed = await createSeedOrder();
+      
+      const res = await adminRequest("/admin/order", { method: "GET" });
+      assertEquals(res.status, 200);
+      
+      const body = await res.json();
+      assert(Array.isArray(body.data.orders));
+      const found = body.data.orders.find((o: any) => o.id === seed.orderId);
       assert(found);
-    } finally {
-      await cleanup(fixture);
-    }
+    });
+
+    it("filters orders by status", async () => {
+      await createSeedOrder(); // to_pay
+      
+      const res = await adminRequest("/admin/order?status=toPay", { method: "GET" });
+      assertEquals(res.status, 200);
+      const body = await res.json();
+      assert(body.data.orders.every((o: any) => o.status === "toPay"));
+    });
   });
 
-  it("creates and pays an order", async () => {
-    const fixture = await seedFixture();
+  describe("Shipping Workflow", () => {
+    it("ships a paid order and then cancels it", async () => {
+      // 1. Create a PAID order
+      const seed = await createSeedOrder(true);
 
-    try {
-      const order = await createOrder(fixture);
-
-      const payOrderRes = await apiRequest(`/order/${order.orderId}/pay`, {
-        method: "POST",
-        body: genPayOrderInput({ paymentId: order.paymentId }),
-        headers: {
-          "Idempotency-Key": crypto.randomUUID(),
-        },
+      // 2. Ship the order (book Lalamove)
+      const shipRes = await adminRequest(`/admin/order/${seed.orderId}/shipment`, {
+        method: "PATCH",
+        body: genAdminShipOrderInput(),
       });
+      
+      assertEquals(shipRes.status, 200);
+      const shipBody = await shipRes.json();
+      assertEquals(shipBody.data.status, "toShip");
 
-      assertEquals(payOrderRes.status, 200);
-
-      const payBody = (await payOrderRes.json()) as {
-        data: PayOrderRes;
-      };
-
-      assert(payBody.data.paymentId);
-    } finally {
-      await cleanup({
-        ...fixture,
+      // 3. Verify status in DB
+      const order = await userDb.admin.query.orders.findFirst({
+        where: eq(orders.id, seed.orderId),
       });
-    }
+      assertEquals(order?.status, "to_ship");
+      assert(order?.shipmentOrderId);
+
+      // 4. Cancel the shipment
+      const cancelRes = await adminRequest(`/admin/order/${seed.orderId}/shipment`, {
+        method: "DELETE",
+      });
+      assertEquals(cancelRes.status, 200);
+      const cancelBody = await cancelRes.json();
+      assertEquals(cancelBody.data.status, "paid");
+      
+      // 5. Verify status reverted in DB
+      const revertedOrder = await userDb.admin.query.orders.findFirst({
+        where: eq(orders.id, seed.orderId),
+      });
+      assertEquals(revertedOrder?.status, "paid");
+      assertEquals(revertedOrder?.shipmentOrderId, null);
+    });
+
+    it("returns 404 for shipping non-existent order", async () => {
+      const res = await adminRequest(`/admin/order/${crypto.randomUUID()}/shipment`, {
+        method: "PATCH",
+        body: genAdminShipOrderInput(),
+      });
+      assertEquals(res.status, 404);
+    });
   });
 });

@@ -26,14 +26,14 @@
 Make sure you have:
 - **Node.js 24.12.0 +** 
 - **Deno** 
-- **pnpm**
+- **pnpm 11.0.1 +**
 - **Docker** 
  
 ### 2. Clone and install
 ```bash
 git clone https://github.com/isMaya404/thecozybudph 
 cd thecozybudph 
-pnpm i
+pn i
 ```
 
 ### 3. Set env vars per directory
@@ -89,20 +89,20 @@ APP_URL=https://thecozybudph.com
 
 Make sure docker in running first, then run:
 ```bash
-pnpm dev
+pn dev
 ```
 
 Running supabase and frontend dev server separately:
 ```bash
-pnpm dev:sb
+pn dev:sb
 ```
 ```bash
-pnpm dev:fe
+pn dev:fe
 ```
 
 ### 4.5. Seed DB (Skip if alredy done once)
 ```bash
-pnpm db:seed
+pn db:seed
 ```
 
 Part of seed script pipeline creates an admin account. Use it for login to access admin dashboard.
@@ -119,33 +119,33 @@ http://localhost:5173
 
 ## 📦 Managing Dependencies
 
-### PNPM Workspace Packages
+### pn Workspace Packages
 
-This project uses a PNPM monorepo.
+This project uses a pn monorepo.
 Workspace definitions are located in:
 
 ```txt
-./pnpm-workspace.yaml
+./pn-workspace.yaml
 ```
 
 ### Install a package into a specific workspace
 
 ```bash
-pnpm i <package-name> -F <workspace-name>
+pn i <package-name> -F <workspace-name>
 ```
 
 Examples:
 
 ```bash
-pnpm i axios -F @cozybud/frontend
+pn i axios -F @cozybud/frontend
 ```
 
 ```bash
-pnpm i -D dotenv -F @cozybud/backend
+pn i -D dotenv -F @cozybud/backend
 ```
 
 ```bash
-pnpm i zod -F @cozybud/schemas
+pn i zod -F @cozybud/schemas
 ```
 
 ---
@@ -155,13 +155,13 @@ pnpm i zod -F @cozybud/schemas
 Add components to the frontend workspace:
 
 ```bash
-pnpm dlx shadcn@latest add <component-name> --cwd frontend
+pn dlx shadcn@latest add <component-name> --cwd frontend
 ```
 
 Example:
 
 ```bash
-pnpm dlx shadcn@latest add button --cwd frontend
+pn dlx shadcn@latest add button --cwd frontend
 ```
 
 ---
@@ -174,30 +174,30 @@ Supabase Functions use a dedicated Deno workspace config located at:
 ./backend/supabase/functions/deno.json
 ```
 
-### Add a dependency
+### Adding dependency
 
 ```bash
-pnpm add:sb <registry-name>:<package-name>
+pn add:sb <registry-name>:<package-name>
 ```
 
 Examples:
 
 ```bash
-pnpm add:sb npm:@hono/zod-openapi
+pn add:sb npm:@hono/zod-openapi
 ```
 
 ```bash
-pnpm add:sb jsr:@std/testing/mock
+pn add:sb jsr:@std/testing/mock
 ```
 
-### Update dependencies
+### Updating dependencies
 
 ```bash
-pnpm update:sb
+pn update:sb
 ```
 
 ```bash
-pnpm update:latest:sb
+pn update:latest:sb
 ```
 
 ---
@@ -218,25 +218,44 @@ with the production Supabase Functions runtime.
 ### Add a test dependency
 
 ```bash
-pnpm add:sb:tests <registry-name>:<package-name>
+pn add:sb:tests <registry-name>:<package-name>
 ```
 
 ### Update test dependencies
 
 ```bash
-pnpm update:sb:tests
+pn update:sb:tests
 
 ```
 ```bash
-pnpm update:latest:sb:tests
+pn update:latest:sb:tests
 ```
 ---
 
-## LOC as of 05/18/26
+
+## API Docs
+
+### Open API URL
+```bash
+http://localhost:54321/functions/v1/profile/doc
+```
+
+### Swagger UI URL
+```bash
+http://localhost:54321/functions/v1/profile/ui
+```
+
+## TODO:
+
+* merge redundant domain types into api types inferred from zod schemas
+* create a script that optimizes images (with sharp maybe) and uploads assets into R2 at build time, and let the app consume it via a manifest
+
+
+## LOC as of 05/23/26
 ```bash
 ❯ tokei . \
   --exclude node_modules \
-  --exclude dist \
+  --exclude 'dist*' \
   --exclude build \
   --exclude .git \
   --exclude '*.xml' \
@@ -251,11 +270,11 @@ pnpm update:latest:sb:tests
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  CSS                       3          246          196           11           39
  HTML                      1           17           17            0            0
- JavaScript                3           59           49            3            7
+ JavaScript                2           61           51            3            7
  SQL                      94         1080          832           41          207
  TSX                     162        17394        15378          271         1745
- TypeScript              295        20432        17296         1017         2119
+ TypeScript              307        23185        19890         1080         2215
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- Total                   558        39228        33768         1343         4117
+ Total                   569        41983        36364         1406         4213
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```

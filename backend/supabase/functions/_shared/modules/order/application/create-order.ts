@@ -26,7 +26,7 @@ export const createOrder = async (
   const { profileId, payload, idempotencyKey } = params;
 
   if (!idempotencyKey) {
-    throw AppError.badRequest("Missing Idempotency-Key");
+    throw AppError.badRequest({ message: "Missing Idempotency-Key" });
   }
 
   const idempotencyResult = await beginCreateOrderIdempotency(db, {

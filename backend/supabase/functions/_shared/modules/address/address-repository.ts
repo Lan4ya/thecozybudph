@@ -25,7 +25,7 @@ export const AddressRepository = {
       const count = Number(countResult.c);
 
       if (count >= 10) {
-        throw AppError.badRequest("Cannot have more than 10 addresses");
+        throw AppError.badRequest({ message: "Cannot have more than 10 addresses" });
       }
 
       // If this new address is set as default, unset any existing default first
@@ -71,7 +71,7 @@ export const AddressRepository = {
         .limit(1);
 
       if (!currentAddress) {
-        throw AppError.notFound("Address not found");
+        throw AppError.notFound({ message: "Address not found" });
       }
 
       // If we're setting this address as default, unset any existing default first
@@ -99,9 +99,9 @@ export const AddressRepository = {
         // UI to not let users be able to unset a default, making this just a
         // guard and should never be triggered. This behavior is similar to
         // Shoppee's address update feature.
-        throw AppError.badRequest(
-          "Cannot unset default address. Set another address as default instead.",
-        );
+        throw AppError.badRequest({
+          message: "Cannot unset default address. Set another address as default instead.",
+        });
       }
 
       // Update the address

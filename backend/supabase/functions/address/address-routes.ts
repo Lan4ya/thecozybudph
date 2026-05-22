@@ -7,7 +7,7 @@ import {
 import {
   createAddressResponseSchema,
   createAddressSchema,
-  errorResponseSchema,
+  apiErrorResponseSchema,
   getAddressesResponseSchema,
   getAddressResponseSchema,
   updateAddressResponseSchema,
@@ -43,7 +43,7 @@ export const getAddressesRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },
@@ -72,7 +72,7 @@ export const getDefaultAddressRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },
@@ -110,7 +110,7 @@ export const createAddressRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },
@@ -118,7 +118,7 @@ export const createAddressRoute = createRoute({
       description: "Validation error",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },
@@ -157,7 +157,7 @@ export const updateAddressRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },
@@ -165,7 +165,7 @@ export const updateAddressRoute = createRoute({
       description: "Address not found",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },
@@ -173,7 +173,7 @@ export const updateAddressRoute = createRoute({
       description: "Validation error",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },

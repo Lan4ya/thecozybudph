@@ -100,22 +100,22 @@ export const beginCreateOrderIdempotency = async (
   });
 
   if (!existingIdempotencyKey) {
-    throw AppError.conflict(
-      "Idempotency conflict detected but no request record was found",
-    );
+    throw AppError.conflict({
+      message: "Idempotency conflict detected but no request record was found",
+    });
   }
 
   if (existingIdempotencyKey.requestHash !== requestHash) {
-    throw AppError.conflict(
-      "This Idempotency-Key was already used with a different payload",
-    );
+    throw AppError.conflict({
+      message: "This Idempotency-Key was already used with a different payload",
+    });
   }
 
   if (existingIdempotencyKey.status === "completed") {
     if (!isCreateOrderRes(existingIdempotencyKey.responsePayload)) {
-      throw AppError.internal(
-        "Completed idempotent create-order request has invalid response payload",
-      );
+      throw AppError.internal({
+        message: "Completed idempotent create-order request has invalid response payload",
+      });
     }
 
     return {
@@ -125,9 +125,9 @@ export const beginCreateOrderIdempotency = async (
   }
 
   if (existingIdempotencyKey.status === "processing") {
-    throw AppError.conflict(
-      "Order creation is already in progress for this Idempotency-Key",
-    );
+    throw AppError.conflict({
+      message: "Order creation is already in progress for this Idempotency-Key",
+    });
   }
 
   const [reclaimedIdempotencyKey] = await db.admin
@@ -150,9 +150,9 @@ export const beginCreateOrderIdempotency = async (
     .returning({ id: idempotencyKeys.id });
 
   if (!reclaimedIdempotencyKey) {
-    throw AppError.conflict(
-      "Unable to reclaim failed idempotent create-order request",
-    );
+    throw AppError.conflict({
+      message: "Unable to reclaim failed idempotent create-order request",
+    });
   }
 
   return {
@@ -192,7 +192,7 @@ export const completeCreateOrderIdempotency = async (
     .returning({ id: idempotencyKeys.id });
 
   if (!completedIdempotencyKey) {
-    throw AppError.conflict("Failed to finalize idempotent create-order request");
+    throw AppError.conflict({ message: "Failed to finalize idempotent create-order request" });
   }
 };
 

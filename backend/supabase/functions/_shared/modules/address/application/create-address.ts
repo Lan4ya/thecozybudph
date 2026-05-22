@@ -7,8 +7,6 @@ export const createAddress = async (
   payload: CreateAddressInput,
   profileId: string,
 ): Promise<Address> => {
-  console.log({ profileId });
-
   const address = await AddressRepository.insert(db, {
     profileId,
     ...payload,

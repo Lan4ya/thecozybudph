@@ -6,4 +6,5 @@ export * from "./payment.ts";
 export * from "./paymongo.ts";
 export * from "./product.ts";
 export * from "./profile.ts";
-export * from "./response.ts";
+export * from "./shipment.ts";
+export * from "./_response.ts";

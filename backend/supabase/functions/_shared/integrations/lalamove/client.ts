@@ -1,5 +1,4 @@
 import { isDev } from "../../utils/isDev.ts";
-// import LalaMove from "npm:@lalamove/lalamove-js";
 import Lalamove from "@lalamove/lalamove-js";
 
 const PUBLIC_KEY = Deno.env.get("LALAMOVE_PUBLIC_KEY");
@@ -37,7 +36,7 @@ export const sdkClient = new Lalamove.ClientModule(
        const message = err?.response?.data || err.message;
 
        return Promise.reject(
-         new AppError(status, "Lalamove request failed", message),
+         new AppError({ status, message: "Lalamove request failed", cause: message }),
        );
      }
 

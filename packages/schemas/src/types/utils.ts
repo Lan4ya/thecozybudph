@@ -114,7 +114,7 @@ export const stringToObject = <T extends ZodType>(schema: T) =>
 
 export type Expect<T extends true> = T;
 
-export type Equal<A, B> =
+export type isEqual<A, B> =
   (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2
     ? true
     : false;

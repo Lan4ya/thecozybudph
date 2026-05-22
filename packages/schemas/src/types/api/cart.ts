@@ -3,7 +3,7 @@ import {
   addCartItemSchema,
   updateCartItemSchema,
   deleteCartItemsSchema,
-} from "../../zod/cart.ts";
+} from "../../zod/api/cart.ts";
 import type { CartItem } from "../domain/index.ts";
 
 export type AddCartItemInput = z.infer<typeof addCartItemSchema>;

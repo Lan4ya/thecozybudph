@@ -1,5 +1,5 @@
 import { AppError } from "@shared/errors/Errors.ts";
-import { handleError } from "@shared/errors/errorHandler.ts";
+import { errorHandler } from "@shared/errors/errorHandler.ts";
 import { supabaseMiddleware } from "@shared/middlewares/supabaseMiddleware.ts";
 import { isDev } from "@shared/utils/isDev.ts";
 import { Context, Hono } from "hono";
@@ -44,7 +44,7 @@ dev.get("/orders", async (c: Context) => {
   const { data: orders, error } = await s.from("orders").select("*");
 
   if (error) throw error;
-  if (!orders) throw AppError.notFound(`No Orders found`);
+  if (!orders) throw AppError.notFound({ message: `No Orders found` });
 
   return c.json({ orders }, 200);
 });
@@ -56,7 +56,7 @@ dev.get("/payments", async (c: Context) => {
   const { data: payments, error } = await s.from("payments").select("*");
 
   if (error) throw error;
-  if (!payments) throw AppError.notFound(`No Payments found`);
+  if (!payments) throw AppError.notFound({ message: `No Payments found` });
 
   return c.json({ payments }, 200);
 });
@@ -72,7 +72,7 @@ dev.get("/products", async (c: Context) => {
     product_categories (name)
   `);
   if (error) throw error;
-  if (!products) throw AppError.notFound(`No Products found`);
+  if (!products) throw AppError.notFound({ message: `No Products found` });
   return c.json(
     {
       product: products,
@@ -83,7 +83,7 @@ dev.get("/products", async (c: Context) => {
 });
 
 dev.notFound((c) => c.text("Not Found"));
-dev.onError((err) => handleError(err));
+dev.onError((err) => errorHandler(err));
 
 if (import.meta.main) {
   Deno.serve(dev.fetch);

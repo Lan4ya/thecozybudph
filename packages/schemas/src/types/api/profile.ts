@@ -1,4 +1,4 @@
 import z from "zod";
-import { updateProfileSchema } from "../../zod/index.ts";
+import { updateProfileSchema } from "../../zod/api/index.ts";
 
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;

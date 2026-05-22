@@ -6,11 +6,9 @@ import {
   supabaseServiceMiddleware,
 } from "@shared/middlewares/mod.ts";
 import {
+  apiErrorResponseSchema,
   createOrderResponseSchema,
   createOrderSchema,
-  createShippingQuoteResponseSchema,
-  createShippingQuoteSchema,
-  errorResponseSchema,
   getOrderPaymentStatusResponseSchema,
   getOrderResponseSchema,
   payOrderResponseSchema,
@@ -22,7 +20,6 @@ import {
 import { AppEnv } from "@shared/types.d.ts";
 import {
   createOrderHandler,
-  createShippingQuoteHandler,
   getOrderHandler,
   getOrderPaymentStatusHandler,
   orderPaymentWebhookHandler,
@@ -47,10 +44,6 @@ export const orderPaymentWebhookRoute = createRoute({
   },
   tags: ["Order"],
 });
-
-// Actually, webhook doesn't really need full OpenAPI definition if it's internal/third-party
-// but I'll add it for completeness.
-// Wait, I'll just use a simpler one.
 
 export const queryOrdersRoute = createRoute({
   method: "get",
@@ -77,7 +70,7 @@ export const queryOrdersRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },
@@ -110,7 +103,7 @@ export const getOrderRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },
@@ -118,7 +111,7 @@ export const getOrderRoute = createRoute({
       description: "Order not found",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },
@@ -157,7 +150,7 @@ export const createOrderRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },
@@ -165,7 +158,7 @@ export const createOrderRoute = createRoute({
       description: "Validation error",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },
@@ -205,7 +198,7 @@ export const payOrderRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },
@@ -213,7 +206,7 @@ export const payOrderRoute = createRoute({
       description: "Order not found",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },
@@ -221,7 +214,7 @@ export const payOrderRoute = createRoute({
       description: "Validation error",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },
@@ -254,7 +247,7 @@ export const getOrderPaymentStatusRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },
@@ -262,40 +255,7 @@ export const getOrderPaymentStatusRoute = createRoute({
       description: "Payment not found",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
-        },
-      },
-    },
-  },
-  tags: ["Order"],
-});
-
-export const createShippingQuoteRoute = createRoute({
-  method: "post",
-  path: "/shipping/quotes",
-  request: {
-    body: {
-      content: {
-        "application/json": {
-          schema: createShippingQuoteSchema,
-        },
-      },
-    },
-  },
-  responses: {
-    200: {
-      description: "Create shipping quotes",
-      content: {
-        "application/json": {
-          schema: createShippingQuoteResponseSchema,
-        },
-      },
-    },
-    422: {
-      description: "Validation error",
-      content: {
-        "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },
@@ -310,7 +270,6 @@ order.openapi(getOrderRoute, getOrderHandler);
 order.openapi(createOrderRoute, createOrderHandler);
 order.openapi(payOrderRoute, payOrderHandler);
 order.openapi(getOrderPaymentStatusRoute, getOrderPaymentStatusHandler);
-order.openapi(createShippingQuoteRoute, createShippingQuoteHandler);
 
 // Special case for webhook as it's not following the standard AppEnv strictly or might need direct access
 order.post("/webhook", orderPaymentWebhookHandler);

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "pkg:generate": "pnpm supabase gen types typescript --local > ../packages/schemas/src/types/db/supabase.types.ts && mkdir -p  ./supabase/functions/_shared/schemas && rm -rf ./supabase/functions/_shared/schemas/* && cp -r ../packages/schemas/src/* ./supabase/functions/_shared/schemas/",
+    "schemas:gen": "pnpm supabase gen types typescript --local > ../packages/schemas/src/types/db/supabase.types.ts && mkdir -p  ./supabase/functions/_shared/schemas && rm -rf ./supabase/functions/_shared/schemas/* && cp -r ../packages/schemas/src/* ./supabase/functions/_shared/schemas/",
     "storage:init": "pnpm tsx ./scripts/initBuckets.ts",
     "db:migrate": "pnpm exec drizzle-kit generate && pnpm exec supabase migrations up --include-all",
     "db:seed:products": "pnpm tsx ./scripts/seedProducts.ts",

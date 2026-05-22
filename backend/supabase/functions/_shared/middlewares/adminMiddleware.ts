@@ -11,10 +11,10 @@ export const adminMiddleware = () => {
     const { isAdmin } = requireVariables(c, "isAdmin");
 
     if (!isAdmin) {
-      throw AppError.forbidden(
-        "Forbidden",
-        "Non-admin attempted admin route access",
-      );
+      throw AppError.forbidden({
+        message: "Forbidden",
+        cause: "Non-admin attempted admin route access",
+      });
     }
 
     await next();

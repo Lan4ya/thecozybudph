@@ -24,7 +24,7 @@ export function requireVariables<T extends keyof Variables>(
 
     const cause = `Missing required context ${isPlural ? `variables` : `variable`}: ${missing.join(", ")}`;
 
-    throw AppError.internal("Internal server error", cause);
+    throw AppError.internal({ message: "Internal server error", cause });
   }
 
   return result;
@@ -56,7 +56,7 @@ export function requireBindings<T extends keyof Bindings>(
       isPlural ? "variables" : "variable"
     }: ${missing.join(", ")}`;
 
-    throw AppError.internal("Internal server error", cause);
+    throw AppError.internal({ message: "Internal server error", cause });
   }
 
   return result;

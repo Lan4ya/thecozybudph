@@ -4,13 +4,7 @@
   "main": "src/index.ts",
   "type": "module",
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "doc:profile": "openapi-typescript http://localhost:54321/functions/v1/profile/doc -o ./src/types/api/openapi/profile.ts",
-    "doc:address": "openapi-typescript http://localhost:54321/functions/v1/address/doc -o ./src/types/api/openapi/address.ts",
-    "doc:admin": "openapi-typescript http://localhost:54321/functions/v1/admin/doc -o ./src/types/api/openapi/admin.ts",
-    "doc:order": "openapi-typescript http://localhost:54321/functions/v1/order/doc -o ./src/types/api/openapi/order.ts",
-    "doc:cart": "openapi-typescript http://localhost:54321/functions/v1/cart/doc -o ./src/types/api/openapi/cart.ts",
-    "doc": "node ./generate-openapi.js"
+    "docs:gen": "pnpm tsx ./genOpenApiDocs.ts"
   },
   "dependencies": {
     "@hono/zod-openapi": "^0.19.10",
@@ -21,7 +15,10 @@
   },
   "devDependencies": {
     "@lalamove/lalamove-js": "^1.1.0",
+    "@types/node": "^24.10.1",
     "execa": "^9.6.1",
-    "openapi-typescript": "^7.13.0"
+    "openapi-typescript": "^7.13.0",
+    "openapi3-ts": "^4.5.0",
+    "typescript": "^5.9.3"
   }
 }

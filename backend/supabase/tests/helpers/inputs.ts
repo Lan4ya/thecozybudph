@@ -156,3 +156,32 @@ export const genPayOrderInput = (params: {
   type: "gcash",
   checkoutSessionId: "9ec2e6a5-5482-4961-945f-ec6a9cbda07c",
 });
+
+export const genAdminShipOrderInput = () => ({
+  sender: {
+    address: {
+      fullName: "Sender Name",
+      phoneNumber: "+639170000000",
+      region: "NCR",
+      city: "Mandaluyong",
+      province: "Metro Manila",
+      postalCode: "1550",
+      barangay: "Barangka Ilaya",
+      addressLine: "Edsa Corner Pioneer Street",
+    },
+  },
+  recipient: {
+    address: {
+      fullName: "Recipient Name",
+      phoneNumber: "+639171111111",
+      region: "NCR",
+      city: "Manila",
+      province: "Sampaloc",
+      postalCode: "1008",
+      barangay: "411",
+      addressLine: "1462 G Tuazon St.",
+    },
+    remarks: "Handle with care",
+  },
+  serviceType: "motorcycle",
+});

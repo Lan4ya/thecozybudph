@@ -1,4 +1,4 @@
 import z from "zod";
-import { eventInquiryFormSchema } from "../../zod/index.ts";
+import type { eventInquiryFormSchema } from "../../zod/index.ts";
 
 export type EventInquiryFormInput = z.infer<typeof eventInquiryFormSchema>;

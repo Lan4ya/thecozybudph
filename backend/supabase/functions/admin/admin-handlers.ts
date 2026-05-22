@@ -2,14 +2,11 @@ import { RouteHandler } from "@hono/zod-openapi";
 import { AdminActions } from "@shared/modules/admin/mod.ts";
 import { ProductActions } from "@shared/modules/product/mod.ts";
 import { AppEnv } from "@shared/types.d.ts";
-import { requireVariables, snakeToCamelString } from "@shared/utils/mod.ts";
+import { requireVariables } from "@shared/utils/mod.ts";
 import {
-  cancelShipOrderRoute,
   createProductRoute,
   deleteProductRoute,
   getAdminOrdersRoute,
-  getShippingOrderRoute,
-  shipOrderRoute,
   updateProductRoute,
 } from "./admin-routes.ts";
 
@@ -45,12 +42,8 @@ export const deleteProductHandler: RouteHandler<
 > = async (c) => {
   const { db, supabaseService } = requireVariables(c, "db", "supabaseService");
   const payload = c.req.valid("json");
-  const deletedProductIds = await ProductActions.deleteProducts(
-    db,
-    supabaseService,
-    payload,
-  );
-  return c.json({ data: deletedProductIds }, 200);
+  const res = await ProductActions.deleteProducts(db, supabaseService, payload);
+  return c.json({ data: res }, 200);
 };
 
 export const getOrdersHandler: RouteHandler<
@@ -60,51 +53,5 @@ export const getOrdersHandler: RouteHandler<
   const { db } = requireVariables(c, "db");
   const query = c.req.valid("query");
   const res = await AdminActions.getOrders(db, query);
-  return c.json({ data: res }, 200);
-};
-
-export const shipOrderHandler: RouteHandler<
-  typeof shipOrderRoute,
-  AppEnv
-> = async (c) => {
-  const { db } = requireVariables(c, "db");
-  const payload = c.req.valid("json");
-  const { id: orderId } = c.req.valid("param");
-  const res = await AdminActions.shipOrder(db, orderId, payload);
-  return c.json(
-    {
-      data: {
-        ...res,
-        status: snakeToCamelString(res.status) as any,
-      },
-    },
-    200,
-  );
-};
-
-export const cancelShipOrderHandler: RouteHandler<
-  typeof cancelShipOrderRoute,
-  AppEnv
-> = async (c) => {
-  const { db } = requireVariables(c, "db");
-  const { id: orderId } = c.req.valid("param");
-  const res = await AdminActions.cancelShipmentOrder(db, orderId);
-  return c.json(
-    {
-      data: {
-        ...res,
-        status: snakeToCamelString(res.status) as any,
-      },
-    },
-    200,
-  );
-};
-
-export const getShippingOrderHandler: RouteHandler<
-  typeof getShippingOrderRoute,
-  AppEnv
-> = async (c) => {
-  const { id: shippingOrderId } = c.req.valid("param");
-  const res = await AdminActions.getShippingOrder(shippingOrderId);
   return c.json({ data: res }, 200);
 };

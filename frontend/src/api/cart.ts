@@ -1,4 +1,4 @@
-import { apiClient } from "@/lib/axios/client";
+import { client, unwrapData } from "./_client";
 import isDev from "@/lib/utils/isDev";
 import type {
   AddCartItemInput,
@@ -12,24 +12,35 @@ import type {
 export const CartAPI = {
   getItems: async (): Promise<CartItem[]> => {
     isDev && console.log("fetching cart items...");
-    return apiClient.get("/cart/items");
+    const { data: raw } = await client.cart.GET("/cart/items");
+    return unwrapData(raw, "GET /cart/items");
   },
 
   addItems: async (payload: AddCartItemInput): Promise<CartItem> => {
-    return apiClient.post("/cart/items", payload);
+    const { data: raw } = await client.cart.POST("/cart/items", {
+      body: payload,
+    });
+    return unwrapData(raw, "POST /cart/items");
   },
 
   updateItemsVariant: async (
-    cartItemId: string,
+    id: string,
     payload: UpdateCartItemInput,
   ): Promise<UpdateCartItemRes> => {
     isDev && console.log("updating cart item...");
-    return apiClient.patch(`/cart/items/${cartItemId}`, payload);
+    const { data: raw } = await client.cart.PATCH("/cart/items/{id}", {
+      params: { path: { id } },
+      body: payload,
+    });
+    return unwrapData(raw, "PATCH /cart/items/{id}");
   },
 
   deleteItems: async (
     payload: DeleteCartItemsInput,
   ): Promise<DeleteCartItemsRes> => {
-    return apiClient.delete("/cart/items", { data: payload });
+    const { data: raw } = await client.cart.DELETE("/cart/items", {
+      body: payload,
+    });
+    return unwrapData(raw, "DELETE /cart/items");
   },
 };

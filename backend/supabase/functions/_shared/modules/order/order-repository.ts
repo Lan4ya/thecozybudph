@@ -277,7 +277,7 @@ export const OrderRepository = {
     params: {
       orderId: string;
       status: DBOrderStatus;
-      shippingOrderId?: string;
+      shippingOrderId?: string | null;
     },
   ) => {
     const { orderId, status, shippingOrderId } = params;
@@ -285,10 +285,10 @@ export const OrderRepository = {
       .update(orders)
       .set({
         status,
-        ...(shippingOrderId ? { shipmentOrderId: shippingOrderId } : {}),
+        ...(shippingOrderId !== undefined ? { shipmentOrderId: shippingOrderId } : {}),
       })
       .where(eq(orders.id, orderId))
       .returning({ status: orders.status });
-    return row.status;
+    return row.status as DBOrderStatus;
   },
 };

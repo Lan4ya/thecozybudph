@@ -1,4 +1,4 @@
-("use client");
+"use client";
 
 import { useRouteError, isRouteErrorResponse } from "react-router";
 import { motion } from "framer-motion";
@@ -6,7 +6,7 @@ import { Button } from "@/lib/ui/__shadcn__/button";
 import { useNavigate } from "react-router";
 import { useEffect } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
-import { AppError } from "@/lib/axios/client";
+import { AppError } from "@/api/_error";
 
 type ErrorPageProps = {
   status?: number;

@@ -3,7 +3,7 @@ import { authMiddleware } from "@shared/middlewares/authMiddleware.ts";
 import { drizzleMiddleware } from "@shared/middlewares/drizzleMiddleware.ts";
 import { supabaseMiddleware } from "@shared/middlewares/supabaseMiddleware.ts";
 import {
-  errorResponseSchema,
+  apiErrorResponseSchema,
   getProfileResponseSchema,
   updateProfileResponseSchema,
   updateProfileSchema,
@@ -33,7 +33,7 @@ export const getProfileRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },
@@ -41,7 +41,7 @@ export const getProfileRoute = createRoute({
       description: "Profile not found",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },
@@ -79,7 +79,7 @@ export const updateProfileRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },
@@ -87,7 +87,7 @@ export const updateProfileRoute = createRoute({
       description: "Profile not found",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },
@@ -95,7 +95,7 @@ export const updateProfileRoute = createRoute({
       description: "Validation error",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },

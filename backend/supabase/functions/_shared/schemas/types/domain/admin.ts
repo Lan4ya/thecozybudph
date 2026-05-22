@@ -1,5 +1,7 @@
 import type { OrderStatus } from "./order.ts";
 
+// TODO: derive this zod schemas
+
 export type AdminOrderItem = {
   orderId: string;
   name: string;

@@ -42,7 +42,7 @@ export const createOrderSnapshots = async (
           const { images, invalids } = parseSupabaseUrls([img.primaryImageUrl]);
 
           if (invalids.length) {
-            throw AppError.badRequest(`Invalid image URL: ${img.primaryImageUrl}`);
+            throw AppError.badRequest({ message: `Invalid image URL: ${img.primaryImageUrl}` });
           }
           const image = images[0];
 
@@ -52,7 +52,7 @@ export const createOrderSnapshots = async (
 
           if (error || !blob) {
             throw (
-              error ?? AppError.internal(`Failed to download ${img.primaryImageUrl}`)
+              error ?? AppError.internal({ message: `Failed to download ${img.primaryImageUrl}` })
             );
           }
 

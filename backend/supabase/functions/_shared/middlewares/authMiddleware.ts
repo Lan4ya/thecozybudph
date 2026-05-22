@@ -15,7 +15,7 @@ export const authMiddleware =
     const authHeader = c.req.header("Authorization");
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      throw AppError.unauthorized("Missing or malformed Authorization header");
+      throw AppError.unauthorized({ message: "Missing or malformed Authorization header" });
     }
 
     const token = authHeader?.split(" ")[1];
@@ -27,14 +27,14 @@ export const authMiddleware =
     // console.log("claims: ", claims);
 
     if (error || !claims) {
-      throw AppError.unauthorized(
-        error?.message ? error.message : "Invalid token",
-      );
+      throw AppError.unauthorized({
+        message: error?.message ? error.message : "Invalid token",
+      });
     }
 
     // This is just fallback. supabase already throws an err if token is expired
     if (claims.exp && claims.exp < Date.now() / 1000) {
-      throw AppError.unauthorized("Token expired");
+      throw AppError.unauthorized({ message: "Token expired" });
     }
 
     // Check user admin status:

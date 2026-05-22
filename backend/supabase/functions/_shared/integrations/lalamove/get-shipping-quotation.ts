@@ -13,6 +13,6 @@ export const getShippingQuotation = async (
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed getting shipping quote";
-    throw new AppError(500, message, error);
+    throw new AppError({ status: 500, message: message, cause: error });
   }
 };

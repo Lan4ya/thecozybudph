@@ -25,27 +25,23 @@ export const payOrder = async (
   const { appURL, idempotencyKey, payload, orderId } = params;
 
   if (!idempotencyKey) {
-    throw AppError.badRequest("Missing Idempotency-Key");
+    throw AppError.badRequest({ message: "Missing Idempotency-Key" });
   }
 
   const order = await OrderRepository.getById(db, orderId);
 
-  if (!order) throw AppError.notFound("Order not found");
+  if (!order) throw AppError.notFound({ message: "Order not found" });
+
+  if (new Date().getTime() > order.expiresAt.getTime()) {
+    await OrderRepository.updateStatus(db, {
+      orderId,
+      status: "expired",
+    });
+
+    throw AppError.badRequest({ message: "Order has expired" });
+  }
 
   return db.rls(async (tx) => {
-    if (new Date().getTime() > order.expiresAt.getTime()) {
-      await tx
-        .update(orders)
-        .set({ status: "expired" })
-        .where(eq(orders.id, orderId));
-
-      await tx
-        .update(payments)
-        .set({ status: "failed" })
-        .where(eq(payments.orderId, orderId));
-
-      throw AppError.badRequest("Order has expired");
-    }
 
     const existingPayment = await tx.query.payments.findFirst({
       where: and(
@@ -60,7 +56,8 @@ export const payOrder = async (
       },
     });
 
-    if (!existingPayment) throw AppError.notFound("Payment not found");
+    if (!existingPayment)
+      throw AppError.notFound({ message: "Payment not found" });
 
     if (existingPayment.status === "paid") {
       // idempotency
@@ -73,7 +70,9 @@ export const payOrder = async (
     }
 
     if (existingPayment.status === "processing") {
-      throw AppError.conflict("Payment is currently being processed");
+      throw AppError.conflict({
+        message: "Payment is currently being processed",
+      });
     }
 
     // Atomic claim: only one request may transition this payment into
@@ -111,7 +110,8 @@ export const payOrder = async (
         },
       });
 
-      if (!latestPayment) throw AppError.notFound("Payment not found");
+      if (!latestPayment)
+        throw AppError.notFound({ message: "Payment not found" });
 
       if (latestPayment.status === "paid") {
         return {
@@ -125,12 +125,14 @@ export const payOrder = async (
         latestPayment.status === "processing" ||
         (latestPayment.status === "pending" && !!latestPayment.paymentIntentId)
       ) {
-        throw AppError.conflict(
-          "Payment attempt already started for this order.",
-        );
+        throw AppError.conflict({
+          message: "Payment attempt already started for this order.",
+        });
       }
 
-      throw AppError.conflict("Unable to claim payment for processing.");
+      throw AppError.conflict({
+        message: "Unable to claim payment for processing.",
+      });
     }
 
     try {
@@ -179,7 +181,9 @@ export const payOrder = async (
         .returning({ id: payments.id });
 
       if (!committedPayment) {
-        throw AppError.conflict("Payment status changed before commit.");
+        throw AppError.conflict({
+          message: "Payment status changed before commit.",
+        });
       }
 
       return {

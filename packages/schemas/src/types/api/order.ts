@@ -3,10 +3,13 @@ import type {
   CustomerOrderItem,
   CustomerOrderStatus,
 } from "../domain/order.ts";
-import type { queryOrdersSchema } from "../../zod/order.ts";
+import type {
+  createOrderSchema,
+  payOrderSchema,
+  queryOrdersSchema,
+} from "../../zod/api/order.ts";
 import type { PaymentStatus } from "./payment.ts";
-import { createOrderSchema, payOrderSchema } from "../../zod/order.ts";
-import type { Address } from "../domain/address.ts";
+import type { Address } from "./address.ts";
 
 export type QueryOrdersInput = z.infer<typeof queryOrdersSchema>;
 

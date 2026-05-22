@@ -85,9 +85,9 @@ export const CartRepository = {
         .limit(1);
 
       if (!variant || !variant.productName || !variant.primaryImageUrl) {
-        throw AppError.badRequest(
-          `Variant ${payload.variantId} not found or data is incomplete`,
-        );
+        throw AppError.badRequest({
+          message: `Variant ${payload.variantId} not found or data is incomplete`,
+        });
       }
 
       const [upsertedCartItem] = await tx
@@ -161,7 +161,7 @@ export const CartRepository = {
         .limit(1);
 
       if (!currentItem || !currentItem.cartId || !currentItem.productId) {
-        throw AppError.notFound("Cart item not found or incomplete");
+        throw AppError.notFound({ message: "Cart item not found or incomplete" });
       }
 
       // CASE A: No variant change (or no new variant provided)
@@ -214,7 +214,7 @@ export const CartRepository = {
           !productRow.productName ||
           !productRow.options
         ) {
-          throw AppError.notFound("Product not found");
+          throw AppError.notFound({ message: "Product not found" });
         }
 
         const item: CartItem = {
@@ -259,15 +259,15 @@ export const CartRepository = {
         .limit(1);
 
       if (!variant || !variant.productName || !variant.primaryImageUrl) {
-        throw AppError.badRequest(
-          `Variant ${payload.newVariantId} not found or incomplete`,
-        );
+        throw AppError.badRequest({
+          message: `Variant ${payload.newVariantId} not found or incomplete`,
+        });
       }
 
       if (variant.productId !== currentItem.productId) {
-        throw AppError.badRequest(
-          "Variant does not belong to the same product",
-        );
+        throw AppError.badRequest({
+          message: "Variant does not belong to the same product",
+        });
       }
 
       const [existingTarget] = await tx

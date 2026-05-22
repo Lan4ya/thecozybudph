@@ -7,13 +7,13 @@ import {
 import {
   addCartItemResponseSchema,
   addCartItemSchema,
-  cartItemIdSchema,
   deleteCartItemsResponseSchema,
   deleteCartItemsSchema,
-  errorResponseSchema,
+  apiErrorResponseSchema,
   getCartItemsResponseSchema,
   updateCartItemResponseSchema,
   updateCartItemSchema,
+  uuidParamSchema,
 } from "@shared/schemas/index.ts";
 import { AppEnv } from "@shared/types.d.ts";
 import {
@@ -44,7 +44,7 @@ export const getCartItemsRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },
@@ -82,7 +82,7 @@ export const addCartItemRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },
@@ -90,7 +90,7 @@ export const addCartItemRoute = createRoute({
       description: "Validation error",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },
@@ -102,7 +102,7 @@ export const updateCartItemRoute = createRoute({
   method: "patch",
   path: "/items/{id}",
   request: {
-    params: cartItemIdSchema,
+    params: uuidParamSchema("id"),
     body: {
       content: {
         "application/json": {
@@ -129,7 +129,7 @@ export const updateCartItemRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },
@@ -137,7 +137,7 @@ export const updateCartItemRoute = createRoute({
       description: "Cart item not found",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },
@@ -145,7 +145,7 @@ export const updateCartItemRoute = createRoute({
       description: "Validation error",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },
@@ -183,7 +183,7 @@ export const deleteCartItemsRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },
@@ -191,7 +191,7 @@ export const deleteCartItemsRoute = createRoute({
       description: "Validation error",
       content: {
         "application/json": {
-          schema: errorResponseSchema,
+          schema: apiErrorResponseSchema,
         },
       },
     },

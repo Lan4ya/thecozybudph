@@ -16,7 +16,7 @@ export const deleteProducts = async (
   const products = await ProductRepository.getProductsByIds(db, productIds);
 
   if (!products || products.length === 0) {
-    throw AppError.notFound("Products not found");
+    throw AppError.notFound({ message: "Products not found" });
   }
 
   const imageUrls = products.flatMap((p) =>

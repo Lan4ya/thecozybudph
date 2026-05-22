@@ -1,4 +1,4 @@
-import sign_up_pic from "@/assets/thecozybud/TCB_4.png";
+// import sign_up_pic from "@/assets/thecozybud/TCB_4.png";
 import LOGO from "@/assets/thecozybud/logo_transparent_oneline1.png";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase/client";
@@ -39,8 +39,8 @@ const Login = () => {
   } = useForm<LogIn>({
     resolver: zodResolver(logInFormSchema),
     defaultValues: {
-      email: "admin@gmail.com",
-      password: "admin123",
+      email: "admin@local.dev",
+      password: "password123",
     },
   });
   const [email, password] = watch(["email", "password"]);

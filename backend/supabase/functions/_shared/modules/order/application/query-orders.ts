@@ -14,13 +14,13 @@ function mapToCustomerStatus(status: string): CustomerOrderStatus {
     case "to_pay":
       return "toPay";
 
-    // since this is for customers view, we won't show full details.
-    // so we compress all these 3 statuses into 'toShip'.
+    // Since this is for customers view, we won't show full details
+    // so we compress paid and to_ship statuses into 'toShip'.
     case "paid":
       return "toShip";
-    case "to_ship":
-      return "toShip";
     case "shipped":
+      return "toShip";
+    case "to_ship":
       return "toShip";
 
     case "to_receive":
@@ -33,10 +33,10 @@ function mapToCustomerStatus(status: string): CustomerOrderStatus {
       return "cancelled";
 
     default:
-      throw AppError.internal(
-        "Internal server error",
-        `Invariant violation: Invalid customer order status: ${status}`,
-      );
+      throw AppError.internal({
+        message: "Internal server error",
+        cause: `Invariant violation: Invalid customer order status: ${status}`,
+      });
   }
 }
 
@@ -53,8 +53,6 @@ export const queryOrders = async (
     status: dbStatus,
     ...rest,
   });
-
-  console.log({ orders });
 
   return orders.map((order) => ({
     ...order,

@@ -15,7 +15,7 @@ export const updateProfile = async (
   );
 
   if (!updatedProfile) {
-    throw AppError.notFound(`Profile with id ${profileId} not found`);
+    throw AppError.notFound({ message: `Profile with id ${profileId} not found` });
   }
 
   return updatedProfile;

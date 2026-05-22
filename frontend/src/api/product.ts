@@ -7,7 +7,7 @@ import {
 } from "@cozybud/schemas";
 import { snakeToCamel } from "@/lib/utils/caseConverter.ts";
 import type { ProductQueryListItemsAPI } from "@/types";
-import { mapProductAndVariantsRowToProductDomain } from "@/lib/utils/mappers";
+import { toProductDomain } from "@/lib/utils/mappers";
 import isDev from "@/lib/utils/isDev";
 
 export const ProductAPI = {
@@ -133,7 +133,7 @@ export const ProductAPI = {
     if (error) throw error;
     if (!data) return null;
 
-    return mapProductAndVariantsRowToProductDomain(data);
+    return toProductDomain(data);
   },
 
   getByIds: async (productIds: string[]): Promise<Product[] | null> => {
@@ -147,7 +147,7 @@ export const ProductAPI = {
     if (error) throw error;
     if (!data) return null;
 
-    return (data ?? []).map(mapProductAndVariantsRowToProductDomain);
+    return (data ?? []).map(toProductDomain);
   },
 
   getCategories: async (): Promise<ProductCategory[]> => {

@@ -1,22 +1,23 @@
+import { toCamelCase } from "drizzle-orm/casing";
 import { DrizzleClient } from "../../../db/client.ts";
 import { AppError } from "../../../errors/Errors.ts";
 import {
   createShippingOrder,
   createShippingQuotation,
 } from "../../../integrations/lalamove/mod.ts";
-import { AdminShipOrderInput, orders } from "../../../schemas/index.ts";
+import { ShipOrderInput, orders, OrderStatus } from "../../../schemas/index.ts";
 import { OrderRepository } from "../../order/mod.ts";
 import { eq } from "drizzle-orm";
 
 export const shipOrder = async (
   db: DrizzleClient,
   orderId: string,
-  payload: AdminShipOrderInput,
+  payload: ShipOrderInput,
 ) => {
   const order = await db.admin.query.orders.findFirst({
     where: eq(orders.id, orderId),
   });
-  if (!order) throw AppError.notFound("Order not found");
+  if (!order) throw AppError.notFound({ message: "Order not found" });
 
   const { remarks, address: recipientFullAddress } = payload.recipient;
   const {
@@ -69,6 +70,6 @@ export const shipOrder = async (
 
   return {
     orderId: order.id,
-    status,
+    status: toCamelCase(status) as OrderStatus,
   };
 };

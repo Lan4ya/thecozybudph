@@ -4,12 +4,12 @@ import { AppEnv } from "@shared/types.d.ts";
 import { requireBindings, requireVariables } from "@shared/utils/mod.ts";
 import {
   createOrderRoute,
-  createShippingQuoteRoute,
   getOrderPaymentStatusRoute,
   getOrderRoute,
   payOrderRoute,
   queryOrdersRoute,
 } from "./order-routes.ts";
+import { Context } from "hono";
 
 export const queryOrderHandler: RouteHandler<
   typeof queryOrdersRoute,
@@ -78,20 +78,11 @@ export const getOrderPaymentStatusHandler: RouteHandler<
 > = async (c) => {
   const { db } = requireVariables(c, "db");
   const { id: paymentId } = c.req.valid("param");
-  const res = await OrderActions.getPaymentStatus(db, paymentId);
+  const res = await OrderActions.getOrderPaymentStatus(db, paymentId);
   return c.json({ data: res }, 200);
 };
 
-export const createShippingQuoteHandler: RouteHandler<
-  typeof createShippingQuoteRoute,
-  AppEnv
-> = async (c) => {
-  const payload = c.req.valid("json");
-  const res = await OrderActions.createShippingQuotation(payload);
-  return c.json({ data: res }, 200);
-};
-
-export const orderPaymentWebhookHandler = async (c: any) => {
+export const orderPaymentWebhookHandler = async (c: Context) => {
   const rawBody = await c.req.text();
   const signatureHeader = c.req.header("Paymongo-Signature");
   const res = await OrderActions.handlePaymentWebhook(rawBody, signatureHeader);

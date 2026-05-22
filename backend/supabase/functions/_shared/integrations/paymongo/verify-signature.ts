@@ -12,7 +12,7 @@ export function verifySignature(
   rawBody: string,
   signatureHeader: string,
 ): boolean {
-  if (!WEBHOOK_SECRET) throw AppError.badRequest("Missing Webhook Secret");
+  if (!WEBHOOK_SECRET) throw AppError.badRequest({ message: "Missing Webhook Secret" });
 
   // signatureHeader format: t=timestamp,te=test_signature,li=live_signature
   const parts = signatureHeader

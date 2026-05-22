@@ -20,19 +20,19 @@ export const handlePaymentWebhook = async (
   signatureHeader?: string,
 ): Promise<{ success: boolean }> => {
   if (!signatureHeader) {
-    throw AppError.badRequest("Missing signature");
+    throw AppError.badRequest({ message: "Missing signature" });
   }
 
   // Auth & Integrity: Since this is a public api, this is important to verify
   // that the payload is really coming from Paymongo and not from someone malicious.
   const isValid = verifySignature(rawBody, signatureHeader);
-  if (!isValid) throw AppError.forbidden("Invalid signature");
+  if (!isValid) throw AppError.forbidden({ message: "Invalid signature" });
 
   let payload: PayMongoWebhookEventPayload = {};
   try {
     payload = JSON.parse(rawBody);
   } catch {
-    throw AppError.badRequest("Invalid JSON payload");
+    throw AppError.badRequest({ message: "Invalid JSON payload" });
   }
   isDev && console.log({ payload });
 
@@ -43,7 +43,7 @@ export const handlePaymentWebhook = async (
     !webhookEvent?.attributes?.type ||
     !webhookEvent.attributes?.data?.id
   ) {
-    throw AppError.badRequest("malformed event data");
+    throw AppError.badRequest({ message: "malformed event data" });
   }
 
   const webhookEventId = webhookEvent.id;
@@ -54,7 +54,7 @@ export const handlePaymentWebhook = async (
   const paymentIntentId = paymentData.attributes?.payment_intent_id;
 
   if (!paymentIntentId) {
-    throw AppError.badRequest("missing payment_intent_id in payment data");
+    throw AppError.badRequest({ message: "missing payment_intent_id in payment data" });
   }
 
   console.log({ webhook_pi_id: paymentIntentId });
@@ -121,7 +121,7 @@ export const handlePaymentWebhook = async (
           });
 
           if (!existing) {
-            throw AppError.notFound("Payment not found");
+            throw AppError.notFound({ message: "Payment not found" });
           }
 
           if (existing.status === "paid") {
@@ -129,7 +129,7 @@ export const handlePaymentWebhook = async (
             return { success: true };
           }
 
-          throw AppError.conflict("Invalid payment state transition");
+          throw AppError.conflict({ message: "Invalid payment state transition" });
         }
 
         isDev && console.log("Payment update result:", updatedPayment);
@@ -158,7 +158,7 @@ export const handlePaymentWebhook = async (
           });
 
           if (!existing) {
-            throw AppError.internal("Order not found");
+            throw AppError.internal({ message: "Order not found" });
           }
 
           if (existing.status === "to_ship") {
@@ -166,7 +166,7 @@ export const handlePaymentWebhook = async (
             return { success: true };
           }
 
-          throw AppError.internal("Invalid order state transition");
+          throw AppError.internal({ message: "Invalid order state transition" });
         }
 
         isDev && console.log("Order update result:", updatedOrder);
@@ -203,7 +203,7 @@ export const handlePaymentWebhook = async (
           });
 
           if (!existing) {
-            throw AppError.notFound("Payment not found");
+            throw AppError.notFound({ message: "Payment not found" });
           }
 
           if (existing.status === "failed") {
@@ -211,7 +211,7 @@ export const handlePaymentWebhook = async (
             return { success: true };
           }
 
-          throw AppError.conflict("Invalid payment state transition");
+          throw AppError.conflict({ message: "Invalid payment state transition" });
         }
 
         isDev &&

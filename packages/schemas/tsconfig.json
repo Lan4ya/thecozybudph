@@ -4,13 +4,20 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "rootDir": "src",
     "noEmit": true,
     "verbatimModuleSyntax": true,
     "noEmitOnError": true,
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "lib": [
+      "ES2023",
+      "DOM"
+    ],
+    "types": [
+      "node"
+    ]
   },
   "include": [
-    "src/"
+    "src/",
+    "genOpenApiDocs.ts"
   ]
 }

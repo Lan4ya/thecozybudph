@@ -3,7 +3,7 @@ import {
   customerOrderStatus,
   orderSourceSchema,
   orderStatusSchema,
-} from "../../zod/order.ts";
+} from "../../zod/api/order.ts";
 
 export type OrderSource = z.infer<typeof orderSourceSchema>;
 export type OrderStatus = z.infer<typeof orderStatusSchema>;

@@ -17,7 +17,7 @@ export const updateProduct = async (
 ): Promise<ProductWithRelations> => {
   const existingProduct = await ProductRepository.getProductById(db, productId);
 
-  if (!existingProduct) throw AppError.notFound("Product not found");
+  if (!existingProduct) throw AppError.notFound({ message: "Product not found" });
 
   let updatedImageUrls = existingProduct.imageUrls ?? [];
   let updatedImageHashes = existingProduct.imageHashes ?? [];
@@ -29,9 +29,9 @@ export const updateProduct = async (
     (payload.newProductImages?.length ?? 0);
 
   if (finalImageCount < 1)
-    throw AppError.badRequest("Product must have at least one image");
+    throw AppError.badRequest({ message: "Product must have at least one image" });
   else if (finalImageCount > 3)
-    throw AppError.badRequest("You can only upload up to 3 images");
+    throw AppError.badRequest({ message: "You can only upload up to 3 images" });
 
   const { primaryImageIndex, imageUrlsToDelete, newProductImages, ...rest } =
     payload;
@@ -105,6 +105,6 @@ export const updateProduct = async (
       });
     }
 
-    throw AppError.internal("Failed to update product", { cause: error });
+    throw AppError.internal({ message: "Failed to update product", cause: error });
   }
 };

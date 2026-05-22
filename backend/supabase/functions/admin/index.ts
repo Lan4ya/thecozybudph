@@ -1,10 +1,9 @@
 import { swaggerUI } from "@hono/swagger-ui";
 import { OpenAPIHono } from "@hono/zod-openapi";
-import { handleError } from "@shared/errors/errorHandler.ts";
+import { errorHandler } from "@shared/errors/errorHandler.ts";
 import { ValidationError } from "@shared/errors/Errors.ts";
 import { adminMiddleware } from "@shared/middlewares/adminMiddleware.ts";
 import { defaultAppMiddlewares } from "@shared/middlewares/defaultMiddleware.ts";
-import { formatZodError } from "@shared/middlewares/zodValidatorMiddleware.ts";
 import { AppEnv } from "@shared/types.d.ts";
 import { isDev } from "@shared/utils/isDev.ts";
 import routes from "./admin-routes.ts";
@@ -12,8 +11,7 @@ import routes from "./admin-routes.ts";
 const app = new OpenAPIHono<AppEnv>({
   defaultHook: (result) => {
     if (!result.success) {
-      const errors = formatZodError(result.error);
-      throw new ValidationError(errors);
+      throw new ValidationError(result.error);
     }
   },
 }).basePath("admin");
@@ -36,7 +34,7 @@ app.get("/ui", swaggerUI({ url: "doc" }));
 
 app.route("/", routes);
 
-app.onError((err) => handleError(err));
+app.onError((err) => errorHandler(err));
 app.notFound((c) => c.text("Not Found", 404));
 
 export default app;

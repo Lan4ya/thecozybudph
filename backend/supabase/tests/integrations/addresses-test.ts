@@ -5,7 +5,7 @@ import { Address, addresses } from "@shared/schemas/index.ts";
 import { assert, assertEquals } from "@std/assert";
 import { afterAll, beforeAll, describe, it } from "@std/testing/bdd";
 import { eq } from "drizzle-orm";
-import { getTestToken } from "../helpers/get-test-token.ts";
+import { getTestToken } from "../helpers/utils.ts";
 import { genCreateAddressInput } from "../helpers/inputs.ts";
 
 type JsonRequestInit = {
@@ -22,7 +22,7 @@ describe("Addresses API", () => {
   const getUserContext = async () => {
     const token = await getTestToken();
     const { data } = await supabaseService.auth.getClaims(token);
-    if (!data) throw AppError.forbidden("Invalid token");
+    if (!data) throw AppError.forbidden({ message: "Invalid token" });
 
     const jwt = data.claims;
     return {

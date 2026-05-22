@@ -13,6 +13,6 @@ export const cancelShippingOrder = async (
       error instanceof Error
         ? error.message
         : "Failed cancelling shipping order";
-    throw new AppError(500, message, error);
+    throw new AppError({ status: 500, message: message, cause: error });
   }
 };

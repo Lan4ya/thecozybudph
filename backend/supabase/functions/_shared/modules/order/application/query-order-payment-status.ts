@@ -10,7 +10,7 @@ export const getOrderPaymentStatus = async (
   const data = await PaymentRepository.getActiveStatusById(db, paymentId);
 
   if (!data) {
-    throw AppError.notFound("Payment not found");
+    throw AppError.notFound({ message: "Payment not found" });
   }
 
   return data;
