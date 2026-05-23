@@ -119,7 +119,7 @@ http://localhost:5173
 
 ## 📦 Managing Dependencies
 
-### pn Workspace Packages
+### PNPM Workspace Packages
 
 This project uses a pn monorepo.
 Workspace definitions are located in:
@@ -245,11 +245,15 @@ http://localhost:54321/functions/v1/profile/doc
 http://localhost:54321/functions/v1/profile/ui
 ```
 
+<br>
+
 ## TODO:
 
 * merge redundant domain types into api types inferred from zod schemas
 * create a script that optimizes images (with sharp maybe) and uploads assets into R2 at build time, and let the app consume it via a manifest
+- determine CI strategy for Supabase Edge Function tests (local Supabase Docker startup vs external deployed env vs exclusion from CI due to runtime overhead)
 
+<br>
 
 ## LOC as of 05/23/26
 ```bash
