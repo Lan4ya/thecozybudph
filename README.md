@@ -31,7 +31,7 @@ Make sure you have:
  
 ### 2. Clone and install
 ```bash
-git clone https://github.com/isMaya404/thecozybudph 
+git clone https://github.com/Lan4ya/thecozybudph 
 cd thecozybudph 
 pn i
 ```
@@ -100,7 +100,7 @@ pn dev:sb
 pn dev:fe
 ```
 
-### 4.5. Seed DB (Skip if alredy done once)
+### 4.5. Seed DB (Skip if already done once)
 ```bash
 pn db:seed
 ```
@@ -237,13 +237,25 @@ pn update:latest:sb:tests
 
 ### Open API URL
 ```bash
-http://localhost:54321/functions/v1/profile/doc
+http://localhost:54321/functions/v1/<function-name>/doc
 ```
 
 ### Swagger UI URL
 ```bash
-http://localhost:54321/functions/v1/profile/ui
+http://localhost:54321/functions/v1/<function-name>/ui
 ```
+
+Examples:
+
+```bash
+http://localhost:54321/functions/v1/order/doc
+```
+
+```bash
+http://localhost:54321/functions/v1/order/ui
+```
+
+---
 
 <br>
 
@@ -254,6 +266,8 @@ http://localhost:54321/functions/v1/profile/ui
 - determine CI strategy for Supabase Edge Function tests (local Supabase Docker startup vs external deployed env vs exclusion from CI due to runtime overhead)
 
 <br>
+
+---
 
 ## LOC as of 05/23/26
 ```bash
