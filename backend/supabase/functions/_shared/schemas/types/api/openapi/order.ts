@@ -31,21 +31,14 @@ export interface paths {
                                 id: string;
                                 /** @enum {string} */
                                 status: "toPay" | "toShip" | "toReceive" | "fulfilled" | "cancelled";
-                                /** @enum {string} */
-                                serviceType: "motorcycle" | "sedan";
-                                items: {
-                                    /** Format: uuid */
-                                    orderId: string;
+                                totalCents: number;
+                                /** Format: date-time */
+                                expiresAt: string;
+                                item: {
                                     /** Format: uuid */
                                     id: string;
-                                    /** Format: uuid */
-                                    productId: string | null;
-                                    /** Format: uuid */
-                                    productVariantId: string | null;
                                     quantity: number;
-                                    cardMessages: string[];
                                     name: string;
-                                    collection: string | null;
                                     category: string;
                                     /** Format: uri */
                                     primaryImageUrl: string;
@@ -53,26 +46,7 @@ export interface paths {
                                         [key: string]: string;
                                     };
                                     priceCents: number;
-                                }[];
-                                subtotalCents: number;
-                                discountCents: number;
-                                shippingCents: number;
-                                passOnFee: number;
-                                totalCents: number;
-                                address: {
-                                    fullName: string;
-                                    region: string;
-                                    city: string;
-                                    province?: string | null;
-                                    postalCode: string;
-                                    barangay: string;
-                                    addressLine: string;
-                                    phoneNumber: string;
                                 };
-                                /** Format: date-time */
-                                createdAt: string | null;
-                                /** Format: date-time */
-                                expiresAt: string;
                             }[];
                         };
                     };
@@ -176,7 +150,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/order/{id}": {
+    "/order/item/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -202,33 +176,24 @@ export interface paths {
                     content: {
                         "application/json": {
                             data: {
-                                /** Format: uuid */
                                 id: string;
+                                quantity: number;
+                                cardMessages: string[];
+                                name: string;
+                                collection: string | null;
+                                category: string;
+                                /** Format: uri */
+                                primaryImageUrl: string;
+                                variantAttributes: {
+                                    [key: string]: string;
+                                };
+                                priceCents: number;
+                                /** Format: date-time */
+                                createdAt: string | null;
                                 /** @enum {string} */
                                 status: "toPay" | "toShip" | "toReceive" | "fulfilled" | "cancelled";
                                 /** @enum {string} */
                                 serviceType: "motorcycle" | "sedan";
-                                items: {
-                                    /** Format: uuid */
-                                    orderId: string;
-                                    /** Format: uuid */
-                                    id: string;
-                                    /** Format: uuid */
-                                    productId: string | null;
-                                    /** Format: uuid */
-                                    productVariantId: string | null;
-                                    quantity: number;
-                                    cardMessages: string[];
-                                    name: string;
-                                    collection: string | null;
-                                    category: string;
-                                    /** Format: uri */
-                                    primaryImageUrl: string;
-                                    variantAttributes: {
-                                        [key: string]: string;
-                                    };
-                                    priceCents: number;
-                                }[];
                                 subtotalCents: number;
                                 discountCents: number;
                                 shippingCents: number;
@@ -244,10 +209,6 @@ export interface paths {
                                     addressLine: string;
                                     phoneNumber: string;
                                 };
-                                /** Format: date-time */
-                                createdAt: string | null;
-                                /** Format: date-time */
-                                expiresAt: string;
                             };
                         };
                     };

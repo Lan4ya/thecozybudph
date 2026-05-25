@@ -3,9 +3,15 @@ import { ShippingActions } from "@shared/modules/shipping/mod.ts";
 import { AppEnv } from "@shared/types.d.ts";
 import { requireVariables } from "@shared/utils/mod.ts";
 import {
-  // cancelShipOrderRoute,
+  addShippingOrderPriorityFeeRoute,
+  cancelShipOrderRoute,
+  changeShippingDriverRoute,
   createShippingQuoteRoute,
+  getShippingCityRoute,
+  getShippingDriverRoute,
+  getShippingMarketRoute,
   getShippingOrderRoute,
+  shipOrderRoute,
 } from "./shipment-routes.ts";
 
 export const createShippingQuoteHandler: RouteHandler<
@@ -17,26 +23,26 @@ export const createShippingQuoteHandler: RouteHandler<
   return c.json({ data }, 200);
 };
 
-// export const shipOrderHandler: RouteHandler<
-//   typeof shipOrderRoute,
-//   AppEnv
-// > = async (c) => {
-//   const { db } = requireVariables(c, "db");
-//   const payload = c.req.valid("json");
-//   const { id: orderId } = c.req.valid("param");
-//   const data = await ShippingActions.shipOrder(db, orderId, payload);
-//   return c.json({ data }, 200);
-// };
+export const shipOrderHandler: RouteHandler<
+  typeof shipOrderRoute,
+  AppEnv
+> = async (c) => {
+  const { db } = requireVariables(c, "db");
+  const payload = c.req.valid("json");
+  const { id: orderId } = c.req.valid("param");
+  const data = await ShippingActions.shipOrder(db, orderId, payload);
+  return c.json({ data }, 200);
+};
 
-// export const cancelShipOrderHandler: RouteHandler<
-//   typeof cancelShipOrderRoute,
-//   AppEnv
-// > = async (c) => {
-//   const { db } = requireVariables(c, "db");
-//   const { id: orderId } = c.req.valid("param");
-//   const data = await ShippingActions.cancelShipmentOrder(db, orderId);
-//   return c.json({ data }, 200);
-// };
+export const cancelShipOrderHandler: RouteHandler<
+  typeof cancelShipOrderRoute,
+  AppEnv
+> = async (c) => {
+  const { db } = requireVariables(c, "db");
+  const { id: orderId } = c.req.valid("param");
+  const data = await ShippingActions.cancelShipmentOrder(db, orderId);
+  return c.json({ data }, 200);
+};
 
 export const getShippingOrderHandler: RouteHandler<
   typeof getShippingOrderRoute,
@@ -44,5 +50,58 @@ export const getShippingOrderHandler: RouteHandler<
 > = async (c) => {
   const { id: shippingOrderId } = c.req.valid("param");
   const res = await ShippingActions.getShippingOrder(shippingOrderId);
+  return c.json({ data: res }, 200);
+};
+
+export const addShippingOrderPriorityFeeHandler: RouteHandler<
+  typeof addShippingOrderPriorityFeeRoute,
+  AppEnv
+> = async (c) => {
+  const payload = c.req.valid("json");
+  const res = await ShippingActions.addShippingOrderPriorityFee(payload);
+  return c.json({ data: res }, 200);
+};
+
+export const getShippingDriverHandler: RouteHandler<
+  typeof getShippingDriverRoute,
+  AppEnv
+> = async (c) => {
+  const query = c.req.valid("query");
+  const res = await ShippingActions.getShippingDriver(query);
+  return c.json({ data: res }, 200);
+};
+
+export const changeShippingDriverHandler: RouteHandler<
+  typeof changeShippingDriverRoute,
+  AppEnv
+> = async (c) => {
+  const payload = c.req.valid("json");
+  const res = await ShippingActions.changeShippingDriver(payload);
+  return c.json({ data: res }, 200);
+};
+
+export const getShippingCityHandler: RouteHandler<
+  typeof getShippingCityRoute,
+  AppEnv
+> = async (c) => {
+  const { cityId } = c.req.valid("param");
+  const res = await ShippingActions.getShippingCity({ cityId });
+  return c.json({ data: res }, 200);
+};
+
+export const getShippingMarketHandler: RouteHandler<
+  typeof getShippingMarketRoute,
+  AppEnv
+> = async (c) => {
+  const res = await ShippingActions.getShippingMarket();
+  return c.json({ data: res }, 200);
+};
+
+export const editShippingOrderHandler: RouteHandler<
+  typeof editShippingOrderRoute,
+  AppEnv
+> = async (c) => {
+  const payload = c.req.valid("json");
+  const res = await ShippingActions.editShippingOrder(payload);
   return c.json({ data: res }, 200);
 };

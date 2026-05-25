@@ -114,7 +114,7 @@ const EditAddressForm = ({
       shouldDirty: true,
       shouldTouch: true,
     });
-  }, [isDefault, setValue]);
+  }, [isDefault, setValue, addToast, updatingAddress.isDefault]);
 
   const onSubmit = (address: EditAddressFormValues) => {
     console.log("submit address payload", address);

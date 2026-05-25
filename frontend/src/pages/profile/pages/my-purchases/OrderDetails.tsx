@@ -5,17 +5,19 @@ import { FlowerSpinner } from "@/components/RouteLoaderSpinner";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { formatPriceCents } from "@/lib/utils/format";
 import { cn } from "@/lib/utils/cn";
-import { 
-  ArrowLeft, 
-  ChevronRight, 
-  MapPin, 
-  Package, 
-  Truck, 
-  CreditCard, 
+import {
+  ArrowLeft,
+  ChevronRight,
+  MapPin,
+  Package,
+  Truck,
+  CreditCard,
   Clock,
   CheckCircle2,
   XCircle,
-  AlertCircle
+  AlertCircle,
+  Receipt,
+  Tag,
 } from "lucide-react";
 
 const statusConfig = {
@@ -23,42 +25,46 @@ const statusConfig = {
     label: "To Pay",
     icon: Clock,
     color: "text-yellow-600 bg-yellow-50 border-yellow-200",
-    description: "Waiting for payment confirmation."
+    description: "Waiting for payment confirmation.",
   },
   toShip: {
     label: "To Ship",
     icon: Package,
     color: "text-blue-600 bg-blue-50 border-blue-200",
-    description: "Your order is being prepared for shipment."
+    description: "Your order is being prepared for shipment.",
   },
   toReceive: {
     label: "To Receive",
     icon: Truck,
     color: "text-orange-600 bg-orange-50 border-orange-200",
-    description: "Your order is on its way to you."
+    description: "Your order is on its way to you.",
   },
   fulfilled: {
     label: "Completed",
     icon: CheckCircle2,
     color: "text-green-600 bg-green-50 border-green-200",
-    description: "Order has been successfully delivered."
+    description: "Order has been successfully delivered.",
   },
   cancelled: {
     label: "Cancelled",
     icon: XCircle,
     color: "text-red-600 bg-red-50 border-red-200",
-    description: "This order has been cancelled."
-  }
+    description: "This order has been cancelled.",
+  },
 } as const;
 
 const OrderDetails = () => {
-  const { orderId } = useParams<{ orderId: string }>();
+  const { itemId } = useParams<{ itemId: string }>();
   const navigate = useNavigate();
 
-  const { data: order, isLoading, error } = useQuery({
-    queryKey: ["order", orderId],
-    queryFn: () => OrderAPI.getOrder(orderId!),
-    enabled: !!orderId,
+  const {
+    data: orderItem,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["order-item", itemId],
+    queryFn: () => OrderAPI.getOrderItem(itemId!),
+    enabled: !!itemId,
   });
 
   if (isLoading) {
@@ -69,17 +75,17 @@ const OrderDetails = () => {
     );
   }
 
-  if (error || !order) {
+  if (error || !orderItem) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-16 text-center">
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
           <AlertCircle className="h-8 w-8 text-destructive" />
         </div>
-        <h2 className="text-2xl font-bold">Failed to load order</h2>
+        <h2 className="text-2xl font-bold">Failed to load order item</h2>
         <p className="mt-2 text-muted-foreground">
-          We couldn't find the order you're looking for.
+          We couldn't find the item you're looking for.
         </p>
-        <Button 
+        <Button
           onClick={() => navigate("/profile/my-purchases")}
           className="mt-6 rounded-full"
         >
@@ -89,12 +95,12 @@ const OrderDetails = () => {
     );
   }
 
-  const status = statusConfig[order.status];
+  const status = statusConfig[orderItem.status];
   const StatusIcon = status.icon;
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 md:px-6 lg:py-12">
-      <button 
+      <button
         onClick={() => navigate("/profile/my-purchases")}
         className="group mb-8 flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
       >
@@ -114,7 +120,7 @@ const OrderDetails = () => {
                   {status.label}
                 </div>
                 <h1 className="mt-2 text-2xl font-bold md:text-3xl">
-                  Order #{order.id.slice(-8).toUpperCase()}
+                  Order Item #{orderItem.id.slice(-8).toUpperCase()}
                 </h1>
                 <p className="mt-2 text-sm font-medium opacity-90">
                   {status.description}
@@ -123,46 +129,88 @@ const OrderDetails = () => {
             </div>
           </section>
 
-          {/* Items Section */}
+          {/* Item Details Section */}
           <section className="space-y-4">
             <h2 className="flex items-center gap-2 text-lg font-bold">
               <Package className="h-5 w-5 text-primary" />
-              Order Items ({order.items.length})
+              Item Details
             </h2>
-            <div className="divide-y rounded-3xl border bg-card">
-              {order.items.map((item) => (
-                <div key={item.id} className="flex gap-4 p-4 md:p-6">
-                  <div className="h-20 w-20 shrink-0 overflow-hidden rounded-2xl border bg-primary/5 md:h-24 md:w-24">
-                    <img 
-                      src={item.primaryImageUrl} 
-                      alt={item.name} 
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                  <div className="flex flex-1 flex-col justify-between py-1">
+            <div className="rounded-3xl border bg-card overflow-hidden">
+              <div className="flex flex-col sm:flex-row gap-6 p-6">
+                <div className="h-48 w-full sm:w-48 shrink-0 overflow-hidden rounded-2xl border bg-primary/5">
+                  <img
+                    src={orderItem.primaryImageUrl}
+                    alt={orderItem.name}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                <div className="flex flex-1 flex-col justify-between py-2">
+                  <div className="space-y-4">
                     <div>
-                      <h3 className="font-semibold text-sm md:text-base leading-tight">
-                        {item.name}
+                      <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary/80 mb-1">
+                        <Tag className="h-3 w-3" />
+                        <span>{orderItem.category}</span>
+                      </div>
+                      <h3 className="text-xl font-bold leading-tight">
+                        {orderItem.name}
                       </h3>
-                      {item.variantAttributes && (
-                        <p className="mt-1 text-xs text-muted-foreground font-medium">
-                          {Object.entries(item.variantAttributes as Record<string, string>)
-                            .map(([k, v]) => `${k}: ${v}`)
-                            .join(", ")}
+                      {orderItem.collection && (
+                        <p className="text-sm text-muted-foreground font-medium">
+                          {orderItem.collection}
                         </p>
                       )}
                     </div>
-                    <div className="flex items-center justify-between mt-2">
-                      <p className="text-sm font-medium">
-                        {formatPriceCents(item.priceCents)} × {item.quantity}
-                      </p>
-                      <p className="font-bold text-primary">
-                        {formatPriceCents(item.priceCents * item.quantity)}
-                      </p>
-                    </div>
+
+                    {Object.keys(orderItem.variantAttributes).length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {Object.entries(orderItem.variantAttributes).map(
+                          ([k, v]) => (
+                            <div
+                              key={k}
+                              className="bg-muted px-3 py-1.5 rounded-xl text-xs font-bold"
+                            >
+                              <span className="text-muted-foreground uppercase tracking-tighter mr-2">
+                                {k}:
+                              </span>
+                              <span>{v}</span>
+                            </div>
+                          ),
+                        )}
+                      </div>
+                    )}
+
+                    {orderItem.cardMessages.length > 0 && (
+                      <div className="space-y-2 pt-2 border-t border-border/50">
+                        <p className="text-xs font-black uppercase tracking-widest text-muted-foreground">
+                          Card Messages
+                        </p>
+                        <div className="space-y-1">
+                          {orderItem.cardMessages.map((msg, i) => (
+                            <p
+                              key={i}
+                              className="text-sm italic text-foreground/80"
+                            >
+                              {i + 1}. "{msg}"
+                            </p>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between mt-6 pt-4 border-t border-border/50">
+                    <p className="text-sm font-medium">
+                      {formatPriceCents(orderItem.priceCents)} ×{" "}
+                      {orderItem.quantity}
+                    </p>
+                    <p className="text-xl font-black text-primary">
+                      {formatPriceCents(
+                        orderItem.priceCents * orderItem.quantity,
+                      )}
+                    </p>
                   </div>
                 </div>
-              ))}
+              </div>
             </div>
           </section>
 
@@ -174,13 +222,21 @@ const OrderDetails = () => {
             </h2>
             <div className="rounded-3xl border bg-card p-6 md:p-8">
               <div className="space-y-1">
-                <p className="font-bold text-lg text-primary">{order.address.fullName}</p>
-                <p className="text-foreground font-medium">{order.address.phoneNumber}</p>
+                <p className="font-bold text-lg text-primary">
+                  {orderItem.address.fullName}
+                </p>
+                <p className="text-foreground font-medium">
+                  {orderItem.address.phoneNumber}
+                </p>
                 <div className="mt-4 space-y-0.5 text-sm text-muted-foreground font-medium">
-                  <p>{order.address.addressLine}</p>
-                  <p>{order.address.barangay}, {order.address.city}</p>
-                  <p>{order.address.province}, {order.address.region}</p>
-                  <p>{order.address.postalCode}</p>
+                  <p>{orderItem.address.addressLine}</p>
+                  <p>
+                    {orderItem.address.barangay}, {orderItem.address.city}
+                  </p>
+                  <p>
+                    {orderItem.address.province}, {orderItem.address.region}
+                  </p>
+                  <p>{orderItem.address.postalCode}</p>
                 </div>
               </div>
             </div>
@@ -200,38 +256,36 @@ const OrderDetails = () => {
                 <div className="flex justify-between text-muted-foreground font-medium">
                   <span>Subtotal</span>
                   <span className="font-bold text-foreground">
-                    {formatPriceCents(order.subtotalCents)}
+                    {formatPriceCents(orderItem.subtotalCents)}
                   </span>
                 </div>
                 <div className="flex justify-between text-muted-foreground font-medium">
                   <span>Shipping Fee</span>
                   <span className="font-bold text-foreground">
-                    {formatPriceCents(order.shippingCents)}
+                    {formatPriceCents(orderItem.shippingCents)}
                   </span>
                 </div>
-                {order.discountCents > 0 && (
+                {orderItem.discountCents > 0 && (
                   <div className="flex justify-between text-green-600 font-bold">
                     <span>Discount</span>
-                    <span>
-                      -{formatPriceCents(order.discountCents)}
-                    </span>
+                    <span>-{formatPriceCents(orderItem.discountCents)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-muted-foreground font-medium">
                   <span>Service Fee</span>
                   <span className="font-bold text-foreground">
-                    {formatPriceCents(order.passOnFee)}
+                    {formatPriceCents(orderItem.passOnFee)}
                   </span>
                 </div>
                 <div className="my-4 border-t-2 border-dashed border-primary/10 pt-4 flex justify-between items-end">
                   <span className="font-black text-base">Total</span>
                   <span className="text-2xl font-black text-primary">
-                    {formatPriceCents(order.totalCents)}
+                    {formatPriceCents(orderItem.totalCents)}
                   </span>
                 </div>
               </div>
 
-              {order.status === "toPay" && (
+              {orderItem.status === "toPay" && (
                 <Button className="mt-6 w-full rounded-full py-6 font-bold text-base shadow-lg shadow-primary/20">
                   <CreditCard className="mr-2 h-5 w-5" />
                   Pay Now
@@ -248,8 +302,12 @@ const OrderDetails = () => {
             </h2>
             <div className="rounded-3xl border bg-card p-6">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-sm text-muted-foreground font-medium">Delivery Method</span>
-                <span className="text-sm font-bold uppercase text-primary">{order.serviceType}</span>
+                <span className="text-sm text-muted-foreground font-medium">
+                  Delivery Method
+                </span>
+                <span className="text-sm font-bold uppercase text-primary">
+                  {orderItem.serviceType}
+                </span>
               </div>
               <div className="flex items-center gap-3 rounded-2xl bg-primary/5 p-4 border border-primary/10">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-background border-2 border-primary/20 shadow-sm">
@@ -257,7 +315,9 @@ const OrderDetails = () => {
                 </div>
                 <div className="text-xs">
                   <p className="font-bold text-primary">Standard Delivery</p>
-                  <p className="text-primary/60 mt-0.5 font-medium">Estimated delivery in 1-3 business days.</p>
+                  <p className="text-primary/60 mt-0.5 font-medium">
+                    Estimated delivery in 1-3 business days.
+                  </p>
                 </div>
               </div>
             </div>
@@ -270,9 +330,13 @@ const OrderDetails = () => {
               Need help?
             </h3>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              If you have any questions about your order, please contact our support team with your Order ID.
+              If you have any questions about your order, please contact our
+              support team with your Order ID.
             </p>
-            <Button variant="link" className="px-0 h-auto text-xs font-bold mt-2">
+            <Button
+              variant="link"
+              className="px-0 h-auto text-xs font-bold mt-2"
+            >
               Contact Support <ChevronRight className="h-3 w-3 ml-1" />
             </Button>
           </div>

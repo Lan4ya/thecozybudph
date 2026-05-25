@@ -19,7 +19,7 @@ import {
 } from "@cozybud/schemas";
 import { useCheckoutStore } from "@/pages/checkout/store/useCheckoutStore";
 import type { PaymentConfirmationLoaderData } from "./PaymentConfirmationLoader";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 
 // NOTE: Maybe make this a global comp along with PaymentStatus.tsx so 'My Purchases' page can reuse this.
@@ -88,41 +88,43 @@ const PaymentConfirmation = () => {
     if (userEmail) {
       setValue("email", userEmail, { shouldValidate: true });
     }
-  }, [userEmail]);
+  }, [userEmail, setValue]);
 
   const paymentIdempotencyKeyRef = useRef<string | null>(null);
 
-  const onSubmit: SubmitHandler<{ email: string }> = (data) => {
-    const { email } = data;
-    const paymentId = useCheckoutStore.getState().checkoutIds?.payment!;
+  const onSubmit: SubmitHandler<{ email: string }> = useCallback(
+    (data) => {
+      const { email } = data;
+      const paymentId = useCheckoutStore.getState().checkoutIds?.payment;
 
-    const payload = {
-      paymentId,
-      billing: {
-        name: userName,
-        email,
-      },
-      type: pmType!,
-      checkoutSessionId: sessionId,
-    } satisfies PayOrderInput;
+      const payload = {
+        paymentId,
+        billing: {
+          name: userName,
+          email,
+        },
+        type: pmType!,
+        checkoutSessionId: sessionId,
+      };
 
-    // validation
-    const result = payOrderSchema.safeParse(payload);
+      const result = payOrderSchema.safeParse(payload);
+      if (!result.success) {
+        isDev && console.error(z.flattenError(result.error).fieldErrors);
+        addToast("Something went wrong. please try again", "error");
+        return;
+      }
 
-    if (!result.success) {
-      isDev && console.error(z.flattenError(result.error).fieldErrors);
-      addToast("Something wen't wrong. please try again", "error");
-      return;
-    }
+      const idempotencyKey =
+        paymentIdempotencyKeyRef.current ?? crypto.randomUUID();
+      paymentIdempotencyKeyRef.current = idempotencyKey;
 
-    // Reuse the same key for retries of the same submit intent.
-    const idempotencyKey =
-      paymentIdempotencyKeyRef.current ?? crypto.randomUUID();
-    paymentIdempotencyKeyRef.current = idempotencyKey;
-    payOrderMutation({ orderId, payload: result.data, idempotencyKey });
-  };
+      payOrderMutation({ orderId, payload: result.data, idempotencyKey });
+    },
+    [userName, pmType, sessionId, orderId, payOrderMutation, addToast],
+  );
 
   return (
+    // eslint-disable-next-line react-hooks/refs -- False positive: ref is only accessed during submit event execution, not during render
     <form onSubmit={handleSubmit(onSubmit)} className="">
       <div className="pb-32 pt-6 custom-container mx-auto max-w-7xl">
         <motion.header
@@ -163,7 +165,7 @@ const PaymentConfirmation = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.1 }}
           className="fixed bottom-0 left-0 w-full z-50 md:static md:w-auto"
         >
           <div className="py-4 px-6 md:px-0 flex items-center justify-between max-w-7xl mx-auto">

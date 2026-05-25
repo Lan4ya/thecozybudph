@@ -1,7 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AdminAPI } from "@/api/admin";
 import { useToast } from "@/providers/ToastProvider";
-import type { ProductWithRelations } from "@cozybud/schemas";
+import type {
+  ProductWithRelations,
+  UpdateProductFormOutput,
+} from "@cozybud/schemas";
 import isDev from "@/lib/utils/isDev";
 
 type ProductsQueryData = {
@@ -46,12 +49,12 @@ export const useProductMutations = () => {
 
   const updateProductMutation = useMutation({
     mutationFn: ({
-      formData,
+      payload,
       productId,
     }: {
-      formData: FormData;
+      payload: UpdateProductFormOutput;
       productId: string;
-    }) => AdminAPI.updateProduct(formData, productId),
+    }) => AdminAPI.updateProduct(payload, productId),
     onMutate: () => {
       addToast("Updating product data...", "info");
     },

@@ -1,4 +1,127 @@
 export interface paths {
+    "/admin/analytics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Get admin analytics */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: {
+                                keyMetrics: {
+                                    totalRevenue: {
+                                        value: string;
+                                        change: string;
+                                        positive: boolean;
+                                    };
+                                    totalOrders: {
+                                        value: string;
+                                        change: string;
+                                        positive: boolean;
+                                    };
+                                    totalCustomers: {
+                                        value: string;
+                                        change: string;
+                                        positive: boolean;
+                                    };
+                                    conversionRate: {
+                                        value: string;
+                                        change: string;
+                                        positive: boolean;
+                                    };
+                                };
+                                revenueTrend: {
+                                    date: string;
+                                    revenue: number;
+                                    orders: number;
+                                }[];
+                                categorySales: {
+                                    name: string;
+                                    value: number;
+                                    color: string;
+                                }[];
+                                topProducts: {
+                                    name: string;
+                                    sales: number;
+                                    revenue: number;
+                                }[];
+                                dailyOrders: {
+                                    date: string;
+                                    orders: number;
+                                }[];
+                                customerAcquisition: {
+                                    month: string;
+                                    customers: number;
+                                }[];
+                                recentTransactions: {
+                                    id: string;
+                                    customer: string;
+                                    amount: string;
+                                    status: string;
+                                    date: string;
+                                }[];
+                                productPerformance: {
+                                    name: string;
+                                    views: number;
+                                    clicks: number;
+                                    conversions: number;
+                                    revenue: string;
+                                }[];
+                            };
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                            code: string;
+                            details?: unknown;
+                        };
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                            code: string;
+                            details?: unknown;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/admin/order": {
         parameters: {
             query?: never;
@@ -141,9 +264,9 @@ export interface paths {
                 content: {
                     "multipart/form-data": {
                         name: string;
-                        description?: string;
+                        description?: string | null;
                         categoryName: string;
-                        collectionName?: string;
+                        collectionName?: string | null;
                         productImages: File[];
                         primaryImageIndex: number | null;
                         options: {
@@ -316,9 +439,9 @@ export interface paths {
                 content: {
                     "multipart/form-data": {
                         name?: string;
-                        description?: string;
+                        description?: string | null;
                         categoryName?: string;
-                        collectionName?: string;
+                        collectionName?: string | null;
                         /** @default [] */
                         newProductImages?: File[] | null;
                         imageUrlsToDelete?: string[];

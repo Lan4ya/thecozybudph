@@ -14,6 +14,8 @@
 
   body {
     font-family: "NeueHaasGrotesk", apple-system, system-ui, sans-serif;
+    background-color: var(--color-background) !important;
+    color: var(--color-foreground) !important;
   }
 
   input {

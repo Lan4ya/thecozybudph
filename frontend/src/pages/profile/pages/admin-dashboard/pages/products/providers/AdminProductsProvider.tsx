@@ -1,6 +1,8 @@
 import type { ProductWithRelations } from "@cozybud/schemas";
 import { createContext, useCallback, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
+import type { ProductQueryUI } from "@/types";
+import { parseProductQueryParams } from "@/pages/shop/utils/parseProductQueryParams";
 
 type AdminProductsContextType = {
   isFormOpen: boolean;
@@ -14,8 +16,12 @@ type AdminProductsContextType = {
   toggleDeletingProductId: (id: string) => void;
   resetDeletingProductIds: () => void;
 
-  searchQuery: string;
-  setSearchQuery: (search: string) => void;
+  productQuery: ProductQueryUI;
+  setProductQuery: (
+    updates:
+      | Partial<ProductQueryUI>
+      | ((filters: ProductQueryUI) => Partial<ProductQueryUI>),
+  ) => void;
 };
 
 export const AdminProductsContext =
@@ -30,23 +36,37 @@ const AdminProductsProvider = ({ children }: { children: React.ReactNode }) => {
   );
 
   const [searchParams, setSearchParams] = useSearchParams();
-  let searchQuery = searchParams.get("search") || "";
+  const productQuery: ProductQueryUI = parseProductQueryParams(searchParams);
 
-  const setSearchQuery = useCallback(
-    (q: string) => {
-      console.log({ searchQuery });
-      console.log({ q });
-      // const next = new URLSearchParams(searchParams);
-      const next = searchParams;
+  const setProductQuery = useCallback(
+    (
+      updates:
+        | Partial<ProductQueryUI>
+        | ((pq: ProductQueryUI) => Partial<ProductQueryUI>),
+    ) => {
+      const qp: ProductQueryUI = parseProductQueryParams(searchParams);
+      const nextQp = typeof updates === "function" ? updates(qp) : updates;
 
-      if (q === "") {
-        next.delete("search");
-      } else {
-        next.set("search", q);
+      // Handle filters
+      if (nextQp.filters) {
+        Object.entries(nextQp.filters).forEach(([key, val]) => {
+          if (!val || (Array.isArray(val) && !val.length)) {
+            searchParams.delete(key);
+          } else if (Array.isArray(val)) {
+            searchParams.delete(key);
+            val.forEach((v) => searchParams.append(key, v));
+          } else {
+            searchParams.set(key, String(val));
+          }
+        });
       }
 
-      setSearchParams(next);
-      // console.log({ searchParams: searchParams.toString() });
+      // Handle sort
+      if (nextQp.sort) {
+        searchParams.set("sort", nextQp.sort);
+      }
+
+      setSearchParams(searchParams, { replace: true });
     },
     [searchParams, setSearchParams],
   );
@@ -88,20 +108,15 @@ const AdminProductsProvider = ({ children }: { children: React.ReactNode }) => {
       toggleDeletingProductId,
       resetDeletingProductIds,
 
-      searchQuery,
-      setSearchQuery,
+      productQuery,
+      setProductQuery,
     }),
     [
       isFormOpen,
-      setFormOpen,
       updatingProduct,
-      openCreateProductForm,
-      openUpdateProductForm,
       deletingProductIds,
-      toggleDeletingProductId,
-      resetDeletingProductIds,
-      searchQuery,
-      setSearchQuery,
+      productQuery,
+      setProductQuery,
     ],
   );
 

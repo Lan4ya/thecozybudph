@@ -113,7 +113,9 @@ describe("Cart API", () => {
     }
 
     if (createdProductIds.length > 0) {
-      await userDb.admin.delete(products).where(inArray(products.id, createdProductIds));
+      await userDb.admin
+        .delete(products)
+        .where(inArray(products.id, createdProductIds));
     }
   });
 
@@ -189,13 +191,25 @@ describe("Cart API", () => {
       const vId = newProduct.variants[0].id;
 
       await Promise.all([
-        addCartItem({ productId: newProduct.id, variantId: vId, quantity: 1, cardMessages: ["C1"] }),
-        addCartItem({ productId: newProduct.id, variantId: vId, quantity: 1, cardMessages: ["C2"] }),
+        addCartItem({
+          productId: newProduct.id,
+          variantId: vId,
+          quantity: 1,
+          cardMessages: ["C1"],
+        }),
+        addCartItem({
+          productId: newProduct.id,
+          variantId: vId,
+          quantity: 1,
+          cardMessages: ["C2"],
+        }),
       ]);
 
       const getRes = await apiRequest("/cart/items", { method: "GET" });
       const getBody = await getRes.json();
-      const item = getBody.data.find((i: any) => i.product.id === newProduct.id);
+      const item = getBody.data.find(
+        (i: any) => i.product.id === newProduct.id,
+      );
 
       assert(item);
       assertEquals(item.quantity, 2);

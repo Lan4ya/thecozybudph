@@ -10,7 +10,7 @@ import {
   createOrderResponseSchema,
   createOrderSchema,
   getOrderPaymentStatusResponseSchema,
-  getOrderResponseSchema,
+  getOrderItemResponseSchema,
   payOrderResponseSchema,
   payOrderSchema,
   queryOrdersResponseSchema,
@@ -20,7 +20,7 @@ import {
 import { AppEnv } from "@shared/types.d.ts";
 import {
   createOrderHandler,
-  getOrderHandler,
+  getOrderItemHandler,
   getOrderPaymentStatusHandler,
   orderPaymentWebhookHandler,
   payOrderHandler,
@@ -35,7 +35,7 @@ export const orderPaymentWebhookRoute = createRoute({
       description: "Handle payment webhook",
       content: {
         "application/json": {
-          schema: getOrderResponseSchema.omit({ data: true }).extend({
+          schema: getOrderItemResponseSchema.omit({ data: true }).extend({
             success: z.boolean(),
           }),
         },
@@ -78,9 +78,9 @@ export const queryOrdersRoute = createRoute({
   tags: ["Order"],
 });
 
-export const getOrderRoute = createRoute({
+export const getOrderItemRoute = createRoute({
   method: "get",
-  path: "/{id}",
+  path: "/item/{id}",
   request: {
     params: uuidParamSchema("id"),
   },
@@ -95,7 +95,7 @@ export const getOrderRoute = createRoute({
       description: "Get order details",
       content: {
         "application/json": {
-          schema: getOrderResponseSchema,
+          schema: getOrderItemResponseSchema,
         },
       },
     },
@@ -266,7 +266,7 @@ export const getOrderPaymentStatusRoute = createRoute({
 const order = new OpenAPIHono<AppEnv>();
 
 order.openapi(queryOrdersRoute, queryOrderHandler);
-order.openapi(getOrderRoute, getOrderHandler);
+order.openapi(getOrderItemRoute, getOrderItemHandler);
 order.openapi(createOrderRoute, createOrderHandler);
 order.openapi(payOrderRoute, payOrderHandler);
 order.openapi(getOrderPaymentStatusRoute, getOrderPaymentStatusHandler);

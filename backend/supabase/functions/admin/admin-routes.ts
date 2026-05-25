@@ -15,6 +15,7 @@ import {
   productIdSchema,
   updateProductResponseSchema,
   updateProductSchema,
+  adminAnalyticsResponseSchema,
 } from "@shared/schemas/index.ts";
 import { AppEnv } from "@shared/types.d.ts";
 import {
@@ -22,7 +23,46 @@ import {
   deleteProductHandler,
   getOrdersHandler,
   updateProductHandler,
+  getAnalyticsHandler,
 } from "./admin-handlers.ts";
+
+export const getAdminAnalyticsRoute = createRoute({
+  method: "get",
+  path: "/analytics",
+  middleware: [
+    supabaseMiddleware(),
+    authMiddleware(),
+    adminMiddleware(),
+    drizzleMiddleware(),
+  ] as const,
+  responses: {
+    200: {
+      description: "Get admin analytics",
+      content: {
+        "application/json": {
+          schema: adminAnalyticsResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: apiErrorResponseSchema,
+        },
+      },
+    },
+    403: {
+      description: "Forbidden",
+      content: {
+        "application/json": {
+          schema: apiErrorResponseSchema,
+        },
+      },
+    },
+  },
+  tags: ["Admin"],
+});
 
 export const getAdminOrdersRoute = createRoute({
   method: "get",
@@ -212,6 +252,7 @@ export const deleteProductRoute = createRoute({
 
 const admin = new OpenAPIHono<AppEnv>();
 
+admin.openapi(getAdminAnalyticsRoute, getAnalyticsHandler);
 admin.openapi(getAdminOrdersRoute, getOrdersHandler);
 admin.openapi(createProductRoute, createProductHandler);
 admin.openapi(updateProductRoute, updateProductHandler);

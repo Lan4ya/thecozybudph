@@ -141,9 +141,9 @@ export interface paths {
                 content: {
                     "multipart/form-data": {
                         name: string;
-                        description?: string;
+                        description?: string | null;
                         categoryName: string;
-                        collectionName?: string;
+                        collectionName?: string | null;
                         productImages: File[];
                         primaryImageIndex: number | null;
                         options: {
@@ -316,9 +316,9 @@ export interface paths {
                 content: {
                     "multipart/form-data": {
                         name?: string;
-                        description?: string;
+                        description?: string | null;
                         categoryName?: string;
-                        collectionName?: string;
+                        collectionName?: string | null;
                         /** @default [] */
                         newProductImages?: File[] | null;
                         imageUrlsToDelete?: string[];

@@ -32,9 +32,11 @@ const Shop = () => {
 
   return (
     <div className="max-w-[1600px] mx-auto min-h-screen w-full">
+      {/* Header */}
       <header className="custom-container mb-8 md:mb-14 md:mt-4">
-        <h1 className="flex justify-center items-center lg:justify-start font-ivy-ora-display text-primary gap-2 font-bold text-2xl lg:text-3xl border-b border-accent/50 pb-4 pt-6 lg:pt-8">
-          Shop <Sparkles />
+        <h1 className="text-header flex justify-center items-center lg:justify-start gap-2 border-b border-accent/50 pb-4 pt-6 lg:pt-8">
+          Shop
+          {/* <Sparkles /> */}
         </h1>
       </header>
 

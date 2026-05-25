@@ -1,12 +1,18 @@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { ordersData } from "../data/mock-analytics";
+import { ordersData as mockData } from "../data/mock-analytics";
 
-export const OrdersTrendChart = () => {
+interface OrdersTrendChartProps {
+  data?: { date: string; orders: number }[];
+}
+
+export const OrdersTrendChart = ({ data }: OrdersTrendChartProps) => {
+  const chartData = data || mockData;
+
   return (
     <div className="bg-card rounded-lg p-6 shadow-sm border">
       <h3 className="text-lg font-semibold mb-4">Daily Orders</h3>
       <ResponsiveContainer width="100%" height={300}>
-        <AreaChart data={ordersData}>
+        <AreaChart data={chartData}>
           <defs>
             <linearGradient id="colorOrders" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#ec4899" stopOpacity={0.3} />

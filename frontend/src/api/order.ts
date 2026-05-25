@@ -6,14 +6,13 @@ import type {
   QueryOrdersInput,
   CreateOrderInput,
   CreateOrderRes,
-  CreateShippingQuoteInput,
   GetPaymentStatusRes,
-  QueryOrdersRes,
-  CreateShippingQuoteData,
+  QueryOrderRes,
+  GetOrderItemRes,
 } from "@cozybud/schemas";
 
 export const OrderAPI = {
-  queryOrders: async (params: QueryOrdersInput): Promise<QueryOrdersRes> => {
+  queryOrders: async (params: QueryOrdersInput): Promise<QueryOrderRes[]> => {
     const { status, limit, offset } = params;
     const { data: raw } = await client.order.GET("/order", {
       params: { query: { status, limit, offset } },
@@ -22,36 +21,18 @@ export const OrderAPI = {
     return data.map((r) => ({
       ...r,
       expiresAt: new Date(r.expiresAt),
-      createdAt: r.createdAt ? new Date(r.createdAt) : null,
     }));
   },
 
-  getOrder: async (id: string): Promise<QueryOrdersRes[number]> => {
-    const { data: raw } = await client.order.GET("/order/{id}", {
+  getOrderItem: async (id: string): Promise<GetOrderItemRes> => {
+    const { data: raw } = await client.order.GET("/order/item/{id}", {
       params: { path: { id } },
     });
-    const data = unwrapData(raw, "GET /order");
+    const data = unwrapData(raw, "GET /order/item/{id}");
     return {
       ...data,
-      expiresAt: new Date(data.expiresAt),
-      createdAt: data.createdAt ? new Date(data.expiresAt) : null,
+      createdAt: data.createdAt ? new Date(data.createdAt) : null,
     };
-  },
-
-  createShippingQuotes: async (
-    payload: CreateShippingQuoteInput,
-  ): Promise<CreateShippingQuoteData[]> => {
-    isDev && console.log("creating shipping quotes...", payload);
-    const { data: raw } = await client.shipment.POST("/shipment/quotes", {
-      body: payload,
-    });
-    const data = unwrapData(raw, "POST /shipment/quotes");
-
-    return data.map((quote) => ({
-      ...quote,
-      scheduleAt: new Date(quote.scheduleAt),
-      expiresAt: new Date(quote.expiresAt),
-    }));
   },
 
   createOrder: async (

@@ -1,15 +1,12 @@
 import { z } from "zod";
 import type {
-  CustomerOrderItem,
-  CustomerOrderStatus,
-} from "../domain/order.ts";
-import type {
   createOrderSchema,
+  getOrderItemDataSchema,
   payOrderSchema,
+  queryOrderDataSchema,
   queryOrdersSchema,
 } from "../../zod/api/order.ts";
 import type { PaymentStatus } from "./payment.ts";
-import type { Address } from "./address.ts";
 
 export type QueryOrdersInput = z.infer<typeof queryOrdersSchema>;
 
@@ -25,23 +22,9 @@ export type CreatePaymentRes = {
   status: string;
 };
 
-export type QueryOrdersRes = {
-  id: string;
-  status: CustomerOrderStatus;
-  serviceType: "motorcycle" | "sedan";
-  items: CustomerOrderItem[];
+export type GetOrderItemRes = z.infer<typeof getOrderItemDataSchema>;
 
-  subtotalCents: number;
-  discountCents: number;
-  shippingCents: number;
-  passOnFee: number;
-  totalCents: number;
-
-  address: Omit<Address, "id" | "isDefault">;
-
-  createdAt: Date | null;
-  expiresAt: Date;
-}[];
+export type QueryOrderRes = z.infer<typeof queryOrderDataSchema>;
 
 export type CreateOrderRes = {
   orderId: string;

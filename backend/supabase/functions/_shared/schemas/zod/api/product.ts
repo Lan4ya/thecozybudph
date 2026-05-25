@@ -27,8 +27,11 @@ export const productBaseSchema = z.object({
 
   description: z.preprocess(
     (v) => (typeof v === "string" && v.trim() === "" ? null : v),
-    z.string().max(600, "description can't exceed 600 characters").optional(),
-    // .nullable(),
+    z
+      .string()
+      .max(600, "description can't exceed 600 characters")
+      .optional()
+      .nullable(),
   ),
 
   categoryName: z
@@ -44,8 +47,8 @@ export const productBaseSchema = z.object({
       .string()
       .max(100, "collection name can't exceed 100 characters")
       .toLowerCase()
-      .optional(),
-    // .nullable(),
+      .optional()
+      .nullable(),
   ),
 });
 

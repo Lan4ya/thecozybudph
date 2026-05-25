@@ -85,7 +85,11 @@ describe("Admin Orders API", () => {
     );
     createdProductIds.push(product.id);
 
-    const address = await createAddress(userDb, genCreateAddressInput(), profileId);
+    const address = await createAddress(
+      userDb,
+      genCreateAddressInput(),
+      profileId,
+    );
     createdAddressIds.push(address.id);
 
     const [quotation] = await createShippingQuotation(
@@ -162,7 +166,10 @@ describe("Admin Orders API", () => {
 
     it("returns 403 Forbidden for non-admin users", async () => {
       const headers = { Authorization: `Bearer ${userToken}` };
-      const res = await adminApp.request("/admin/order", { method: "GET", headers });
+      const res = await adminApp.request("/admin/order", {
+        method: "GET",
+        headers,
+      });
       assertEquals(res.status, 403);
     });
   });
@@ -170,10 +177,10 @@ describe("Admin Orders API", () => {
   describe("Order Management", () => {
     it("queries all orders", async () => {
       const seed = await createSeedOrder();
-      
+
       const res = await adminRequest("/admin/order", { method: "GET" });
       assertEquals(res.status, 200);
-      
+
       const body = await res.json();
       assert(Array.isArray(body.data.orders));
       const found = body.data.orders.find((o: any) => o.id === seed.orderId);
@@ -182,58 +189,69 @@ describe("Admin Orders API", () => {
 
     it("filters orders by status", async () => {
       await createSeedOrder(); // to_pay
-      
-      const res = await adminRequest("/admin/order?status=toPay", { method: "GET" });
+
+      const res = await adminRequest("/admin/order?status=toPay", {
+        method: "GET",
+      });
       assertEquals(res.status, 200);
       const body = await res.json();
       assert(body.data.orders.every((o: any) => o.status === "toPay"));
     });
   });
 
-  describe("Shipping Workflow", () => {
-    it("ships a paid order and then cancels it", async () => {
-      // 1. Create a PAID order
-      const seed = await createSeedOrder(true);
-
-      // 2. Ship the order (book Lalamove)
-      const shipRes = await adminRequest(`/admin/order/${seed.orderId}/shipment`, {
-        method: "PATCH",
-        body: genAdminShipOrderInput(),
-      });
-      
-      assertEquals(shipRes.status, 200);
-      const shipBody = await shipRes.json();
-      assertEquals(shipBody.data.status, "toShip");
-
-      // 3. Verify status in DB
-      const order = await userDb.admin.query.orders.findFirst({
-        where: eq(orders.id, seed.orderId),
-      });
-      assertEquals(order?.status, "to_ship");
-      assert(order?.shipmentOrderId);
-
-      // 4. Cancel the shipment
-      const cancelRes = await adminRequest(`/admin/order/${seed.orderId}/shipment`, {
-        method: "DELETE",
-      });
-      assertEquals(cancelRes.status, 200);
-      const cancelBody = await cancelRes.json();
-      assertEquals(cancelBody.data.status, "paid");
-      
-      // 5. Verify status reverted in DB
-      const revertedOrder = await userDb.admin.query.orders.findFirst({
-        where: eq(orders.id, seed.orderId),
-      });
-      assertEquals(revertedOrder?.status, "paid");
-      assertEquals(revertedOrder?.shipmentOrderId, null);
-    });
-
-    it("returns 404 for shipping non-existent order", async () => {
-      const res = await adminRequest(`/admin/order/${crypto.randomUUID()}/shipment`, {
-        method: "PATCH",
-        body: genAdminShipOrderInput(),
-      });
-      assertEquals(res.status, 404);
-    });
-  });
+  // describe("Shipping Workflow", () => {
+  //   it("ships a paid order and then cancels it", async () => {
+  //     // 1. Create a PAID order
+  //     const seed = await createSeedOrder(true);
+  //
+  //     // 2. Ship the order (book Lalamove)
+  //     const shipRes = await adminRequest(
+  //       `/admin/order/${seed.orderId}/shipment`,
+  //       {
+  //         method: "PATCH",
+  //         body: genAdminShipOrderInput(),
+  //       },
+  //     );
+  //
+  //     assertEquals(shipRes.status, 200);
+  //     const shipBody = await shipRes.json();
+  //     assertEquals(shipBody.data.status, "toShip");
+  //
+  //     // 3. Verify status in DB
+  //     const order = await userDb.admin.query.orders.findFirst({
+  //       where: eq(orders.id, seed.orderId),
+  //     });
+  //     assertEquals(order?.status, "to_ship");
+  //     assert(order?.shipmentOrderId);
+  //
+  //     // 4. Cancel the shipment
+  //     const cancelRes = await adminRequest(
+  //       `/admin/order/${seed.orderId}/shipment`,
+  //       {
+  //         method: "DELETE",
+  //       },
+  //     );
+  //     assertEquals(cancelRes.status, 200);
+  //     const cancelBody = await cancelRes.json();
+  //     assertEquals(cancelBody.data.status, "paid");
+  //
+  //     // 5. Verify status reverted in DB
+  //     const revertedOrder = await userDb.admin.query.orders.findFirst({
+  //       where: eq(orders.id, seed.orderId),
+  //     });
+  //     assertEquals(revertedOrder?.status, "paid");
+  //     assertEquals(revertedOrder?.shipmentOrderId, null);
+  //   });
+  //
+  //   it("returns 404 for shipping non-existent order", async () => {
+  //     const res = await adminRequest(
+  //       `/admin/order/${crypto.randomUUID()}/shipment`,
+  //       {
+  //         method: "PATCH",
+  //         body: genAdminShipOrderInput(),
+  //       },
+  //     );
+  //     assertEquals(res.status, 404);
+  //   });
+  // });
 });

@@ -5,16 +5,17 @@
   "tasks": {
     "update": "deno update",
     "update:latest": "deno update --latest",
-    "test:integration": "deno test --allow-all --no-check ./integrations/*-test.ts --parallel",
-    "test:unit": "deno test --allow-all --no-check ./unit/*-test.ts --parallel",
+    "test:integration": "deno test --allow-all --no-check ./integrations/*test.ts --parallel",
+    "test:unit": "deno test --allow-all --no-check ./unit/*test.ts --parallel",
     "test:watch": "deno test --watch",
-    "test:orders": "deno test --preload=./helpers/setup.ts --no-check --allow-all ./integrations/orders-test.ts",
-    "test:addresses": "deno test --preload=./helpers/setup.ts --no-check --allow-all ./integrations/addresses-test.ts",
-    "test:carts": "deno test --preload=./helpers/setup.ts --no-check --allow-all ./integrations/carts-test.ts",
-    "test:profiles": "deno test --preload=./helpers/setup.ts --no-check --allow-all ./integrations/profiles-test.ts",
-    "test:admin-products": "deno test --preload=./helpers/setup.ts --no-check --allow-all ./integrations/admin-products-test.ts",
-    "test:admin-orders": "deno test --preload=./helpers/setup.ts --no-check --allow-all ./integrations/admin-orders-test.ts",
-    "test-all": "deno test --preload=./helpers/setup.ts --no-check --allow-all --parallel ./**/*-test.ts"
+    "test:orders": "deno test --preload=./helpers/setup.ts --no-check --allow-all ./integrations/orders.test.ts",
+    "test:addresses": "deno test --preload=./helpers/setup.ts --no-check --allow-all ./integrations/addresses.test.ts",
+    "test:carts": "deno test --preload=./helpers/setup.ts --no-check --allow-all ./integrations/carts.test.ts",
+    "test:profiles": "deno test --preload=./helpers/setup.ts --no-check --allow-all ./integrations/profiles.test.ts",
+    "test:admin-products": "deno test --preload=./helpers/setup.ts --no-check --allow-all ./integrations/admin-products.test.ts",
+    "test:admin-orders": "deno test --preload=./helpers/setup.ts --no-check --allow-all ./integrations/admin-orders.test.ts",
+    "test:admin-analytics": "deno test --preload=./helpers/setup.ts --no-check --allow-all ./integrations/admin-analytics.test.ts",
+    "test-all": "deno test --preload=./helpers/setup.ts --no-check --allow-all --parallel ./**/*test.ts"
   },
   "imports": {
     "@functions/": "../functions/",

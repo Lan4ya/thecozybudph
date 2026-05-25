@@ -26,7 +26,7 @@ const PaymentDetailsSection = () => {
 
   const total = baseTotalCents + passOnFeeCents;
 
-  useEffect(() => setPayment({ total }), [total]);
+  useEffect(() => setPayment({ total }), [total, setPayment]);
 
   return (
     <motion.div

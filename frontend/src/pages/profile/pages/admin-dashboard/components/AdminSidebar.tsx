@@ -1,14 +1,7 @@
-import { useState } from "react";
 import { NavLink } from "react-router";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import {
-  BarChart3,
-  CalendarDays,
-  Package,
-  ShoppingCart,
-  Users,
-} from "lucide-react";
+import { BarChart3, CalendarDays, Package, ShoppingCart } from "lucide-react";
 import { Drawer, DrawerContent } from "@/lib/ui/__shadcn__/drawer";
 import { cn } from "@/lib/utils/cn";
 import { useAdminDashboardStore } from "../hooks/useAdminDashboardStore";
@@ -16,7 +9,6 @@ import { useAdminDashboardStore } from "../hooks/useAdminDashboardStore";
 export const adminNavLinks = [
   { label: "Products", to: "/profile/admin/products", icon: Package },
   { label: "Orders", to: "/profile/admin/orders", icon: ShoppingCart },
-  { label: "Users", to: "/profile/admin/users", icon: Users },
   { label: "Analytics", to: "/profile/admin/analytics", icon: BarChart3 },
   { label: "Events", to: "/profile/admin/events", icon: CalendarDays },
 ];

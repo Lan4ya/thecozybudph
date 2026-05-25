@@ -102,9 +102,7 @@ const Cart = () => {
             </Button>
           </div>
 
-          <h1 className="text-xl lg:text-2xl font-semibold text-foreground text-center">
-            Your Cart
-          </h1>
+          <h1 className="text-header text-center">Your Cart</h1>
 
           <div className="flex justify-end ">
             {!hasNoItems && (

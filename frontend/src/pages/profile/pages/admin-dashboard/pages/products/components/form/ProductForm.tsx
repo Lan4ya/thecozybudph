@@ -6,15 +6,10 @@ import {
   type KeyboardEvent,
 } from "react";
 
-// import { useToast } from "@/providers/ToastProvider";
 import { motion } from "framer-motion";
 import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  type ProductFormInput,
-  type ProductFormOutput,
-  productFormSchema,
-} from "@cozybud/schemas";
+import { type ProductFormOutput, productFormSchema } from "@cozybud/schemas";
 import {
   Card,
   CardHeader,
@@ -24,10 +19,6 @@ import {
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import { Plus, X } from "lucide-react";
-import {
-  buildUpdateProductFormData,
-  buildCreateProductFormData,
-} from "./helpers/buildProductFormData";
 import z from "zod";
 import { formHasChanges } from "./helpers/formHasChanges";
 import { useProductMutations } from "@/pages/profile/pages/admin-dashboard/pages/products/hooks/useProductsMutations";
@@ -410,26 +401,24 @@ export default function ProductForm() {
     }
 
     if (fieldData.mode === "update" && updatingProduct) {
-      const formData = buildUpdateProductFormData({
+      const payload = {
         ...fieldData,
         primaryImageIndex,
         imageUrlsToDelete,
         newProductImages: compressedFiles,
-      });
+      };
       updateProductMutation.mutate({
-        formData,
+        payload,
         productId: updatingProduct.id,
       });
     }
 
     if (fieldData.mode === "create") {
-      const formData = buildCreateProductFormData({
+      createProductMutation.mutate({
         ...fieldData,
         productImages: compressedFiles,
         primaryImageIndex,
       });
-
-      createProductMutation.mutate(formData);
     }
   };
 

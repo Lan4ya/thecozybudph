@@ -79,68 +79,6 @@ export const OrderRepository = {
       return !!row;
     }),
 
-  getOrder: (db: DrizzleClient, id: string) => {
-    return db.rls(async (tx) => {
-      const [orderRow] = await tx
-        .select({
-          id: orders.id,
-          profileId: orders.profileId,
-          createdAt: orders.createdAt,
-          status: orders.status,
-          serviceType: orders.serviceType,
-          subtotalCents: orders.subtotalCents,
-          discountCents: orders.discountCents,
-          shippingCents: orders.shippingCents,
-          passOnFee: orders.passOnFee,
-          totalCents: orders.totalCents,
-          expiresAt: orders.expiresAt,
-
-          address: {
-            fullName: orderAddressesSnapshot.fullName,
-            postalCode: orderAddressesSnapshot.postalCode,
-            region: orderAddressesSnapshot.region,
-            city: orderAddressesSnapshot.city,
-            province: orderAddressesSnapshot.province,
-            barangay: orderAddressesSnapshot.barangay,
-            addressLine: orderAddressesSnapshot.addressLine,
-            phoneNumber: orderAddressesSnapshot.phoneNumber,
-          },
-        })
-        .from(orders)
-        .innerJoin(
-          orderAddressesSnapshot,
-          eq(orderAddressesSnapshot.orderId, orders.id),
-        )
-        .where(eq(orders.id, id));
-
-      if (!orderRow) {
-        return null;
-      }
-
-      const items = await tx
-        .select({
-          id: orderItemsSnapshots.id,
-          productId: orderItemsSnapshots.productId,
-          productVariantId: orderItemsSnapshots.productVariantId,
-          quantity: orderItemsSnapshots.quantity,
-          cardMessages: orderItemsSnapshots.cardMessages,
-          name: orderItemsSnapshots.name,
-          collection: orderItemsSnapshots.collection,
-          category: orderItemsSnapshots.category,
-          primaryImageUrl: orderItemsSnapshots.primaryImageUrl,
-          variantAttributes: orderItemsSnapshots.variantAttributes,
-          priceCents: orderItemsSnapshots.priceCents,
-        })
-        .from(orderItemsSnapshots)
-        .where(eq(orderItemsSnapshots.orderId, id));
-
-      return {
-        ...orderRow,
-        items,
-      };
-    });
-  },
-
   getById: (db: DrizzleClient, id: string) => {
     return db.rls(async (tx) => {
       const order = await tx.query.orders.findFirst({
@@ -150,26 +88,22 @@ export const OrderRepository = {
     });
   },
 
-  queryOrders: (
-    db: DrizzleClient,
-    profileId: string,
-    params: {
-      status: DBOrderStatus;
-      limit: number;
-      offset: number;
-    },
-  ) => {
+  getOrderItem: (db: DrizzleClient, itemId: string, profileId: string) => {
     return db.rls(async (tx) => {
-      const { status, limit, offset } = params;
-
-      const statusCondition =
-        status === "to_ship"
-          ? inArray(orders.status, ["to_ship", "shipped", "paid"])
-          : eq(orders.status, status);
-
-      const orderRows = await tx
+      const [orderItem] = await tx
         .select({
-          id: orders.id,
+          // item details
+          id: orderItemsSnapshots.id,
+          quantity: orderItemsSnapshots.quantity,
+          cardMessages: orderItemsSnapshots.cardMessages,
+          name: orderItemsSnapshots.name,
+          collection: orderItemsSnapshots.collection,
+          category: orderItemsSnapshots.category,
+          primaryImageUrl: orderItemsSnapshots.primaryImageUrl,
+          variantAttributes: orderItemsSnapshots.variantAttributes,
+          priceCents: orderItemsSnapshots.priceCents,
+
+          // order details
           createdAt: orders.createdAt,
           status: orders.status,
           serviceType: orders.serviceType,
@@ -178,7 +112,6 @@ export const OrderRepository = {
           shippingCents: orders.shippingCents,
           passOnFee: orders.passOnFee,
           totalCents: orders.totalCents,
-          expiresAt: orders.expiresAt,
 
           address: {
             fullName: orderAddressesSnapshot.fullName,
@@ -191,11 +124,65 @@ export const OrderRepository = {
             phoneNumber: orderAddressesSnapshot.phoneNumber,
           },
         })
-        .from(orders)
+        .from(orderItemsSnapshots)
+        .innerJoin(orders, eq(orders.id, orderItemsSnapshots.orderId))
         .innerJoin(
           orderAddressesSnapshot,
-          eq(orderAddressesSnapshot.orderId, orders.id),
+          eq(orderAddressesSnapshot.orderId, orderItemsSnapshots.orderId),
         )
+        .where(
+          and(
+            eq(orderItemsSnapshots.id, itemId),
+            eq(orders.profileId, profileId),
+          ),
+        )
+        .limit(1);
+
+      if (!orderItem) {
+        return null;
+      }
+      return orderItem;
+    });
+  },
+
+  queryOrders: (
+    db: DrizzleClient,
+    profileId: string,
+    params: {
+      status?: DBOrderStatus;
+      limit: number;
+      offset: number;
+    },
+  ) => {
+    return db.rls(async (tx) => {
+      const { status, limit, offset } = params;
+
+      const statusCondition =
+        status === undefined
+          ? undefined
+          : status === "to_ship"
+            ? inArray(orders.status, ["to_ship", "shipped", "paid"])
+            : eq(orders.status, status);
+
+      return await tx
+        .select({
+          id: orders.id,
+          status: orders.status,
+          totalCents: orders.totalCents,
+          expiresAt: orders.expiresAt,
+
+          item: {
+            id: orderItemsSnapshots.id,
+            quantity: orderItemsSnapshots.quantity,
+            name: orderItemsSnapshots.name,
+            category: orderItemsSnapshots.category,
+            primaryImageUrl: orderItemsSnapshots.primaryImageUrl,
+            variantAttributes: orderItemsSnapshots.variantAttributes,
+            priceCents: orderItemsSnapshots.priceCents,
+          },
+        })
+        .from(orderItemsSnapshots)
+        .innerJoin(orders, eq(orders.id, orderItemsSnapshots.orderId))
         .where(
           and(
             eq(orders.profileId, profileId),
@@ -206,38 +193,6 @@ export const OrderRepository = {
         .orderBy(desc(orders.createdAt))
         .limit(limit)
         .offset(offset);
-
-      const orderIds = orderRows.map((o) => o.id);
-
-      if (orderIds.length === 0) {
-        return [];
-      }
-
-      const items = await tx
-        .select({
-          orderId: orderItemsSnapshots.orderId,
-
-          id: orderItemsSnapshots.id,
-          productId: orderItemsSnapshots.productId,
-          productVariantId: orderItemsSnapshots.productVariantId,
-          quantity: orderItemsSnapshots.quantity,
-          cardMessages: orderItemsSnapshots.cardMessages,
-          name: orderItemsSnapshots.name,
-          collection: orderItemsSnapshots.collection,
-          category: orderItemsSnapshots.category,
-          primaryImageUrl: orderItemsSnapshots.primaryImageUrl,
-          variantAttributes: orderItemsSnapshots.variantAttributes,
-          priceCents: orderItemsSnapshots.priceCents,
-        })
-        .from(orderItemsSnapshots)
-        .where(inArray(orderItemsSnapshots.orderId, orderIds));
-
-      const itemsByOrder = Object.groupBy(items, (i) => i.orderId);
-
-      return orderRows.map((o) => ({
-        ...o,
-        items: itemsByOrder[o.id] ?? [],
-      }));
     });
   },
 
@@ -285,7 +240,9 @@ export const OrderRepository = {
       .update(orders)
       .set({
         status,
-        ...(shippingOrderId !== undefined ? { shipmentOrderId: shippingOrderId } : {}),
+        ...(shippingOrderId !== undefined
+          ? { shipmentOrderId: shippingOrderId }
+          : {}),
       })
       .where(eq(orders.id, orderId))
       .returning({ status: orders.status });

@@ -1,53 +1,18 @@
-import { AppError } from "@shared/errors/Errors.ts";
-import {
-  CustomerOrderStatus,
-  DBOrderStatus,
-  QueryOrdersRes,
-} from "@shared/schemas/index.ts";
+import { toCustomerStatus } from "@shared/modules/order/to-order-status.ts";
+import { DBOrderStatus, QueryOrderRes } from "@shared/schemas/index.ts";
 import { QueryOrdersInput } from "@shared/schemas/types/api/order.ts";
 import { toSnakeCase } from "drizzle-orm/casing";
 import { DrizzleClient } from "../../../db/client.ts";
 import { OrderRepository } from "../order-repository.ts";
 
-function mapToCustomerStatus(status: string): CustomerOrderStatus {
-  switch (status) {
-    case "to_pay":
-      return "toPay";
-
-    // Since this is for customers view, we won't show full details
-    // so we compress paid and to_ship statuses into 'toShip'.
-    case "paid":
-      return "toShip";
-    case "shipped":
-      return "toShip";
-    case "to_ship":
-      return "toShip";
-
-    case "to_receive":
-      return "toReceive";
-
-    case "fulfilled":
-      return "fulfilled";
-
-    case "cancelled":
-      return "cancelled";
-
-    default:
-      throw AppError.internal({
-        message: "Internal server error",
-        cause: `Invariant violation: Invalid customer order status: ${status}`,
-      });
-  }
-}
-
 export const queryOrders = async (
   db: DrizzleClient,
   profileId: string,
   query: QueryOrdersInput,
-): Promise<QueryOrdersRes> => {
+): Promise<QueryOrderRes[]> => {
   const { status, ...rest } = query;
 
-  const dbStatus = toSnakeCase(status) as DBOrderStatus;
+  const dbStatus = status ? (toSnakeCase(status) as DBOrderStatus) : undefined;
 
   const orders = await OrderRepository.queryOrders(db, profileId, {
     status: dbStatus,
@@ -56,6 +21,6 @@ export const queryOrders = async (
 
   return orders.map((order) => ({
     ...order,
-    status: mapToCustomerStatus(order.status),
+    status: toCustomerStatus(order.status),
   }));
 };

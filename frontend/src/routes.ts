@@ -22,7 +22,6 @@ import {
   AdminDashboard,
   AdminDashboardEvents,
   AdminDashboardOrders,
-  AdminDashboardUsers,
   AdminDashboardAnalytics,
   AdminDashboardProducts,
 } from "@/pages/profile/pages/admin-dashboard/index.ts";
@@ -73,7 +72,7 @@ const router = createBrowserRouter([
             path: "my-purchases",
             children: [
               { index: true, Component: MyPurchases },
-              { path: ":orderId", Component: OrderDetails },
+              { path: "item/:itemId", Component: OrderDetails },
             ],
           },
           { path: "settings", Component: Settings },
@@ -90,7 +89,6 @@ const router = createBrowserRouter([
               },
               { path: "products", Component: AdminDashboardProducts },
               { path: "orders", Component: AdminDashboardOrders },
-              { path: "users", Component: AdminDashboardUsers },
               { path: "analytics", Component: AdminDashboardAnalytics },
               { path: "events", Component: AdminDashboardEvents },
             ],

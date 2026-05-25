@@ -11,7 +11,6 @@ import { toProductDomain } from "@/lib/utils/mappers";
 import isDev from "@/lib/utils/isDev";
 
 export const ProductAPI = {
-  // Queries the minimum information of products to display in shop
   queryProducts: async ({
     filters,
     sort,
@@ -55,19 +54,19 @@ export const ProductAPI = {
 
     if (priceRange) {
       // convert to cents for comparison
-      const min = priceRange.min * 100;
-      const max =
+      const minPrice = priceRange.min * 100;
+      const maxPrice =
         priceRange.max !== undefined ? priceRange.max * 100 : undefined;
-      console.log("Price Range in cents: ", { min, max });
+      console.log("Price Range in cents: ", { min: minPrice, max: maxPrice });
 
-      if (max !== undefined) {
+      if (maxPrice !== undefined) {
         query = query
-          .gte("min_price_cents", min)
-          .lte("min_price_cents", max)
+          .gte("min_price_cents", minPrice)
+          .lte("min_price_cents", maxPrice)
           .order("min_price_cents", { ascending: true });
       } else {
         query = query
-          .gte("min_price_cents", min)
+          .gte("min_price_cents", minPrice)
           .order("min_price_cents", { ascending: true });
       }
     }

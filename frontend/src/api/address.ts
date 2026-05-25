@@ -7,8 +7,10 @@ import { client, unwrapData } from "./_client";
 
 export const AddressAPI = {
   createAddress: async (payload: CreateAddressInput): Promise<Address> => {
-    const { data } = await client.address.POST("/address", payload);
-    return unwrapData(data, "GET /address");
+    const { data } = await client.address.POST("/address", {
+      body: payload,
+    });
+    return unwrapData(data, "POST /address");
   },
 
   updateAddress: async (

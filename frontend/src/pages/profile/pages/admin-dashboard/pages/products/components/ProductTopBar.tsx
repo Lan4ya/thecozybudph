@@ -1,61 +1,26 @@
 import { Button } from "@/lib/ui/__shadcn__/button";
-import { Input } from "@/lib/ui/__shadcn__/input";
 import { cn } from "@/lib/utils/cn";
-import { Search, Plus } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { Plus, X } from "lucide-react";
 import { useAdminProductsPageState } from "../hooks/useAdminProductsPageState";
 import { useToast } from "@/providers/ToastProvider";
 import { DeleteProductDialog } from "./DeleteDialog";
 import { useProductMutations } from "../hooks/useProductsMutations";
 import { useQueryClient } from "@tanstack/react-query";
+import Search from "@/pages/shop/components/filters/Search";
+import PriceRange from "@/pages/shop/components/filters/PriceRange";
+import Categories from "@/pages/shop/components/filters/Categories";
+import Collections from "@/pages/shop/components/filters/Collection";
+import { SortDropdownMenu } from "@/pages/shop/components/SortDropDown";
+import AdminFilterTags from "./AdminFilterTags";
 
 const ProductFilters = () => {
   const { deleteProductMutation } = useProductMutations();
   const queryClient = useQueryClient();
 
-  const {
-    setSearchQuery,
-    searchQuery,
-    openCreateProductForm,
-    deletingProductIds,
-    resetDeletingProductIds,
-  } = useAdminProductsPageState();
+  const { openCreateProductForm, deletingProductIds, resetDeletingProductIds } =
+    useAdminProductsPageState();
 
   const { addToast } = useToast();
-
-  const [isSearchInputOpen, setSearchInputOpen] = useState(false);
-  const [searchInputVal, setSearchInputVal] = useState(searchQuery);
-
-  const searchInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    const q = searchInputVal.trim();
-    if (q === searchQuery) return;
-
-    const handler = setTimeout(() => {
-      setSearchQuery(q);
-    }, 450);
-
-    return () => clearTimeout(handler);
-  }, [searchInputVal, searchQuery, setSearchQuery]);
-
-  useEffect(() => {
-    if (isSearchInputOpen) {
-      searchInputRef.current?.focus();
-    }
-  }, [isSearchInputOpen]);
-
-  const handleSearchToggle = () => {
-    setSearchInputOpen((prev) => {
-      const next = !prev;
-
-      if (!next) {
-        setSearchInputVal("");
-      }
-
-      return next;
-    });
-  };
 
   const handleDelete = () => {
     if (deletingProductIds.size === 0) {
@@ -79,55 +44,59 @@ const ProductFilters = () => {
   const isDeletingMode = deletingProductIds.size > 0;
 
   return (
-    <div className="flex items-center justify-between">
-      {isDeletingMode ? (
-        <div className="flex gap-2">
-          <Button size="sm" variant="outline" onClick={resetDeletingProductIds}>
-            Cancel
-          </Button>
-
-          <DeleteProductDialog
-            onConfirm={handleDelete}
-            deleteLoading={deleteProductMutation.isPending}
-            deletingCount={deletingProductIds.size}
-          />
+    <div className="space-y-6">
+      {/* Selection Overlay */}
+      {isDeletingMode && (
+        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50">
+          <div className="bg-background/80 backdrop-blur-md border rounded-full p-2 shadow-2xl flex items-center gap-2 min-w-max">
+            <span className="text-sm font-medium px-4 border-r">
+              {deletingProductIds.size} Selected
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={resetDeletingProductIds}
+              className="rounded-full h-9"
+            >
+              <X size={16} />
+              Cancel
+            </Button>
+            <DeleteProductDialog
+              onConfirm={handleDelete}
+              deleteLoading={deleteProductMutation.isPending}
+              deletingCount={deletingProductIds.size}
+              className="rounded-full px-6 h-9"
+            />
+          </div>
         </div>
-      ) : (
-        <div />
       )}
 
-      <div className="flex-center gap-3">
-        <div className="relative flex h-8 items-center justify-end">
-          <Input
-            ref={searchInputRef}
-            value={searchInputVal}
-            onChange={(e) => setSearchInputVal(e.target.value)}
-            placeholder="Search..."
-            className={cn(
-              "placeholder:text-muted-foreground transition-all duration-300 placeholder:text-xs",
-              isSearchInputOpen
-                ? "w-[min(90%,222px)] pr-12 opacity-100"
-                : "w-0 border-0 p-0 opacity-0",
-            )}
-          />
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleSearchToggle}
-            className={cn(
-              "absolute top-0 right-0",
-              isSearchInputOpen &&
-                "border-0 bg-transparent! hover:bg-accent/33!",
-            )}
-          >
+      {/* Filter Bar */}
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-wrap items-end gap-x-4 md:gap-x-6 gap-y-4">
+          <div className="w-full sm:w-[200px]">
             <Search />
-          </Button>
+          </div>
+          <div className="w-full sm:w-[180px]">
+            <PriceRange />
+          </div>
+          <div className="w-full sm:w-[180px]">
+            <Categories />
+          </div>
+          <div className="w-full sm:w-[180px]">
+            <Collections />
+          </div>
+
+          <div className="flex items-center gap-3 h-[45px] ml-auto">
+            <SortDropdownMenu className="h-[45px]" />
+            <Button variant="outline" size="sm" onClick={openCreateProductForm}>
+              <Plus />
+            </Button>
+          </div>
         </div>
 
-        <Button variant="outline" size="sm" onClick={openCreateProductForm}>
-          <Plus />
-        </Button>
+        {/* Active Filters Display */}
+        <AdminFilterTags />
       </div>
     </div>
   );

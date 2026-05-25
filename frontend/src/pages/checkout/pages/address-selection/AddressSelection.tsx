@@ -1,9 +1,8 @@
 import { useLocation, useNavigate } from "react-router";
-import { addresses, type Address } from "@cozybud/schemas";
+import { type Address } from "@cozybud/schemas";
 import { useState } from "react";
 import CreateAddressForm from "./components/CreateAddressForm";
 import EditAddressForm from "./components/EditAddressForm";
-import BottomBar from "./components/BottomBar";
 import AddressList from "./components/AddressList";
 import { useCheckoutStore } from "../../store/useCheckoutStore";
 import { Button } from "@/lib/ui/__shadcn__/button";

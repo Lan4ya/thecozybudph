@@ -1,6 +1,18 @@
-import { recentTransactions } from "../data/mock-analytics";
+import { recentTransactions as mockData } from "../data/mock-analytics";
 
-export const RecentTransactions = () => {
+interface RecentTransactionsProps {
+  data?: {
+    id: string;
+    customer: string;
+    amount: string;
+    status: string;
+    date: string;
+  }[];
+}
+
+export const RecentTransactions = ({ data }: RecentTransactionsProps) => {
+  const transactions = data || mockData;
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Completed":
@@ -19,25 +31,44 @@ export const RecentTransactions = () => {
         <table className="w-full">
           <thead>
             <tr className="border-b">
-              <th className="text-left py-3 px-4 text-sm font-semibold text-muted-foreground">ID</th>
-              <th className="text-left py-3 px-4 text-sm font-semibold text-muted-foreground">Customer</th>
-              <th className="text-left py-3 px-4 text-sm font-semibold text-muted-foreground">Amount</th>
-              <th className="text-left py-3 px-4 text-sm font-semibold text-muted-foreground">Status</th>
-              <th className="text-left py-3 px-4 text-sm font-semibold text-muted-foreground">Date</th>
+              <th className="text-left py-3 px-4 text-sm font-semibold text-muted-foreground">
+                ID
+              </th>
+              <th className="text-left py-3 px-4 text-sm font-semibold text-muted-foreground">
+                Customer
+              </th>
+              <th className="text-left py-3 px-4 text-sm font-semibold text-muted-foreground">
+                Amount
+              </th>
+              <th className="text-left py-3 px-4 text-sm font-semibold text-muted-foreground">
+                Status
+              </th>
+              <th className="text-left py-3 px-4 text-sm font-semibold text-muted-foreground">
+                Date
+              </th>
             </tr>
           </thead>
           <tbody>
-            {recentTransactions.map((txn, index) => (
-              <tr key={index} className="border-b hover:bg-muted/50 transition-colors">
-                <td className="py-3 px-4 text-sm font-mono text-primary">{txn.id}</td>
+            {transactions.map((txn, index) => (
+              <tr
+                key={index}
+                className="border-b hover:bg-accent/15 transition-colors"
+              >
+                <td className="py-3 px-4 text-sm font-mono text-primary">
+                  {txn.id}
+                </td>
                 <td className="py-3 px-4 text-sm">{txn.customer}</td>
                 <td className="py-3 px-4 text-sm font-medium">{txn.amount}</td>
                 <td className="py-3 px-4 text-sm">
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(txn.status)}`}>
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(txn.status)}`}
+                  >
                     {txn.status}
                   </span>
                 </td>
-                <td className="py-3 px-4 text-sm text-muted-foreground">{txn.date}</td>
+                <td className="py-3 px-4 text-sm text-muted-foreground">
+                  {txn.date}
+                </td>
               </tr>
             ))}
           </tbody>

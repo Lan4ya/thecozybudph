@@ -38,12 +38,6 @@ pn i
 
 ### 3. Set env vars per directory
 ```bash
-# ./frontend/.env
-VITE_SUPABASE_URL=
-VITE_SUPABASE_ANON_KEY=
-```
-
-```bash
 # ./frontend/.env.local
 VITE_SUPABASE_URL=
 VITE_SUPABASE_ANON_KEY=
@@ -55,6 +49,18 @@ SUPABASE_URL=
 SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 SUPABASE_DB_URL=
+
+PAYMONGO_PUBLIC_KEY=
+PAYMONGO_SECRET_KEY=
+
+PAYMONGO_CHECKOUT_WEBHOOK_SECRET=
+
+LALAMOVE_PUBLIC_KEY=
+LALAMOVE_SECRET_KEY=
+
+GEOAPIFY_API_KEY=
+ENV=development
+APP_URL=http://localhost:5173
 ```
 
 ```bash
@@ -70,8 +76,6 @@ GOOGLE_APP_PASSWORD=
 
 ```bash
 # ./backend/supabase/functions/.env
-DB_TX_POOLER_URL=
-
 PAYMONGO_PUBLIC_KEY=
 PAYMONGO_SECRET_KEY=
 PAYMONGO_CHECKOUT_WEBHOOK_SECRET=
@@ -90,14 +94,6 @@ APP_URL=https://thecozybudph.com
 Make sure docker in running first, then run:
 ```bash
 pn dev
-```
-
-Running supabase and frontend dev server separately:
-```bash
-pn dev:sb
-```
-```bash
-pn dev:fe
 ```
 
 ### 4.5. Seed DB (Skip if already done once)

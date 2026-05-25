@@ -48,7 +48,6 @@ export function DeleteCartItemDialog({
       <DialogContent className="sm:max-w-[420px]">
         <DialogHeader>
           <VisuallyHidden>
-            {/* @ts-ignore */}
             <DialogTitle className="text-destructive">Delete Item</DialogTitle>
           </VisuallyHidden>
 
@@ -60,12 +59,10 @@ export function DeleteCartItemDialog({
         </DialogHeader>
 
         <DialogFooter className="flex">
-          {/* @ts-ignore */}
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
 
-          {/* @ts-ignore */}
           <DialogClose asChild>
             <Button variant="destructive" onClick={onConfirm}>
               Delete

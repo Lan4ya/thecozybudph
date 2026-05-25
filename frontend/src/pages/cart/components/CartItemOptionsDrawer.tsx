@@ -117,7 +117,6 @@ export const CartItemOptionsDrawer = ({
 
   return (
     <Drawer open={drawerOpen} onOpenChange={(open) => setDrawerOpen(open)}>
-      {/* @ts-ignore */}
       <DrawerTrigger asChild>
         <Button
           variant="minimal"

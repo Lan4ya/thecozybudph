@@ -19,29 +19,19 @@ import { afterAll, beforeAll } from "@std/testing/bdd";
 const { adminPg, supabase, supabaseService } =
   await import("@shared/db/client.ts");
 
-export const TEST_ADMIN_EMAIL = "test-admin@local.dev";
-export const TEST_USER_EMAIL = "test-user@local.dev";
+const TEST_RUN_ID = crypto.randomUUID();
+export const TEST_ADMIN_EMAIL = `test-admin-${TEST_RUN_ID}@local.dev`;
+export const TEST_USER_EMAIL = `test-user-${TEST_RUN_ID}@local.dev`;
 export const TEST_PASSWORD = "password123";
 
 export let adminUserId = "";
 export let normalUserId = "";
 
-async function findOrCreateUser(params: {
+async function createUser(params: {
   email: string;
   password: string;
   appMetadata?: Record<string, unknown>;
 }) {
-  const { data: usersRes, error: listError } =
-    await supabaseService.auth.admin.listUsers();
-
-  if (listError) throw listError;
-
-  const existing = usersRes.users.find((user) => user.email === params.email);
-
-  if (existing) {
-    return existing.id;
-  }
-
   const { data, error } = await supabaseService.auth.admin.createUser({
     email: params.email,
     password: params.password,
@@ -49,22 +39,19 @@ async function findOrCreateUser(params: {
     ...(params.appMetadata ? { app_metadata: params.appMetadata } : {}),
   });
 
-  if (error) {
-    console.error("[CREATE USER ERROR]", error);
-    throw error;
-  }
+  if (error) throw error;
 
   const userId = data.user?.id;
 
   if (!userId) {
-    throw new Error(`Invariant failed: no user returned for ${params.email}`);
+    throw new Error(`No user returned for ${params.email}`);
   }
 
   return userId;
 }
 
 beforeAll(async () => {
-  adminUserId = await findOrCreateUser({
+  adminUserId = await createUser({
     email: TEST_ADMIN_EMAIL,
     password: TEST_PASSWORD,
     appMetadata: {
@@ -72,7 +59,7 @@ beforeAll(async () => {
     },
   });
 
-  normalUserId = await findOrCreateUser({
+  normalUserId = await createUser({
     email: TEST_USER_EMAIL,
     password: TEST_PASSWORD,
   });
@@ -84,5 +71,10 @@ afterAll(async () => {
   supabase.auth.stopAutoRefresh();
   supabaseService.auth.stopAutoRefresh();
 
+  // delete users
+  await Promise.all([
+    supabaseService.auth.admin.deleteUser(adminUserId),
+    supabaseService.auth.admin.deleteUser(normalUserId),
+  ]);
   await adminPg.end();
 });

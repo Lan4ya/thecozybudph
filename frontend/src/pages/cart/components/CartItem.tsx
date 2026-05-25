@@ -8,7 +8,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Check, Trash2, XIcon, Minus, Plus } from "lucide-react";
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router";
-import { useShallow } from "zustand/react/shallow";
 import { CartItemOptionsDrawer } from "./CartItemOptionsDrawer";
 
 type CartItemProps = {
@@ -32,15 +31,11 @@ const CartItem = ({
 
   const [isEditing, setIsEditing] = useState(false);
 
-  const { getCartItem, increment, decrement } = useCartStore(
-    useShallow((s) => ({
-      getCartItem: s.getCartItem,
-      increment: s.increment,
-      decrement: s.decrement,
-    })),
-  );
+  const cartItem = useCartStore((s) => s.getCartItem(cartItemId));
+  const increment = useCartStore((s) => s.increment);
+  const decrement = useCartStore((s) => s.decrement);
 
-  const cartItem = getCartItem(cartItemId);
+  const debounceTimeout = useRef<number | null>(null);
 
   if (!cartItem) return null;
 
@@ -49,10 +44,7 @@ const CartItem = ({
   if (!isAvailable || !product) return null;
 
   const price = formatPriceCents(product.variant.priceCents * quantity);
-
   const isItemAvailable = isAvailable && product.id && product.variant.id;
-
-  const debounceTimeout = useRef<number | null>(null);
 
   const debouncedUpdateQuantity = (newQuantity: number) => {
     if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
@@ -189,48 +181,41 @@ const CartItem = ({
             </div>
 
             {/* Drawer & Quantity Control */}
-            <div className="flex justify-between">
-              <div onClick={(e) => e.stopPropagation()}>
-                <CartItemOptionsDrawer
-                  cartItemId={cartItemId}
-                  onUpdateCartItem={onUpdateCartItem}
-                />
-              </div>
+            <div
+              className="flex justify-between items-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <CartItemOptionsDrawer
+                cartItemId={cartItemId}
+                onUpdateCartItem={onUpdateCartItem}
+              />
 
-              <div className="flex justify-between items-center">
-                <div className="flex items-center">
-                  <Button
-                    variant="minimal"
-                    size="icon-sm"
-                    className=""
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (quantity === 1) {
-                        onRequestRemove();
-                        return;
-                      }
-                      handleDecrement();
-                    }}
-                  >
-                    <Minus className="size-3" />
-                  </Button>
+              <div className="flex items-center">
+                <Button
+                  variant="minimal"
+                  size="icon-sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDecrement();
+                  }}
+                >
+                  <Minus className="size-3" />
+                </Button>
 
-                  <span className="text-sm font-medium bg-sidebar rounded-sm min-w-6 text-center">
-                    {quantity}
-                  </span>
+                <span className="text-sm font-medium bg-sidebar rounded-sm min-w-6 text-center">
+                  {quantity}
+                </span>
 
-                  <Button
-                    variant="minimal"
-                    size="icon-sm"
-                    className=""
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleIncrement();
-                    }}
-                  >
-                    <Plus className="size-3" />
-                  </Button>
-                </div>
+                <Button
+                  variant="minimal"
+                  size="icon-sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleIncrement();
+                  }}
+                >
+                  <Plus className="size-3" />
+                </Button>
               </div>
             </div>
           </div>

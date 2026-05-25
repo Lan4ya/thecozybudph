@@ -31,35 +31,37 @@ export const topProductsData = [
   { name: "Cherry Blossom", sales: 640, revenue: 6400 },
 ];
 
+import { DollarSign, ShoppingCart, Users, BarChart3 } from "lucide-react";
+
 // Key metrics
 export const keyMetrics = [
   {
     label: "Total Revenue",
-    value: "$58,200",
+    value: "₱58,200",
     change: "+12.5%",
     positive: true,
-    icon: "💰",
+    icon: DollarSign,
   },
   {
     label: "Total Orders",
     value: "487",
     change: "+8.2%",
     positive: true,
-    icon: "📦",
+    icon: ShoppingCart,
   },
   {
     label: "Total Customers",
     value: "342",
     change: "+5.1%",
     positive: true,
-    icon: "👥",
+    icon: Users,
   },
   {
     label: "Conversion Rate",
     value: "3.2%",
     change: "-0.5%",
     positive: false,
-    icon: "📈",
+    icon: BarChart3,
   },
 ];
 
@@ -89,35 +91,35 @@ export const recentTransactions = [
   {
     id: "TXN001",
     customer: "Sarah Johnson",
-    amount: "$125.00",
+    amount: "₱1,250.00",
     status: "Completed",
     date: "Today at 2:30 PM",
   },
   {
     id: "TXN002",
     customer: "Michael Chen",
-    amount: "$89.50",
+    amount: "₱895.50",
     status: "Completed",
     date: "Today at 1:15 PM",
   },
   {
     id: "TXN003",
     customer: "Emma Wilson",
-    amount: "$215.00",
+    amount: "₱2,150.00",
     status: "Pending",
     date: "Today at 12:45 PM",
   },
   {
     id: "TXN004",
     customer: "David Martinez",
-    amount: "$145.75",
+    amount: "₱1,457.50",
     status: "Completed",
     date: "Yesterday at 4:20 PM",
   },
   {
     id: "TXN005",
     customer: "Lisa Anderson",
-    amount: "$195.50",
+    amount: "₱1,955.00",
     status: "Completed",
     date: "Yesterday at 3:10 PM",
   },
@@ -130,27 +132,27 @@ export const productPerformance = [
     views: 2450,
     clicks: 1250,
     conversions: 125,
-    revenue: "$1,250",
+    revenue: "₱12,500",
   },
   {
     name: "Sunflower Delight",
     views: 2100,
     clicks: 1050,
     conversions: 105,
-    revenue: "$1,050",
+    revenue: "₱10,500",
   },
   {
     name: "Tulip Rainbow",
     views: 1780,
     clicks: 890,
     conversions: 89,
-    revenue: "$890",
+    revenue: "₱8,900",
   },
   {
     name: "Wildflower Mix",
     views: 1530,
     clicks: 765,
     conversions: 76,
-    revenue: "$765",
+    revenue: "₱7,650",
   },
 ];

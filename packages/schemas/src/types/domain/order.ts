@@ -1,6 +1,6 @@
 import z from "zod";
 import {
-  customerOrderStatus,
+  customerOrderStatusSchema,
   orderSourceSchema,
   orderStatusSchema,
 } from "../../zod/api/order.ts";
@@ -8,7 +8,7 @@ import {
 export type OrderSource = z.infer<typeof orderSourceSchema>;
 export type OrderStatus = z.infer<typeof orderStatusSchema>;
 
-export type CustomerOrderStatus = z.infer<typeof customerOrderStatus>;
+export type CustomerOrderStatus = z.infer<typeof customerOrderStatusSchema>;
 
 export type CustomerOrder = {
   id: string;

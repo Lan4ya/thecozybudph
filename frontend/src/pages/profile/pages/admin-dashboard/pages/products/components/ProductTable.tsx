@@ -1,7 +1,6 @@
 import { ProductImage } from "@/components/products/ProductImage";
 import type { ProductWithRelations } from "@cozybud/schemas";
 import { Button } from "@/lib/ui/__shadcn__/button";
-import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { Check, Edit } from "lucide-react";
 import { useEffect, useRef } from "react";
 import ProductTableRowsSkeleton from "@/lib/ui/skeletons/AdminProductTableItemSkeleton";
@@ -10,46 +9,22 @@ import { useAdminProductsPageState } from "../hooks/useAdminProductsPageState";
 import { formatPriceCents } from "@/lib/utils/format";
 import { MetaBadge } from "@/components/MetaBadge";
 import { useProductMutations } from "../hooks/useProductsMutations";
-import { AdminAPI } from "@/api";
+import { useAdminProductsSuspenseInfiniteQuery } from "../hooks/useAdminProductsSuspenseInfiniteQuery";
 
 export default function ProductTable() {
-  const {
-    openUpdateProductForm,
-    deletingProductIds,
-    toggleDeletingProductId,
-    searchQuery,
-  } = useAdminProductsPageState();
+  const { openUpdateProductForm, deletingProductIds, toggleDeletingProductId } =
+    useAdminProductsPageState();
 
   const { deleteProductMutation } = useProductMutations();
 
-  const perPage = 12;
-  const DAY = 1000 * 60 * 60 * 24;
-  const queryKey = searchQuery
-    ? ["__admin__products__", { search: searchQuery }]
-    : ["__admin__products__"];
   const {
-    data: productQuery,
+    data: productData,
     fetchNextPage,
     hasNextPage,
     error,
     isFetchingNextPage,
     isFetching,
-  } = useSuspenseInfiniteQuery<ProductWithRelations[]>({
-    queryKey,
-    queryFn: ({ pageParam }) =>
-      AdminAPI.queryProducts({
-        page: pageParam as number,
-        perPage,
-        search: searchQuery,
-      }),
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, allPages) => {
-      if (!lastPage) return undefined;
-      return lastPage.length < perPage ? undefined : allPages.length;
-    },
-    staleTime: searchQuery ? 0 : DAY * 7,
-    gcTime: searchQuery ? 5 * 60 * 1000 : DAY * 14,
-  });
+  } = useAdminProductsSuspenseInfiniteQuery();
 
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
@@ -70,25 +45,17 @@ export default function ProductTable() {
     return () => observer.disconnect();
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-  const products = productQuery.pages.flat();
+  const products = productData.pages.flat();
 
   if (error && !isFetching) throw error;
 
   if (!products.length && !isFetching) {
-    if (searchQuery) {
-      return (
-        <div className="py-12 text-center text-muted-foreground">
-          No products found.
-        </div>
-      );
-    } else {
-      return (
-        <div className="py-12 text-center text-muted-foreground">
-          No products yet. Create one using the <strong>Plus Icon</strong>{" "}
-          button.
-        </div>
-      );
-    }
+    return (
+      <div className="py-12 text-center text-muted-foreground">
+        No products found. Create one using the <strong>Plus Icon</strong>{" "}
+        button.
+      </div>
+    );
   }
 
   return (
@@ -137,7 +104,7 @@ function ProductRow({
   });
 
   return (
-    <article className="border grid grid-cols-[auto_auto_3fr_1fr] sm:grid-cols-[auto_auto_3fr_repeat(3,1fr)] lg:grid-cols-[auto_auto_3fr_repeat(4,1fr)] xl:grid-cols-[auto_auto_3fr_repeat(5,1fr)] items-center justify-items-center gap-4 lg:gap-6 px-2 py-4 rounded-lg hover:shadow-sm transition">
+    <article className="border grid grid-cols-[auto_auto_3fr_1fr] sm:grid-cols-[auto_auto_3fr_repeat(3,1fr)]  xl:grid-cols-[auto_auto_3fr_repeat(5,1fr)] items-center justify-items-center gap-4 lg:gap-6 px-2 py-4 rounded-lg hover:shadow-sm transition">
       {/* Selection Toggle */}
       <div className="flex items-center">
         <button
@@ -192,29 +159,25 @@ function ProductRow({
       </div>
 
       <div className="hidden xl:block text-center ">
-        <p className="text-sm">Variants</p>
-        <p className="text-muted-foreground text-[12.5px]">
-          {product.variants.length}
-        </p>
+        <p className="text-sm text-muted-foreground">Variants</p>
+        <p className="text-[12.5px]">{product.variants.length}</p>
       </div>
 
       <div className="text-center hidden sm:block">
-        <p className="text-sm">Min Price</p>
+        <p className="text-sm text-muted-foreground">Min Price</p>
         <p className="text-[12.5px] text-primary">
           {formatPriceCents(product.minPriceCents)}
         </p>
       </div>
 
-      <div className="text-center hidden sm:block">
-        <p className="text-sm">Max Price</p>
-        <p className="text-[12.5px] text-primary">
-          {formatPriceCents(product.maxPriceCents)}
-        </p>
+      <div className="text-center hidden xl:block">
+        <p className="text-sm text-muted-foreground">Images</p>
+        <p className="text-[12.5px]">{product.imageUrls.length}</p>
       </div>
 
-      <div className="hidden lg:block">
-        <p className="text-sm">Updated</p>
-        <p className="text-[12.5px] text-muted-foreground">{updatedAt}</p>
+      <div className="hidden sm:block">
+        <p className="text-sm text-muted-foreground">Updated</p>
+        <p className="text-[12.5px]">{updatedAt}</p>
       </div>
 
       {/* Edit */}

@@ -178,6 +178,47 @@ describe("Orders API", () => {
     assertEquals(!!foundOrder, true);
   });
 
+  it("gets a single order item", async () => {
+    const { addressId, productId, variantId, quotationId } = (globalThis as any)
+      .testContext;
+
+    const createOrderRes = await apiRequest("/order", {
+      method: "POST",
+      body: genCreateOrderInput({
+        addressId,
+        productId,
+        variantId,
+        shippingQuoteId: quotationId,
+      }),
+      headers: {
+        "Idempotency-Key": crypto.randomUUID(),
+      },
+    });
+
+    const { data: createOrderData } = (await createOrderRes.json()) as {
+      data: { orderId: string; paymentId: string };
+    };
+
+    createdOrderIds.push(createOrderData.orderId);
+    createdPaymentIds.push(createOrderData.paymentId);
+
+    // Get the itemId first
+    const queryRes = await apiRequest("/order");
+    const queryBody = await queryRes.json();
+    const order = queryBody.data.find(
+      (o: any) => o.id === createOrderData.orderId,
+    );
+    const itemId = order.item.id;
+
+    const getRes = await apiRequest(`/order/item/${itemId}`);
+
+    assertEquals(getRes.status, 200);
+
+    const getBody = await getRes.json();
+    assertEquals(getBody.data.id, itemId);
+    assertEquals(getBody.data.name, "Rose Bouquet");
+  });
+
   it("creates and pay an order", async () => {
     const { addressId, productId, variantId, quotationId } = (globalThis as any)
       .testContext;

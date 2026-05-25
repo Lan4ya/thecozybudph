@@ -15,8 +15,8 @@ import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import { useShallow } from "zustand/react/shallow";
 import isDev from "@/lib/utils/isDev";
 import { z } from "zod";
-import { createShippingQuoteQK } from "./ShippingSection";
 import { useRef } from "react";
+import { createShippingQuoteQK } from "../queryKeys";
 
 const BottomBar = () => {
   const navigate = useNavigate();

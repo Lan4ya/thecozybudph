@@ -71,23 +71,23 @@ export function OrderDetailsDrawer({
 
         <div className="space-y-6 overflow-y-auto p-4 md:p-6">
           <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-md border bg-muted/20 p-3">
+            <div className="rounded-md border bg-accent/10 p-3">
               <div className="text-xs text-muted-foreground">Status</div>
               <div className="mt-1">
                 <StatusBadge status={order.status} />
               </div>
             </div>
-            <div className="rounded-md border bg-muted/20 p-3">
+            <div className="rounded-md border bg-accent/10 p-3">
               <div className="text-xs text-muted-foreground">Total</div>
               <div className="mt-1 text-lg font-semibold">
                 {formatPriceCents(order.totalCents)}
               </div>
             </div>
-            <div className="rounded-md border bg-muted/20 p-3">
+            <div className="rounded-md border bg-accent/10 p-3">
               <div className="text-xs text-muted-foreground">Created</div>
               <div className="mt-1 text-sm">{formatDate(order.createdAt)}</div>
             </div>
-            <div className="rounded-md border bg-muted/20 p-3">
+            <div className="rounded-md border bg-accent/10 p-3">
               <div className="text-xs text-muted-foreground">Updated</div>
               <div className="mt-1 text-sm">{formatDate(order.updatedAt)}</div>
             </div>
@@ -95,21 +95,21 @@ export function OrderDetailsDrawer({
 
           <section className="space-y-2">
             <h3 className="text-sm font-semibold">Recipient</h3>
-            <div className="rounded-md border bg-muted/20 p-3 text-sm text-muted-foreground">
+            <div className="rounded-md border bg-accent/10 p-3 text-sm text-muted-foreground">
               {order.address.name || "No name information"}
             </div>
           </section>
 
           <section className="space-y-2">
             <h3 className="text-sm font-semibold">Address</h3>
-            <div className="rounded-md border bg-muted/20 p-3 text-sm text-muted-foreground">
+            <div className="rounded-md border bg-accent/10 p-3 text-sm text-muted-foreground">
               {formatAddress(order) || "No address information"}
             </div>
           </section>
 
           <section className="space-y-2">
             <h3 className="text-sm font-semibold">Phone Number</h3>
-            <div className="rounded-md border bg-muted/20 p-3 text-sm text-muted-foreground">
+            <div className="rounded-md border bg-accent/10 p-3 text-sm text-muted-foreground">
               {order.address.phone || "No phone information"}
             </div>
           </section>
@@ -119,7 +119,7 @@ export function OrderDetailsDrawer({
               Order Items ({getOrderItemCount(order.items)})
             </h3>
             {order.items.length === 0 ? (
-              <div className="rounded-md border bg-muted/20 p-4 text-sm text-muted-foreground">
+              <div className="rounded-md border bg-accent/10 p-4 text-sm text-muted-foreground">
                 No items found for this order.
               </div>
             ) : (
@@ -171,7 +171,7 @@ export function OrderDetailsDrawer({
                         {item.cardMessages.map((message, messageIndex) => (
                           <div
                             key={messageIndex}
-                            className="rounded-md bg-muted/30 p-2 text-xs text-muted-foreground"
+                            className="rounded-md bg-accent/20 p-2 text-xs text-muted-foreground"
                           >
                             #{messageIndex + 1}: {message || "(empty)"}
                           </div>
@@ -185,32 +185,32 @@ export function OrderDetailsDrawer({
           </section>
 
           <section className="grid grid-cols-2 gap-3">
-            <div className="rounded-md border bg-muted/20 p-3">
+            <div className="rounded-md border bg-accent/10 p-3">
               <div className="text-xs text-muted-foreground">Subtotal</div>
               <div className="mt-1 text-sm font-medium">
                 {formatPriceCents(order.subtotalCents)}
               </div>
             </div>
-            <div className="rounded-md border bg-muted/20 p-3">
+            <div className="rounded-md border bg-accent/10 p-3">
               <div className="text-xs text-muted-foreground">Shipping</div>
               <div className="mt-1 text-sm font-medium">
                 {formatPriceCents(order.shippingCents)}
               </div>
             </div>
-            <div className="rounded-md border bg-muted/20 p-3">
+            <div className="rounded-md border bg-accent/10 p-3">
               <div className="text-xs text-muted-foreground">Discount</div>
               <div className="mt-1 text-sm font-medium">
                 {formatPriceCents(order.discountCents)}
               </div>
             </div>
 
-            <div className="rounded-md border bg-muted/20 p-3">
+            <div className="rounded-md border bg-accent/10 p-3">
               <div className="text-xs text-muted-foreground">Pass On Fee</div>
               <div className="mt-1 text-sm font-medium">
                 {formatPriceCents(order.passOnFee)}
               </div>
             </div>
-            <div className="rounded-md border bg-muted/20 p-3">
+            <div className="rounded-md border bg-accent/10 p-3">
               <div className="text-xs text-muted-foreground">Expires At</div>
               <div className="mt-1 text-sm font-medium">
                 {formatDate(order.expiresAt)}

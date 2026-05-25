@@ -39,7 +39,7 @@ export const useCartStore = create<CartState>((set, get) => ({
       pendingDeleteIds: [],
     }),
 
-  getCartItem: (cartItemId) => get().cartItems.find((i) => i.id === cartItemId),
+  getCartItem: (cartItemId: string) => get().cartItems.find((i) => i.id === cartItemId),
 
   setCartItems: (itemsOrUpdater) =>
     set((state) => ({

@@ -49,8 +49,7 @@ export const DesktopNavLinks = ({
             <NavLink
               to={href}
               className={cn(
-                "text-foreground hover:text-primary-foreground/70 text-lg font-medium transition-colors",
-                "text-foreground hover:text-primary/90",
+                "text-foreground text-lg font-medium transition-colors",
               )}
             >
               {label}

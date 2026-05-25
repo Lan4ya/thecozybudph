@@ -36,18 +36,27 @@ export const cancelShipmentOrder = async (
     throw AppError.conflict({ message: "No shipment exists" });
   }
 
-  await cancelShippingOrder(order.shipmentOrderId);
+  try {
+    await cancelShippingOrder(order.shipmentOrderId);
 
-  // regress status: to_ship -> paid and clear shipment id
-  const status = await OrderRepository.updateStatus(db, {
-    orderId: order.id,
-    status: "paid",
-    shippingOrderId: null,
-  });
+    // regress status: to_ship -> paid and clear shipment id
+    const status = await OrderRepository.updateStatus(db, {
+      orderId: order.id,
+      status: "paid",
+      shippingOrderId: null,
+    });
 
-  return {
-    orderId: order.id,
-    status: toCamelCase(status) as OrderStatus,
-    shipmentStatus: "cancelled",
-  };
+    return {
+      orderId: order.id,
+      status: toCamelCase(status) as OrderStatus,
+      shipmentStatus: "cancelled",
+    };
+  } catch (error) {
+    if (error instanceof AppError) throw error;
+    throw new AppError({
+      status: 500,
+      message: error instanceof Error ? error.message : "Failed to cancel shipment order",
+      cause: error,
+    });
+  }
 };

@@ -18,6 +18,10 @@
 
   /* Typography utils */
 
+  .text-header {
+    @apply text-2xl lg:text-[28px] xl:text-3xl font-bold font-ivy-ora-display;
+  }
+
   .text-30-bold {
     @apply text-[30px] font-bold;
   }

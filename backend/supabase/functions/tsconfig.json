@@ -6,11 +6,6 @@
     "useUnknownInCatchVariables": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
-    "vertbatimModuleSyntax": true,
-    "allowJs": false,
-    "composite": true,
-    "lib": [
-      "esnext"
-    ]
+    "allowJs": false
   }
 }

@@ -21,7 +21,7 @@ const options: ProductSortOption[] = [
   "Lowest Price",
 ];
 
-export function SortDropdownMenu() {
+export function SortDropdownMenu({ className }: { className?: string }) {
   const { productQuery, setProductQuery } = useProductsFilterAndSortState();
   const [sortOpt, setSortOpt] = React.useState<ProductSortOption>(
     productQuery.sort ?? "Popularity",
@@ -43,7 +43,7 @@ export function SortDropdownMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="minimal" size="lg" className="w-40 border">
+        <Button variant="minimal" size="lg" className={cn("w-40 border", className)}>
           <ArrowUpDown className="size-3.5 text-muted-foreground" /> {sortOpt}
         </Button>
       </DropdownMenuTrigger>

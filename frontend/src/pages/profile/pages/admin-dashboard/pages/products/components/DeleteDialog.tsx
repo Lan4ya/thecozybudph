@@ -15,20 +15,21 @@ export function DeleteProductDialog({
   onConfirm,
   deleteLoading,
   deletingCount,
+  className,
 }: {
   onConfirm: () => void;
   deleteLoading: boolean;
   deletingCount: number;
+  className?: string;
 }) {
   return (
     <Dialog>
-      {/* @ts-ignore */}
       <DialogTrigger asChild>
         <Button
           variant="destructive"
           size="sm"
           disabled={deleteLoading}
-          className={cn(deleteLoading && "opacity-70 pointer-events-none")}
+          className={cn(deleteLoading && "opacity-70 pointer-events-none", className)}
           aria-label={`Delete product`}
         >
           {deleteLoading && <Spinner />} Delete
@@ -36,7 +37,6 @@ export function DeleteProductDialog({
       </DialogTrigger>
       <DialogContent className="sm:max-w-[420px]">
         <DialogHeader>
-          {/* @ts-ignore */}
           <DialogTitle className="text-destructive">Delete Product</DialogTitle>
 
           <DialogDescription>
@@ -47,12 +47,10 @@ export function DeleteProductDialog({
         </DialogHeader>
 
         <DialogFooter className="flex justify-end gap-2 mt-4">
-          {/* @ts-ignore */}
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
 
-          {/* @ts-ignore */}
           <DialogClose asChild>
             <Button variant="destructive" onClick={onConfirm}>
               Delete

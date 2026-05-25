@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { ChevronDown, HelpCircle, MessageCircle, Truck, CreditCard, RotateCcw, Package } from "lucide-react";
+import {
+  ChevronDown,
+  HelpCircle,
+  MessageCircle,
+  Truck,
+  CreditCard,
+  RotateCcw,
+  Package,
+} from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
 interface FAQItem {
@@ -121,28 +129,38 @@ const faqCategories: FAQCategory[] = [
   },
 ];
 
-const AccordionItem = ({ item, isOpen, onToggle }: { item: FAQItem; isOpen: boolean; onToggle: () => void }) => {
+const AccordionItem = ({
+  item,
+  isOpen,
+  onToggle,
+}: {
+  item: FAQItem;
+  isOpen: boolean;
+  onToggle: () => void;
+}) => {
   return (
     <div className="border-b last:border-b-0">
       <button
         onClick={onToggle}
         className={cn(
           "w-full flex items-center justify-between py-4 px-1 text-left transition-colors hover:text-primary",
-          isOpen && "text-primary"
+          isOpen && "text-primary",
         )}
       >
-        <span className="font-medium text-sm md:text-base pr-4">{item.question}</span>
+        <span className="font-medium text-sm md:text-base pr-4">
+          {item.question}
+        </span>
         <ChevronDown
           className={cn(
             "size-4 shrink-0 text-muted-foreground transition-transform duration-200",
-            isOpen && "rotate-180"
+            isOpen && "rotate-180",
           )}
         />
       </button>
       <div
         className={cn(
           "grid transition-all duration-200 ease-in-out",
-          isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+          isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
         )}
       >
         <div className="overflow-hidden">
@@ -165,7 +183,7 @@ const FAQ = () => {
   return (
     <main className="flex-1">
       {/* Hero Header */}
-      <section className="bg-card/40 border-b">
+      <section className="bg-card/40">
         <div className="custom-container mx-auto py-12 md:py-16 text-center">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary mb-4">
             <HelpCircle className="size-6" />
@@ -174,7 +192,9 @@ const FAQ = () => {
             Frequently Asked Questions
           </h1>
           <p className="mt-3 text-muted-foreground max-w-lg mx-auto text-sm md:text-base">
-            Find answers to common questions about our products, delivery, payments, and more. Can't find what you're looking for? Reach out to our support team.
+            Find answers to common questions about our products, delivery,
+            payments, and more. Can't find what you're looking for? Reach out to
+            our support team.
           </p>
         </div>
       </section>
@@ -183,10 +203,15 @@ const FAQ = () => {
       <section className="custom-container mx-auto py-8 md:py-12">
         <div className="max-w-3xl mx-auto space-y-8">
           {faqCategories.map((category) => (
-            <div key={category.title} className="bg-card rounded-xl border shadow-sm overflow-hidden">
-              <div className="px-5 py-4 border-b bg-muted/30 flex items-center gap-3">
+            <div
+              key={category.title}
+              className="bg-card rounded-xl border shadow-sm overflow-hidden"
+            >
+              <div className="px-5 py-4 border-b bg-card flex items-center gap-3">
                 <span className="text-primary">{category.icon}</span>
-                <h2 className="font-semibold text-foreground">{category.title}</h2>
+                <h2 className="font-semibold text-foreground">
+                  {category.title}
+                </h2>
               </div>
               <div className="px-5">
                 {category.items.map((item, idx) => {
@@ -207,12 +232,13 @@ const FAQ = () => {
 
         {/* Contact CTA */}
         <div className="max-w-3xl mx-auto mt-10 text-center">
-          <div className="bg-primary/5 rounded-xl border border-primary/10 p-6 md:p-8">
+          <div className="bg-card rounded-xl border border-primary/10 p-6 md:p-8">
             <h3 className="text-lg font-semibold text-foreground">
               Still have questions?
             </h3>
             <p className="mt-2 text-sm text-muted-foreground">
-              Our friendly support team is here to help. Reach out and we'll get back to you within 24 hours.
+              Our friendly support team is here to help. Reach out and we'll get
+              back to you within 24 hours.
             </p>
             <div className="mt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
               <a

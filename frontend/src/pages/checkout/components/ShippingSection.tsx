@@ -6,14 +6,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useCheckoutStore } from "../store/useCheckoutStore";
 import { CheckoutShippingOptionSkeleton } from "@/lib/ui/skeletons/CheckoutShippingOptionSkeleton";
 import { useEffect } from "react";
-import { OrderAPI } from "@/api";
-import type { Address, CreateQuotationsRes } from "@cozybud/schemas";
+import { ShipmentAPI } from "@/api";
 import { Button } from "@/lib/ui/__shadcn__/button";
-
-export const createShippingQuoteQK = (address: Address | null) => [
-  "shipping-quote",
-  address,
-];
+import { createShippingQuoteQK } from "../queryKeys";
 
 const ShippingSection = () => {
   const addressStore = useCheckoutStore((s) => s.address);
@@ -27,10 +22,10 @@ const ShippingSection = () => {
     refetch,
   } = useQuery({
     queryKey: createShippingQuoteQK(addressStore),
-    queryFn: (): Promise<CreateQuotationsRes> => {
+    queryFn: () => {
       if (!addressStore) throw new Error("Missing address");
 
-      return OrderAPI.createShippingQuotes({
+      return ShipmentAPI.createShippingQuote({
         recipientAddress: {
           addressLine: addressStore.addressLine,
           postalCode: addressStore.postalCode,
@@ -90,7 +85,8 @@ const ShippingSection = () => {
       <div className="space-y-3">
         {!isFetching && error && (
           <div className="text-destructive flex justify-baseline items-baseline gap-3 text-sm">
-            Failed loading shipping options. Please try again.
+            Failed loading shipping options. Make sure you're using a valid
+            address then try again.
             <Button size="icon-sm" onClick={() => refetch()}>
               <RotateCw onClick={() => refetch()} />
             </Button>

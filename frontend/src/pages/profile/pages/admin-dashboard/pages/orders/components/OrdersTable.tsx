@@ -1,5 +1,4 @@
 import type { AdminOrderItem, AdminOrderListItem } from "@cozybud/schemas";
-import { Loader2 } from "lucide-react";
 import { StatusBadge } from "./StatusBadge";
 import { formatPriceCents } from "@/lib/utils/format";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
@@ -42,7 +41,7 @@ export function OrdersTable({
     <div className="overflow-hidden rounded-lg border bg-card shadow-sm">
       <div className="overflow-x-auto">
         <table className="w-full lg:table-fixed text-sm">
-          <thead className="bg-muted/40">
+          <thead className="">
             <tr>
               <th className="pr-4 pl-8 py-3 text-left font-medium text-muted-foreground">
                 ORDER
@@ -98,8 +97,8 @@ export function OrdersTable({
                 <tr
                   key={order.id}
                   onClick={() => onRowClick(order)}
-                  className={`cursor-pointer border-t transition-colors hover:bg-muted/40 ${
-                    selectedOrderId === order.id ? "bg-muted/30" : ""
+                  className={`cursor-pointer border-t transition-colors hover:bg-accent/15 ${
+                    selectedOrderId === order.id ? "bg-accent/30" : ""
                   }`}
                 >
                   <td className="pr-4 pl-8 py-3 text-left">

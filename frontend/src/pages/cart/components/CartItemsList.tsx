@@ -40,41 +40,41 @@ export const CartItemsList = () => {
     })),
   );
 
-  const hydrateCartItems = (): CartItemUI[] => {
-    return (
-      cartQueryData?.reduce<CartItemUI[]>((acc, item) => {
-        if (!item.isAvailable) return acc;
-
-        const existingItem = getCartItem(item.id);
-
-        // Fill the cardMessages array with empty strings so its length always matches the item’s quantity.
-        // This is needed to render extra empty TextArea's so the user can add more messages if wanted.
-        const cardMessages =
-          item.cardMessages.length < item.quantity
-            ? [
-                ...item.cardMessages,
-                ...Array(
-                  Math.max(0, item.quantity - item.cardMessages.length),
-                ).fill(""),
-              ]
-            : item.cardMessages;
-
-        acc.push({
-          ...item,
-          cardMessages,
-          selected: existingItem?.selected ?? false,
-        });
-
-        return acc;
-      }, []) ?? []
-    );
-  };
-
   useEffect(() => {
+    const hydrateCartItems = (): CartItemUI[] => {
+      return (
+        cartQueryData?.reduce<CartItemUI[]>((acc, item) => {
+          if (!item.isAvailable) return acc;
+
+          const existingItem = getCartItem(item.id);
+
+          // Fill the cardMessages array with empty strings so its length always matches the item’s quantity.
+          // This is needed to render extra empty TextArea's so the user can add more messages if wanted.
+          const cardMessages =
+            item.cardMessages.length < item.quantity
+              ? [
+                  ...item.cardMessages,
+                  ...Array(
+                    Math.max(0, item.quantity - item.cardMessages.length),
+                  ).fill(""),
+                ]
+              : item.cardMessages;
+
+          acc.push({
+            ...item,
+            cardMessages,
+            selected: existingItem?.selected ?? false,
+          });
+
+          return acc;
+        }, []) ?? []
+      );
+    };
+
     if (cartQueryData) {
       setCartItems(hydrateCartItems());
     }
-  }, [cartQueryData]);
+  }, [cartQueryData, setCartItems, getCartItem]);
 
   const { updateCartItemMutation, deleteCartItemsMutation } =
     useCartItemMutations();
@@ -136,8 +136,8 @@ export const CartItemsList = () => {
     );
 
   return (
-    <div className="">
-      <ul className="space-y-5">
+    <div>
+      <ul className="grid md:grid-cols-2 gap-5">
         {cartItems.map((item) => (
           <li key={item.id}>
             <CartItem

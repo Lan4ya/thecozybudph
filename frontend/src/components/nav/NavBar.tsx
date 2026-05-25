@@ -10,7 +10,6 @@ import { MobileDrawer } from "./MobileDrawer";
 import { DesktopNavLinks } from "./DesktopNavLinks";
 import { useCartQuery } from "@/pages/cart/hooks/useCartQuery";
 import { useAuthStore } from "@/store/useAuthStore";
-// import logo_mini_transparent from "@/assets/thecozybud/logo_mini_transparent.png";
 
 const NavBar = () => {
   const isMediumScreenAndBelow = useMediaQuery("(max-width: 1023px)");
