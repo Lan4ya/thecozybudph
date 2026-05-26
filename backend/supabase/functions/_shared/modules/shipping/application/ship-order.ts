@@ -11,7 +11,7 @@ import { eq } from "drizzle-orm";
 
 /**
  * Ships an order using Lalamove.
- * 
+ *
  * Flow:
  * 1. Validate order exists and is in 'paid' status.
  * 2. Create a Lalamove quotation to get valid stop IDs.
@@ -34,8 +34,8 @@ export const shipOrder = async (
 
   // Only paid orders can be shipped
   if (order.status !== "paid") {
-    throw AppError.badRequest({ 
-      message: `Cannot ship order with status: ${order.status}. Order must be 'paid'.` 
+    throw AppError.badRequest({
+      message: `Cannot ship order with status: ${order.status}. Order must be 'paid'.`,
     });
   }
 
@@ -70,7 +70,9 @@ export const shipOrder = async (
     const recipientStop = quotation.stops[1];
 
     if (!senderStop.id || !recipientStop.id) {
-      throw AppError.internalServer({ message: "Failed to retrieve stop IDs from quotation" });
+      throw AppError.internal({
+        message: "Failed to retrieve stop IDs from quotation",
+      });
     }
 
     // 3. Place Order with Lalamove
@@ -106,11 +108,14 @@ export const shipOrder = async (
     };
   } catch (error) {
     if (error instanceof AppError) throw error;
-    
+
     throw new AppError({
       status: 500,
-      message: error instanceof Error ? error.message : "An unexpected error occurred during shipping",
-      cause: error
+      message:
+        error instanceof Error
+          ? error.message
+          : "An unexpected error occurred during shipping",
+      cause: error,
     });
   }
 };

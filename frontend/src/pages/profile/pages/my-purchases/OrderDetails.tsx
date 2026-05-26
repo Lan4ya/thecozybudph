@@ -5,8 +5,8 @@ import { FlowerSpinner } from "@/components/RouteLoaderSpinner";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { formatPriceCents } from "@/lib/utils/format";
 import { cn } from "@/lib/utils/cn";
+import { MetaBadge } from "@/components/MetaBadge";
 import {
-  ArrowLeft,
   ChevronRight,
   MapPin,
   Package,
@@ -16,7 +16,6 @@ import {
   CheckCircle2,
   XCircle,
   AlertCircle,
-  Receipt,
   Tag,
 } from "lucide-react";
 
@@ -99,111 +98,109 @@ const OrderDetails = () => {
   const StatusIcon = status.icon;
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 md:px-6 lg:py-12">
-      <button
-        onClick={() => navigate("/profile/my-purchases")}
-        className="group mb-8 flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-      >
-        <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-        Back to Purchases
-      </button>
-
-      <div className="grid gap-8 lg:grid-cols-3">
-        {/* Main Content */}
-        <div className="lg:col-span-2 space-y-8">
-          {/* Order Status Header */}
-          <section className={cn("rounded-3xl border p-6 md:p-8", status.color)}>
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <div className="flex items-center gap-2 font-bold uppercase tracking-wider text-xs opacity-80">
-                  <StatusIcon className="h-4 w-4" />
-                  {status.label}
-                </div>
-                <h1 className="mt-2 text-2xl font-bold md:text-3xl">
-                  Order Item #{orderItem.id.slice(-8).toUpperCase()}
-                </h1>
-                <p className="mt-2 text-sm font-medium opacity-90">
-                  {status.description}
-                </p>
-              </div>
+    <div className="mx-auto w-full max-w-4xl space-y-6 px-4 py-8">
+      {/* Status Header - Compact & Refined */}
+      <section className={cn("rounded-2xl border p-5", status.color)}>
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider opacity-80 mb-1">
+              <StatusIcon className="h-3.5 w-3.5 shrink-0" />
+              {status.label}
             </div>
-          </section>
+            <h1 className="text-lg md:text-xl font-medium tracking-tight leading-snug">
+              Order #{orderItem.id.slice(-6).toUpperCase()}
+            </h1>
+            <p className="mt-1 text-xs opacity-85 leading-relaxed">
+              {status.description}
+            </p>
+          </div>
+        </div>
+      </section>
 
-          {/* Item Details Section */}
-          <section className="space-y-4">
-            <h2 className="flex items-center gap-2 text-lg font-bold">
-              <Package className="h-5 w-5 text-primary" />
-              Item Details
-            </h2>
-            <div className="rounded-3xl border bg-card overflow-hidden">
-              <div className="flex flex-col sm:flex-row gap-6 p-6">
-                <div className="h-48 w-full sm:w-48 shrink-0 overflow-hidden rounded-2xl border bg-primary/5">
-                  <img
-                    src={orderItem.primaryImageUrl}
-                    alt={orderItem.name}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-                <div className="flex flex-1 flex-col justify-between py-2">
-                  <div className="space-y-4">
-                    <div>
-                      <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary/80 mb-1">
-                        <Tag className="h-3 w-3" />
-                        <span>{orderItem.category}</span>
-                      </div>
-                      <h3 className="text-xl font-bold leading-tight">
-                        {orderItem.name}
-                      </h3>
-                      {orderItem.collection && (
-                        <p className="text-sm text-muted-foreground font-medium">
-                          {orderItem.collection}
-                        </p>
-                      )}
-                    </div>
+      {/* Product & Payment Grid */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Product Card - Left */}
+        <div className="lg:col-span-2">
+          <div className="rounded-2xl border bg-card overflow-hidden">
+            <div className="flex flex-col sm:flex-row gap-5 p-5">
+              {/* Image - Same as OrderCard h-24 w-24 */}
+              <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl border bg-primary/5">
+                <img
+                  src={orderItem.primaryImageUrl}
+                  alt={orderItem.name}
+                  className="h-full w-full object-cover"
+                />
+              </div>
 
-                    {Object.keys(orderItem.variantAttributes).length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {Object.entries(orderItem.variantAttributes).map(
-                          ([k, v]) => (
-                            <div
-                              key={k}
-                              className="bg-muted px-3 py-1.5 rounded-xl text-xs font-bold"
-                            >
-                              <span className="text-muted-foreground uppercase tracking-tighter mr-2">
-                                {k}:
-                              </span>
-                              <span>{v}</span>
-                            </div>
-                          ),
-                        )}
-                      </div>
-                    )}
+              {/* Product Info */}
+              <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+                <div className="space-y-2">
+                  {/* Category */}
+                  <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-primary/70">
+                    <Tag className="h-3 w-3 shrink-0" />
+                    <span className="truncate">{orderItem.category}</span>
+                  </div>
 
-                    {orderItem.cardMessages.length > 0 && (
-                      <div className="space-y-2 pt-2 border-t border-border/50">
-                        <p className="text-xs font-black uppercase tracking-widest text-muted-foreground">
-                          Card Messages
-                        </p>
-                        <div className="space-y-1">
-                          {orderItem.cardMessages.map((msg, i) => (
-                            <p
-                              key={i}
-                              className="text-sm italic text-foreground/80"
-                            >
-                              {i + 1}. "{msg}"
-                            </p>
-                          ))}
-                        </div>
-                      </div>
+                  {/* Product Name & Collection */}
+                  <div>
+                    <h2 className="text-base font-medium leading-snug">
+                      {orderItem.name}
+                    </h2>
+                    {orderItem.collection && (
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {orderItem.collection}
+                      </p>
                     )}
                   </div>
 
-                  <div className="flex items-center justify-between mt-6 pt-4 border-t border-border/50">
-                    <p className="text-sm font-medium">
-                      {formatPriceCents(orderItem.priceCents)} ×{" "}
-                      {orderItem.quantity}
+                  {/* Variants */}
+                  {Object.keys(orderItem.variantAttributes).length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {Object.entries(orderItem.variantAttributes).map(
+                        ([key, val]) => (
+                          <MetaBadge
+                            key={key}
+                            label={key}
+                            value={val}
+                            className="text-xs px-2 py-0.5"
+                          />
+                        ),
+                      )}
+                    </div>
+                  )}
+
+                  {/* Card Messages */}
+                  {orderItem.cardMessages.length > 0 && (
+                    <div className="pt-2 border-t border-border/50 mt-2">
+                      <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-1">
+                        Messages
+                      </p>
+                      <div className="space-y-0.5">
+                        {orderItem.cardMessages.map((msg, i) => (
+                          <p
+                            key={i}
+                            className="text-xs italic text-foreground/80"
+                          >
+                            "{msg}"
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Price */}
+                <div className="flex items-end justify-between gap-4 mt-3 pt-3 border-t border-border/50">
+                  <div>
+                    <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">
+                      Qty: {orderItem.quantity}
                     </p>
-                    <p className="text-xl font-black text-primary">
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider mb-0.5">
+                      Total Item
+                    </p>
+                    <p className="text-lg font-bold text-primary">
                       {formatPriceCents(
                         orderItem.priceCents * orderItem.quantity,
                       )}
@@ -212,135 +209,130 @@ const OrderDetails = () => {
                 </div>
               </div>
             </div>
-          </section>
-
-          {/* Shipping Address */}
-          <section className="space-y-4">
-            <h2 className="flex items-center gap-2 text-lg font-bold">
-              <MapPin className="h-5 w-5 text-primary" />
-              Delivery Address
-            </h2>
-            <div className="rounded-3xl border bg-card p-6 md:p-8">
-              <div className="space-y-1">
-                <p className="font-bold text-lg text-primary">
-                  {orderItem.address.fullName}
-                </p>
-                <p className="text-foreground font-medium">
-                  {orderItem.address.phoneNumber}
-                </p>
-                <div className="mt-4 space-y-0.5 text-sm text-muted-foreground font-medium">
-                  <p>{orderItem.address.addressLine}</p>
-                  <p>
-                    {orderItem.address.barangay}, {orderItem.address.city}
-                  </p>
-                  <p>
-                    {orderItem.address.province}, {orderItem.address.region}
-                  </p>
-                  <p>{orderItem.address.postalCode}</p>
-                </div>
-              </div>
-            </div>
-          </section>
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-8">
-          {/* Order Summary */}
-          <section className="space-y-4">
-            <h2 className="flex items-center gap-2 text-lg font-bold">
-              <Receipt className="h-5 w-5 text-primary" />
-              Payment Summary
-            </h2>
-            <div className="rounded-3xl border-2 border-primary/10 bg-card p-6 shadow-sm">
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between text-muted-foreground font-medium">
-                  <span>Subtotal</span>
-                  <span className="font-bold text-foreground">
-                    {formatPriceCents(orderItem.subtotalCents)}
-                  </span>
-                </div>
-                <div className="flex justify-between text-muted-foreground font-medium">
-                  <span>Shipping Fee</span>
-                  <span className="font-bold text-foreground">
-                    {formatPriceCents(orderItem.shippingCents)}
-                  </span>
-                </div>
-                {orderItem.discountCents > 0 && (
-                  <div className="flex justify-between text-green-600 font-bold">
-                    <span>Discount</span>
-                    <span>-{formatPriceCents(orderItem.discountCents)}</span>
-                  </div>
-                )}
-                <div className="flex justify-between text-muted-foreground font-medium">
-                  <span>Service Fee</span>
-                  <span className="font-bold text-foreground">
-                    {formatPriceCents(orderItem.passOnFee)}
-                  </span>
-                </div>
-                <div className="my-4 border-t-2 border-dashed border-primary/10 pt-4 flex justify-between items-end">
-                  <span className="font-black text-base">Total</span>
-                  <span className="text-2xl font-black text-primary">
-                    {formatPriceCents(orderItem.totalCents)}
-                  </span>
-                </div>
-              </div>
-
-              {orderItem.status === "toPay" && (
-                <Button className="mt-6 w-full rounded-full py-6 font-bold text-base shadow-lg shadow-primary/20">
-                  <CreditCard className="mr-2 h-5 w-5" />
-                  Pay Now
-                </Button>
-              )}
-            </div>
-          </section>
-
-          {/* Delivery Details */}
-          <section className="space-y-4">
-            <h2 className="flex items-center gap-2 text-lg font-bold">
-              <Truck className="h-5 w-5 text-primary" />
-              Service Details
-            </h2>
-            <div className="rounded-3xl border bg-card p-6">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-sm text-muted-foreground font-medium">
-                  Delivery Method
-                </span>
-                <span className="text-sm font-bold uppercase text-primary">
-                  {orderItem.serviceType}
-                </span>
-              </div>
-              <div className="flex items-center gap-3 rounded-2xl bg-primary/5 p-4 border border-primary/10">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-background border-2 border-primary/20 shadow-sm">
-                  <Truck className="h-5 w-5 text-primary" />
-                </div>
-                <div className="text-xs">
-                  <p className="font-bold text-primary">Standard Delivery</p>
-                  <p className="text-primary/60 mt-0.5 font-medium">
-                    Estimated delivery in 1-3 business days.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Timeline / Info */}
-          <div className="rounded-3xl bg-primary/5 p-6 border border-primary/10">
-            <h3 className="font-bold text-sm mb-3 flex items-center gap-2">
-              <AlertCircle className="h-4 w-4 text-primary" />
-              Need help?
-            </h3>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              If you have any questions about your order, please contact our
-              support team with your Order ID.
-            </p>
-            <Button
-              variant="link"
-              className="px-0 h-auto text-xs font-bold mt-2"
-            >
-              Contact Support <ChevronRight className="h-3 w-3 ml-1" />
-            </Button>
           </div>
         </div>
+
+        {/* Payment Summary - Right */}
+        <section>
+          <div className="rounded-2xl border-2 border-primary/10 bg-card p-5">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
+              Order Summary
+            </h3>
+            <div className="space-y-2 text-xs">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Subtotal</span>
+                <span className="font-medium">
+                  {formatPriceCents(orderItem.subtotalCents)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Shipping</span>
+                <span className="font-medium">
+                  {formatPriceCents(orderItem.shippingCents)}
+                </span>
+              </div>
+              {orderItem.discountCents > 0 && (
+                <div className="flex justify-between text-green-600 font-medium">
+                  <span>Discount</span>
+                  <span>-{formatPriceCents(orderItem.discountCents)}</span>
+                </div>
+              )}
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Service Fee</span>
+                <span className="font-medium">
+                  {formatPriceCents(orderItem.passOnFee)}
+                </span>
+              </div>
+              <div className="pt-2 border-t border-primary/10 mt-3 flex justify-between items-baseline">
+                <span className="text-xs font-bold text-foreground">Total</span>
+                <span className="text-xl font-bold text-primary">
+                  {formatPriceCents(orderItem.totalCents)}
+                </span>
+              </div>
+            </div>
+
+            {orderItem.status === "toPay" && (
+              <Button className="mt-4 w-full rounded-lg py-2.5 text-xs font-bold">
+                <CreditCard className="mr-2 h-3.5 w-3.5" />
+                Pay Now
+              </Button>
+            )}
+          </div>
+        </section>
+      </div>
+
+      {/* Address & Service */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Delivery Address */}
+        <section>
+          <h2 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
+            <MapPin className="h-4 w-4 text-primary" />
+            Delivery
+          </h2>
+          <div className="rounded-2xl border bg-card p-5 space-y-2.5">
+            <div>
+              <p className="text-xs text-primary font-bold mb-1">
+                {orderItem.address.fullName}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {orderItem.address.phoneNumber}
+              </p>
+            </div>
+            <div className="text-xs text-foreground space-y-1 border-t border-border/50 pt-2.5">
+              <p>{orderItem.address.addressLine}</p>
+              <p>
+                {orderItem.address.barangay}, {orderItem.address.city}
+              </p>
+              <p>
+                {orderItem.address.province}, {orderItem.address.region}{" "}
+                {orderItem.address.postalCode}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Service Details */}
+        <section>
+          <h2 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
+            <Truck className="h-4 w-4 text-primary" />
+            Service
+          </h2>
+          <div className="rounded-2xl border bg-card p-5 space-y-3">
+            <MetaBadge
+              label="Method"
+              value={orderItem.serviceType}
+              className="text-xs px-2 py-1"
+            />
+            <div className="rounded-lg bg-primary/5 p-3 border border-primary/10 flex items-center gap-2">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-background border border-primary/20">
+                <Truck className="h-3.5 w-3.5 text-primary" />
+              </div>
+              <div className="text-xs">
+                <p className="font-bold text-primary leading-tight">
+                  Standard Delivery
+                </p>
+                <p className="text-primary/70">1–3 business days</p>
+              </div>
+            </div>
+
+            {/* Help */}
+            <div className="rounded-lg bg-primary/5 p-3 border border-primary/10">
+              <p className="text-xs font-bold text-primary flex items-center gap-1.5 mb-1">
+                <AlertCircle className="h-3.5 w-3.5" />
+                Questions?
+              </p>
+              <p className="text-xs text-muted-foreground leading-relaxed mb-2">
+                Contact us with your Order ID.
+              </p>
+              <Button
+                variant="link"
+                className="px-0 h-auto text-xs font-bold p-0"
+              >
+                Get Help <ChevronRight className="h-3 w-3 ml-1" />
+              </Button>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   );

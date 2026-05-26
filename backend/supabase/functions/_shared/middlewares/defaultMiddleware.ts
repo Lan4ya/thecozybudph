@@ -29,40 +29,40 @@ export const defaultAppMiddlewares = (app: OpenAPIHono<AppEnv>) => {
     }),
   );
 
-  // app.use("*", (c, next) => {
-  //   const isSwaggerUI = c.req.path.includes("/ui");
-  //
-  //   if (isSwaggerUI) {
-  //     return next();
-  //   }
-  //
-  //   return secureHeaders({
-  //     contentSecurityPolicy: {
-  //       defaultSrc: ["'self'"],
-  //       baseUri: ["'self'"],
-  //       childSrc: ["'self'"],
-  //       connectSrc: ["'self'"],
-  //       fontSrc: ["'self'", "https:", "data:"],
-  //       formAction: ["'self'"],
-  //       frameAncestors: ["'self'"],
-  //       frameSrc: ["'self'"],
-  //       imgSrc: ["'self'", "data:"],
-  //       manifestSrc: ["'self'"],
-  //       mediaSrc: ["'self'"],
-  //       objectSrc: ["'none'"],
-  //       reportTo: "endpoint-1",
-  //       sandbox: ["allow-same-origin", "allow-scripts"],
-  //       scriptSrcAttr: ["'none'"],
-  //       styleSrcAttr: ["none"],
-  //       styleSrcElem: ["'self'", "https:", "'unsafe-inline'"],
-  //       upgradeInsecureRequests: [],
-  //       workerSrc: ["'self'"],
-  //       styleSrc: ["'self'", "'unsafe-inline'"],
-  //       scriptSrc: ["'self'"],
-  //       scriptSrcElem: ["'self'"],
-  //     },
-  //   })(c, next);
-  // });
+  app.use("*", (c, next) => {
+    const isSwaggerUI = c.req.path.includes("/ui");
+
+    if (isSwaggerUI) {
+      return next();
+    }
+
+    return secureHeaders({
+      contentSecurityPolicy: {
+        defaultSrc: ["'self'"],
+        baseUri: ["'self'"],
+        childSrc: ["'self'"],
+        connectSrc: ["'self'"],
+        fontSrc: ["'self'", "https:", "data:"],
+        formAction: ["'self'"],
+        frameAncestors: ["'self'"],
+        frameSrc: ["'self'"],
+        imgSrc: ["'self'", "data:"],
+        manifestSrc: ["'self'"],
+        mediaSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        reportTo: "endpoint-1",
+        sandbox: ["allow-same-origin", "allow-scripts"],
+        scriptSrcAttr: ["'none'"],
+        styleSrcAttr: ["none"],
+        styleSrcElem: ["'self'", "https:", "'unsafe-inline'"],
+        upgradeInsecureRequests: [],
+        workerSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'"],
+        scriptSrcElem: ["'self'"],
+      },
+    })(c, next);
+  });
 
   app.use(
     "*",

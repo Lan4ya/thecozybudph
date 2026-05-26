@@ -10,6 +10,7 @@ import {
   getShippingCityRoute,
   getShippingDriverRoute,
   getShippingMarketRoute,
+  editShippingOrderRoute,
   getShippingOrderRoute,
   shipOrderRoute,
 } from "./shipment-routes.ts";

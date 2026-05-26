@@ -81,13 +81,7 @@ export const DesktopNavLinks = ({
         className="relative flex flex-col items-center"
         onMouseEnter={() => setHovered("/cart")}
       >
-        <NavLink
-          to="/cart"
-          className={cn(
-            "text-primary-foreground transition-colors relative",
-            "text-foreground hover:text-primary/90",
-          )}
-        >
+        <NavLink to="/cart" className="transition-colors relative">
           <div className="absolute -right-3.5 -top-[9px] flex-center text-secondary-foreground text-[9px] font-medium bg-secondary size-5 rounded-full select-none">
             {cartItemsCount}
           </div>

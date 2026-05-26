@@ -4,7 +4,7 @@ import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import isDev from "@/lib/utils/isDev";
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { Edit, ChevronRight, Shield } from "lucide-react";
+import { ChevronRight, Shield, ShoppingBag, Settings } from "lucide-react";
 import DefaultAvatar from "@/assets/thecozybud/avatar.png";
 import { useAuthStore } from "@/store/useAuthStore";
 import { handleError } from "@/lib/utils/format";
@@ -21,7 +21,7 @@ const Row = ({
 }) => (
   <button
     onClick={onClick}
-    className="w-full flex items-center justify-between px-4 py-4 md:px-5 md:py-4 hover:bg-card/60 transition-colors"
+    className="hover:bg-primary/15 w-full flex items-center justify-between py-2 px-2 rounded-md md:py-4 cursor-pointer transition-colors"
   >
     <div className="flex items-center gap-3 text-sm md:text-base">
       {icon}
@@ -38,13 +38,13 @@ const Section = ({
   children: React.ReactNode;
   title?: string;
 }) => (
-  <div className="bg-card rounded-xl border overflow-hidden">
+  <div className="bg-card rounded-xl border overflow-hidden p-4 ">
     {title && (
-      <div className="px-4 py-3 md:px-5 text-xs text-muted uppercase tracking-wide">
+      <div className="pb-3 text-xs text-muted uppercase tracking-wide px-2">
         {title}
       </div>
     )}
-    <div className="divide-y">{children}</div>
+    <div className="space-y-1">{children}</div>
   </div>
 );
 
@@ -99,15 +99,6 @@ const Profile = () => {
               {session?.user?.email}
             </p>
           </div>
-
-          <Button
-            size="icon"
-            variant="outline"
-            className="self-start sm:self-auto"
-            onClick={() => navigate("/profile/edit")}
-          >
-            <Edit className="size-4" />
-          </Button>
         </div>
 
         {/* Grid Layout */}
@@ -117,14 +108,12 @@ const Profile = () => {
             <Section title="Account">
               <Row
                 label="My Purchases"
+                icon={<ShoppingBag className="size-4 text-primary" />}
                 onClick={() => navigate("/profile/my-purchases")}
               />
               <Row
-                label="Vouchers"
-                onClick={() => navigate("/profile/vouchers")}
-              />
-              <Row
                 label="Settings"
+                icon={<Settings className="size-4 text-primary" />}
                 onClick={() => navigate("/profile/settings")}
               />
             </Section>
@@ -140,7 +129,6 @@ const Profile = () => {
             )}
           </div>
 
-          {/* Right (Side / Actions) */}
           <div className="space-y-6">
             <Section title="Danger Zone">
               <div className="p-4">

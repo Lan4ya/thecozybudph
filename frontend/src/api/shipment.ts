@@ -88,9 +88,12 @@ export const ShipmentAPI = {
   changeDriver: async (
     payload: ChangeShippingDriverInput,
   ): Promise<Record<string, unknown>> => {
-    const { data: raw } = await client.shipment.POST("/shipment/driver/change", {
-      body: payload,
-    });
+    const { data: raw } = await client.shipment.POST(
+      "/shipment/driver/change",
+      {
+        body: payload,
+      },
+    );
     return unwrapData(raw, "POST /shipment/driver/change");
   },
 

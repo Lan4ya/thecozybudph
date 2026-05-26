@@ -50,7 +50,6 @@ export const MobileDrawer = ({ hasSession }: { hasSession: boolean }) => {
 
   return (
     <Drawer>
-      {/* @ts-ignore */}
       <DrawerTrigger asChild>
         <Button
           variant="minimal"
@@ -86,7 +85,6 @@ export const MobileDrawer = ({ hasSession }: { hasSession: boolean }) => {
             const Icon = icons[key];
 
             return (
-              // @ts-ignore
               <DrawerClose asChild key={href}>
                 <NavLink
                   to={href}

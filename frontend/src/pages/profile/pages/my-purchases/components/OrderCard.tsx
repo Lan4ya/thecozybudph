@@ -97,7 +97,7 @@ export function OrderCard({ order }: { order: QueryOrderRes }) {
               <img
                 src={item.primaryImageUrl}
                 alt={item.name}
-                className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                className="h-full w-full object-cover transition-transform"
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center bg-muted">
