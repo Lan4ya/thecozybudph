@@ -3,15 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router";
 import { OrderAPI } from "@/api";
 import { cn } from "@/lib/utils/cn";
-
 import type { QueryOrdersInput } from "@cozybud/schemas";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Receipt, ArrowRight, ShoppingBag } from "lucide-react";
-import {
-  OrderCard,
-  statusConfig,
-  type QueryOrderRes,
-} from "./components/OrderCard";
+import { OrderCard, statusConfig } from "./components/OrderCard";
 import { FlowerSpinner } from "@/components/RouteLoaderSpinner";
 
 export type OrderStatusUI = keyof typeof statusConfig | "all";
@@ -38,13 +33,13 @@ const MyPurchases = () => {
   );
 
   const { data, error, refetch, isFetching } = useQuery({
-    queryKey: ["orders", queryParams],
-    queryFn: () =>
-      OrderAPI.queryOrders(queryParams) as Promise<QueryOrderRes[]>,
+    queryKey: ["orders", activeTab],
+    queryFn: () => OrderAPI.queryOrders(queryParams),
   });
 
   const currentStatus =
     activeTab === "all" ? undefined : statusConfig[activeTab];
+
   const orders = data ?? [];
 
   return (
@@ -68,9 +63,9 @@ const MyPurchases = () => {
             role="tablist"
             aria-label="Order status tabs"
           >
-            {ORDER_STATUS_TABS.map(({ status, label }) => (
+            {ORDER_STATUS_TABS.map(({ status, label }, idx) => (
               <button
-                key={status}
+                key={`status-${idx}`}
                 type="button"
                 role="tab"
                 aria-selected={activeTab === status}
@@ -136,7 +131,7 @@ const MyPurchases = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {orders.map((order) => (
-            <OrderCard key={order.id} order={order} />
+            <OrderCard key={order.item.id} order={order} />
           ))}
         </div>
       )}
