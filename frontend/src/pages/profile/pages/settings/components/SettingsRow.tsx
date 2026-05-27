@@ -31,7 +31,7 @@ export function SettingsRow({
       <Switch
         checked={checked}
         onCheckedChange={onCheckedChange}
-        className={cn(!checked && "[&_span]:bg-background")}
+        className={cn(!checked && "dark:[&_span]:bg-background")}
       />
     </div>
   );

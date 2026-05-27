@@ -8,7 +8,7 @@ import { useProductSelectionStore } from "@/pages/shop/store/useProductSelection
 import { Swiper, SwiperSlide } from "swiper/react";
 import { A11y, Navigation } from "swiper/modules";
 import { Textarea } from "@/lib/ui/__shadcn__/textarea";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "swiper/swiper.css";
 import { useShallow } from "zustand/react/shallow";
 import type { Product } from "@cozybud/schemas";
@@ -89,20 +89,14 @@ export const OptionsDrawer = ({
       ? selectedVariant.priceCents * quantity
       : 0;
 
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [cardActiveIndex, setCardActiveIndex] = useState(0);
 
-  const isFirstSlide = activeIndex === 0;
-  const isLastSlide = activeIndex === cardMessages.length - 1;
-
-  useEffect(() => {
-    if (activeIndex >= quantity) {
-      setActiveIndex(quantity - 1);
-    }
-  }, [quantity, activeIndex]);
+  const isFirstSlide = cardActiveIndex === 0;
+  const isLastSlide = cardActiveIndex === cardMessages.length - 1;
 
   return (
     <Drawer open={drawerOpen} onOpenChange={(open) => setDrawerOpen(open)}>
-      <DrawerContent className="w-full rounded-t-xl border border-border/40 pb-8">
+      <DrawerContent className="z-99 w-full rounded-t-xl border border-border/40 pb-8">
         <VisuallyHidden>
           <DialogTitle>Add to Cart</DialogTitle>
           <DialogDescription>
@@ -111,7 +105,7 @@ export const OptionsDrawer = ({
           </DialogDescription>
         </VisuallyHidden>
 
-        <div className="max-w-7xl w-full mx-auto px-5 pt-6 space-y-6">
+        <div className="max-w-7xl w-full mx-auto px-5 pt-6 pb-8 lg:pb-0 space-y-6">
           {/* Variant Summary */}
           {selectedVariant && (
             <>
@@ -166,7 +160,7 @@ export const OptionsDrawer = ({
                       nextEl: ".custom-next",
                     }}
                     onSlideChange={(swiper) =>
-                      setActiveIndex(swiper.activeIndex)
+                      setCardActiveIndex(swiper.activeIndex)
                     }
                   >
                     {cardMessages.map((msg, i) => (
@@ -205,7 +199,9 @@ export const OptionsDrawer = ({
 
                   <div className="mt-1 flex justify-between text-xs text-muted-foreground">
                     <span>Included free with your flowers</span>
-                    <span>{cardMessages[activeIndex]?.length ?? 0}/600</span>
+                    <span>
+                      {cardMessages[cardActiveIndex]?.length ?? 0}/600
+                    </span>
                   </div>
                 </div>
               </div>

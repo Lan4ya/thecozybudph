@@ -7,6 +7,7 @@ import { ProductImage } from "@/components/products/ProductImage";
 import { Link } from "react-router";
 import { ArrowLeft } from "lucide-react";
 import { useIsLgScreenMin } from "@/hooks/useMediaQuery";
+import type { Swiper as SwiperType } from "swiper";
 
 interface CarouselProps {
   urls: string[];
@@ -14,9 +15,10 @@ interface CarouselProps {
 
 const Carousel = ({ urls }: CarouselProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [mainSwiper, setMainSwiper] = useState<any>(null);
-  if (!urls || urls.length === 0) return null;
+  const [mainSwiper, setMainSwiper] = useState<SwiperType | null>(null);
   const isLgScreen = useIsLgScreenMin();
+
+  if (!urls || urls.length === 0) return null;
 
   const isFirstSlide = activeIndex === 0;
   const isLastSlide = activeIndex === urls.length - 1;

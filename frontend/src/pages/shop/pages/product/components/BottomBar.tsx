@@ -31,7 +31,7 @@ export const BottomBar = (props: BottomBarProps) => {
       ),
     );
     setSelectedVariant(variant ?? null);
-  }, [props.product.variants, selectedOptions]);
+  }, [props.product.variants, selectedOptions, setSelectedVariant]);
 
   const handleBuyNowMode = () => {
     if (!selectedVariant) return;
@@ -82,7 +82,7 @@ export const BottomBarActions = ({
     <div
       className={cn(
         "w-full flex lg:gap-3 lg:mt-3",
-        "fixed left-0 z-100 bottom-0 lg:static lg:left-auto lg:bottom-auto",
+        "fixed left-0 z-30 bottom-0 lg:static lg:left-auto lg:bottom-auto",
       )}
     >
       <Button

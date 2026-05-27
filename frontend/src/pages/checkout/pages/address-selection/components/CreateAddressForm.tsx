@@ -25,18 +25,6 @@ import { FieldError } from "@/pages/checkout/components/FieldError";
 
 type FormValues = z.infer<typeof createAddressFormSchema>;
 
-const defaultValues: FormValues = {
-  fullName: `Juan-${crypto.randomUUID()}`,
-  phoneNumber: "9950916583",
-  postalCode: "4436",
-  region: "NCR",
-  province: "",
-  city: "Quezon",
-  barangay: "Tudturan",
-  addressLine: "Camia",
-  isDefault: true,
-};
-
 const CreateAddressForm = ({ onCloseForm }: { onCloseForm: () => void }) => {
   const {
     register,
@@ -45,7 +33,6 @@ const CreateAddressForm = ({ onCloseForm }: { onCloseForm: () => void }) => {
     handleSubmit,
     formState: { errors, isValid, isDirty },
   } = useForm<FormValues>({
-    defaultValues,
     resolver: zodResolver(createAddressFormSchema),
     mode: "onChange",
   });
@@ -212,7 +199,7 @@ const CreateAddressForm = ({ onCloseForm }: { onCloseForm: () => void }) => {
                     <MapPin className="size-4 shrink-0 text-muted-foreground" />
                     <input
                       {...register("region")}
-                      placeholder="National Capital Region (NCR)"
+                      placeholder="NCR"
                       className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
                     />
                   </div>

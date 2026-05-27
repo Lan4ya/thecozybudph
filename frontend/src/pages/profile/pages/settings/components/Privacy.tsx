@@ -1,6 +1,5 @@
 import { Globe } from "lucide-react";
 import { Separator } from "@/lib/ui/__shadcn__/separator";
-import { Button } from "@/lib/ui/__shadcn__/button";
 import { useState } from "react";
 import { SettingsRow } from "./SettingsRow";
 
@@ -33,7 +32,7 @@ export function Privacy() {
           description="Hide your order history from other users."
           checked={settings.orderHistoryPrivate}
           onCheckedChange={() => toggle("orderHistoryPrivate")}
-          className="hover:bg-primary/20"
+          className="hover:bg-primary/10"
         />
 
         <SettingsRow
@@ -46,7 +45,7 @@ export function Privacy() {
           description="Allow us to use cookies for personalized ads and offers."
           checked={settings.marketingCookies}
           onCheckedChange={() => toggle("marketingCookies")}
-          className="hover:bg-muted/20"
+          className="hover:bg-primary/10"
         />
 
         <SettingsRow
@@ -54,24 +53,8 @@ export function Privacy() {
           description="Help us improve by allowing anonymous usage analytics."
           checked={settings.analyticsCookies}
           onCheckedChange={() => toggle("analyticsCookies")}
-          className="hover:bg-muted/20"
+          className="hover:bg-primary/10"
         />
-      </div>
-      <Separator />
-      <div className="space-y-3">
-        <h4 className="text-sm font-medium text-destructive">Danger Zone</h4>
-        <div className="bg-destructive/5 border border-destructive/10 rounded-lg p-4 space-y-3">
-          <div>
-            <p className="text-sm font-medium">Delete Account</p>
-            <p className="text-xs text-muted-foreground">
-              Permanently delete your account and all associated data. This
-              action cannot be undone.
-            </p>
-          </div>
-          <Button variant="destructive" size="sm">
-            Delete Account
-          </Button>
-        </div>
       </div>
     </div>
   );
