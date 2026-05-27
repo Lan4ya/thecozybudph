@@ -21,7 +21,7 @@ const Row = ({
 }) => (
   <button
     onClick={onClick}
-    className="hover:bg-primary/15 w-full flex items-center justify-between py-2 px-2 rounded-md md:py-4 cursor-pointer transition-colors"
+    className="hover:bg-primary/15 w-full flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors"
   >
     <div className="flex items-center gap-3 text-sm md:text-base">
       {icon}
@@ -38,7 +38,7 @@ const Section = ({
   children: React.ReactNode;
   title?: string;
 }) => (
-  <div className="bg-card rounded-xl border overflow-hidden p-4 ">
+  <div className="bg-card rounded-xl border overflow-hidden p-4">
     {title && (
       <div className="pb-3 text-xs text-muted uppercase tracking-wide px-2">
         {title}

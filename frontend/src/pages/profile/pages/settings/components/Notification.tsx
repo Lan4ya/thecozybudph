@@ -1,6 +1,6 @@
 import { Separator } from "@/lib/ui/__shadcn__/separator";
-import { Switch } from "@/lib/ui/__shadcn__/switch";
 import { useState } from "react";
+import { SettingsRow } from "./SettingsRow";
 
 export function Notifications() {
   const [settings, setSettings] = useState({
@@ -67,19 +67,14 @@ export function Notifications() {
 
       <div className="space-y-1">
         {rows.map((row) => (
-          <div
+          <SettingsRow
             key={row.key}
-            className="flex items-center justify-between py-4 px-1 hover:bg-primary/20 rounded-lg transition-colors"
-          >
-            <div className="pr-4">
-              <p className="text-sm font-medium">{row.label}</p>
-              <p className="text-xs text-muted-foreground">{row.description}</p>
-            </div>
-            <Switch
-              checked={settings[row.key]}
-              onCheckedChange={() => toggle(row.key)}
-            />
-          </div>
+            label={row.label}
+            description={row.description}
+            checked={settings[row.key]}
+            onCheckedChange={() => toggle(row.key)}
+            className="hover:bg-primary/10"
+          />
         ))}
       </div>
     </div>

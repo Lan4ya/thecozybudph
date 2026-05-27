@@ -1,7 +1,7 @@
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Input } from "@/lib/ui/__shadcn__/input";
 import { Separator } from "@/lib/ui/__shadcn__/separator";
-import { Mail, Smartphone, Save } from "lucide-react";
+import { Mail } from "lucide-react";
 import { useState } from "react";
 
 export function Account() {
@@ -56,36 +56,11 @@ export function Account() {
           </p>
         </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Phone Number</label>
-          <div className="relative">
-            <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-            <Input
-              value={form.phone}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, phone: e.target.value }))
-              }
-              className="pl-9"
-            />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Bio</label>
-          <textarea
-            value={form.bio}
-            onChange={(e) => setForm((f) => ({ ...f, bio: e.target.value }))}
-            rows={3}
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring resize-none"
-          />
-        </div>
-
         <Button
           onClick={handleSave}
           disabled={saving}
           className="min-w-[100px]"
         >
-          <Save className="size-4 mr-2" />
           {saving ? "Saving..." : saved ? "Saved!" : "Save Changes"}
         </Button>
       </div>

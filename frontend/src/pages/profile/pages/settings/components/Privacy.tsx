@@ -1,8 +1,8 @@
-import { Eye, Globe } from "lucide-react";
-import { Switch } from "@/lib/ui/__shadcn__/switch";
+import { Globe } from "lucide-react";
 import { Separator } from "@/lib/ui/__shadcn__/separator";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { useState } from "react";
+import { SettingsRow } from "./SettingsRow";
 
 export function Privacy() {
   const [settings, setSettings] = useState({
@@ -28,67 +28,36 @@ export function Privacy() {
       <Separator />
 
       <div className="space-y-1">
-        <div className="flex items-center justify-between py-4 px-1 hover:bg-primary/20 rounded-lg transition-colors">
-          <div className="pr-4">
-            <p className="text-sm font-medium flex items-center gap-2">
-              <Eye className="size-4" />
-              Public Profile
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Allow others to see your profile and public activity.
-            </p>
-          </div>
-          <Switch
-            checked={settings.profileVisible}
-            onCheckedChange={() => toggle("profileVisible")}
-          />
-        </div>
+        <SettingsRow
+          label="Private Order History"
+          description="Hide your order history from other users."
+          checked={settings.orderHistoryPrivate}
+          onCheckedChange={() => toggle("orderHistoryPrivate")}
+          className="hover:bg-primary/20"
+        />
 
-        <div className="flex items-center justify-between py-4 px-1 hover:bg-primary/20 rounded-lg transition-colors">
-          <div className="pr-4">
-            <p className="text-sm font-medium">Private Order History</p>
-            <p className="text-xs text-muted-foreground">
-              Hide your order history from other users.
-            </p>
-          </div>
-          <Switch
-            checked={settings.orderHistoryPrivate}
-            onCheckedChange={() => toggle("orderHistoryPrivate")}
-          />
-        </div>
-
-        <div className="flex items-center justify-between py-4 px-1 hover:bg-muted/20 rounded-lg transition-colors">
-          <div className="pr-4">
-            <p className="text-sm font-medium flex items-center gap-2">
+        <SettingsRow
+          label={
+            <div className="flex items-center gap-2">
               <Globe className="size-4" />
               Marketing Cookies
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Allow us to use cookies for personalized ads and offers.
-            </p>
-          </div>
-          <Switch
-            checked={settings.marketingCookies}
-            onCheckedChange={() => toggle("marketingCookies")}
-          />
-        </div>
+            </div>
+          }
+          description="Allow us to use cookies for personalized ads and offers."
+          checked={settings.marketingCookies}
+          onCheckedChange={() => toggle("marketingCookies")}
+          className="hover:bg-muted/20"
+        />
 
-        <div className="flex items-center justify-between py-4 px-1 hover:bg-muted/20 rounded-lg transition-colors">
-          <div className="pr-4">
-            <p className="text-sm font-medium">Analytics Cookies</p>
-            <p className="text-xs text-muted-foreground">
-              Help us improve by allowing anonymous usage analytics.
-            </p>
-          </div>
-          <Switch
-            checked={settings.analyticsCookies}
-            onCheckedChange={() => toggle("analyticsCookies")}
-          />
-        </div>
+        <SettingsRow
+          label="Analytics Cookies"
+          description="Help us improve by allowing anonymous usage analytics."
+          checked={settings.analyticsCookies}
+          onCheckedChange={() => toggle("analyticsCookies")}
+          className="hover:bg-muted/20"
+        />
       </div>
-
       <Separator />
-
       <div className="space-y-3">
         <h4 className="text-sm font-medium text-destructive">Danger Zone</h4>
         <div className="bg-destructive/5 border border-destructive/10 rounded-lg p-4 space-y-3">

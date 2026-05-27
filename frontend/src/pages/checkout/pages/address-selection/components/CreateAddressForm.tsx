@@ -118,16 +118,30 @@ const CreateAddressForm = ({ onCloseForm }: { onCloseForm: () => void }) => {
             transition={{ delay: 0.05 }}
             className="rounded-3xl border border-border/60 bg-card p-4 shadow-sm sm:p-6"
           >
-            <div className="mb-5 flex items-center gap-3">
-              <div className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                <MapPin className="size-5" />
+            <div className="mb-5 space-y-2">
+              <div className="flex items-center gap-3">
+                <div className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                  <MapPin className="size-5" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-foreground">
+                    Address
+                  </h2>
+                </div>
               </div>
 
-              <div>
-                <h2 className="text-lg font-semibold text-foreground">
-                  Address
-                </h2>
-              </div>
+              <p className="text-sm text-muted-foreground">
+                Note: We deliver to North, Central, South Luzon, and Cebu
+                Islandwide only. See Lalamove's{" "}
+                <a
+                  href="https://www.lalamove.com/en-ph/serviceable-areas"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-link"
+                >
+                  serviceable areas
+                </a>
+              </p>
             </div>
 
             <div className="space-y-4">

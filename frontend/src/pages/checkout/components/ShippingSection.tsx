@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { RotateCw, Truck } from "lucide-react";
+import { Truck } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { capitalizeFirstLetter } from "@/lib/utils/format";
 import { useQuery } from "@tanstack/react-query";
@@ -7,7 +7,6 @@ import { useCheckoutStore } from "../store/useCheckoutStore";
 import { CheckoutShippingOptionSkeleton } from "@/lib/ui/skeletons/CheckoutShippingOptionSkeleton";
 import { useEffect } from "react";
 import { ShipmentAPI } from "@/api";
-import { Button } from "@/lib/ui/__shadcn__/button";
 import { createShippingQuoteQK } from "../queryKeys";
 
 const ShippingSection = () => {
@@ -19,7 +18,6 @@ const ShippingSection = () => {
     data: quotations,
     error,
     isFetching,
-    refetch,
   } = useQuery({
     queryKey: createShippingQuoteQK(addressStore),
     queryFn: () => {
@@ -78,18 +76,26 @@ const ShippingSection = () => {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Truck className="size-5 text-primary" />
-          <h2 className="font-semibold text-foreground">Shipping Option </h2>
+          <h2 className="font-semibold text-foreground">
+            Shipping Option{" "}
+            <span className="text-muted-foreground text-sm">(Lalamove)</span>
+          </h2>
         </div>
       </div>
 
       <div className="space-y-3">
         {!isFetching && error && (
-          <div className="text-destructive flex justify-baseline items-baseline gap-3 text-sm">
-            Failed loading shipping options. Make sure you're using a valid
-            address then try again.
-            <Button size="icon-sm" onClick={() => refetch()}>
-              <RotateCw onClick={() => refetch()} />
-            </Button>
+          <div className="text-destructive text-sm">
+            Failed loading shipping options. Make sure the address you're using
+            is serviceable to Lalamove. See full list of{" "}
+            <a
+              href="https://www.lalamove.com/en-ph/serviceable-areas"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-link"
+            >
+              serviceable areas
+            </a>
           </div>
         )}
 
