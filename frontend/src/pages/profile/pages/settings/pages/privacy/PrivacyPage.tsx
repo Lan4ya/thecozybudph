@@ -1,12 +1,11 @@
 import { Globe } from "lucide-react";
 import { Separator } from "@/lib/ui/__shadcn__/separator";
 import { useState } from "react";
-import { SettingsRow } from "./SettingsRow";
+import { SettingsRow } from "../../components/SettingsRow";
 
-export function Privacy() {
+export default function PrivacyPage() {
   const [settings, setSettings] = useState({
     profileVisible: true,
-    orderHistoryPrivate: false,
     marketingCookies: true,
     analyticsCookies: true,
   });
@@ -16,7 +15,7 @@ export function Privacy() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="bg-card rounded-xl border p-5 md:p-6 shadow-sm space-y-6">
       <div>
         <h3 className="text-lg font-semibold">Privacy & Security</h3>
         <p className="text-sm text-muted-foreground">
@@ -27,14 +26,6 @@ export function Privacy() {
       <Separator />
 
       <div className="space-y-1">
-        <SettingsRow
-          label="Private Order History"
-          description="Hide your order history from other users."
-          checked={settings.orderHistoryPrivate}
-          onCheckedChange={() => toggle("orderHistoryPrivate")}
-          className="hover:bg-primary/10"
-        />
-
         <SettingsRow
           label={
             <div className="flex items-center gap-2">

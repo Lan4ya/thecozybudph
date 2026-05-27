@@ -58,6 +58,7 @@ const Carousel = ({ urls }: CarouselProps) => {
                 loading={index === activeIndex ? "eager" : "lazy"}
                 src={u}
                 alt={`Slide ${index + 1}`}
+                className="min-[501px]:rounded-3xl"
               />
             </SwiperSlide>
           ))}

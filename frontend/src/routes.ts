@@ -17,6 +17,11 @@ import FAQ from "./pages/FAQ/FAQ.tsx";
 import MyPurchases from "./pages/profile/pages/my-purchases/MyPurchases.tsx";
 import OrderDetails from "./pages/profile/pages/my-purchases/OrderDetails.tsx";
 import Settings from "./pages/profile/pages/settings/Settings.tsx";
+import AccountPage from "./pages/profile/pages/settings/pages/account/AccountPage.tsx";
+import AddAddressPage from "./pages/profile/pages/settings/pages/account/pages/AddAddressPage.tsx";
+import EditAddressPage from "./pages/profile/pages/settings/pages/account/pages/EditAddressPage.tsx";
+import NotificationsPage from "./pages/profile/pages/settings/pages/notification/NotificationsPage.tsx";
+import PrivacyPage from "./pages/profile/pages/settings/pages/privacy/PrivacyPage.tsx";
 import {
   AdminDashboardLoader,
   AdminDashboard,
@@ -75,7 +80,24 @@ const router = createBrowserRouter([
               { path: "item/:itemId", Component: OrderDetails },
             ],
           },
-          { path: "settings", Component: Settings },
+          {
+            path: "settings",
+            Component: Settings,
+            children: [
+              { index: true, loader: () => redirect("account") },
+              {
+                path: "account",
+                Component: AccountPage,
+              },
+              { path: "notifications", Component: NotificationsPage },
+              { path: "privacy", Component: PrivacyPage },
+            ],
+          },
+          { path: "settings/account/address/add", Component: AddAddressPage },
+          {
+            path: "settings/account/address/:addressId/edit",
+            Component: EditAddressPage,
+          },
           {
             path: "admin",
             loader: AdminDashboardLoader,

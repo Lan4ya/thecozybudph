@@ -1,31 +1,19 @@
-import { useState } from "react";
 import { cn } from "@/lib/utils/cn";
 import { User, Bell, Shield } from "lucide-react";
-import { Privacy } from "./components/Privacy";
-import { Account } from "./components/Account";
-import { Notifications } from "./components/Notification";
+import { NavLink, Outlet } from "react-router";
 
-type SettingsTab = "account" | "notifications" | "privacy";
-
-const tabs: { id: SettingsTab; label: string; icon: React.ReactNode }[] = [
-  { id: "account", label: "Account", icon: <User className="size-4" /> },
+const tabs: { id: string; label: string; icon: React.ReactNode; path: string }[] = [
+  { id: "account", label: "Account", icon: <User className="size-4" />, path: "account" },
   {
     id: "notifications",
     label: "Notifications",
     icon: <Bell className="size-4" />,
+    path: "notifications",
   },
-  { id: "privacy", label: "Privacy", icon: <Shield className="size-4" /> },
+  { id: "privacy", label: "Privacy", icon: <Shield className="size-4" />, path: "privacy" },
 ];
 
 const Settings = () => {
-  const [activeTab, setActiveTab] = useState<SettingsTab>("account");
-
-  const TabContent = {
-    account: Account,
-    notifications: Notifications,
-    privacy: Privacy,
-  }[activeTab];
-
   return (
     <div className="w-full px-4 py-6 md:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto space-y-6">
@@ -45,28 +33,28 @@ const Settings = () => {
           <div className="lg:col-span-1">
             <nav className="bg-card rounded-xl border p-4 space-y-1 overflow-hidden sticky top-6">
               {tabs.map((tab) => (
-                <button
+                <NavLink
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={cn(
-                    "w-full flex items-center px-2 rounded-md gap-3 py-3 text-sm font-medium transition-colors text-left",
-                    activeTab === tab.id
-                      ? "bg-primary/20 text-primary"
-                      : "text-foreground/75 hover:bg-primary/10",
-                  )}
+                  to={tab.path}
+                  className={({ isActive }) =>
+                    cn(
+                      "w-full flex items-center px-2 rounded-md gap-3 py-3 text-sm font-medium transition-colors text-left",
+                      isActive
+                        ? "bg-primary/20 text-primary"
+                        : "text-foreground/75 hover:bg-primary/10",
+                    )
+                  }
                 >
                   {tab.icon}
                   {tab.label}
-                </button>
+                </NavLink>
               ))}
             </nav>
           </div>
 
           {/* Content */}
-          <div className="lg:col-span-3">
-            <div className="bg-card rounded-xl border p-5 md:p-6 shadow-sm">
-              <TabContent />
-            </div>
+          <div className="lg:col-span-3 space-y-6">
+            <Outlet />
           </div>
         </div>
       </div>

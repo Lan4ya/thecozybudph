@@ -10,7 +10,6 @@ import { Textarea } from "@/lib/ui/__shadcn__/textarea";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { cn } from "@/lib/utils/cn";
 import { EVENT_TYPES, BUDGET_RANGES } from "@/pages/events/constants";
-import { Calendar, Users, MapPin, Banknote, MessageSquare } from "lucide-react";
 
 export interface EventInquiryFormProps {
   onSubmit: (data: EventInquiryFormInput) => void;
@@ -133,11 +132,7 @@ export const EventInquiryForm = ({
       {/* Event Date & Guest Count Row */}
       <div className="grid sm:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label
-            htmlFor="eventDate"
-            className="text-foreground/80 flex items-center gap-2"
-          >
-            <Calendar className="w-4 h-4" />
+          <Label htmlFor="eventDate" className="text-foreground/80">
             Event Date <span className="text-red-500">*</span>
           </Label>
           <Input
@@ -156,11 +151,7 @@ export const EventInquiryForm = ({
         </div>
 
         <div className="space-y-2">
-          <Label
-            htmlFor="guestCount"
-            className="text-foreground/80 flex items-center gap-2"
-          >
-            <Users className="w-4 h-4" />
+          <Label htmlFor="guestCount" className="text-foreground/80">
             Number of Guests
           </Label>
           <Input
@@ -182,11 +173,7 @@ export const EventInquiryForm = ({
       {/* Venue & Budget Row */}
       <div className="grid sm:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label
-            htmlFor="venue"
-            className="text-foreground/80 flex items-center gap-2"
-          >
-            <MapPin className="w-4 h-4" />
+          <Label htmlFor="venue" className="text-foreground/80">
             Event Venue
           </Label>
           <Input
@@ -204,11 +191,7 @@ export const EventInquiryForm = ({
         </div>
 
         <div className="space-y-2">
-          <Label
-            htmlFor="budget"
-            className="text-foreground/80 flex items-center gap-2"
-          >
-            <Banknote className="w-4 h-4" />
+          <Label htmlFor="budget" className="text-foreground/80">
             Budget Range
           </Label>
           <select id="budget" {...register("budget")} className={selectClasses}>
@@ -223,11 +206,7 @@ export const EventInquiryForm = ({
 
       {/* Message */}
       <div className="space-y-2">
-        <Label
-          htmlFor="message"
-          className="text-foreground/80 flex items-center gap-2"
-        >
-          <MessageSquare className="w-4 h-4" />
+        <Label htmlFor="message" className="text-foreground/80">
           Tell Us About Your Event <span className="text-red-500">*</span>
         </Label>
         <Textarea

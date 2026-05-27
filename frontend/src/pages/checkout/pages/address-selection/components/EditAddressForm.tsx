@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ChevronLeft, Hash, MapPin, Phone, User } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,6 +21,7 @@ import {
   checkoutDefaultAddressQK,
 } from "@/pages/checkout/hooks/useAddressQuery";
 import { useCheckoutStore } from "@/pages/checkout/store/useCheckoutStore";
+import { Input } from "@/lib/ui/__shadcn__/input";
 
 type EditAddressFormValues = z.infer<typeof updateAddressFormSchema>;
 
@@ -156,16 +157,7 @@ const EditAddressForm = ({
             className="rounded-3xl border border-border/60 bg-card p-4 shadow-sm sm:p-6"
           >
             <div className="mb-5 space-y-2">
-              <div className="flex items-center gap-3">
-                <div className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                  <MapPin className="size-5" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-foreground">
-                    Address
-                  </h2>
-                </div>
-              </div>
+              <h2 className="text-lg font-semibold text-foreground">Address</h2>
 
               <p className="text-sm text-muted-foreground">
                 Note: We deliver to North, Central, South Luzon, and Cebu
@@ -187,14 +179,7 @@ const EditAddressForm = ({
                 <label className="block text-sm font-medium text-foreground/90">
                   Full name
                 </label>
-                <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-background px-4 py-3 shadow-sm focus-within:border-primary/40">
-                  <User className="size-4 shrink-0 text-muted-foreground" />
-                  <input
-                    {...register("fullName")}
-                    placeholder="Juan Dela Cruz"
-                    className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-                  />
-                </div>
+                <Input {...register("fullName")} placeholder="Juan Dela Cruz" />
                 <FieldError message={errors.fullName?.message} />
               </div>
 
@@ -203,12 +188,11 @@ const EditAddressForm = ({
                   Phone number
                 </label>
 
-                <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-background px-4 py-3 shadow-sm focus-within:border-primary/40">
-                  <Phone className="size-4 shrink-0 text-muted-foreground" />
-                  <span className="border rounded-md text-xs -mr-2 mt-0.5 px] px-2">
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground border-r pr-2">
                     +63
                   </span>
-                  <input
+                  <Input
                     onChange={(e) => {
                       const value = e.target.value;
                       const formattedValue = value ? `+63${value}` : "";
@@ -222,7 +206,7 @@ const EditAddressForm = ({
                     maxLength={10}
                     placeholder="9XXXXXXXXX"
                     inputMode="numeric"
-                    className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                    className="pl-14"
                   />
                 </div>
                 <FieldError message={errors.phoneNumber?.message} />
@@ -232,16 +216,12 @@ const EditAddressForm = ({
                 <label className="block text-sm font-medium text-foreground/90">
                   Postal code
                 </label>
-                <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-background px-4 py-3 shadow-sm focus-within:border-primary/40">
-                  <Hash className="size-4 shrink-0 text-muted-foreground" />
-                  <input
-                    {...register("postalCode")}
-                    placeholder="1100"
-                    inputMode="numeric"
-                    maxLength={4}
-                    className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-                  />
-                </div>
+                <Input
+                  {...register("postalCode")}
+                  placeholder="1100"
+                  inputMode="numeric"
+                  maxLength={4}
+                />
                 <FieldError message={errors.postalCode?.message} />
               </div>
 
@@ -249,14 +229,10 @@ const EditAddressForm = ({
                 <label className="block text-sm font-medium text-foreground/90">
                   Region
                 </label>
-                <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-background px-4 py-3 shadow-sm focus-within:border-primary/40">
-                  <MapPin className="size-4 shrink-0 text-muted-foreground" />
-                  <input
-                    {...register("region")}
-                    placeholder="National Capital Region (NCR)"
-                    className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-                  />
-                </div>
+                <Input
+                  {...register("region")}
+                  placeholder="National Capital Region (NCR)"
+                />
                 <FieldError message={errors.region?.message} />
               </div>
 
@@ -267,14 +243,7 @@ const EditAddressForm = ({
                     (optional)
                   </span>
                 </label>
-                <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-background px-4 py-3 shadow-sm focus-within:border-primary/40">
-                  <MapPin className="size-4 shrink-0 text-muted-foreground" />
-                  <input
-                    {...register("province")}
-                    placeholder="Metro Manila"
-                    className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-                  />
-                </div>
+                <Input {...register("province")} placeholder="Metro Manila" />
                 <FieldError message={errors.province?.message} />
               </div>
 
@@ -282,14 +251,7 @@ const EditAddressForm = ({
                 <label className="block text-sm font-medium text-foreground/90">
                   City
                 </label>
-                <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-background px-4 py-3 shadow-sm focus-within:border-primary/40">
-                  <MapPin className="size-4 shrink-0 text-muted-foreground" />
-                  <input
-                    {...register("city")}
-                    placeholder="Quezon City"
-                    className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-                  />
-                </div>
+                <Input {...register("city")} placeholder="Quezon City" />
                 <FieldError message={errors.city?.message} />
               </div>
 
@@ -297,14 +259,7 @@ const EditAddressForm = ({
                 <label className="block text-sm font-medium text-foreground/90">
                   Barangay
                 </label>
-                <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-background px-4 py-3 shadow-sm focus-within:border-primary/40">
-                  <MapPin className="size-4 shrink-0 text-muted-foreground" />
-                  <input
-                    {...register("barangay")}
-                    placeholder="Bagumbayan"
-                    className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-                  />
-                </div>
+                <Input {...register("barangay")} placeholder="Bagumbayan" />
                 <FieldError message={errors.barangay?.message} />
               </div>
 
@@ -312,14 +267,10 @@ const EditAddressForm = ({
                 <label className="block text-sm font-medium text-foreground/90">
                   Address line
                 </label>
-                <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-background px-4 py-3 shadow-sm focus-within:border-primary/40">
-                  <MapPin className="size-4 shrink-0 text-muted-foreground" />
-                  <input
-                    {...register("addressLine")}
-                    placeholder="House / block / street / landmark"
-                    className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-                  />
-                </div>
+                <Input
+                  {...register("addressLine")}
+                  placeholder="House / block / street / landmark"
+                />
                 <FieldError message={errors.addressLine?.message} />
               </div>
             </div>

@@ -1,8 +1,8 @@
 import { Separator } from "@/lib/ui/__shadcn__/separator";
 import { useState } from "react";
-import { SettingsRow } from "./SettingsRow";
+import { SettingsRow } from "../../components/SettingsRow";
 
-export function Notifications() {
+export default function NotificationsPage() {
   const [settings, setSettings] = useState({
     emailOrders: true,
     emailPromos: true,
@@ -55,7 +55,7 @@ export function Notifications() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="bg-card rounded-xl border p-5 md:p-6 shadow-sm space-y-6">
       <div>
         <h3 className="text-lg font-semibold">Notification Preferences</h3>
         <p className="text-sm text-muted-foreground">

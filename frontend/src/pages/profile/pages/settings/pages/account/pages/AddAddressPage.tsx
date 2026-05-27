@@ -1,0 +1,253 @@
+import { useWatch } from "react-hook-form";
+import { motion } from "framer-motion";
+import { Button } from "@/lib/ui/__shadcn__/button";
+import { Input } from "@/lib/ui/__shadcn__/input";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  createAddressFormSchema,
+  type Address,
+  type CreateAddressInput,
+} from "@cozybud/schemas";
+import { useCallback } from "react";
+import { useToast } from "@/providers/ToastProvider";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AddressAPI } from "@/api/address";
+import isDev from "@/lib/utils/isDev";
+import { Spinner } from "@/lib/ui/__shadcn__/spinner";
+import {
+  checkoutAddressesQK,
+  checkoutDefaultAddressQK,
+} from "@/pages/checkout/hooks/useAddressQuery";
+import { useCheckoutStore } from "@/pages/checkout/store/useCheckoutStore";
+import { FieldError } from "@/pages/checkout/components/FieldError";
+import { useNavigate } from "react-router";
+
+type FormValues = z.infer<typeof createAddressFormSchema>;
+
+export default function AddAddressPage() {
+  const navigate = useNavigate();
+  const {
+    register,
+    setValue,
+    control,
+    handleSubmit,
+    formState: { errors, isValid, isDirty },
+  } = useForm<FormValues>({
+    resolver: zodResolver(createAddressFormSchema),
+    mode: "onChange",
+  });
+
+  const isDefault = useWatch({ control, name: "isDefault" });
+
+  const { addToast } = useToast();
+  const queryClient = useQueryClient();
+  const setAddress = useCheckoutStore((state) => state.setAddress);
+
+  const { mutate: createAddressMutation, isPending: createLoading } =
+    useMutation({
+      mutationFn: ({ address }: { address: CreateAddressInput }) =>
+        AddressAPI.createAddress(address),
+      onError: (err: Error) => {
+        isDev && console.error(err.message);
+        addToast("Something wen't wrong. Please try again later.", "error");
+      },
+      onSuccess: (newAddress) => {
+        queryClient.setQueryData<Address[]>(
+          [checkoutAddressesQK],
+          (old = []) => {
+            return [...old, newAddress];
+          },
+        );
+
+        addToast("Address created", "success");
+        setAddress(newAddress);
+        queryClient.invalidateQueries({ queryKey: [checkoutDefaultAddressQK] });
+        navigate("/profile/settings/account");
+      },
+    });
+
+  const toggleDefault = useCallback(() => {
+    setValue("isDefault", !isDefault, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  }, [isDefault, setValue]);
+
+  const onSubmit = (address: FormValues) => {
+    createAddressMutation({ address });
+  };
+
+  return (
+    <div className="w-full px-4 py-6 md:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto space-y-6">
+        <div className="bg-card rounded-xl border p-5 md:p-6 shadow-sm space-y-6">
+          <h3 className="text-lg font-semibold">Create Address</h3>
+
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-6"
+            noValidate
+          >
+            <div className="grid gap-6">
+              <section className="space-y-4">
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    Note: We deliver to North, Central, South Luzon, and Cebu
+                    Islandwide only. See Lalamove's{" "}
+                    <a
+                      href="https://www.lalamove.com/en-ph/serviceable-areas"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-link"
+                    >
+                      serviceable areas
+                    </a>
+                  </p>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2 sm:col-span-2">
+                    <label className="block text-sm font-medium">
+                      Full name
+                    </label>
+                    <Input
+                      {...register("fullName")}
+                      placeholder="Juan Dela Cruz"
+                    />
+                    <FieldError message={errors.fullName?.message} />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium">
+                      Phone number
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground border-r pr-2">
+                        +63
+                      </span>
+                      <Input
+                        {...register("phoneNumber", {
+                          setValueAs: (value: string) =>
+                            value ? `+63${value}` : "",
+                        })}
+                        maxLength={10}
+                        placeholder="9XXXXXXXXX"
+                        inputMode="numeric"
+                        className="pl-14"
+                      />
+                    </div>
+                    <FieldError message={errors.phoneNumber?.message} />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium">
+                      Postal code
+                    </label>
+                    <Input
+                      {...register("postalCode")}
+                      placeholder="1100"
+                      inputMode="numeric"
+                      maxLength={4}
+                    />
+                    <FieldError message={errors.postalCode?.message} />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium">Region</label>
+                    <Input {...register("region")} placeholder="NCR" />
+                    <FieldError message={errors.region?.message} />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium">
+                      Province
+                    </label>
+                    <Input
+                      {...register("province")}
+                      placeholder="Metro Manila"
+                    />
+                    <FieldError message={errors.province?.message} />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium">City</label>
+                    <Input {...register("city")} placeholder="Quezon City" />
+                    <FieldError message={errors.city?.message} />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium">
+                      Barangay
+                    </label>
+                    <Input {...register("barangay")} placeholder="Bagumbayan" />
+                    <FieldError message={errors.barangay?.message} />
+                  </div>
+
+                  <div className="space-y-2 sm:col-span-2">
+                    <label className="block text-sm font-medium">
+                      Address line
+                    </label>
+                    <Input
+                      {...register("addressLine")}
+                      placeholder="House / block / street / landmark"
+                    />
+                    <FieldError message={errors.addressLine?.message} />
+                  </div>
+                </div>
+              </section>
+
+              <aside className="space-y-4">
+                <div className="font-medium text-sm">Default address</div>
+                <button
+                  type="button"
+                  onClick={toggleDefault}
+                  className="flex w-full items-center justify-between rounded-2xl border border-border/60 bg-background px-4 py-3 text-left shadow-sm transition-colors hover:border-primary/40"
+                >
+                  <div className="text-xs text-muted-foreground">
+                    Use this for future checkouts
+                  </div>
+                  <div
+                    className={[
+                      "relative h-6 w-10 rounded-full p-1 transition-colors duration-300",
+                      isDefault ? "bg-primary" : "bg-muted",
+                    ].join(" ")}
+                  >
+                    <motion.div
+                      layout
+                      transition={{
+                        type: "spring",
+                        stiffness: 500,
+                        damping: 30,
+                      }}
+                      className="h-4 w-4 rounded-full bg-background shadow-md"
+                      animate={{ x: isDefault ? 16 : 0 }}
+                    />
+                  </div>
+                </button>
+              </aside>
+            </div>
+
+            <div className="pt-4 flex justify-end gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => navigate("/profile/settings/account")}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={!isValid || createLoading || !isDirty}
+                className="min-w-40"
+              >
+                {createLoading && <Spinner />} Save address
+              </Button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}

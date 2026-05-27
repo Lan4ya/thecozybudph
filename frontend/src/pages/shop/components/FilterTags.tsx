@@ -13,7 +13,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/lib/ui/__shadcn__/popover";
-import { PopoverArrow } from "@radix-ui/react-popover";
 import { cn } from "@/lib/utils/cn";
 import { formatPriceRange } from "./filters/PriceRange";
 
@@ -73,7 +72,6 @@ const FilterTags = () => {
                 : "justify-center p-2 w-30",
             )}
           >
-            <PopoverArrow />
             {hasProductQueryFilters ? (
               <>
                 {flattenedFilters.map(({ key, val }) => (
