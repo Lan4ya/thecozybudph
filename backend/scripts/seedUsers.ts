@@ -1,18 +1,7 @@
 import { randomInt } from "node:crypto";
-import { createClient } from "@supabase/supabase-js";
-import dotenv from "dotenv";
 import pLimit from "p-limit";
-
-dotenv.config();
-
-const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = process.env;
-
-if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-  console.error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
-  process.exit(1);
-}
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+import { supabase } from "./helpers/supabase.ts";
+import { getRandomAvatarUrl } from "./helpers/getDefaultAvatarUrl.ts";
 
 const USERS_TO_CREATE = 60;
 const DEFAULT_PASSWORD = "password123";
@@ -68,6 +57,8 @@ async function createUser() {
   const random = randomInt(1000, 100000);
   const email = `user${random}@local.dev`;
 
+  const avatar_url = await getRandomAvatarUrl();
+
   const {
     data: { user },
     error,
@@ -76,7 +67,8 @@ async function createUser() {
     password: DEFAULT_PASSWORD,
     email_confirm: true,
     user_metadata: {
-      name: "Yoda",
+      name: `User_${random}`,
+      avatar_url, // provide default avatar
     },
   });
 
@@ -102,7 +94,7 @@ async function createUser() {
   };
 }
 
-async function main() {
+export async function seedUsers() {
   await deleteAllUsers();
 
   const results = await Promise.all(
@@ -138,4 +130,9 @@ async function main() {
   console.log("Failed:", failed);
 }
 
-await main();
+if (process.argv[1] === import.meta.filename) {
+  seedUsers().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}

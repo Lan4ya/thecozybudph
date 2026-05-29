@@ -48,7 +48,7 @@
   }
 
   .text-link {
-    @apply underline text-blue-500 hover:text-blue-500/90;
+    @apply cursor-pointer hover:underline text-blue-500 hover:text-blue-500/90;
   }
 
   /* dev border */

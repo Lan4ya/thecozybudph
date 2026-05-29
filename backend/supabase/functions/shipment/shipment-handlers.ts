@@ -1,7 +1,7 @@
 import { RouteHandler } from "@hono/zod-openapi";
 import { ShippingActions } from "@shared/modules/shipping/mod.ts";
 import { AppEnv } from "@shared/types.d.ts";
-import { requireVariables } from "@shared/utils/mod.ts";
+import { isDev, requireVariables } from "@shared/utils/mod.ts";
 import {
   addShippingOrderPriorityFeeRoute,
   cancelShipOrderRoute,
@@ -21,6 +21,7 @@ export const createShippingQuoteHandler: RouteHandler<
 > = async (c) => {
   const payload = c.req.valid("json");
   const data = await ShippingActions.createShippingQuotation(payload);
+  isDev && console.log("[createShippingQuoteHandler] data", data);
   return c.json({ data }, 200);
 };
 

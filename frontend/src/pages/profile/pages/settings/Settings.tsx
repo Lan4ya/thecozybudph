@@ -1,16 +1,37 @@
 import { cn } from "@/lib/utils/cn";
-import { User, Bell, Shield } from "lucide-react";
+import { User, Bell, Shield, MapPin } from "lucide-react";
 import { NavLink, Outlet } from "react-router";
 
-const tabs: { id: string; label: string; icon: React.ReactNode; path: string }[] = [
-  { id: "account", label: "Account", icon: <User className="size-4" />, path: "account" },
+const tabs: {
+  id: string;
+  label: string;
+  icon: React.ReactNode;
+  path: string;
+}[] = [
+  {
+    id: "account",
+    label: "Account",
+    icon: <User className="size-4" />,
+    path: "account",
+  },
+  {
+    id: "addresses",
+    label: "My Addresses",
+    icon: <MapPin className="size-4" />,
+    path: "addresses",
+  },
   {
     id: "notifications",
     label: "Notifications",
     icon: <Bell className="size-4" />,
     path: "notifications",
   },
-  { id: "privacy", label: "Privacy", icon: <Shield className="size-4" />, path: "privacy" },
+  {
+    id: "privacy",
+    label: "Privacy",
+    icon: <Shield className="size-4" />,
+    path: "privacy",
+  },
 ];
 
 const Settings = () => {

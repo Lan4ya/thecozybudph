@@ -7,14 +7,15 @@ import PriceRange from "./components/filters/PriceRange";
 import Categories from "./components/filters/Categories";
 import Collections from "./components/filters/Collection";
 import PersistSuspense from "@/components/PersistSuspense";
-import { ShopProductGridSkeleton } from "../../lib/ui/skeletons/ShopProductGridItemsSkeleton";
+import { ShopProductGridItemsSkeleton } from "../../lib/ui/skeletons/ShopProductGridItemsSkeleton";
 import FilterTags from "./components/FilterTags";
 import { useIsXlScreenMin } from "@/hooks/useMediaQuery";
 import ProductGrid, { type ProductCardProps } from "./components/ProductGrid";
 import { ErrorBoundary } from "react-error-boundary";
 import isDev from "@/lib/utils/isDev";
 import { useNavigate } from "react-router";
-import { Sparkles } from "lucide-react";
+import { ShopProductGridDetailedItemsSkeleton } from "@/lib/ui/skeletons/ShopProductGridDetailedItemsSkeleton";
+import { cn } from "@/lib/utils/cn";
 
 const Shop = () => {
   const { productQuery, hasProductQueryFilters } =
@@ -34,9 +35,8 @@ const Shop = () => {
     <div className="max-w-[1600px] mx-auto min-h-screen w-full">
       {/* Header */}
       <header className="custom-container mb-8 md:mb-14 md:mt-4">
-        <h1 className="text-header flex justify-center items-center lg:justify-start gap-2 border-b border-accent/50 pb-4 pt-6 lg:pt-8">
+        <h1 className="text-header text-center lg:text-start border-b border-accent/50 pb-4 pt-6 lg:pt-8">
           Shop
-          {/* <Sparkles /> */}
         </h1>
       </header>
 
@@ -78,8 +78,19 @@ const Shop = () => {
 
         <PersistSuspense
           fallback={
-            <div className="grid gap-5 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 xl:gap-8 2xl:gap-10 ">
-              <ShopProductGridSkeleton />
+            <div
+              className={cn(
+                "grid",
+                cardType === "default"
+                  ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 xl:gap-8 2xl:gap-10"
+                  : "grid-cols-[repeat(auto-fit,minmax(400px,1fr))] sm:grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-10",
+              )}
+            >
+              {cardType === "default" ? (
+                <ShopProductGridItemsSkeleton />
+              ) : (
+                <ShopProductGridDetailedItemsSkeleton />
+              )}
             </div>
           }
         >

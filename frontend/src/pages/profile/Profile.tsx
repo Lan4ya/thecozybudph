@@ -2,13 +2,28 @@ import { supabase } from "@/lib/supabase/client";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import isDev from "@/lib/utils/isDev";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { ChevronRight, Shield, ShoppingBag, Settings } from "lucide-react";
-import DefaultAvatar from "@/assets/thecozybud/avatar.png";
+import {
+  ChevronRight,
+  Shield,
+  ShoppingBag,
+  Settings,
+  HelpCircle,
+} from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { handleError } from "@/lib/utils/format";
 import { useToast } from "@/providers/ToastProvider";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/lib/ui/__shadcn__/dialog";
+import { getAvatarUrls } from "@/lib/utils/avatars";
+import { cn } from "@/lib/utils/cn";
+import { ProgressiveImage } from "@/components/ProgressiveImage";
 
 const Row = ({
   label,
@@ -53,12 +68,92 @@ const Profile = () => {
   const isAdmin = session?.user?.app_metadata?.role === "admin";
 
   const [signingOut, setSigningOut] = useState(false);
+  const [isAvatarDialogOpen, setIsAvatarDialogOpen] = useState(false);
+  const [availableAvatars, setAvailableAvatars] = useState<string[]>([]);
+  const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
+  const [updatingAvatar, setUpdatingAvatar] = useState(false);
 
   const navigate = useNavigate();
   const { addToast } = useToast();
 
+  const user = session?.user;
+
   const userName =
-    session?.user?.user_metadata?.name ?? session?.user?.email?.split("@")[0];
+    user?.user_metadata?.display_name ?? user?.email?.split("@")[0];
+
+  const [avatarUrl, setAvatarUrl] = useState<string>("/fallback-avatar.png");
+
+  useEffect(() => {
+    if (!user) return;
+
+    const initAvatar = async () => {
+      // Use user's avatar if available
+      if (user.user_metadata?.avatar_url) {
+        setAvatarUrl(user.user_metadata.avatar_url);
+        return;
+      }
+
+      // Fallback to trigger-populated avatar_path (random avatar from avatar set)
+      const avatarPath = user?.user_metadata?.avatar_path;
+      if (avatarPath) {
+        const { data } = supabase.storage
+          .from("avatars")
+          .getPublicUrl(avatarPath);
+        const publicUrl = data.publicUrl;
+        setAvatarUrl(publicUrl);
+
+        // Persist it to avatar_url so we don't do this check again
+        try {
+          await supabase.auth.updateUser({
+            data: { avatar_url: publicUrl },
+          });
+        } catch (err) {
+          isDev &&
+            console.error("Failed to auto-persist fallback avatar:", err);
+        }
+      }
+    };
+
+    initAvatar();
+
+    // Load available list for the dialog
+    getAvatarUrls().then(setAvailableAvatars);
+  }, [user]);
+
+  const createdAt = user?.created_at;
+  const formattedCreateAt = createdAt
+    ? new Date(createdAt).toLocaleDateString("en-US", {
+        month: "long",
+        day: "2-digit",
+        year: "numeric",
+      })
+    : null;
+
+  const handleOpenAvatarDialog = () => {
+    setSelectedAvatar(user?.user_metadata?.avatar_url ?? null);
+    setIsAvatarDialogOpen(true);
+  };
+
+  const handleUpdateAvatar = async () => {
+    if (!selectedAvatar) return;
+    setUpdatingAvatar(true);
+
+    try {
+      const { error } = await supabase.auth.updateUser({
+        data: { avatar_url: selectedAvatar },
+      });
+      if (error) throw error;
+
+      addToast("Avatar updated successfully!", "success");
+      setIsAvatarDialogOpen(false);
+    } catch (err) {
+      const message = handleError(err);
+      addToast("Failed to update avatar.", "error");
+      isDev && console.error(message);
+    } finally {
+      setUpdatingAvatar(false);
+    }
+  };
 
   const handleLogout = async () => {
     setSigningOut(true);
@@ -82,24 +177,72 @@ const Profile = () => {
       {/* Container */}
       <div className="max-w-5xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex sm:items-center gap-4 bg-card/40 p-5 rounded-xl border">
-          <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-full overflow-hidden border shrink-0">
-            <img
-              src={DefaultAvatar}
+        <div className="flex items-center gap-4 bg-card/40 p-5 rounded-xl border">
+          <button
+            onClick={handleOpenAvatarDialog}
+            className="w-16 h-16 sm:w-18 sm:h-18 rounded-full overflow-hidden border shrink-0 hover:ring-2 hover:ring-primary transition-all cursor-pointer"
+          >
+            <ProgressiveImage
+              src={avatarUrl}
+              loading="eager"
+              decoding="sync"
               alt="avatar"
-              className="w-full h-full object-cover"
             />
-          </div>
+          </button>
 
           <div className="flex-1 min-w-0">
-            <p className="text-lg md:text-xl font-semibold truncate">
-              {userName}
+            <p className="text-xl xl:text-2xl font-semibold truncate">
+              {userName}{" "}
             </p>
-            <p className="text-sm text-muted truncate">
-              {session?.user?.email}
-            </p>
+
+            <p className="text-muted text-xs">Joined: {formattedCreateAt}</p>
           </div>
         </div>
+
+        {/* Avatar Selection Dialog */}
+        <Dialog open={isAvatarDialogOpen} onOpenChange={setIsAvatarDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Choose an Avatar</DialogTitle>
+            </DialogHeader>
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(80px,1fr))] gap-4 py-4 max-h-[400px] overflow-y-auto pr-2">
+              {availableAvatars.map((url) => (
+                <button
+                  key={url}
+                  onClick={() => setSelectedAvatar(url)}
+                  className={cn(
+                    "relative aspect-square rounded-full overflow-hidden border-2 transition-all max-w-[100px] mx-auto w-full",
+                    selectedAvatar === url
+                      ? "border-primary ring-2 ring-primary/20"
+                      : "border-transparent hover:border-primary/50",
+                  )}
+                >
+                  <img
+                    src={url}
+                    alt="Available avatar"
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
+              {availableAvatars.length === 0 && (
+                <div className="col-span-3 flex justify-center py-8">
+                  <Spinner className="size-8" />
+                </div>
+              )}
+            </div>
+
+            <DialogFooter>
+              <Button
+                className="w-full"
+                onClick={handleUpdateAvatar}
+                disabled={updatingAvatar || !selectedAvatar}
+              >
+                {updatingAvatar && <Spinner className="mr-2" />}
+                {updatingAvatar ? "Saving..." : "Save Changes"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         {/* Grid Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -115,6 +258,11 @@ const Profile = () => {
                 label="Settings"
                 icon={<Settings className="size-4 text-primary" />}
                 onClick={() => navigate("/profile/settings")}
+              />
+              <Row
+                label="FAQ"
+                icon={<HelpCircle className="size-4 text-primary" />}
+                onClick={() => navigate("/FAQ")}
               />
             </Section>
 

@@ -3,6 +3,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { ProductAPI } from "@/api/product";
 import { useAuthStore } from "@/store/useAuthStore";
 import { cn } from "@/lib/utils/cn";
+import { useIsLgScreenMin } from "@/hooks/useMediaQuery";
 
 const Recommendations = () => {
   const { data, error, isFetching } = useSuspenseQuery({
@@ -11,6 +12,7 @@ const Recommendations = () => {
   });
 
   const session = useAuthStore((s) => s.session);
+  const isLg = useIsLgScreenMin();
 
   if (error && !isFetching) throw error;
 
@@ -44,16 +46,70 @@ const Recommendations = () => {
         </p>
       </div>
 
-      <div className="mx-auto grid w-full grid-cols-2 gap-4 min-[600px]:grid-cols-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 xl:gap-8 2xl:gap-10">
-        {data.map((d) => (
-          <ProductCard
-            key={d.id}
-            productId={d.id}
-            name={d.name}
-            imageUrl={d.primaryImageUrl}
-            price={d.minPriceCents}
-          />
-        ))}
+      <div
+        className={cn(
+          "mx-auto grid w-full grid-cols-2 gap-x-6 gap-y-16 min-[600px]:grid-cols-3 md:grid-cols-4 pb-32",
+          "lg:flex lg:flex-wrap lg:justify-center lg:gap-x-12 lg:gap-y-24 lg:px-10 lg:pt-12",
+        )}
+      >
+        {data.map((d, i) => {
+          // Organic variables: rot, y-offset, x-offset (lg only)
+          const styles = [
+            { rot: -1.5, y: 0, x: 0, tape: true },
+            { rot: 2, y: 30, x: 15, tape: true },
+            { rot: -1, y: 10, x: -10, tape: true },
+            { rot: 1.5, y: -20, x: 5, tape: true },
+            { rot: -2, y: 40, x: -20, tape: true },
+            { rot: 1, y: 5, x: 10, tape: true },
+            { rot: -1.8, y: 25, x: -5, tape: true },
+            { rot: 2.2, y: -10, x: 20, tape: true },
+            { rot: -0.5, y: 15, x: -15, tape: true },
+            { rot: 1.2, y: 35, x: 0, tape: true },
+          ];
+
+          const s = styles[i % styles.length];
+
+          return (
+            <div
+              key={d.id}
+              style={
+                {
+                  "--rot": `${s.rot}deg`,
+                  "--y": `${isLg ? s.y : 0}px`,
+                  "--x": `${isLg ? s.x : 0}px`,
+                  transform: `rotate(var(--rot)) translate(var(--x), var(--y))`,
+                } as React.CSSProperties
+              }
+              className="relative w-full max-w-[180px] mx-auto group transition-all duration-500 ease-out hover:!transform-none hover:scale-110 hover:z-30"
+            >
+              {/* Realistic Washi Tape Accent */}
+              {s.tape && (
+                <div
+                  className="absolute -top-4 left-1/2 -translate-x-1/2 w-14 h-7 bg-primary/25 backdrop-blur-[1px] -rotate-2 z-40 pointer-events-none border-white/10 shadow-[0_1px_2px_rgba(0,0,0,0.1)] transition-transform duration-500 group-hover:scale-105"
+                  style={{
+                    backgroundImage: `linear-gradient(to right, transparent, rgba(255,255,255,0.1) 50%, transparent)`,
+                    clipPath:
+                      "polygon(2% 10%, 98% 5%, 100% 90%, 95% 95%, 5% 100%, 0% 85%)",
+                  }}
+                />
+              )}
+
+              {/* Always Visible Specimen Tag */}
+              <div className="absolute -bottom-5 -right-1 z-40 pointer-events-none transition-opacity duration-500 group-hover:opacity-100">
+                <span className="font-back-to-black text-2xl text-primary/60 drop-shadow-sm">
+                  #{String(i + 1).padStart(2, "0")}
+                </span>
+              </div>
+
+              <ProductCard
+                productId={d.id}
+                name={d.name}
+                imageUrl={d.primaryImageUrl}
+                price={d.minPriceCents}
+              />
+            </div>
+          );
+        })}
       </div>
     </section>
   );

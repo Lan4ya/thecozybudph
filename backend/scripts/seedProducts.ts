@@ -1,12 +1,11 @@
-import { readFile } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
-import dotenv from "dotenv";
 import pLimit from "p-limit";
-import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
-import { createProductSchema, type Database } from "@cozybud/schemas";
-
-dotenv.config();
+import { createProductSchema } from "@cozybud/schemas";
+import { ADMIN_EMAIL, ADMIN_PASSWORD } from "./seedAdmin.ts";
+import { supabase } from "./helpers/supabase.ts";
+import { convertToOptimalWebp } from "./helpers/convertToOptimalWebp.ts";
 
 type CreateProductPayload = { id?: string };
 
@@ -40,59 +39,16 @@ type SeedResult =
   | { status: "failed"; index: number; name: string; error: string };
 
 const DEFAULT_DATA_FILE = path.resolve(
-  process.cwd(),
-  "./scripts/data/products.seed.json",
+  import.meta.dirname,
+  "./data/products.seed.json",
 );
 
-const MIME_BY_EXT: Record<string, string> = {
-  ".png": "image/png",
-  ".jpg": "image/jpeg",
-  ".jpeg": "image/jpeg",
-  ".webp": "image/webp",
-};
-
-const args = process.argv.slice(2);
-
-const getArg = (key: string) => {
-  const idx = args.indexOf(`--${key}`);
-  return idx !== -1 ? args[idx + 1] : undefined;
-};
-
 const DEFAULT_CONCURRENCY = 3;
-let CONCURRENCY = Number(getArg("concurrency") ?? DEFAULT_CONCURRENCY);
 
-/**
- * Usage:
- * cd backend && pnpm db:seed:product --concurrency 2
- *
- * Default: 3
- * Allowed range: 1–5
- *
- * Script breaks if used incorrectly.
- * e.g. concurrency doesnt have value: --concurrency
- *
- */
-
-if (Number.isNaN(CONCURRENCY)) {
-  throw new Error("Concurrency must be a number");
-}
-
-if (CONCURRENCY < 1 || CONCURRENCY > 5) {
-  throw new Error("Concurrency must be between 1 and 5");
-}
-
+const RETRYABLE_STATUS_CODES = new Set([408, 425, 429, 500, 502, 503, 504]);
 const MAX_ATTEMPTS = 3;
 const BASE_RETRY_DELAY_MS = 750;
 const MAX_RETRY_DELAY_MS = 5_000;
-
-const RETRYABLE_STATUS_CODES = new Set([408, 425, 429, 500, 502, 503, 504]);
-
-const limit = pLimit(CONCURRENCY);
-
-// This script assumes you already have an admin user.
-// If not create one using: cd backend && pnpm db:seed:admin
-const ADMIN_EMAIL = "admin@local.dev";
-const ADMIN_PASSWORD = "password123";
 
 const seedProductSchema = createProductSchema.superRefine((data, ctx) => {
   if (data.primaryImageIndex >= data.productImages.length) {
@@ -118,55 +74,27 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const getRetryDelayMs = (attempt: number) =>
   Math.min(MAX_RETRY_DELAY_MS, BASE_RETRY_DELAY_MS * 2 ** (attempt - 1));
 
-const getEnv = () => {
-  const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = process.env;
-
-  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-    throw new Error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in env");
-  }
-
-  return { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY };
-};
-
-const parseArgs = () => {
-  const args = process.argv.slice(2);
-  const parsed: Record<string, string> = {};
-
-  for (let i = 0; i < args.length; i++) {
-    const current = args[i];
-    if (!current.startsWith("--")) continue;
-
-    const key = current.slice(2);
-    const next = args[i + 1];
-
-    if (!next || next.startsWith("--")) continue;
-
-    parsed[key] = next;
-    i++;
-  }
-
-  return parsed;
-};
-
-const getMimeType = (filePath: string) => {
-  const ext = path.extname(filePath).toLowerCase();
-  const mime = MIME_BY_EXT[ext];
-
-  if (!mime) {
-    throw new Error(
-      `Unsupported image extension "${ext}" for "${filePath}". Use png/jpg/jpeg/webp.`,
-    );
-  }
-
-  return mime;
-};
-
 const toFile = async (absoluteFilePath: string) => {
-  const buffer = await readFile(absoluteFilePath);
-  const mimeType = getMimeType(absoluteFilePath);
+  const stats = await stat(absoluteFilePath);
+  const originalSizeMB = stats.size / 1024 / 1024;
 
-  return new File([buffer], path.basename(absoluteFilePath), {
-    type: mimeType,
+  const optimizedWebpBuffer = await convertToOptimalWebp(absoluteFilePath, {
+    quality: 85,
+    effort: 5,
+    keepMetadata: false,
+  });
+
+  const optimizedSizeKB = optimizedWebpBuffer.length / 1024;
+  const ext = path.extname(absoluteFilePath);
+  const baseName = path.basename(absoluteFilePath, ext);
+  const targetFileName = `${baseName}.webp`;
+
+  console.log(
+    `  ↳ ${path.basename(absoluteFilePath)}: ${originalSizeMB.toFixed(2)} MB -> ${optimizedSizeKB.toFixed(2)} KB (webp)`,
+  );
+
+  return new File([optimizedWebpBuffer], targetFileName, {
+    type: "image/webp",
   });
 };
 
@@ -186,6 +114,7 @@ const buildValidatedProduct = async (
   product: SeedProduct,
   imagesBaseDir: string,
 ): Promise<ValidatedSeedProduct> => {
+  console.log(`Optimizing images: ${product.name}`);
   const productImages: File[] = [];
 
   for (const relativeImagePath of product.images) {
@@ -386,24 +315,29 @@ const deleteExisting = async (
   });
 };
 
-const main = async () => {
-  const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = getEnv();
+export async function seedProducts(
+  options: {
+    concurrency?: number;
+    data?: string;
+    imagesDir?: string;
+  } = {},
+) {
+  const { SUPABASE_URL } = process.env;
+  if (!SUPABASE_URL) throw new Error("Missing SUPABASE_URL");
 
-  console.log(
-    "Product seeding started. Each seed is heavy so this may take a while...",
-  );
-  if (CONCURRENCY > 1) {
+  const concurrency = options.concurrency ?? DEFAULT_CONCURRENCY;
+  const limit = pLimit(concurrency);
+
+  if (concurrency > 1) {
     console.log(
-      `Concurrency is set at ${CONCURRENCY}. If you experience high CPU usage lower it with flag --concurrency <value>`,
+      `Concurrency is set at ${concurrency}. If you experience high CPU usage lower it with flag --concurrency <value>`,
     );
   }
 
-  const args = parseArgs();
-  const dataArg = args.data ?? DEFAULT_DATA_FILE;
-  const imagesDirArg = args["images-dir"];
-
-  const dataPath = path.resolve(process.cwd(), dataArg);
-
+  const dataPath = path.resolve(
+    process.cwd(),
+    options.data ?? DEFAULT_DATA_FILE,
+  );
   const raw = await readFile(dataPath, "utf8");
   const parsed = JSON.parse(raw) as SeedFile;
 
@@ -411,14 +345,9 @@ const main = async () => {
     throw new Error("Seed file must contain a non-empty products array");
   }
 
-  const imagesBaseDir = imagesDirArg
-    ? path.resolve(process.cwd(), imagesDirArg)
+  const imagesBaseDir = options.imagesDir
+    ? path.resolve(process.cwd(), options.imagesDir)
     : path.dirname(dataPath);
-
-  const supabase = createClient<Database>(
-    SUPABASE_URL,
-    SUPABASE_SERVICE_ROLE_KEY,
-  );
 
   const { data: authData, error: authError } =
     await supabase.auth.signInWithPassword({
@@ -468,9 +397,39 @@ const main = async () => {
   }
 
   console.log(`Done. Created: ${successCount}, Failed: ${failCount}`);
-};
+}
 
-main().catch((error) => {
-  console.error(error instanceof Error ? error.message : error);
-  process.exit(1);
-});
+if (process.argv[1] === import.meta.filename) {
+  const args = process.argv.slice(2);
+
+  const parsedArgs: Record<string, string> = {};
+
+  for (let i = 0; i < args.length; i++) {
+    const current = args[i];
+    if (!current.startsWith("--")) continue;
+    const key = current.slice(2);
+    const next = args[i + 1];
+    if (!next || next.startsWith("--")) continue;
+    parsedArgs[key] = next;
+    i++;
+  }
+
+  const concurrency = parsedArgs.concurrency
+    ? Number(parsedArgs.concurrency)
+    : undefined;
+  if (
+    concurrency != null &&
+    (Number.isNaN(concurrency) || concurrency < 1 || concurrency > 5)
+  ) {
+    throw new Error("Concurrency must be between 1 and 5");
+  }
+
+  seedProducts({
+    concurrency,
+    data: parsedArgs.data,
+    imagesDir: parsedArgs["images-dir"],
+  }).catch((error) => {
+    console.error(error instanceof Error ? error.message : error);
+    process.exit(1);
+  });
+}

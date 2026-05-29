@@ -5,6 +5,12 @@ import { PROTECTED_ROUTES } from "./Root";
 const matchesPath = (pathname: string, paths: string[]) =>
   paths.some((p) => pathname.startsWith(p));
 
+/**
+ * Root level route loader responsible for global authentication guarding and session retrieval.
+ * This loader intercept requests before rendering down the route tree. It verifies
+ * the current user session via Supabase and cross-references the targeted pathname
+ * against a whitelist of protected application routes.
+ */
 const RootLoader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const pathname = url.pathname;

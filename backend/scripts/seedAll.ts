@@ -1,25 +1,31 @@
-import { execa } from "execa";
+import { seedUsers } from "./seedUsers.ts";
+import { seedAdmin } from "./seedAdmin.ts";
+import { seedProducts } from "./seedProducts.ts";
+import { seedAvatars } from "./seedAvatars.ts";
 
-// Order matters
-const steps = [
-  "storage:init",
-  "db:seed:users",
-  "db:seed:admin",
-  "db:seed:products",
-];
+// WARN: Execution order matters! Script will break otherwise
+async function main() {
+  console.log("Starting seeding pipeline...");
 
-let hasFailure = false;
-
-for (const step of steps) {
   try {
-    await execa("pnpm", ["run", step], { stdio: "inherit" });
+    console.log("\n--- Seeding Avatars ---");
+    await seedAvatars();
+
+    console.log("\n--- Seeding Users ---");
+    await seedUsers();
+
+    console.log("\n--- Seeding Admin ---");
+    await seedAdmin();
+
+    console.log("\n--- Seeding Products ---");
+    await seedProducts();
+
+    console.log("\nSeeding pipeline finished successfully.");
   } catch (err) {
-    hasFailure = true;
-    console.error(`Script failed: ${step}`);
+    console.error("\nSeeding pipeline failed:");
     console.error(err);
+    process.exit(1);
   }
 }
 
-console.log("Seeding pipeline finished.");
-
-process.exit(hasFailure ? 1 : 0);
+main();

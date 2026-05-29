@@ -21,7 +21,7 @@ export const createShippingQuotation = async (
       senderAddress.province,
       senderAddress.postalCode,
       senderAddress.city,
-      senderAddress.region,
+      // senderAddress.region,
       "Philippines",
     ]
       .filter(Boolean)
@@ -36,7 +36,7 @@ export const createShippingQuotation = async (
     recipientAddress.province,
     recipientAddress.postalCode,
     recipientAddress.city,
-    recipientAddress.region,
+    // recipientAddress.region,
     "Philippines",
   ]
     .filter(Boolean)

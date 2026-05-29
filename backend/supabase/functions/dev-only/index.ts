@@ -1,18 +1,37 @@
 import { AppError } from "@shared/errors/Errors.ts";
 import { errorHandler } from "@shared/errors/errorHandler.ts";
-import { supabaseMiddleware } from "@shared/middlewares/supabaseMiddleware.ts";
+import { supabaseMiddleware } from "@shared/middlewares/mod.ts";
+
+import { AppEnv } from "@shared/types.d.ts";
 import { isDev } from "@shared/utils/isDev.ts";
+import { requireVariables } from "@shared/utils/mod.ts";
 import { Context, Hono } from "hono";
 import { logger } from "hono/logger";
-import { AppEnv } from "@shared/types.d.ts";
-import { requireVariables } from "@shared/utils/mod.ts";
 
 // WARN: This function is only for local environment only. DO NOT deploy it. It's
 // only purpose is for quick testing and is not needed in production.
+
 const dev = new Hono<AppEnv>().basePath("dev-only");
 
 dev.use("*", supabaseMiddleware());
 dev.use(logger());
+
+dev.post("/auth/user/update", async (c: Context) => {
+  if (!isDev) throw new Error("Dev ednpoint only");
+
+  // const s = c.get("supabaseService");
+  const s = c.get("supabase");
+  const { email, password, name } = await c.req.json();
+  const { data, error } = await s.auth.updateUser({
+    data: {
+      display_name: name,
+    },
+    ...(email && { email }),
+    ...(password && { password }),
+  });
+  if (error) throw error;
+  return c.json(data);
+});
 
 dev.post("/auth/signup", async (c: Context) => {
   if (!isDev) throw new Error("Dev ednpoint only");

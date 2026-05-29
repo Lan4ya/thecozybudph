@@ -1,6 +1,6 @@
 import { Skeleton } from "@/lib/ui/__shadcn__/skeleton";
 
-export const ShopProductGridSkeleton = () => {
+export const ShopProductGridItemsSkeleton = () => {
   return (
     <>
       {Array.from({ length: 12 }).map((_, i) => (

@@ -30,9 +30,9 @@
       ],
       "primaryImageIndex": 0,
       "images": [
-        "./images/satin-poppy.jpg",
-        "./images/satin-poppy2.jpg",
-        "./images/satin-poppy3.jpg"
+        "./images/products/satin-poppy.jpg",
+        "./images/products/satin-poppy2.jpg",
+        "./images/products/satin-poppy3.jpg"
       ]
     },
     {
@@ -88,9 +88,9 @@
       ],
       "primaryImageIndex": 0,
       "images": [
-        "./images/amber-zinnia.jpg",
-        "./images/amber-zinnia2.jpg",
-        "./images/amber-zinnia3.jpg"
+        "./images/products/amber-zinnia3.jpg",
+        "./images/products/amber-zinnia.jpg",
+        "./images/products/amber-zinnia2.jpg"
       ]
     },
     {
@@ -123,9 +123,9 @@
       ],
       "primaryImageIndex": 0,
       "images": [
-        "./images/orchid-veil.jpg",
-        "./images/orchid-veil2.jpg",
-        "./images/orchid-veil3.jpg"
+        "./images/products/orchid-veil.jpg",
+        "./images/products/orchid-veil2.jpg",
+        "./images/products/orchid-veil3.jpg"
       ]
     },
     {
@@ -181,7 +181,7 @@
       ],
       "primaryImageIndex": 0,
       "images": [
-        "./images/blush-camellia.jpg"
+        "./images/products/blush-camellia.jpg"
       ]
     },
     {
@@ -214,7 +214,7 @@
       ],
       "primaryImageIndex": 0,
       "images": [
-        "./images/opal-tulip.jpg"
+        "./images/products/opal-tulip.jpg"
       ]
     },
     {
@@ -270,7 +270,7 @@
       ],
       "primaryImageIndex": 0,
       "images": [
-        "./images/peony-lumiere.jpg"
+        "./images/products/peony-lumiere.jpg"
       ]
     },
     {
@@ -303,8 +303,8 @@
       ],
       "primaryImageIndex": 0,
       "images": [
-        "./images/moonlight-sonata.jpg",
-        "./images/moonlight-sonata-2.jpg"
+        "./images/products/moonlight-sonata.jpg",
+        "./images/products/moonlight-sonata-2.jpg"
       ]
     },
     {
@@ -336,9 +336,9 @@
       ],
       "primaryImageIndex": 0,
       "images": [
-        "./images/crimson-heirloom.jpg",
-        "./images/crimson-heirloom-2.jpg",
-        "./images/crimson-heirloom-3.jpg"
+        "./images/products/crimson-heirloom.jpg",
+        "./images/products/crimson-heirloom-2.jpg",
+        "./images/products/crimson-heirloom-3.jpg"
       ]
     },
     {
@@ -370,9 +370,9 @@
       ],
       "primaryImageIndex": 0,
       "images": [
-        "./images/indigo-solstice.jpeg",
-        "./images/indigo-solstice-3.jpg",
-        "./images/indigo-solstice-2.jpg"
+        "./images/products/indigo-solstice.jpeg",
+        "./images/products/indigo-solstice-3.jpg",
+        "./images/products/indigo-solstice-2.jpg"
       ]
     },
     {
@@ -404,9 +404,9 @@
       ],
       "primaryImageIndex": 0,
       "images": [
-        "./images/golden-times.jpg",
-        "./images/golden-times-2.jpg",
-        "./images/golden-times-3.jpg"
+        "./images/products/golden-times.jpg",
+        "./images/products/golden-times-2.jpg",
+        "./images/products/golden-times-3.jpg"
       ]
     },
     {
@@ -439,9 +439,9 @@
       ],
       "primaryImageIndex": 0,
       "images": [
-        "./images/imperial-velvet.jpg",
-        "./images/imperial-velvet-2.jpg",
-        "./images/imperial-velvet-3.jpg"
+        "./images/products/imperial-velvet.jpg",
+        "./images/products/imperial-velvet-2.jpg",
+        "./images/products/imperial-velvet-3.jpg"
       ]
     },
     {
@@ -473,9 +473,9 @@
       ],
       "primaryImageIndex": 0,
       "images": [
-        "./images/lunar-serenade.jpg",
-        "./images/lunar-serenade-2.jpg",
-        "./images/lunar-serenade-3.jpg"
+        "./images/products/lunar-serenade.jpg",
+        "./images/products/lunar-serenade-2.jpg",
+        "./images/products/lunar-serenade-3.jpg"
       ]
     },
     {
@@ -507,8 +507,8 @@
       ],
       "primaryImageIndex": 0,
       "images": [
-        "./images/petal-prelude.jpg",
-        "./images/petal-prelude-2.jpg"
+        "./images/products/petal-prelude.jpg",
+        "./images/products/petal-prelude-2.jpg"
       ]
     },
     {
@@ -540,8 +540,8 @@
       ],
       "primaryImageIndex": 0,
       "images": [
-        "./images/rhapsody-in-rose.jpg",
-        "./images/rhapsody-in-rose-2.jpg"
+        "./images/products/rhapsody-in-rose.jpg",
+        "./images/products/rhapsody-in-rose-2.jpg"
       ]
     },
     {
@@ -574,9 +574,9 @@
       ],
       "primaryImageIndex": 0,
       "images": [
-        "./images/stardust-symphony.jpg",
-        "./images/stardust-symphony-2.jpg",
-        "./images/stardust-symphony-3.jpg"
+        "./images/products/stardust-symphony.jpg",
+        "./images/products/stardust-symphony-2.jpg",
+        "./images/products/stardust-symphony-3.jpg"
       ]
     }
   ]

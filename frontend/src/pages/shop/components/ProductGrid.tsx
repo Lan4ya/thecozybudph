@@ -1,10 +1,10 @@
 import { useRef, useEffect } from "react";
 import ProductCard from "@/components/products/ProductCard";
-import { ShopProductGridSkeleton } from "@/lib/ui/skeletons/ShopProductGridItemsSkeleton";
+import { ShopProductGridItemsSkeleton } from "@/lib/ui/skeletons/ShopProductGridItemsSkeleton";
 import { useProductsSuspenseInfiniteQuery } from "@/pages/shop/hooks/useProductsSuspenseInfiniteQuery";
 import ProductCardDetailed from "@/components/products/ProductCardDetailed";
 import { cn } from "@/lib/utils/cn";
-import type { ProductListItem } from "@cozybud/schemas";
+import { ShopProductGridDetailedItemsSkeleton } from "@/lib/ui/skeletons/ShopProductGridDetailedItemsSkeleton";
 
 export type ProductCardProps = {
   cardType: "default" | "detailed";
@@ -69,7 +69,13 @@ const ProductGrid = ({ cardType }: ProductCardProps) => {
         ),
       )}
 
-      {isFetchingNextPage && <ShopProductGridSkeleton />}
+      {isFetchingNextPage ? (
+        cardType === "default" ? (
+          <ShopProductGridItemsSkeleton />
+        ) : (
+          <ShopProductGridDetailedItemsSkeleton />
+        )
+      ) : null}
 
       <div
         ref={sentinelRef}

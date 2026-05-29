@@ -81,10 +81,7 @@ const NavBar = () => {
 
       {/* Desktop Layout */}
       {!isMediumScreenAndBelow && (
-        <DesktopNavLinks
-          hasSession={!!session}
-          cartItemsCount={cartItemsCount}
-        />
+        <DesktopNavLinks session={session} cartItemsCount={cartItemsCount} />
       )}
     </nav>
   );

@@ -1,10 +1,8 @@
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Input } from "@/lib/ui/__shadcn__/input";
 import { Separator } from "@/lib/ui/__shadcn__/separator";
-import { Mail, Plus } from "lucide-react";
+import { Mail } from "lucide-react";
 import { useState } from "react";
-import AddressList from "./components/AddressList";
-import { Link } from "react-router";
 
 export default function AccountPage() {
   const [form, setForm] = useState({
@@ -68,27 +66,6 @@ export default function AccountPage() {
             {saving ? "Saving..." : saved ? "Saved!" : "Save Changes"}
           </Button>
         </div>
-      </div>
-
-      {/* Addresses Card */}
-      <div className="bg-card rounded-xl border p-5 md:p-6 shadow-sm space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-lg font-semibold">Addresses</h3>
-            <p className="text-sm text-muted-foreground">
-              Manage your shipping and billing addresses.
-            </p>
-          </div>
-          <Link to="address/add">
-            <Button size="sm" variant="outline">
-              <Plus className="size-4 mr-2" /> Add Address
-            </Button>
-          </Link>
-        </div>
-
-        <Separator />
-
-        <AddressList />
       </div>
     </div>
   );

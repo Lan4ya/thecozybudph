@@ -11,7 +11,7 @@ import {
   type Address,
   type CreateAddressInput,
 } from "@cozybud/schemas";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useToast } from "@/providers/ToastProvider";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AddressAPI } from "@/api/address";
@@ -26,6 +26,18 @@ import { FieldError } from "@/pages/checkout/components/FieldError";
 
 type FormValues = z.infer<typeof createAddressFormSchema>;
 
+const defaultValues = {
+  fullName: "",
+  phoneNumber: "",
+  postalCode: "",
+  region: "",
+  province: "",
+  city: "",
+  barangay: "",
+  addressLine: "",
+  isDefault: false,
+};
+
 const CreateAddressForm = ({ onCloseForm }: { onCloseForm: () => void }) => {
   const {
     register,
@@ -34,9 +46,16 @@ const CreateAddressForm = ({ onCloseForm }: { onCloseForm: () => void }) => {
     handleSubmit,
     formState: { errors, isValid, isDirty },
   } = useForm<FormValues>({
+    defaultValues,
     resolver: zodResolver(createAddressFormSchema),
     mode: "onChange",
   });
+
+  useEffect(() => {
+    if (isDev) {
+      console.log("CreateAddressForm State:", { isDirty, isValid, errors });
+    }
+  }, [isDirty, isValid, errors]);
 
   const isDefault = useWatch({ control, name: "isDefault" });
 

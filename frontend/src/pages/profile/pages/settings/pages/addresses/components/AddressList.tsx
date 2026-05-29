@@ -58,7 +58,7 @@ const AddressList = () => {
                 </div>
               </div>
 
-              <Link to={`address/${address.id}/edit`}>
+              <Link to={`${address.id}/edit`}>
                 <Button
                   variant="minimal"
                   size="sm"

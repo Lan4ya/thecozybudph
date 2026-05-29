@@ -1,32 +1,21 @@
-import { Database } from "@cozybud/schemas";
-import { createClient } from "@supabase/supabase-js";
-import dotenv from "dotenv";
-dotenv.config();
+import { getRandomAvatarUrl } from "./helpers/getDefaultAvatarUrl.ts";
+import { supabase } from "./helpers/supabase.ts";
 
-const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = process.env;
+export const ADMIN_EMAIL = "admin@local.dev";
+export const ADMIN_PASSWORD = "password123";
 
-if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-  console.error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY...");
-  process.exit(1);
-}
+export async function seedAdmin() {
+  const avatar_url = await getRandomAvatarUrl();
 
-const EMAIL = "admin@local.dev";
-const PASSWORD = "password123";
-
-const supabase = createClient<Database>(
-  SUPABASE_URL,
-  SUPABASE_SERVICE_ROLE_KEY,
-);
-
-async function main() {
   const {
     data: { user },
     error: error,
   } = await supabase.auth.admin.createUser({
-    email: EMAIL,
-    password: PASSWORD,
+    email: ADMIN_EMAIL,
+    password: ADMIN_PASSWORD,
     email_confirm: true, // auto-confirm so no manual step needed
     app_metadata: { role: "admin" }, // set as admin
+    user_metadata: { avatar_url }, // set default avatar
   });
 
   if (error) {
@@ -36,23 +25,28 @@ async function main() {
       error.status === 422
     ) {
       console.log(`DB already has an admin user initialized:`);
-      console.log(`Email: ${EMAIL}`);
-      console.log(`Password: ${PASSWORD}`);
+      console.log(`Email: ${ADMIN_EMAIL}`);
+      console.log(`Password: ${ADMIN_PASSWORD}`);
       return;
     }
 
     console.error("Error creating admin:", error);
-    process.exit(1);
+    throw error;
   }
 
   if (!user) {
     console.error("Invariant error: createAdmin returned no data");
-    process.exit(1);
+    throw new Error("createAdmin returned no data");
   }
 
   console.log(`Created admin:`);
-  console.log(`Email: ${EMAIL}`);
-  console.log(`Password: ${PASSWORD}`);
+  console.log(`Email: ${ADMIN_EMAIL}`);
+  console.log(`Password: ${ADMIN_PASSWORD}`);
 }
 
-main();
+if (process.argv[1] === import.meta.filename) {
+  seedAdmin().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}

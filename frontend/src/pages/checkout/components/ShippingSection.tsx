@@ -1,13 +1,14 @@
 import { motion } from "framer-motion";
 import { Truck } from "lucide-react";
-import { cn } from "@/lib/utils/cn";
-import { capitalizeFirstLetter } from "@/lib/utils/format";
 import { useQuery } from "@tanstack/react-query";
 import { useCheckoutStore } from "../store/useCheckoutStore";
 import { CheckoutShippingOptionSkeleton } from "@/lib/ui/skeletons/CheckoutShippingOptionSkeleton";
 import { useEffect } from "react";
 import { ShipmentAPI } from "@/api";
 import { createShippingQuoteQK } from "../queryKeys";
+import { ShippingOption } from "./ShippingOption";
+
+const SERVICE_TYPES = ["motorcycle", "sedan"] as const;
 
 const ShippingSection = () => {
   const addressStore = useCheckoutStore((s) => s.address);
@@ -43,7 +44,6 @@ const ShippingSection = () => {
   useEffect(() => {
     if (!quotations || quotations.length === 0) return;
 
-    // if (!shipping) {
     const first = quotations[0];
 
     setShipping({
@@ -51,7 +51,6 @@ const ShippingSection = () => {
       serviceType: first.serviceType.toLowerCase(),
       quotationId: first.id,
     });
-    // }
   }, [quotations, setShipping]);
 
   const handleSelect = (
@@ -101,53 +100,36 @@ const ShippingSection = () => {
 
         {isFetching && <CheckoutShippingOptionSkeleton />}
 
-        {!isFetching &&
-          quotations &&
-          quotations.map((quote) => {
-            const normalizedServiceType = quote.serviceType.toLowerCase();
-            return (
-              <label
-                key={quote.id}
-                className={cn(
-                  "flex items-start justify-between p-3 rounded-lg border cursor-pointer transition-all",
-                  shipping?.serviceType === normalizedServiceType
-                    ? "border-primary bg-primary/5"
-                    : "border-border/40 hover:border-primary/50",
-                )}
-              >
-                <div className="flex items-start gap-3">
-                  <input
-                    type="radio"
-                    name="shippingOption"
-                    value={normalizedServiceType}
-                    checked={shipping?.serviceType === normalizedServiceType}
-                    onChange={() =>
-                      handleSelect(
-                        normalizedServiceType,
-                        Number(quote.priceBreakdown.total),
-                        quote.id,
-                      )
-                    }
-                    className="mt-1 text-primary focus:ring-primary"
-                  />
+        {!isFetching && (
+          <>
+            {SERVICE_TYPES.map((type) => {
+              const quote = quotations?.find(
+                (q) => q.serviceType.toLowerCase() === type,
+              );
+              const isSelected = shipping?.serviceType === type;
 
-                  <div>
-                    <p className="font-medium text-foreground">
-                      {capitalizeFirstLetter(normalizedServiceType)}
-                    </p>
-
-                    <p className="text-xs text-muted-foreground">
-                      Estimated around 4-7 business days
-                    </p>
-                  </div>
-                </div>
-
-                <p className="font-semibold text-sm text-foreground">
-                  ₱{quote.priceBreakdown.total}
-                </p>
-              </label>
-            );
-          })}
+              return (
+                <ShippingOption
+                  key={type}
+                  serviceType={type}
+                  isSelected={isSelected}
+                  price={quote?.priceBreakdown.total}
+                  disabled={!quote}
+                  onSelect={
+                    quote
+                      ? () =>
+                          handleSelect(
+                            type,
+                            Number(quote.priceBreakdown.total),
+                            quote.id,
+                          )
+                      : undefined
+                  }
+                />
+              );
+            })}
+          </>
+        )}
       </div>
     </motion.div>
   );

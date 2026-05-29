@@ -64,7 +64,7 @@ export default function AddAddressPage() {
         addToast("Address created", "success");
         setAddress(newAddress);
         queryClient.invalidateQueries({ queryKey: [checkoutDefaultAddressQK] });
-        navigate("/profile/settings/account");
+        navigate("/profile/settings/addresses");
       },
     });
 
@@ -80,10 +80,8 @@ export default function AddAddressPage() {
   };
 
   return (
-    <div className="w-full px-4 py-6 md:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto space-y-6">
-        <div className="bg-card rounded-xl border p-5 md:p-6 shadow-sm space-y-6">
-          <h3 className="text-lg font-semibold">Create Address</h3>
+    <div className="bg-card rounded-xl border p-5 md:p-6 shadow-sm space-y-6">
+      <h3 className="text-lg font-semibold">Create Address</h3>
 
           <form
             onSubmit={handleSubmit(onSubmit)}
@@ -233,7 +231,7 @@ export default function AddAddressPage() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => navigate("/profile/settings/account")}
+                onClick={() => navigate("/profile/settings/addresses")}
               >
                 Cancel
               </Button>
@@ -247,7 +245,5 @@ export default function AddAddressPage() {
             </div>
           </form>
         </div>
-      </div>
-    </div>
   );
 }

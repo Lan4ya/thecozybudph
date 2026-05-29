@@ -32,7 +32,7 @@ export const useInitAuthStore = () => {
       (event, session) => {
         if (!mounted) return;
 
-        console.log("Has auth session: ", !!session);
+        console.log("Has auth session: ", session);
 
         const isExpiredSession =
           session?.expires_at && Date.now() > session.expires_at * 1000;
@@ -47,9 +47,11 @@ export const useInitAuthStore = () => {
           event,
         });
 
-        // Clear orphan confirm email flag on successful email confirmation.
-        if (session?.user?.confirmed_at) {
-          localStorage.removeItem("confirm-email");
+        if (event === "INITIAL_SESSION") {
+          // Clear orphan confirm email flag on successful email confirmation.
+          if (session?.user?.confirmed_at) {
+            sessionStorage.removeItem("signup_confirm_email");
+          }
         }
 
         // See when is this event is emitted: https://supabase.com/docs/reference/javascript/auth-onauthstatechange
@@ -63,6 +65,7 @@ export const useInitAuthStore = () => {
           useAuthStore.setState({
             session: null,
             status: "unauthenticated",
+            event: null,
           });
           useProductSelectionStore.getState().reset([]);
           useCartStore.getState().reset();

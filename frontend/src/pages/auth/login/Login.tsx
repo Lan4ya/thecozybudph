@@ -1,54 +1,63 @@
+// import sign_up_pic from "@/assets/thecozybud/TCB_4.png";
 import LOGO from "@/assets/thecozybud/logo_transparent_oneline1.png";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { supabase } from "@/lib/supabase/client";
-import isDev from "@/lib/utils/isDev";
-
 import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/lib/ui/__shadcn__/button";
-import { useForm, type SubmitHandler } from "react-hook-form";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@/lib/ui/__shadcn__/card";
+import { Input } from "@/lib/ui/__shadcn__/input";
 import { Link, useNavigate } from "react-router";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import googleIcon from "@/assets/icons/google.svg";
 import { useIsLgScreenMin } from "@/hooks/useMediaQuery";
-import { signUpFormSchema, type SignUp } from "@cozybud/schemas";
-import { Input } from "@/lib/ui/__shadcn__/input";
+import { logInFormSchema, type LogIn } from "@cozybud/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, useWatch } from "react-hook-form";
+import isDev from "@/lib/utils/isDev";
 import { handleError } from "@/lib/utils/format";
-import SideImage from "./SideImage";
+import SideImage from "../SideImage";
 
-const Signup = () => {
+const { APP_URL } = import.meta.env;
+
+const Login = () => {
   const [loading, setLoading] = useState(false);
   const [passVisible, setPassVisible] = useState(false);
-  const [signUpSucess, setSignUpSuccess] = useState(false);
 
   const navigate = useNavigate();
-
-  const isLgScreen = useIsLgScreenMin();
 
   const {
     register,
     handleSubmit,
-    watch,
-    // setValue,
     formState: { errors },
     clearErrors,
     setError,
-  } = useForm<SignUp>({
-    resolver: zodResolver(signUpFormSchema),
+
+    control,
+  } = useForm<LogIn>({
+    resolver: zodResolver(logInFormSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
   });
-  const [email, password] = watch(["email", "password"]);
+
+  const [email, password] = useWatch({
+    control,
+    name: ["email", "password"],
+  });
 
   const disabled = !email || !password;
 
   const emailErr = errors.email;
   const passErr = errors.password;
   const rootErr = errors.root;
+
+  const isLgScreen = useIsLgScreenMin();
 
   const handleSignInWithOAuth = async () => {
     clearErrors();
@@ -57,9 +66,7 @@ const Signup = () => {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: isDev
-            ? "http://localhost:5173/"
-            : "https://thecozybud.vercel.app/", // NOTE: idk yet if im gon deploy to vercel or cloudflare
+          redirectTo: isDev ? "http://localhost:5173/" : APP_URL,
         },
       });
       if (error) throw error;
@@ -78,67 +85,32 @@ const Signup = () => {
     }
   };
 
-  const onSubmit: SubmitHandler<SignUp> = async (data) => {
+  async function onSubmit() {
     clearErrors();
     setLoading(true);
 
-    const { email, password } = data;
-
     try {
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
-        options: {
-          emailRedirectTo: isDev
-            ? "http://localhost:5173/"
-            : "https:thecozybud.vercel.app",
-        },
       });
 
-      if (error) {
-        setError("root", {
-          type: "server",
-          message: "Something went wrong. Please try again later",
-        });
+      if (error) throw error;
 
-        throw error;
-      }
-
-      if (user?.identities?.length === 0) {
-        setError("email", {
-          type: "server",
-          message: "email address already in use",
-        });
-
-        setLoading(false);
-        return;
-      }
-
-      setSignUpSuccess(true);
-      setLoading(false);
+      sessionStorage.setItem("notifyLogInSuccess", "success");
+      isDev && console.log({ data });
+      navigate(isDev ? "/" : APP_URL);
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : "Unknown error occurred";
-
-      isDev && console.error(message);
+      const message = handleError(err);
+      console.log(message);
 
       setError("root", {
         type: "server",
         message,
       });
-      setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    if (signUpSucess) {
-      localStorage.setItem("confirm-email", email);
-      navigate("/auth/confirm-email");
-    }
-  }, [signUpSucess]);
+    setLoading(false);
+  }
 
   return (
     <div className="custom-container flex lg:flex lg:gap-15 xl:gap-30 pt-6 justify-center items-center h-screen">
@@ -150,7 +122,6 @@ const Signup = () => {
           <ArrowLeft className="size-4" /> Home
         </Link>
 
-        {/* LOGO */}
         <div className="px-4 w-full py-3 mb-6 flex-center">
           <img
             loading="eager"
@@ -161,11 +132,10 @@ const Signup = () => {
           />
         </div>
 
-        {/* Signup Form */}
         <Card className="shadow-lg border-border/50 backdrop-blur-sm bg-card/70">
           <CardHeader className="text-center">
             <CardTitle className="text-xl font-semibold text-foreground">
-              Sign up for an account
+              Log in to your account
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -182,10 +152,10 @@ const Signup = () => {
                   Email
                 </label>
                 <Input
-                  {...register("email")}
-                  type="text"
                   placeholder="youremail@email.com"
-                  // value={email}
+                  type="email"
+                  required
+                  {...register("email")}
                   className="bg-popover border-border/60"
                 />
 
@@ -199,15 +169,25 @@ const Signup = () => {
 
               {/* Password */}
               <div className="mb-5 relative">
-                <label className="block text-sm text-muted-foreground">
-                  Password
-                </label>
+                <div className="flex-between mb-1">
+                  <label className="block text-sm text-muted-foreground">
+                    Password
+                  </label>
+
+                  <Link
+                    to="/auth/forgot-password"
+                    className="ml-auto text-blue-500 hover:text-blue-500/90 hover:underline text-sm"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
 
                 <div className="relative">
                   <Input
+                    placeholder="Enter your password"
                     {...register("password")}
                     type={passVisible ? "text" : "password"}
-                    placeholder="Enter a unique password"
+                    required
                     className="pr-10 bg-popover border-border/60"
                   />
 
@@ -231,17 +211,17 @@ const Signup = () => {
                 )}
               </div>
 
-              {/* Sign Up */}
+              {/* Log In */}
               <Button
                 type="submit"
-                className="border w-full flex-center"
+                className="border w-full"
                 disabled={loading || disabled}
               >
                 {loading ? <Spinner /> : null}
-                {loading ? "Signing up" : "Sign up"}
+                {loading ? "Logging in..." : "Log in"}
               </Button>
 
-              {/* Root Err */}
+              {/* Root Error  */}
               {rootErr && (
                 <p className="text-xs text-red-500 mt-1 line-clamp-2 text-center">
                   {rootErr.message}
@@ -249,12 +229,12 @@ const Signup = () => {
               )}
 
               <div className="text-muted-foreground mt-2 text-sm">
-                Already have an account?
+                New to CozyBud?
                 <Link
-                  to="/auth/login"
+                  to="/auth/signup"
                   className="pl-1 text-blue-500 hover:text-blue-500/90 hover:underline"
                 >
-                  Login to your account
+                  Sign up for an account
                 </Link>
               </div>
             </form>
@@ -300,4 +280,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default Login;

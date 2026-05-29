@@ -1,9 +1,12 @@
-const TOS = () => {
+import { type FC } from "react";
+
+const TOS: FC = () => {
   return (
-    <div className="max-w-4xl mx-auto p-6 md:p-12  shadow-lg rounded-lg space-y-8">
-      <h1 className="text-3xl font-bold text-gray-900 text-center">
-        Terms of Service
-      </h1>
+    <div className="max-w-4xl mx-auto p-6 md:p-12 space-y-8">
+      <div className="text-center space-y-2">
+        <h1 className="text-3xl font-bold text-gray-900">Terms of Service</h1>
+        <p className="text-sm text-gray-500">Last Updated: May 29, 2026</p>
+      </div>
 
       <p className="text-gray-700">
         Welcome to CozyBud! By using our website and services, you agree to
@@ -55,8 +58,12 @@ const TOS = () => {
           5. Returns & Refunds
         </h2>
         <p className="text-gray-700">
-          Returns are accepted according to our <strong>Return Policy</strong>.
-          Refunds will be processed through the original payment method.
+          Due to the delicate and perishable nature of our floral products,{" "}
+          <strong>all sales are final</strong>. Returns, replacements, or
+          refunds are not accepted for change-of-mind purchases. In compliance
+          with the Consumer Act of the Philippines, exceptions apply solely to
+          products that arrive inherently defective or damaged, provided they
+          are reported with proof within 24 hours of delivery.
         </p>
       </section>
 
@@ -86,12 +93,12 @@ const TOS = () => {
           8. Governing Law
         </h2>
         <p className="text-gray-700">
-          These Terms are governed by the laws of the Republic of the
-          Philippines.
+          These Terms are governed by and construed in accordance with the laws
+          of the Republic of the Philippines.
         </p>
       </section>
 
-      <p className="text-gray-600 text-sm text-center">
+      <p className="text-gray-600 text-sm text-center pt-4 border-t border-gray-100">
         By using our services, you agree to these Terms of Service. Please check
         this page periodically for updates.
       </p>

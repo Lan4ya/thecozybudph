@@ -10,9 +10,6 @@ import { useShallow } from "zustand/react/shallow";
 import { CustomErrorBoundary } from "@/components/CustomErrorBoundary";
 import { useCheckoutStore } from "../checkout/store/useCheckoutStore";
 
-// TODO:
-// add created_at in db for most recent display sorting
-// add UI for !isAvailable
 const Cart = () => {
   const navigate = useNavigate();
   const { addToast } = useToast();
@@ -134,48 +131,50 @@ const Cart = () => {
       </div>
 
       {/* Bottom Bar */}
-      <div className="fixed left-0 bottom-0 w-full z-10 flex items-center justify-between gap-3 p-4 bg-card border">
-        <div className="flex gap-2">
-          <div
-            onClick={toggleAllSelection}
-            className={cn(
-              "flex items-center justify-center w-5 h-5 border-2 rounded cursor-pointer transition-all",
-              allItemsSelected
-                ? "bg-primary border-primary text-primary-foreground"
-                : "border-muted-foreground hover:border-primary",
-            )}
-          >
-            {allItemsSelected && <Check className="size-3" />}
-          </div>
-          <span
-            className="text-sm font-medium cursor-pointer select-none"
-            onClick={toggleAllSelection}
-          >
-            Select all ({selectedItems.length}/{cartItems.length})
-          </span>
-        </div>
-
-        {isEditingCart ? (
-          <Button
-            variant={"destructive"}
-            className=""
-            onClick={handleDeleteItems}
-          >
-            Delete
-          </Button>
-        ) : (
-          <div className="flex gap-2 items-center">
-            <span className="text-sm">{formatPriceCents(subtotal)}</span>
-
-            <Button
-              disabled={hasNoItems}
-              onClick={handleCheckout}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
+      <div className="fixed left-0 bottom-0 w-full z-10 bg-card border">
+        <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-3 p-4">
+          <div className="flex gap-2">
+            <div
+              onClick={toggleAllSelection}
+              className={cn(
+                "flex items-center justify-center w-5 h-5 border-2 rounded cursor-pointer transition-all",
+                allItemsSelected
+                  ? "bg-primary border-primary text-primary-foreground"
+                  : "border-muted-foreground hover:border-primary",
+              )}
             >
-              Check Out
-            </Button>
+              {allItemsSelected && <Check className="size-3" />}
+            </div>
+            <span
+              className="text-sm font-medium cursor-pointer select-none"
+              onClick={toggleAllSelection}
+            >
+              Select all ({selectedItems.length}/{cartItems.length})
+            </span>
           </div>
-        )}
+
+          {isEditingCart ? (
+            <Button
+              variant={"destructive"}
+              className=""
+              onClick={handleDeleteItems}
+            >
+              Delete
+            </Button>
+          ) : (
+            <div className="flex gap-2 items-center">
+              <span className="text-sm">{formatPriceCents(subtotal)}</span>
+
+              <Button
+                disabled={hasNoItems}
+                onClick={handleCheckout}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
+              >
+                Check Out
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
     </>
   );

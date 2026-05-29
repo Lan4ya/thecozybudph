@@ -56,6 +56,9 @@ export const createProduct = async (
     }
 
     const msg = error instanceof AppError ? error.message : error;
-    throw AppError.internal({ message: "Failed to create product", cause: msg });
+    throw AppError.internal({
+      message: "Failed to create product",
+      cause: msg,
+    });
   }
 };

@@ -4,7 +4,17 @@ import { CatchAllErrorPage } from "./pages/ErrorPage.tsx";
 import Root from "./pages/Root.tsx";
 import RootLoader from "./pages/RootLoader.tsx";
 import About from "./pages/about/About.tsx";
-import { AuthLoader, ConfirmEmail, Login, Signup } from "./pages/auth";
+import {
+  AuthLoader,
+  Signup,
+  SignupConfirmEmail,
+  Login,
+  ForgotPasswordSubmitEmail,
+  ForgotPasswordCheckEmail,
+  ForgotPasswordCheckEmailLoader,
+  ForgotPasswordResetPassword,
+  ForgotPasswordResetPasswordLoader,
+} from "./pages/auth";
 import Cart from "./pages/cart/Cart.tsx";
 import Contact from "./pages/contact/Contact.tsx";
 import Events from "./pages/events/Events.tsx";
@@ -18,8 +28,9 @@ import MyPurchases from "./pages/profile/pages/my-purchases/MyPurchases.tsx";
 import OrderDetails from "./pages/profile/pages/my-purchases/OrderDetails.tsx";
 import Settings from "./pages/profile/pages/settings/Settings.tsx";
 import AccountPage from "./pages/profile/pages/settings/pages/account/AccountPage.tsx";
-import AddAddressPage from "./pages/profile/pages/settings/pages/account/pages/AddAddressPage.tsx";
-import EditAddressPage from "./pages/profile/pages/settings/pages/account/pages/EditAddressPage.tsx";
+import AddressesPage from "./pages/profile/pages/settings/pages/addresses/AddressesPage.tsx";
+import AddAddressPage from "./pages/profile/pages/settings/pages/addresses/pages/AddAddressPage.tsx";
+import EditAddressPage from "./pages/profile/pages/settings/pages/addresses/pages/EditAddressPage.tsx";
 import NotificationsPage from "./pages/profile/pages/settings/pages/notification/NotificationsPage.tsx";
 import PrivacyPage from "./pages/profile/pages/settings/pages/privacy/PrivacyPage.tsx";
 import {
@@ -52,21 +63,29 @@ const router = createBrowserRouter([
       { index: true, Component: Home },
 
       {
-        path: "auth/signup",
+        path: "auth",
         loader: AuthLoader,
-        Component: Signup,
-      },
-
-      {
-        path: "auth/confirm-email",
-        loader: AuthLoader,
-        Component: ConfirmEmail,
-      },
-
-      {
-        path: "auth/login",
-        loader: AuthLoader,
-        Component: Login,
+        children: [
+          { path: "signup", Component: Signup },
+          { path: "login", Component: Login },
+          { path: "confirm-email", Component: SignupConfirmEmail },
+          {
+            path: "forgot-password",
+            children: [
+              { index: true, Component: ForgotPasswordSubmitEmail },
+              {
+                path: "check-email",
+                loader: ForgotPasswordCheckEmailLoader,
+                Component: ForgotPasswordCheckEmail,
+              },
+              {
+                path: "reset-password",
+                loader: ForgotPasswordResetPasswordLoader,
+                Component: ForgotPasswordResetPassword,
+              },
+            ],
+          },
+        ],
       },
 
       {
@@ -89,14 +108,17 @@ const router = createBrowserRouter([
                 path: "account",
                 Component: AccountPage,
               },
+              {
+                path: "addresses",
+                children: [
+                  { index: true, Component: AddressesPage },
+                  { path: "add", Component: AddAddressPage },
+                  { path: ":addressId/edit", Component: EditAddressPage },
+                ],
+              },
               { path: "notifications", Component: NotificationsPage },
               { path: "privacy", Component: PrivacyPage },
             ],
-          },
-          { path: "settings/account/address/add", Component: AddAddressPage },
-          {
-            path: "settings/account/address/:addressId/edit",
-            Component: EditAddressPage,
           },
           {
             path: "admin",

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Skeleton } from "@/lib/ui/__shadcn__/skeleton";
 import { cn } from "@/lib/utils/cn";
-import TCB_1 from "@/assets/thecozybud/TCB_1_C.png";
+import TCB_1 from "@/assets/thecozybud/TCB_1.png";
 
 interface HeroSectionProps {
   registerSentinel: (ref: HTMLElement | null) => void;
@@ -13,14 +13,16 @@ const HeroSection = ({ registerSentinel, visibleMap }: HeroSectionProps) => {
 
   return (
     <section className="relative h-[60vh] lg:h-[70vh] w-full overflow-hidden">
-      {!loaded && <Skeleton className="absolute inset-0 rounded-none bg-card" />}
+      {!loaded && (
+        <Skeleton className="absolute inset-0 rounded-none bg-card" />
+      )}
       <img
         ref={registerSentinel}
         src={TCB_1}
         alt="The Cozy Bud"
         className={cn(
           "pointer-events-none select-none h-full w-full object-cover transition-all duration-900 ease-out",
-          loaded && visibleMap[0] ? "opacity-100" : "opacity-0"
+          loaded && visibleMap[0] ? "opacity-100" : "opacity-0",
         )}
         loading="eager"
         decoding="async"
@@ -34,7 +36,9 @@ const HeroSection = ({ registerSentinel, visibleMap }: HeroSectionProps) => {
         ref={(el) => registerSentinel(el)}
         className={cn(
           "absolute inset-0 flex flex-col items-center justify-center text-center text-white px-6 transition-all duration-900 ease-out",
-          visibleMap[1] ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          visibleMap[1]
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 translate-y-8",
         )}
       >
         <h1 className="font-ivy-ora-display text-4xl md:text-5xl lg:text-6xl font-semibold mb-4">
@@ -49,3 +53,4 @@ const HeroSection = ({ registerSentinel, visibleMap }: HeroSectionProps) => {
 };
 
 export default HeroSection;
+

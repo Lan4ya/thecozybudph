@@ -8,11 +8,7 @@ import { TanstackQueryDevtoolsToggle } from "@/components/TanstackQueryDevToolsT
 import SessionExpiredModal from "@/components/SessionExpiredModal";
 import { ScrollToTop } from "@/components/ScrollToTop";
 
-export const NAV_HIDDEN_PATHS = [
-  "/auth/login",
-  "/auth/signup",
-  "/auth/confirm-email",
-];
+export const NAV_HIDDEN_PATHS = ["/auth"];
 export const FOOTER_HIDDEN_PATHS = [
   ...NAV_HIDDEN_PATHS,
   "/cart",

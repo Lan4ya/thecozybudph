@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 
-import { Skeleton } from "@/lib/ui/__shadcn__/skeleton";
-import TCB_1_Cropped from "@/assets/thecozybud/TCB_1_Cropped.jpg";
+import TCB_1 from "@/assets/thecozybud/TCB_1.png";
 import TCB_3 from "@/assets/thecozybud/TCB_3.png";
 import TCB_5 from "@/assets/thecozybud/TCB_5.jpg";
 import TCB_6 from "@/assets/thecozybud/TCB_6.jpg";
@@ -13,8 +12,9 @@ import {
 } from "@/hooks/useAnimateOnView";
 import { cn } from "@/lib/utils/cn";
 import { useIsLgScreenMin } from "@/hooks/useMediaQuery";
+import { ProgressiveImage } from "@/components/ProgressiveImage";
 
-const imgSrcs = [TCB_1_Cropped, TCB_6, TCB_7, TCB_5, TCB_3];
+const imgSrcs = [TCB_1, TCB_6, TCB_7, TCB_5, TCB_3];
 const TRANSITION_MS = 1000;
 
 const Hero = () => {
@@ -45,7 +45,6 @@ const MobileHeroInner = ({
   registerSentinel: RegisterSentinel;
   visibleMap: boolean[];
 }) => {
-  const [imgLoaded, setImgLoaded] = useState(false);
   const slides = [imgSrcs[imgSrcs.length - 1], ...imgSrcs, imgSrcs[0]];
   const [index, setIndex] = useState(1);
   const [transition, setTransition] = useState(true);
@@ -132,13 +131,13 @@ const MobileHeroInner = ({
         >
           {slides.map((src, i) => (
             <div key={i} className="relative h-full w-full shrink-0 aspect-4/5">
-              {!imgLoaded && <Skeleton className="h-full w-full bg-card" />}
-              <img
+              <ProgressiveImage
+                key={i}
                 src={src}
-                loading={i === index ? "eager" : "lazy"}
-                decoding="async"
-                onLoad={() => setImgLoaded(true)}
-                className="pointer-events-none h-full w-full select-none object-cover"
+                decoding="sync"
+                alt={`Product image ${i + 1}`}
+                isEager={i === index}
+                className={cn(src === imgSrcs[0] && "object-fit ")}
               />
             </div>
           ))}
@@ -155,8 +154,6 @@ const DesktopHeroInner = ({
   registerSentinel: RegisterSentinel;
   visibleMap: boolean[];
 }) => {
-  const [loaded, setLoaded] = useState(false);
-
   return (
     <div className="mx-auto grid w-full max-w-[1420px] items-center gap-10 py-30 pb-32 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] xl:gap-14">
       <div
@@ -238,17 +235,12 @@ const DesktopHeroInner = ({
       >
         <div className="absolute -inset-6 -z-10 rounded-[2.5rem] bg-linear-to-br from-primary/10 via-accent/10 to-transparent blur-2xl" />
         <div className="overflow-hidden rounded-[2.5rem] border border-accent/10 bg-card shadow-2xl">
-          {!loaded && <Skeleton className="h-[620px] w-full bg-card" />}
-          <img
-            src={TCB_1_Cropped}
+          <ProgressiveImage
+            src={TCB_1}
             alt="CozyBud floral arrangement"
-            className={cn(
-              "pointer-events-none h-[620px] w-full select-none object-cover transition-opacity duration-300",
-              loaded ? "opacity-100" : "opacity-0",
-            )}
-            loading="eager"
-            decoding="async"
-            onLoad={() => setLoaded(true)}
+            isEager={true}
+            decoding="sync"
+            className="pointer-events-none h-[620px] select-none"
           />
         </div>
       </div>

@@ -2,6 +2,7 @@ import { AppError } from "@shared/errors/Errors.ts";
 import { UpdateProfileInput } from "@shared/schemas/index.ts";
 import { DrizzleClient } from "../../../db/client.ts";
 import { ProfileRepository } from "../profile-repository.ts";
+import { SupabaseDB } from "@shared/types.d.ts";
 
 export const updateProfile = async (
   db: DrizzleClient,
@@ -15,7 +16,9 @@ export const updateProfile = async (
   );
 
   if (!updatedProfile) {
-    throw AppError.notFound({ message: `Profile with id ${profileId} not found` });
+    throw AppError.notFound({
+      message: `Profile with id ${profileId} not found`,
+    });
   }
 
   return updatedProfile;

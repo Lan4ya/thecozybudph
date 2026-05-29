@@ -96,12 +96,14 @@ Make sure docker in running first, then run:
 pn dev
 ```
 
-### 4.5. Seed DB (Skip if already done once)
+### 4.5. Seed DB 
+
+Note: Do NOT spam this script since you'll get hit with rate limit and the script will not work for a while
 ```bash
 pn db:seed
 ```
 
-Part of seed script pipeline creates an admin account. Use it for login to access admin dashboard.
+Part of seed script creates an admin account. Use it for login to access admin dashboard.
 ```bash
 email: admin@local.dev
 password: password123
