@@ -123,7 +123,7 @@ This project uses a pn monorepo.
 Workspace definitions are located in:
 
 ```txt
-./pn-workspace.yaml
+./pnpm-workspace.yaml
 ```
 
 ### Install a package into a specific workspace
@@ -200,7 +200,7 @@ pn update:latest:sb
 
 ---
 
-## 🧪 Supabase Function Tests
+## 🧪 Supabase Edge Function Tests
 
 Integration tests intentionally use a separate Deno workspace.
 
@@ -213,14 +213,17 @@ This avoids coupling:
 
 with the production Supabase Functions runtime.
 
-### Add a test dependency
+### Running all integration tests
+```bash
+pn test:sb
+```
 
+### Add a test dependency
 ```bash
 pn add:sb:tests <registry-name>:<package-name>
 ```
 
 ### Update test dependencies
-
 ```bash
 pn update:sb:tests
 
