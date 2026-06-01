@@ -1,6 +1,6 @@
 import z from "zod";
 
-export type FieldError = { field?: string; message: string };
+export type FieldError = { field?: string; message: unknown };
 
 export const formatZodError = (error: z.ZodError): FieldError[] => {
   const flattened = z.flattenError(error);

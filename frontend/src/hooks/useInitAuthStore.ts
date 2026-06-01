@@ -1,15 +1,19 @@
 import { useCartStore } from "@/pages/cart/store/useCartStore";
 import { useProductSelectionStore } from "@/pages/shop/store/useProductSelectionStore";
 import { supabase } from "@/lib/supabase/client";
-import { useAuthStore } from "@/store/useAuthStore";
+import { useAuthStore, type AuthStatus } from "@/store/useAuthStore";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useCheckoutStore } from "@/pages/checkout/store/useCheckoutStore";
 import isDev from "@/lib/utils/isDev";
+import { useToast } from "@/providers/ToastProvider";
+import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
 
-// Initialize once in Root.tsx
+// Initialized in Root.tsx
 export const useInitAuthStore = () => {
   const queryClient = useQueryClient();
+  const { addToast } = useToast();
+  const setSession = useAuthStore((state) => state.setSession);
 
   useEffect(() => {
     let mounted = true;
@@ -29,34 +33,47 @@ export const useInitAuthStore = () => {
     init();
 
     const { data: listener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      (event: AuthChangeEvent, session: Session | null) => {
         if (!mounted) return;
-
-        console.log("Has auth session: ", session);
 
         const isExpiredSession =
           session?.expires_at && Date.now() > session.expires_at * 1000;
 
-        useAuthStore.setState({
-          session,
-          status: session
-            ? isExpiredSession
-              ? "expired"
-              : "authenticated"
-            : "unauthenticated",
-          event,
-        });
+        const status: AuthStatus = session
+          ? isExpiredSession
+            ? "expired"
+            : "authenticated"
+          : "unauthenticated";
 
-        if (event === "INITIAL_SESSION") {
-          // Clear orphan confirm email flag on successful email confirmation.
-          if (session?.user?.confirmed_at) {
-            sessionStorage.removeItem("signup_confirm_email");
+        setSession(session, status, event);
+
+        if (event === "SIGNED_IN" && session) {
+          const user = session.user;
+          const userName =
+            user.user_metadata?.display_name ??
+            user.user_metadata?.full_name ??
+            user.email?.split("@")[0];
+
+          const isActiveLogin =
+            sessionStorage.getItem("activeLogin") === "true";
+
+          const signupAttempt = localStorage.getItem("signup_attempt");
+
+          if (signupAttempt && user.confirmed_at) {
+            // New User Greeting
+            addToast(`Welcome to CozyBud, ${userName}`);
+            sessionStorage.removeItem("signup_attempt");
+          }
+
+          if (isActiveLogin) {
+            // Login Greeting
+            addToast(`Welcome back, ${userName}`);
+            sessionStorage.removeItem("activeLogin");
           }
         }
 
-        // See when is this event is emitted: https://supabase.com/docs/reference/javascript/auth-onauthstatechange
         if (event === "SIGNED_OUT") {
-          isDev && console.log("SIGNED_OUT: Clearing caches and stores...");
+          isDev && console.log("SIGNED_OUT: Clearing Caches and Stores...");
 
           // Clear tanstack query cache
           queryClient.clear();
@@ -78,5 +95,5 @@ export const useInitAuthStore = () => {
       mounted = false;
       listener.subscription.unsubscribe();
     };
-  }, []);
+  }, [setSession, addToast, queryClient]);
 };

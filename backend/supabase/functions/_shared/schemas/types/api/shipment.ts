@@ -18,6 +18,9 @@ import type {
   shipOrderDataSchema,
   cancelShipOrderDataSchema,
   getShippingOrderDataSchema,
+  getShippingDriverDataSchema,
+  getShippingCityDataSchema,
+  getShippingMarketDataSchema,
 } from "../../zod/index.ts";
 import type { isEqual, Expect } from "../utils.ts";
 import type { IQuotation } from "@lalamove/lalamove-js";
@@ -58,6 +61,9 @@ export type PriceBreakdown = z.infer<typeof priceBreakdownSchema>;
 export type ShipOrderData = z.infer<typeof shipOrderDataSchema>;
 export type CancelShipOrderData = z.infer<typeof cancelShipOrderDataSchema>;
 export type GetShippingOrderData = z.infer<typeof getShippingOrderDataSchema>;
+export type GetShippingDriverData = z.infer<typeof getShippingDriverDataSchema>;
+export type GetShippingCityData = z.infer<typeof getShippingCityDataSchema>;
+export type GetShippingMarketData = z.infer<typeof getShippingMarketDataSchema>;
 
 // Test to make sure the schema type aligns with Lalamove's quote shape.
 // Will error if not equal

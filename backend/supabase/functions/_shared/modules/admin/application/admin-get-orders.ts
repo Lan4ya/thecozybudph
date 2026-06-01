@@ -93,6 +93,8 @@ export const getOrders = async (
         id: orders.id,
         profileId: orders.profileId,
         status: orders.status,
+        shipmentOrderId: orders.shipmentOrderId,
+        serviceType: orders.serviceType,
 
         subtotalCents: orders.subtotalCents,
         discountCents: orders.discountCents,
@@ -159,6 +161,8 @@ export const getOrders = async (
     id: row.id,
     profileId: row.profileId,
     status: snakeToCamelString(row.status) as OrderStatus,
+    shipmentOrderId: row.shipmentOrderId,
+    serviceType: row.serviceType,
 
     subtotalCents: row.subtotalCents,
     passOnFee: row.passOnFee,

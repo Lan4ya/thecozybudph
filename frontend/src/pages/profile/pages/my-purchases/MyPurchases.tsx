@@ -1,6 +1,6 @@
-import { useMemo, useState, useRef, useEffect } from "react";
+import { useMemo, useRef, useEffect } from "react";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { OrderAPI } from "@/api";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/lib/ui/__shadcn__/button";
@@ -73,7 +73,29 @@ const MyPurchases = () => {
 };
 
 const MyPurchasesContent = () => {
-  const [activeTab, setActiveTab] = useState<OrderStatusUI>("all");
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const activeTab = useMemo(() => {
+    const status = searchParams.get("status") as OrderStatusUI;
+    if (ORDER_STATUS_TABS.some((tab) => tab.status === status)) {
+      return status;
+    }
+    return "all";
+  }, [searchParams]);
+
+  const setActiveTab = (status: OrderStatusUI) => {
+    setSearchParams(
+      (prev) => {
+        if (status === "all") {
+          prev.delete("status");
+        } else {
+          prev.set("status", status);
+        }
+        return prev;
+      },
+      { replace: true },
+    );
+  };
 
   const { data, hasNextPage, fetchNextPage, isFetchingNextPage } =
     useSuspenseInfiniteQuery({

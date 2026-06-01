@@ -1,8 +1,12 @@
 import { useAuthStore } from "@/store/useAuthStore";
 import { Link } from "react-router";
+import { useAnimateOnView } from "@/hooks/useAnimateOnView";
+import { cn } from "@/lib/utils/cn";
 
 export const MembersOnlySection = () => {
   const session = useAuthStore((s) => s.session);
+  const { registerSentinel, visibleMap } = useAnimateOnView();
+
   if (!!session) return null;
 
   return (
@@ -14,7 +18,15 @@ export const MembersOnlySection = () => {
 
         <div className="relative mx-auto grid w-full max-w-5xl items-end gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
           {/* Left content */}
-          <div className="space-y-6 text-center lg:text-left">
+          <div
+            ref={registerSentinel}
+            className={cn(
+              "space-y-6 text-center lg:text-left transition-all duration-1000 ease-out",
+              visibleMap[0]
+                ? "translate-y-0 opacity-100"
+                : "translate-y-8 opacity-0",
+            )}
+          >
             {/* Eyebrow */}
             <p className="text-xs font-semibold uppercase tracking-[0.32em] text-accent/70">
               Members
@@ -38,7 +50,15 @@ export const MembersOnlySection = () => {
           </div>
 
           {/* Right CTA */}
-          <div className="flex flex-col gap-4 px-8 backdrop-blur-sm">
+          <div
+            ref={registerSentinel}
+            className={cn(
+              "flex flex-col gap-4 px-8 backdrop-blur-sm transition-all duration-1000 ease-out",
+              visibleMap[1]
+                ? "translate-y-0 opacity-100"
+                : "translate-y-8 opacity-0",
+            )}
+          >
             <Link
               to="/auth/signup"
               className="inline-flex items-center justify-center rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary/90"

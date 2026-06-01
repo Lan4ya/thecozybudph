@@ -3,12 +3,14 @@ import { z } from "zod";
 export const signUpFormSchema = z.object({
   email: z.email("Please enter a valid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
+  cfTurnstileToken: z.string(),
 });
 
 export const logInFormSchema = signUpFormSchema;
 
 export const forgotPasswordFormSchema = z.object({
   email: z.email("Please enter a valid email address"),
+  cfTurnstileToken: z.string(),
 });
 
 export const updateUserSchema = signUpFormSchema.partial().extend({
@@ -18,4 +20,7 @@ export const updateUserSchema = signUpFormSchema.partial().extend({
     .optional(),
 });
 
-export const resetPasswordSchema = signUpFormSchema.omit({ email: true });
+export const resetPasswordFormSchema = signUpFormSchema.omit({
+  email: true,
+  cfTurnstileToken: true,
+});

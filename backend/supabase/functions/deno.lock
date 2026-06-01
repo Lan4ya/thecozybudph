@@ -1,17 +1,18 @@
 {
   "version": "5",
   "specifiers": {
-    "npm:@hono/swagger-ui@~0.6.1": "0.6.1_hono@4.12.22",
-    "npm:@hono/zod-openapi@^1.4.0": "1.4.0_hono@4.12.22_zod@4.4.3",
-    "npm:@hono/zod-validator@0.8.0": "0.8.0_hono@4.12.22_zod@4.4.3",
+    "npm:@hono/swagger-ui@~0.6.1": "0.6.1_hono@4.12.23",
+    "npm:@hono/zod-openapi@^1.4.0": "1.4.0_hono@4.12.23_zod@4.4.3",
+    "npm:@hono/zod-validator@0.8.0": "0.8.0_hono@4.12.23_zod@4.4.3",
     "npm:@lalamove/lalamove-js@^1.1.0": "1.1.0",
-    "npm:@supabase/supabase-js@^2.106.1": "2.106.1",
+    "npm:@supabase/supabase-js@^2.106.2": "2.106.2",
+    "npm:@upstash/redis@^1.38.0": "1.38.0",
     "npm:axios@^1.16.1": "1.16.1",
     "npm:drizzle-kit@0.31.10": "0.31.10",
-    "npm:drizzle-orm@0.45.2": "0.45.2_postgres@3.4.9",
-    "npm:drizzle-zod@0.8.3": "0.8.3_drizzle-orm@0.45.2__postgres@3.4.9_zod@4.4.3",
-    "npm:hono-rate-limiter@0.5.3": "0.5.3_hono@4.12.22",
-    "npm:hono@^4.12.22": "4.12.22",
+    "npm:drizzle-orm@0.45.2": "0.45.2_@upstash+redis@1.38.0_postgres@3.4.9",
+    "npm:drizzle-zod@0.8.3": "0.8.3_drizzle-orm@0.45.2__@upstash+redis@1.38.0__postgres@3.4.9_zod@4.4.3_@upstash+redis@1.38.0",
+    "npm:hono-rate-limiter@0.5.3": "0.5.3_hono@4.12.23",
+    "npm:hono@^4.12.23": "4.12.23",
     "npm:p-limit@^7.3.0": "7.3.0",
     "npm:postgres@3.4.9": "3.4.9",
     "npm:zod@^4.4.3": "4.4.3"
@@ -413,13 +414,13 @@
       "os": ["win32"],
       "cpu": ["x64"]
     },
-    "@hono/swagger-ui@0.6.1_hono@4.12.22": {
+    "@hono/swagger-ui@0.6.1_hono@4.12.23": {
       "integrity": "sha512-sJTvldu1GPeEPfyeLG7gRj+W4vEuD+JDi+JjJ3TJs/DvMUtBLs0KJO5yokGegWWdy5qrbdnQGekbhgNRmPmYKQ==",
       "dependencies": [
         "hono"
       ]
     },
-    "@hono/zod-openapi@1.4.0_hono@4.12.22_zod@4.4.3": {
+    "@hono/zod-openapi@1.4.0_hono@4.12.23_zod@4.4.3": {
       "integrity": "sha512-AFchqR1N/NxfI4hUOSGI2/g8zLROxA1OE7Oh5JJFlTaGxhrdRyH+93gd0tIBpb0z8s9r8hUoNnaOBfHbdb4NMw==",
       "dependencies": [
         "@asteasolutions/zod-to-openapi",
@@ -429,7 +430,7 @@
         "zod"
       ]
     },
-    "@hono/zod-validator@0.8.0_hono@4.12.22_zod@4.4.3": {
+    "@hono/zod-validator@0.8.0_hono@4.12.23_zod@4.4.3": {
       "integrity": "sha512-5uS4S1/LKtZQYvD4BtpPUFkOv8d1wNxHHrChm26buMiEYc1FrHWvDUaKVBwkiVtvSExHSpLGDvcnpI2Copyj9w==",
       "dependencies": [
         "hono",
@@ -443,14 +444,14 @@
         "crypto-js"
       ]
     },
-    "@supabase/auth-js@2.106.1": {
-      "integrity": "sha512-7eyheXfAGwkB9bZewJPs+N3UYt6kra2JG6mIxNEgbkvcO15PLD1e75PTIUEYYl3zrifm3GrpShVl7QZxKrXO/w==",
+    "@supabase/auth-js@2.106.2": {
+      "integrity": "sha512-VcAjUErkHkhC5Jaf+g/G1qbkQrFh8edaCdHa7pxJmHUjkWKjT7UnYCtPA89XV0N0GIYRkEqJZw5V62CtOxTmBQ==",
       "dependencies": [
         "tslib"
       ]
     },
-    "@supabase/functions-js@2.106.1": {
-      "integrity": "sha512-XbOPnR2mW7jp/EcW447xmGwCa+/Wc00Hkw8t4tUIJjRsHQ4xAESsLKcyLRhRJjJoUnJVXUlC+w0wUxUCM7CG2A==",
+    "@supabase/functions-js@2.106.2": {
+      "integrity": "sha512-oRnr0QrL8H+zTO1YyQ1QjiHZU/957jvubbxSJTUm2XLAgzoGGV9Tahfyd+uvLsBLRVmXLtpU3oyCjdQIvkGMOA==",
       "dependencies": [
         "tslib"
       ]
@@ -458,28 +459,28 @@
     "@supabase/phoenix@0.4.2": {
       "integrity": "sha512-YSAGnmDAfuleFCVt3CeurQZAhxRfXWeZIIkwp7NhYzQ1UwW6ePSnzsFAiUm/mbCkfoCf70QQHKW/K6RKh52a4A=="
     },
-    "@supabase/postgrest-js@2.106.1": {
-      "integrity": "sha512-Qbn6d2lqiqeaBX1Uko0e/hL90dtQGRN6CG2wMVQtJpRFstlVW45qmUTyTOsiB8dYUWu1fWYo4YzJuDbokGv3tQ==",
+    "@supabase/postgrest-js@2.106.2": {
+      "integrity": "sha512-tDOzyPgp9pIRMR2x6C9+uDSJrnXSzxLtt3d7nC+Lrsy3jnJDHYfdQC/xcRyhJE/TOBJ0heSqRKR3UmejDjZxsw==",
       "dependencies": [
         "tslib"
       ]
     },
-    "@supabase/realtime-js@2.106.1": {
-      "integrity": "sha512-eQCYri5E8KsjpDgC7g28cOOS2britjUWdNSJluFMainqrMRepzjOnaxqXc3RoAz7H0dxmBrfLUNF6NGP8C+YaA==",
+    "@supabase/realtime-js@2.106.2": {
+      "integrity": "sha512-LdRGT7DNhyZkPjubUv5bSdAZ0jSEX8wTHvx7htj7+K59TOZRvz4TuQK7tL2RWxyIZVeFMRluL04SzWS61rKnUA==",
       "dependencies": [
         "@supabase/phoenix",
         "tslib"
       ]
     },
-    "@supabase/storage-js@2.106.1": {
-      "integrity": "sha512-HWcLIhqinhWKpOQ3WzglR2unjW0eh9J7yOu3IZrZNIEkraK4La/HDvTqndljGsNw0itPtyHhuKBxRoPG1VUARw==",
+    "@supabase/storage-js@2.106.2": {
+      "integrity": "sha512-xgKCSYuev1YarV+iVqr+zlfgSyremnJtn8T0NCT8L4XmMv1CLtESc0Q6kNp8+mKWdX/8ND0nzm7OMKx08kwNAw==",
       "dependencies": [
         "iceberg-js",
         "tslib"
       ]
     },
-    "@supabase/supabase-js@2.106.1": {
-      "integrity": "sha512-gP4HurGkGu7Z3xoOCjtAI17BKKp7jpsmwY0Ssbsks9XQRzJ7ZhK7LxfLdBSYgUdgZCQgjRK+Mr7+cl4Gxrk0Rw==",
+    "@supabase/supabase-js@2.106.2": {
+      "integrity": "sha512-2/RZ/1fmJx/MRSEDG2Xk8+J4JVk5clM9V0uSI6kUTrcS32KA89DtqI5RUOC9r6mzY3WBC9qexLjssIHjbLyVJA==",
       "dependencies": [
         "@supabase/auth-js",
         "@supabase/functions-js",
@@ -490,6 +491,12 @@
     },
     "@types/crypto-js@4.2.2": {
       "integrity": "sha512-sDOLlVbHhXpAUAL0YHDUUwDZf3iN4Bwi4W6a0W0b+QcAezUbRtH4FVb+9J4h+XFPW7l/gQ9F8qC7P+Ec4k8QVQ=="
+    },
+    "@upstash/redis@1.38.0": {
+      "integrity": "sha512-wu+dZBptlLy0+MCUEoHmzrY/TnmgDey3+c7EbIGwrLqAvkP8yi5MWZHYGIFtAygmL4Bkz2TdFu+eU0vFPncIcg==",
+      "dependencies": [
+        "uncrypto"
+      ]
     },
     "agent-base@6.0.2": {
       "integrity": "sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==",
@@ -547,16 +554,18 @@
       ],
       "bin": true
     },
-    "drizzle-orm@0.45.2_postgres@3.4.9": {
+    "drizzle-orm@0.45.2_@upstash+redis@1.38.0_postgres@3.4.9": {
       "integrity": "sha512-kY0BSaTNYWnoDMVoyY8uxmyHjpJW1geOmBMdSSicKo9CIIWkSxMIj2rkeSR51b8KAPB7m+qysjuHme5nKP+E5Q==",
       "dependencies": [
+        "@upstash/redis",
         "postgres"
       ],
       "optionalPeers": [
+        "@upstash/redis",
         "postgres"
       ]
     },
-    "drizzle-zod@0.8.3_drizzle-orm@0.45.2__postgres@3.4.9_zod@4.4.3": {
+    "drizzle-zod@0.8.3_drizzle-orm@0.45.2__@upstash+redis@1.38.0__postgres@3.4.9_zod@4.4.3_@upstash+redis@1.38.0": {
       "integrity": "sha512-66yVOuvGhKJnTdiqj1/Xaaz9/qzOdRJADpDa68enqS6g3t0kpNkwNYjUuaeXgZfO/UWuIM9HIhSlJ6C5ZraMww==",
       "dependencies": [
         "drizzle-orm",
@@ -754,14 +763,14 @@
         "function-bind"
       ]
     },
-    "hono-rate-limiter@0.5.3_hono@4.12.22": {
+    "hono-rate-limiter@0.5.3_hono@4.12.23": {
       "integrity": "sha512-M0DxbVMpPELEzLi0AJg1XyBHLGJXz7GySjsPoK+gc5YeeBsdGDGe+2RvVuCAv8ydINiwlbxqYMNxUEyYfRji/A==",
       "dependencies": [
         "hono"
       ]
     },
-    "hono@4.12.22": {
-      "integrity": "sha512-7fvVPbB92zNRsQke+uiRGwtTuef0tB2Dg4hWxYfFNvkQhIltWoyi0ONReM5LWA+jJWS3nfT5lTq+qbsIpX0IQw=="
+    "hono@4.12.23": {
+      "integrity": "sha512-eIaZ9qDgu7XV0pxOCrg7/WhnQ6Ivm22UcxhXx/A3dcbqbbYgBEkc6e/J/s7j2tS96zoB0S9VBdLwQNCWwUo4LA=="
     },
     "https-proxy-agent@5.0.1": {
       "integrity": "sha512-dFcAjpTQFgoLMzC2VwU+C/CbS7uRL0lWmxDITmqm7C+7F0Odmj6s9l6alZc6AELXhrnggM2CeWSXHGOdX2YtwA==",
@@ -832,6 +841,9 @@
       ],
       "bin": true
     },
+    "uncrypto@0.1.3": {
+      "integrity": "sha512-Ql87qFHB3s/De2ClA9e0gsnS6zXG27SkTiSJwjCc9MebbfapQfuPzumMIUMi38ezPZVNFcHI9sUIepeQfw8J8Q=="
+    },
     "yaml@2.9.0": {
       "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
       "bin": true
@@ -849,13 +861,14 @@
       "npm:@hono/zod-openapi@^1.4.0",
       "npm:@hono/zod-validator@0.8.0",
       "npm:@lalamove/lalamove-js@^1.1.0",
-      "npm:@supabase/supabase-js@^2.106.1",
+      "npm:@supabase/supabase-js@^2.106.2",
+      "npm:@upstash/redis@^1.38.0",
       "npm:axios@^1.16.1",
       "npm:drizzle-kit@0.31.10",
       "npm:drizzle-orm@0.45.2",
       "npm:drizzle-zod@0.8.3",
       "npm:hono-rate-limiter@0.5.3",
-      "npm:hono@^4.12.22",
+      "npm:hono@^4.12.23",
       "npm:p-limit@^7.3.0",
       "npm:postgres@3.4.9",
       "npm:zod@^4.4.3"

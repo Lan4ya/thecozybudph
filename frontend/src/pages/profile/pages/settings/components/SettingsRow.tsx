@@ -20,7 +20,7 @@ export function SettingsRow({
   return (
     <div
       className={cn(
-        "flex items-center justify-between py-4 px-1 rounded-lg transition-colors",
+        "flex items-center justify-between py-3 px-2 rounded-lg transition-colors",
         className,
       )}
     >

@@ -1,0 +1,95 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reset Your Password</title>
+  </head>
+  <body
+    style="
+      font-family:
+        -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto,
+        Helvetica, Arial, sans-serif;
+      background-color: #f9fafb;
+      margin: 0;
+      padding: 40px 20px;
+    "
+  >
+    <div
+      style="
+        max-width: 500px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        padding: 32px;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+      "
+    >
+      <!-- Header Area -->
+      <h2
+        style="
+          color: #af4f47;
+          font-size: 24px;
+          font-weight: 700;
+          margin-top: 0;
+          margin-bottom: 8px;
+        "
+      >
+        Reset your password
+      </h2>
+      <p
+        style="
+          color: #4b5563;
+          font-size: 15px;
+          line-height: 24px;
+          margin-top: 0;
+          margin-bottom: 24px;
+        "
+      >
+        We received a request to reset the password for your account. If you
+        didn't make this request, you can safely ignore this email.
+      </p>
+
+      <!-- Call to Action -->
+      <div style="margin-bottom: 32px">
+        <a
+          href="{{ .ConfirmationURL }}"
+          style="
+            display: inline-block;
+            background-color: #af4f47;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px 0 rgba(175, 79, 71, 0.15);
+          "
+        >
+          Reset Password
+        </a>
+      </div>
+
+      <!-- Secondary Link Fallback -->
+      <hr
+        style="border: 0; border-top: 1px solid #e5e7eb; margin-bottom: 24px"
+      />
+      <p style="color: #6b7280; font-size: 13px; line-height: 20px; margin: 0">
+        If the button above doesn't work, copy and paste this URL into your
+        browser:
+      </p>
+      <p
+        style="
+          color: #af4f47;
+          font-size: 13px;
+          word-break: break-all;
+          margin-top: 8px;
+          margin-bottom: 0;
+        "
+      >
+        {{ .ConfirmationURL }}
+      </p>
+    </div>
+  </body>
+</html>

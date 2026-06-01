@@ -104,6 +104,7 @@ export const shipOrder = async (
 
     return {
       orderId: order.id,
+      shippingOrderId: shippingOrder.id,
       status: toCamelCase(status) as OrderStatus,
     };
   } catch (error) {

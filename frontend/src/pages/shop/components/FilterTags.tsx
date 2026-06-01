@@ -10,6 +10,7 @@ import toggleArrItem from "@/lib/utils/toggleArrItem";
 import { useMemo } from "react";
 import {
   Popover,
+  PopoverAnchor,
   PopoverContent,
   PopoverTrigger,
 } from "@/lib/ui/__shadcn__/popover";
@@ -51,7 +52,6 @@ const FilterTags = () => {
     <div className="group-tags text-muted-foreground flex items-center gap-5 text-sm">
       {!isXlScreen ? (
         <Popover>
-          {/* @ts-ignore */}
           <PopoverTrigger asChild>
             <Button variant="minimal" size="icon" className="relative border">
               <TagIcon className="text-muted-foreground size-5" />

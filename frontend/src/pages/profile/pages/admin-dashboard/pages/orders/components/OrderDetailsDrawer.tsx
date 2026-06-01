@@ -10,6 +10,7 @@ import {
 import { formatPriceCents } from "@/lib/utils/format";
 import { StatusBadge } from "./StatusBadge";
 import { getOrderItemCount } from "./OrdersTable";
+import ShipmentManagement from "@/pages/profile/pages/admin-dashboard/pages/orders/components/ShipmentManagement";
 
 type OrderDetailsDrawerProps = {
   order: AdminOrderListItem | null;
@@ -49,9 +50,12 @@ export function OrderDetailsDrawer({
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange} direction="right">
-      <DrawerContent className="data-[vaul-drawer-direction=right]:h-full data-[vaul-drawer-direction=right]:w-full data-[vaul-drawer-direction=right]:max-w-none md:data-[vaul-drawer-direction=right]:w-[44rem] md:data-[vaul-drawer-direction=right]:max-w-[44rem]">
+      <DrawerContent
+        data-vaul-no-drag
+        className="data-[vaul-drawer-direction=right]:h-full data-[vaul-drawer-direction=right]:w-full data-[vaul-drawer-direction=right]:max-w-none md:data-[vaul-drawer-direction=right]:w-[44rem] md:data-[vaul-drawer-direction=right]:max-w-[44rem] bg-card"
+      >
         <DrawerHeader className="border-b">
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center select-text justify-between gap-4">
             <div>
               <DrawerTitle>Order Details</DrawerTitle>
               <p className="mt-1 font-mono text-xs text-muted-foreground">
@@ -69,61 +73,59 @@ export function OrderDetailsDrawer({
           </div>
         </DrawerHeader>
 
-        <div className="space-y-6 overflow-y-auto p-4 md:p-6">
+        <div className="space-y-6 overflow-y-auto select-text p-4 md:p-6">
           <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-md border bg-accent/10 p-3">
+            <div className="rounded-md border bg-background p-3">
               <div className="text-xs text-muted-foreground">Status</div>
               <div className="mt-1">
                 <StatusBadge status={order.status} />
               </div>
             </div>
-            <div className="rounded-md border bg-accent/10 p-3">
+            <div className="rounded-md border bg-background p-3">
               <div className="text-xs text-muted-foreground">Total</div>
               <div className="mt-1 text-lg font-semibold">
                 {formatPriceCents(order.totalCents)}
               </div>
             </div>
-            <div className="rounded-md border bg-accent/10 p-3">
+            <div className="rounded-md border bg-background p-3">
               <div className="text-xs text-muted-foreground">Created</div>
               <div className="mt-1 text-sm">{formatDate(order.createdAt)}</div>
             </div>
-            <div className="rounded-md border bg-accent/10 p-3">
+            <div className="rounded-md border bg-background p-3">
               <div className="text-xs text-muted-foreground">Updated</div>
               <div className="mt-1 text-sm">{formatDate(order.updatedAt)}</div>
             </div>
           </div>
-
           <section className="space-y-2">
             <h3 className="text-sm font-semibold">Recipient</h3>
-            <div className="rounded-md border bg-accent/10 p-3 text-sm text-muted-foreground">
+            <div className="rounded-md border bg-background p-3 text-sm text-muted-foreground">
               {order.address.name || "No name information"}
             </div>
           </section>
-
           <section className="space-y-2">
             <h3 className="text-sm font-semibold">Address</h3>
-            <div className="rounded-md border bg-accent/10 p-3 text-sm text-muted-foreground">
+            <div className="rounded-md border bg-background p-3 text-sm text-muted-foreground">
               {formatAddress(order) || "No address information"}
             </div>
           </section>
-
           <section className="space-y-2">
             <h3 className="text-sm font-semibold">Phone Number</h3>
-            <div className="rounded-md border bg-accent/10 p-3 text-sm text-muted-foreground">
+            <div className="rounded-md border bg-background p-3 text-sm text-muted-foreground">
               {order.address.phone || "No phone information"}
             </div>
           </section>
 
+          {/*  Order Items */}
           <section className="space-y-3">
             <h3 className="text-sm font-semibold">
               Order Items ({getOrderItemCount(order.items)})
             </h3>
             {order.items.length === 0 ? (
-              <div className="rounded-md border bg-accent/10 p-4 text-sm text-muted-foreground">
+              <div className="rounded-md border bg-background p-4 text-sm text-muted-foreground">
                 No items found for this order.
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-3i bg-background">
                 {order.items.map((item, index) => (
                   <article
                     key={`${item.orderId}-${index}`}
@@ -132,7 +134,7 @@ export function OrderDetailsDrawer({
                     <div className="flex gap-3">
                       <div className="size-20 shrink-0 overflow-hidden rounded-md border">
                         <ProductImage
-                          src={item.image ?? "/no-image-light.png"}
+                          src={item.image ?? "/no-image-light.webp"}
                           alt={item.name}
                           roundedSize="md"
                         />
@@ -171,7 +173,7 @@ export function OrderDetailsDrawer({
                         {item.cardMessages.map((message, messageIndex) => (
                           <div
                             key={messageIndex}
-                            className="rounded-md bg-accent/20 p-2 text-xs text-muted-foreground"
+                            className="rounded-md bg-background p-2 text-xs text-muted-foreground"
                           >
                             #{messageIndex + 1}: {message || "(empty)"}
                           </div>
@@ -183,40 +185,64 @@ export function OrderDetailsDrawer({
               </div>
             )}
           </section>
-
           <section className="grid grid-cols-2 gap-3">
-            <div className="rounded-md border bg-accent/10 p-3">
+            <div className="rounded-md border bg-background p-3">
               <div className="text-xs text-muted-foreground">Subtotal</div>
               <div className="mt-1 text-sm font-medium">
                 {formatPriceCents(order.subtotalCents)}
               </div>
             </div>
-            <div className="rounded-md border bg-accent/10 p-3">
+            <div className="rounded-md border bg-background p-3">
               <div className="text-xs text-muted-foreground">Shipping</div>
               <div className="mt-1 text-sm font-medium">
                 {formatPriceCents(order.shippingCents)}
               </div>
             </div>
-            <div className="rounded-md border bg-accent/10 p-3">
+            <div className="rounded-md border bg-background p-3">
               <div className="text-xs text-muted-foreground">Discount</div>
               <div className="mt-1 text-sm font-medium">
                 {formatPriceCents(order.discountCents)}
               </div>
             </div>
 
-            <div className="rounded-md border bg-accent/10 p-3">
+            <div className="rounded-md border bg-background p-3">
               <div className="text-xs text-muted-foreground">Pass On Fee</div>
               <div className="mt-1 text-sm font-medium">
                 {formatPriceCents(order.passOnFee)}
               </div>
             </div>
-            <div className="rounded-md border bg-accent/10 p-3">
+            <div className="rounded-md border bg-background p-3">
               <div className="text-xs text-muted-foreground">Expires At</div>
               <div className="mt-1 text-sm font-medium">
                 {formatDate(order.expiresAt)}
               </div>
             </div>
           </section>
+          <ShipmentManagement
+            orderItem={{
+              ...order,
+              id: order.id,
+              orderId: order.id,
+              // Adapt AdminOrderListItem to GetOrderItemRes fields if needed
+              // ShipmentManagement expects GetOrderItemRes which is a single item order usually
+              // but here we have the whole order. We can pick the first item's details if needed
+              // or just pass enough for ShipmentManagement to work.
+              category: order.items[0]?.category ?? "N/A",
+              name: order.items[0]?.name ?? "N/A",
+              primaryImageUrl: order.items[0]?.image ?? "",
+              variantAttributes: order.items[0]?.attributes ?? {},
+              cardMessages: order.items[0]?.cardMessages ?? [],
+              quantity: order.items[0]?.quantity ?? 0,
+              priceCents: order.items[0]?.priceCents ?? 0,
+              createdAt: order.createdAt,
+              address: {
+                ...order.address,
+                fullName: order.address.name,
+                phoneNumber: order.address.phone,
+                province: order.address.province ?? "",
+              },
+            }}
+          />
         </div>
       </DrawerContent>
     </Drawer>

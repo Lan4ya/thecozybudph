@@ -177,6 +177,9 @@ export interface paths {
                         "application/json": {
                             data: {
                                 id: string;
+                                /** Format: uuid */
+                                orderId: string;
+                                shipmentOrderId: string | null;
                                 quantity: number;
                                 cardMessages: string[];
                                 name: string;
@@ -377,7 +380,7 @@ export interface paths {
                         "application/json": {
                             data: {
                                 /** @enum {string} */
-                                status: "processing" | "pending" | "paid" | "failed" | "cancelled" | "refunded";
+                                status: "pending" | "paid" | "failed";
                                 /** Format: date-time */
                                 expiresAt: string;
                             };

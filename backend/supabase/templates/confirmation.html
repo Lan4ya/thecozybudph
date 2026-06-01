@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Confirm Your Account</title>
+  </head>
+  <body
+    style="
+      width: 100% !important;
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+      margin: 0;
+      padding: 0;
+      background-color: #f9fafb;
+    "
+  >
+    <table
+      cellpadding="0"
+      cellspacing="0"
+      border="0"
+      width="100%"
+      style="
+        background-color: #f9fafb;
+        min-width: 100%;
+        font-family:
+          -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto,
+          Helvetica, Arial, sans-serif;
+      "
+    >
+      <tr>
+        <td align="center" style="padding: 40px 20px">
+          <!-- Card Container Table -->
+          <table
+            cellpadding="0"
+            cellspacing="0"
+            border="0"
+            width="100%"
+            style="
+              max-width: 500px;
+              background-color: #ffffff;
+              border: 1px solid #e5e7eb;
+              border-radius: 12px;
+              border-collapse: separate;
+              box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+            "
+          >
+            <tr>
+              <td style="padding: 32px">
+                <!-- Header Area -->
+                <h2
+                  style="
+                    color: #af4f47;
+                    font-size: 24px;
+                    font-weight: 700;
+                    margin: 0 0 8px 0;
+                    font-family:
+                      -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;,
+                      Roboto, Helvetica, Arial, sans-serif;
+                  "
+                >
+                  Welcome to The Cozy Bud PH!
+                </h2>
+
+                <!-- Paragraph text -->
+                <p
+                  style="
+                    color: #4b5563;
+                    font-size: 15px;
+                    line-height: 24px;
+                    margin: 0 0 24px 0;
+                    font-family:
+                      -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;,
+                      Roboto, Helvetica, Arial, sans-serif;
+                  "
+                >
+                  Thanks for signing up. Please verify your email address to
+                  activate your account and get started.
+                </p>
+
+                <!-- Call to Action Container -->
+                <table
+                  cellpadding="0"
+                  cellspacing="0"
+                  border="0"
+                  style="margin: 0 0 32px 0"
+                >
+                  <tr>
+                    <td>
+                      <!-- Outlook/Gmail Safe Button Structure -->
+                      <a
+                        href="{{ .ConfirmationURL }}"
+                        style="
+                          display: inline-block;
+                          background-color: #af4f47;
+                          color: #ffffff;
+                          font-size: 15px;
+                          font-weight: 600;
+                          text-decoration: none;
+                          padding: 12px 24px;
+                          border-radius: 8px;
+                          font-family:
+                            -apple-system, BlinkMacSystemFont,
+                            &quot;Segoe UI&quot;, Roboto, Helvetica, Arial,
+                            sans-serif;
+                        "
+                      >
+                        Confirm Email Address
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- Secondary Link Fallback Divider -->
+                <table
+                  cellpadding="0"
+                  cellspacing="0"
+                  border="0"
+                  width="100%"
+                  style="margin: 0 0 24px 0"
+                >
+                  <tr>
+                    <td
+                      style="
+                        border-top: 1px solid #e5e7eb;
+                        height: 1px;
+                        font-size: 1px;
+                        line-height: 1px;
+                      "
+                    >
+                      &nbsp;
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- Fallback Text Links -->
+                <p
+                  style="
+                    color: #6b7280;
+                    font-size: 13px;
+                    line-height: 20px;
+                    margin: 0;
+                    font-family:
+                      -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;,
+                      Roboto, Helvetica, Arial, sans-serif;
+                  "
+                >
+                  If the button above doesn't work, copy and paste this URL into
+                  your browser:
+                </p>
+                <p
+                  style="
+                    color: #af4f47;
+                    font-size: 13px;
+                    line-height: 18px;
+                    word-break: break-all;
+                    margin: 8px 0 0 0;
+                    font-family:
+                      -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;,
+                      Roboto, Helvetica, Arial, sans-serif;
+                  "
+                >
+                  {{ .ConfirmationURL }}
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

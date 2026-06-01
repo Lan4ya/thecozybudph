@@ -86,7 +86,7 @@ export const adminDb = drizzle(adminPg, {
   schema,
 });
 
-export function createDrizzle(token: JwtPayload): DrizzleClient {
+export function createDrizzle(token?: JwtPayload): DrizzleClient {
   return {
     admin: adminDb,
     rls: ((

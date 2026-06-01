@@ -85,9 +85,9 @@ export const BottomBarActions = ({
   onBuyNow,
   disabled,
 }: BottomBarActionsProps) => {
-  const messengerLink = `https://m.me/thecozybud?text=${encodeURIComponent(`Hi! I'm interested in ${product.name}`)}`;
-  const instagramLink = `https://ig.me/m/thecozybud`;
-  const gmailLink = `mailto:thecozybud@gmail.com?subject=${encodeURIComponent(`Inquiry about ${product.name}`)}&body=${encodeURIComponent(`Hi, I'm interested in the ${product.name}.`)}`;
+  const messengerLink = `https://m.me/thecozybudph?text=${encodeURIComponent(`Hi! I'm interested in ${product.name}: ${window.location.href}`)}`;
+  const instagramLink = `https://ig.me/m/thecozybudph`;
+  const gmailLink = `mailto:thecozybudph@gmail.com?subject=${encodeURIComponent(`Inquiry about ${product.name}`)}&body=${encodeURIComponent(`Hi, I'm interested in ${product.name}: ${window.location.href}`)}`;
 
   return (
     <div
@@ -125,7 +125,7 @@ export const BottomBarActions = ({
             </div>
             <span className="text-sm font-medium lg:hidden">Messenger</span>
             <span className="text-sm font-medium hidden lg:inline">
-              Facebook Msg
+              Messenger
             </span>
           </a>
 

@@ -5,12 +5,7 @@ import {
   Calendar,
   Palette,
 } from "lucide-react";
-
-// Event showcase images
-import e1 from "@/assets/thecozybud/event_pic_1.jpg";
-import e2 from "@/assets/thecozybud/event_pic_2.jpg";
-import e3 from "@/assets/thecozybud/event_pic_3.jpg";
-import e4 from "@/assets/thecozybud/event_pic_4.jpg";
+import { ASSETS } from "@/lib/constants/assets";
 
 export interface EventCategory {
   title: string;
@@ -47,10 +42,10 @@ export const EVENT_CATEGORIES: EventCategory[] = [
 ];
 
 export const GALLERY_IMAGES: GalleryImage[] = [
-  { src: e1, alt: "Wedding floral arrangement" },
-  { src: e2, alt: "Event centerpiece design" },
-  { src: e3, alt: "Elegant bouquet display" },
-  { src: e4, alt: "Floral decoration setup" },
+  { src: ASSETS.EVENT_1, alt: "Wedding floral arrangement" },
+  { src: ASSETS.EVENT_2, alt: "Event centerpiece design" },
+  { src: ASSETS.EVENT_3, alt: "Elegant bouquet display" },
+  { src: ASSETS.EVENT_4, alt: "Floral decoration setup" },
 ];
 
 export const EVENT_TYPES = [

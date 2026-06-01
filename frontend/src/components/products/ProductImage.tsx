@@ -19,7 +19,7 @@ export const ProductImage = ({
 }: ProductImageProps) => {
   const [loaded, setLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
-  const fallBackImg = "/no-image-light.png";
+  const fallBackImg = "/no-image-light.webp";
   const borderRadius = `rounded-${roundedSize ?? ""}`;
 
   return (
@@ -45,7 +45,7 @@ export const ProductImage = ({
         draggable={false}
         className={cn(
           loaded ? "opacity-100" : "opacity-0",
-          " pointer-events-none h-full w-full object-cover transition-opacity duration-300",
+          "pointer-events-none select-none h-full w-full object-cover transition-opacity duration-300",
         )}
       />
     </div>

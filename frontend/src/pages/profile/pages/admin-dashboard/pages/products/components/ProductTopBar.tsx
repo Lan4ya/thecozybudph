@@ -12,10 +12,12 @@ import Categories from "@/pages/shop/components/filters/Categories";
 import Collections from "@/pages/shop/components/filters/Collection";
 import { SortDropdownMenu } from "@/pages/shop/components/SortDropDown";
 import AdminFilterTags from "./AdminFilterTags";
+import { useIsXlScreenMin } from "@/hooks/useMediaQuery";
 
 const ProductFilters = () => {
   const { deleteProductMutation } = useProductMutations();
   const queryClient = useQueryClient();
+  const isXlScreen = useIsXlScreenMin();
 
   const { openCreateProductForm, deletingProductIds, resetDeletingProductIds } =
     useAdminProductsPageState();
@@ -73,30 +75,44 @@ const ProductFilters = () => {
 
       {/* Filter Bar */}
       <div className="flex flex-col gap-6">
-        <div className="flex flex-wrap items-end gap-x-4 md:gap-x-6 gap-y-4">
-          <div className="w-full sm:w-[200px]">
+        <div className="xl:flex xl:gap-6 items-end">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 md:gap-x-6 gap-y-4 flex-1">
             <Search />
-          </div>
-          <div className="w-full sm:w-[180px]">
             <PriceRange />
-          </div>
-          <div className="w-full sm:w-[180px]">
             <Categories />
-          </div>
-          <div className="w-full sm:w-[180px]">
             <Collections />
           </div>
 
-          <div className="flex items-center gap-3 h-[45px] ml-auto">
-            <SortDropdownMenu className="h-[45px]" />
-            <Button variant="outline" size="sm" onClick={openCreateProductForm}>
-              <Plus />
-            </Button>
-          </div>
+          {isXlScreen && (
+            <div className="flex items-center gap-3">
+              <SortDropdownMenu className="h-[45px]" />
+              <Button
+                variant="outline"
+                className="h-[45px]"
+                onClick={openCreateProductForm}
+              >
+                <Plus className="size-4" />
+              </Button>
+            </div>
+          )}
         </div>
 
-        {/* Active Filters Display */}
-        <AdminFilterTags />
+        <div className="flex justify-between items-center xl:block">
+          <AdminFilterTags />
+
+          {!isXlScreen && (
+            <div className="flex items-center gap-3">
+              <SortDropdownMenu className="h-[45px]" />
+              <Button
+                variant="outline"
+                className="h-[45px]"
+                onClick={openCreateProductForm}
+              >
+                <Plus className="size-4" />
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

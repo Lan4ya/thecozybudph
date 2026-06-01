@@ -1,12 +1,12 @@
 import { motion } from "framer-motion";
-import heroImage from "@/assets/thecozybud/event_pic_1.jpg";
+import { ASSETS } from "@/lib/constants/assets";
 
 export const HeroSection = () => {
   return (
     <section className="relative h-[50vh] min-h-[400px] w-full overflow-hidden">
       <div className="absolute inset-0 bg-linear-to-r from-background/80 via-background/40 to-transparent z-10" />
       <img
-        src={heroImage}
+        src={ASSETS.EVENT_1}
         alt="CozyBud Events"
         className="absolute inset-0 w-full h-full object-cover"
       />

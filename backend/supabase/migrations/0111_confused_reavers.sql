@@ -1,0 +1,1 @@
+ALTER TABLE "action_cooldowns" ADD CONSTRAINT "action_cooldowns_profile_id_action_type_pk" PRIMARY KEY("profile_id","action_type");

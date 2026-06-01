@@ -1,26 +1,45 @@
-import e1 from "@/assets/thecozybud/event_pic_1.jpg";
-import e2 from "@/assets/thecozybud/event_pic_2.jpg";
-import e3 from "@/assets/thecozybud/event_pic_3.jpg";
-import e4 from "@/assets/thecozybud/event_pic_4.jpg";
+import { ASSETS } from "@/lib/constants/assets";
 import { useState } from "react";
 import { Navigation, A11y } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/swiper.css";
 import { ProductImage } from "@/components/products/ProductImage";
 import { cn } from "@/lib/utils/cn";
+import { useAnimateOnView } from "@/hooks/useAnimateOnView";
+import { useNavigate } from "react-router";
 
-const imgSrcs = [e1, e2, e3, e4];
+const imgSrcs = [
+  ASSETS.EVENT_1,
+  ASSETS.EVENT_2,
+  ASSETS.EVENT_3,
+  ASSETS.EVENT_4,
+];
 
 const EventSection = () => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const { registerSentinel, visibleMap } = useAnimateOnView();
+  const navigate = useNavigate();
 
   const isFirstSlide = activeIndex === 0;
   const isLastSlide = activeIndex === imgSrcs.length - 1;
 
+  const handleImageClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate("/events");
+  };
+
   return (
     <section className="bg-primary/5">
-      <div className="space-y-12 w-full py-18 lg:py-24 custom-container justify-between  gap-5 md:gap-10 lg:grid lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:items-center lg:[grid-template-areas:'carousel_text'] max-w-[1420px] mx-auto ">
-        <div className="space-y-6 lg:text-right">
+      <div className="space-y-12 w-full py-18 lg:py-24 custom-container justify-between gap-5 md:gap-10 lg:grid lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:items-center lg:[grid-template-areas:'carousel_text'] max-w-[1420px] mx-auto">
+        <div
+          ref={registerSentinel}
+          className={cn(
+            "space-y-6 lg:text-right transition-all duration-1000 ease-out",
+            visibleMap[0]
+              ? "translate-y-0 opacity-100"
+              : "translate-y-8 opacity-0",
+          )}
+        >
           {/* Eyebrow */}
           <p className="text-xs font-semibold uppercase tracking-[0.32em] text-accent/70">
             Events with cozybud
@@ -40,7 +59,15 @@ const EventSection = () => {
         </div>
 
         {/* Main Carousel */}
-        <div className="lg:[grid-area:carousel] group relative w-full overflow-hidden active:cursor-grabbing">
+        <div
+          ref={registerSentinel}
+          className={cn(
+            "lg:[grid-area:carousel] group relative w-full overflow-hidden active:cursor-grabbing transition-all duration-1000 ease-out",
+            visibleMap[1]
+              ? "translate-y-0 opacity-100"
+              : "translate-y-8 opacity-0",
+          )}
+        >
           <Swiper
             modules={[Navigation, A11y]}
             spaceBetween={0}
@@ -58,12 +85,17 @@ const EventSection = () => {
           >
             {imgSrcs.map((u, index) => (
               <SwiperSlide key={index} className="aspect-4/3 sm:aspect-7/6">
-                <ProductImage
-                  loading={index === activeIndex ? "eager" : "lazy"}
-                  src={u}
-                  alt={`Slide ${index + 1}`}
-                  roundedSize="xl"
-                />
+                <div
+                  onClick={handleImageClick}
+                  className="size-full cursor-pointer"
+                >
+                  <ProductImage
+                    loading={index === activeIndex ? "eager" : "lazy"}
+                    src={u}
+                    alt={`Slide ${index + 1}`}
+                    roundedSize="xl"
+                  />
+                </div>
               </SwiperSlide>
             ))}
           </Swiper>

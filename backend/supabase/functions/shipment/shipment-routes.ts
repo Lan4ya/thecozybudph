@@ -18,6 +18,11 @@ import {
   shipOrderSchema,
   uuidParamSchema,
   apiSuccessResponseSchema,
+  addShippingOrderPriorityFeeResponseSchema,
+  getShippingDriverResponseSchema,
+  getShippingCityResponseSchema,
+  getShippingMarketResponseSchema,
+  editShippingOrderResponseSchema,
 } from "@shared/schemas/index.ts";
 import { z } from "zod";
 import { AppEnv } from "@shared/types.d.ts";
@@ -86,7 +91,9 @@ export const getShippingOrderRoute = createRoute({
   method: "get",
   path: "/{id}",
   request: {
-    params: uuidParamSchema("id"),
+    params: z.object({
+      id: z.string().trim().min(1),
+    }),
   },
   middleware: [
     supabaseMiddleware(),
@@ -219,7 +226,7 @@ export const addShippingOrderPriorityFeeRoute = createRoute({
       description: "Add priority fee",
       content: {
         "application/json": {
-          schema: apiSuccessResponseSchema(z.any()),
+          schema: addShippingOrderPriorityFeeResponseSchema,
         },
       },
     },
@@ -251,7 +258,7 @@ export const getShippingDriverRoute = createRoute({
       description: "Get shipping driver",
       content: {
         "application/json": {
-          schema: apiSuccessResponseSchema(z.any()),
+          schema: getShippingDriverResponseSchema,
         },
       },
     },
@@ -289,7 +296,7 @@ export const changeShippingDriverRoute = createRoute({
       description: "Change shipping driver",
       content: {
         "application/json": {
-          schema: apiSuccessResponseSchema(z.any()),
+          schema: getShippingDriverResponseSchema,
         },
       },
     },
@@ -316,7 +323,7 @@ export const getShippingCityRoute = createRoute({
       description: "Get shipping city",
       content: {
         "application/json": {
-          schema: apiSuccessResponseSchema(z.any()),
+          schema: getShippingCityResponseSchema,
         },
       },
     },
@@ -332,7 +339,7 @@ export const getShippingMarketRoute = createRoute({
       description: "Get shipping market",
       content: {
         "application/json": {
-          schema: apiSuccessResponseSchema(z.any()),
+          schema: getShippingMarketResponseSchema,
         },
       },
     },
@@ -362,7 +369,7 @@ export const editShippingOrderRoute = createRoute({
       description: "Edit shipping order",
       content: {
         "application/json": {
-          schema: apiSuccessResponseSchema(z.any()),
+          schema: editShippingOrderResponseSchema,
         },
       },
     },

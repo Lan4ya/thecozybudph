@@ -10,6 +10,9 @@ import type {
   GetShippingOrderData,
   ShipOrderData,
   ShipOrderInput,
+  GetShippingDriverData,
+  GetShippingCityData,
+  GetShippingMarketData,
 } from "@cozybud/schemas";
 import { client, unwrapData } from "./_client";
 
@@ -66,7 +69,7 @@ export const ShipmentAPI = {
 
   addPriorityFee: async (
     payload: AddShippingOrderPriorityFeeInput,
-  ): Promise<Record<string, unknown>> => {
+  ): Promise<GetShippingOrderData> => {
     const { data: raw } = await client.shipment.POST(
       "/shipment/order/priority-fee",
       {
@@ -78,7 +81,7 @@ export const ShipmentAPI = {
 
   getDriver: async (
     query: GetShippingDriverInput,
-  ): Promise<Record<string, unknown>> => {
+  ): Promise<GetShippingDriverData> => {
     const { data: raw } = await client.shipment.GET("/shipment/driver", {
       params: { query },
     });
@@ -87,7 +90,7 @@ export const ShipmentAPI = {
 
   changeDriver: async (
     payload: ChangeShippingDriverInput,
-  ): Promise<Record<string, unknown>> => {
+  ): Promise<GetShippingDriverData> => {
     const { data: raw } = await client.shipment.POST(
       "/shipment/driver/change",
       {
@@ -97,21 +100,21 @@ export const ShipmentAPI = {
     return unwrapData(raw, "POST /shipment/driver/change");
   },
 
-  getCity: async (cityId: string): Promise<Record<string, unknown>> => {
+  getCity: async (cityId: string): Promise<GetShippingCityData> => {
     const { data: raw } = await client.shipment.GET("/shipment/city/{cityId}", {
       params: { path: { cityId } },
     });
     return unwrapData(raw, `GET /shipment/city/${cityId}`);
   },
 
-  getMarket: async (): Promise<Record<string, unknown>> => {
+  getMarket: async (): Promise<GetShippingMarketData> => {
     const { data: raw } = await client.shipment.GET("/shipment/market");
     return unwrapData(raw, "GET /shipment/market");
   },
 
   editOrder: async (
     payload: EditShippingOrderInput,
-  ): Promise<Record<string, unknown>> => {
+  ): Promise<GetShippingOrderData> => {
     const { data: raw } = await client.shipment.PATCH("/shipment/order/edit", {
       body: payload,
     });

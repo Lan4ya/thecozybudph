@@ -1,7 +1,9 @@
 import { Card, CardContent } from "@/lib/ui/__shadcn__/card";
-import no_pic from "@/assets/thecozybud/no_pic.png";
+import { ASSETS } from "@/lib/constants/assets";
 import { useAnimationFrame } from "framer-motion";
 import { useRef } from "react";
+import { useAnimateOnView } from "@/hooks/useAnimateOnView";
+import { cn } from "@/lib/utils/cn";
 
 const SPEED = 0.45;
 const REVIEW_LOOP_COPIES = 4;
@@ -19,33 +21,34 @@ const dummyReviews: Review[] = [
     review:
       "Grabe, ang ganda ng mga bulaklak! Tumagal pa siya ng higit sa isang linggo.",
     rating: 5,
-    avatar: no_pic,
+    avatar: ASSETS.NO_PIC,
   },
   {
     name: "Liam R.",
     review:
       "Super bilis ng delivery at ang ganda ng pagkakaayos ng bouquet. Highly recommended!",
     rating: 4,
-    avatar: no_pic,
+    avatar: ASSETS.NO_PIC,
   },
   {
     name: "Sofia G.",
     review: "Mas maganda pa talaga ang bouquet in person kesa sa mga pictures!",
     rating: 5,
-    avatar: no_pic,
+    avatar: ASSETS.NO_PIC,
   },
   {
     name: "Noah P.",
     review:
       "Ayos ang service at maganda ang packaging, talagang nakaka-impress.",
     rating: 4,
-    avatar: no_pic,
+    avatar: ASSETS.NO_PIC,
   },
 ];
 
 export const ReviewCarousel = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const xRef = useRef(0);
+  const { registerSentinel, visibleMap } = useAnimateOnView();
 
   useAnimationFrame((_, delta) => {
     if (!containerRef.current) return;
@@ -62,7 +65,15 @@ export const ReviewCarousel = () => {
   });
 
   return (
-    <section className="custom-container py-18 lg:py-24 mx-auto max-w-[1420px] w-full flex flex-col gap-6 overflow-hidden">
+    <section
+      ref={registerSentinel}
+      className={cn(
+        "custom-container py-18 lg:py-24 mx-auto max-w-[1420px] w-full flex flex-col gap-6 overflow-hidden transition-all duration-1000 ease-out",
+        visibleMap[0]
+          ? "translate-y-0 opacity-100"
+          : "translate-y-8 opacity-0",
+      )}
+    >
       <div className="space-y-6 w-full ">
         <p className="text-xs font-semibold uppercase tracking-[0.32em] text-accent/70">
           Testimonials

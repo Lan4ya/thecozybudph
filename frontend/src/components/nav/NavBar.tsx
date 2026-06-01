@@ -1,6 +1,5 @@
 import { useCallback } from "react";
-import LOGO from "@/assets/thecozybud/logo_transparent_oneline1.png";
-// import LOGOS from "@/assets/thecozybud/logo_transparent_oneline1.svg";
+import { ASSETS } from "@/lib/constants/assets";
 import { ShoppingCart } from "lucide-react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { cn } from "@/lib/utils/cn";
@@ -48,7 +47,7 @@ const NavBar = () => {
           <div className={cn("w-32 lg:w-37 p-0 m-0 ")}>
             <img
               decoding="async"
-              src={LOGO}
+              src={ASSETS.LOGO_ONELINE_ALT}
               alt="logo"
               className="w-full h-full"
             />

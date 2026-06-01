@@ -1,5 +1,5 @@
-import LOGO from "@/assets/thecozybud/logo_transparent_oneline1.png";
-import { useLayoutEffect, useState } from "react";
+import { ASSETS } from "@/lib/constants/assets";
+import { useLayoutEffect } from "react";
 import isDev from "@/lib/utils/isDev";
 import { useNavigate, Link } from "react-router";
 import { motion } from "framer-motion";
@@ -14,53 +14,43 @@ import { useIsLgScreenMin } from "@/hooks/useMediaQuery";
 import SideImage from "../SideImage";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
-import { supabase } from "@/lib/supabase/client";
 import { useToast } from "@/providers/ToastProvider";
-import { useCooldown } from "@/hooks/useCooldown";
+import { useActionCooldown } from "@/hooks/useCooldown";
 import { handleError } from "@/lib/utils/format";
-import { isAuthApiError } from "@supabase/supabase-js";
-
-const { VITE_APP_URL } = import.meta.env;
+import { AuthAPI } from "@/api/auth";
+import type { ResendEmailVerificationInput } from "@cozybud/schemas";
+import type { AppError } from "@/api/_error";
+import { useMutation } from "@tanstack/react-query";
 
 const ConfirmEmail = () => {
-  const storedConfirmEmail =
-    sessionStorage.getItem("signup_confirm_email") || "";
+  const storedConfirmEmail = sessionStorage.getItem("signup_attempt") || "";
 
   const navigate = useNavigate();
   const isLgScreen = useIsLgScreenMin();
-  const [loading, setLoading] = useState(false);
-
-  const redirectUrl = isDev ? "http://localhost:5173/" : VITE_APP_URL;
 
   const { addToast } = useToast();
-  const { countdown, isLocked, startCooldown } = useCooldown(
-    120,
-    `email_cooldown_signup_${storedConfirmEmail}`,
+
+  const { onCooldown, timeRemaining, startCooldown } = useActionCooldown(
+    `cooldown:email_verification:${storedConfirmEmail}`,
+    { durationSeconds: 60 },
   );
 
-  const handleResend = async () => {
-    setLoading(true);
-
-    try {
-      const { error } = await supabase.auth.resend({
-        type: "signup",
-        email: storedConfirmEmail,
-        options: { emailRedirectTo: redirectUrl },
-      });
-      if (error) throw error;
-
-      addToast("Email resent! Please check your inbox.", "success");
-      startCooldown();
-    } catch (error: unknown) {
-      if (isDev) console.error("Resend Error:", error);
-      addToast(handleError(error), "error");
-
-      if (isAuthApiError(error) && error.status === 429) {
+  const { mutate: resendEmailVerificationMutation, isPending: resendLoading } =
+    useMutation({
+      mutationFn: async (payload: ResendEmailVerificationInput) =>
+        AuthAPI.resendEmailVerification(payload),
+      onSuccess: () => {
+        addToast("Email resent! Please check your inbox.", "success");
         startCooldown();
-      }
-    } finally {
-      setLoading(false);
-    }
+      },
+      onError: (error: AppError) => {
+        if (isDev) console.error("Resend Error:", error);
+        addToast(handleError(error), "error");
+      },
+    });
+
+  const handleResend = async () => {
+    resendEmailVerificationMutation({ email: storedConfirmEmail });
   };
 
   useLayoutEffect(() => {
@@ -90,7 +80,7 @@ const ConfirmEmail = () => {
           <img
             loading="eager"
             decoding="sync"
-            src={LOGO}
+            src={ASSETS.LOGO_ONELINE}
             alt="logo"
             className="h-full w-40"
           />
@@ -121,14 +111,14 @@ const ConfirmEmail = () => {
                 variant="outline"
                 size="sm"
                 onClick={handleResend}
-                disabled={loading || isLocked}
+                disabled={resendLoading || onCooldown}
                 className=""
               >
-                {isLocked ? (
-                  `Resend in ${countdown}s`
+                {onCooldown ? (
+                  `Resend in ${timeRemaining}s`
                 ) : (
                   <span className="flex items-center gap-2">
-                    {loading && <Spinner />}
+                    {resendLoading && <Spinner />}
                     Resend Link
                   </span>
                 )}

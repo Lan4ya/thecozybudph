@@ -1,5 +1,4 @@
-// import sign_up_pic from "@/assets/thecozybud/TCB_4.png";
-import LOGO from "@/assets/thecozybud/logo_transparent_oneline1.png";
+import { ASSETS } from "@/lib/constants/assets";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { ArrowLeft, Eye, EyeOff } from "lucide-react";
@@ -15,20 +14,27 @@ import { Link, useNavigate } from "react-router";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import googleIcon from "@/assets/icons/google.svg";
 import { useIsLgScreenMin } from "@/hooks/useMediaQuery";
-import { logInFormSchema, type LogIn } from "@cozybud/schemas";
+import { logInFormSchema, type LogInFormData } from "@cozybud/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm, useWatch, Controller } from "react-hook-form";
 import isDev from "@/lib/utils/isDev";
 import { handleError } from "@/lib/utils/format";
 import SideImage from "../SideImage";
+import { OAuathSignin } from "../OAuathSignin";
+import { Turnstile } from "@marsidev/react-turnstile";
 
-const { APP_URL } = import.meta.env;
+import { useMutation } from "@tanstack/react-query";
+import { AuthAPI } from "@/api";
+
+const { VITE_CF_TURNSTILE_SITE_KEY } = import.meta.env;
 
 const Login = () => {
-  const [loading, setLoading] = useState(false);
   const [passVisible, setPassVisible] = useState(false);
 
   const navigate = useNavigate();
+
+  const siteKey =
+    VITE_CF_TURNSTILE_SITE_KEY || (isDev ? "1x00000000000000000000AA" : "");
 
   const {
     register,
@@ -38,20 +44,25 @@ const Login = () => {
     setError,
 
     control,
-  } = useForm<LogIn>({
+  } = useForm<LogInFormData>({
     resolver: zodResolver(logInFormSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
+    defaultValues: !isDev
+      ? {
+          email: "",
+          password: "",
+        }
+      : {
+          email: "admin@local.dev",
+          password: "password123",
+        },
   });
 
-  const [email, password] = useWatch({
+  const [email, password, cfTurnstileToken] = useWatch({
     control,
-    name: ["email", "password"],
+    name: ["email", "password", "cfTurnstileToken"],
   });
 
-  const disabled = !email || !password;
+  const disabled = !email || !password || !cfTurnstileToken;
 
   const emailErr = errors.email;
   const passErr = errors.password;
@@ -61,55 +72,45 @@ const Login = () => {
 
   const handleSignInWithOAuth = async () => {
     clearErrors();
-
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: isDev ? "http://localhost:5173/" : APP_URL,
-        },
-      });
-      if (error) throw error;
-
-      sessionStorage.setItem("notifyLogInSuccess", "success");
+      const { data } = await OAuathSignin();
       isDev && console.log({ data });
     } catch (err: unknown) {
       const message = handleError(err);
-
       setError("root", {
         type: "server",
         message,
       });
-
       isDev && console.error(message);
     }
   };
 
-  async function onSubmit() {
-    clearErrors();
-    setLoading(true);
-
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+  const { mutateAsync: loginMutation, isPending: loginLoading } = useMutation({
+    mutationFn: async (payload: LogInFormData) => AuthAPI.login(payload),
+    onSuccess: async (data) => {
+      const { error } = await supabase.auth.setSession({
+        access_token: data.accessToken,
+        refresh_token: data.refreshToken,
       });
 
       if (error) throw error;
 
-      sessionStorage.setItem("notifyLogInSuccess", "success");
+      sessionStorage.setItem("activeLogin", "true");
       isDev && console.log({ data });
-      navigate(isDev ? "/" : APP_URL);
-    } catch (err: unknown) {
-      const message = handleError(err);
-      console.log(message);
-
+      navigate("/");
+    },
+    onError: (error: unknown) => {
+      const message = handleError(error);
       setError("root", {
         type: "server",
         message,
       });
-    }
-    setLoading(false);
+    },
+  });
+
+  async function onSubmit(data: LogInFormData) {
+    clearErrors();
+    await loginMutation(data);
   }
 
   return (
@@ -126,7 +127,7 @@ const Login = () => {
           <img
             loading="eager"
             decoding="sync"
-            src={LOGO}
+            src={ASSETS.LOGO_ONELINE_ALT}
             alt="logo"
             className="h-full w-40"
           />
@@ -211,14 +212,35 @@ const Login = () => {
                 )}
               </div>
 
+              {/* CF Turnstile */}
+              <div className="flex justify-center mb-2 w-full">
+                <Controller
+                  control={control}
+                  name="cfTurnstileToken"
+                  render={({ field }) => (
+                    <Turnstile
+                      siteKey={siteKey}
+                      options={{
+                        theme: "dark",
+                        size: "flexible",
+                        appearance: "always",
+                      }}
+                      onSuccess={(token: string) => field.onChange(token)}
+                      onExpire={() => field.onChange("")}
+                      onError={() => field.onChange("")}
+                    />
+                  )}
+                />
+              </div>
+
               {/* Log In */}
               <Button
                 type="submit"
                 className="border w-full"
-                disabled={loading || disabled}
+                disabled={loginLoading || disabled}
               >
-                {loading ? <Spinner /> : null}
-                {loading ? "Logging in..." : "Log in"}
+                {loginLoading ? <Spinner /> : null}
+                {loginLoading ? "Logging in..." : "Log in"}
               </Button>
 
               {/* Root Error  */}

@@ -42,9 +42,12 @@ export const createOrderSnapshots = async (
           const { images, invalids } = parseSupabaseUrls([img.primaryImageUrl]);
 
           if (invalids.length) {
-            throw AppError.badRequest({ message: `Invalid image URL: ${img.primaryImageUrl}` });
+            throw AppError.badRequest({
+              message: `Invalid image URL: ${img.primaryImageUrl}`,
+            });
           }
           const image = images[0];
+          console.log(image.bucket, image.path);
 
           const { data: blob, error } = await supabaseService.storage
             .from(image.bucket)
@@ -52,7 +55,10 @@ export const createOrderSnapshots = async (
 
           if (error || !blob) {
             throw (
-              error ?? AppError.internal({ message: `Failed to download ${img.primaryImageUrl}` })
+              error ??
+              AppError.internal({
+                message: `Failed to download ${img.primaryImageUrl}`,
+              })
             );
           }
 
@@ -61,7 +67,7 @@ export const createOrderSnapshots = async (
           });
 
           const { error: uploadError } = await supabaseService.storage
-            .from("product_snapshots")
+            .from("image_snapshots")
             .upload(hash, file, {
               upsert: true,
             });
@@ -73,7 +79,9 @@ export const createOrderSnapshots = async (
 
         const {
           data: { publicUrl },
-        } = supabaseService.storage.from("product_snapshots").getPublicUrl(hash);
+        } = supabaseService.storage
+          .from("image_snapshots")
+          .getPublicUrl(hash);
 
         return {
           sourceHash: hash,
@@ -83,7 +91,9 @@ export const createOrderSnapshots = async (
     ),
   );
 
-  return new Map(snapshots.map((snapshot) => [snapshot.sourceHash, snapshot.snapshotUrl]));
+  return new Map(
+    snapshots.map((snapshot) => [snapshot.sourceHash, snapshot.snapshotUrl]),
+  );
 };
 
 export const rollbackOrderSnapshots = async (
@@ -110,14 +120,19 @@ export const rollbackOrderSnapshots = async (
           const [deleted] = await tx
             .delete(imageSnapshots)
             .where(
-              and(eq(imageSnapshots.hash, hash), eq(imageSnapshots.refCount, 0)),
+              and(
+                eq(imageSnapshots.hash, hash),
+                eq(imageSnapshots.refCount, 0),
+              ),
             )
             .returning({ hash: imageSnapshots.hash });
 
           if (deleted) {
-            await ProductStorage.deleteImages(supabaseService, "product_snapshots", [
-              hash,
-            ]).catch((err) =>
+            await ProductStorage.deleteImages(
+              supabaseService,
+              "image_snapshots",
+              [hash],
+            ).catch((err) =>
               console.error(`Failed to delete orphaned snapshot ${hash}:`, err),
             );
           }

@@ -1,6 +1,4 @@
-import LOGO from "@/assets/thecozybud/logo_transparent_oneline1.png";
-import { useState } from "react";
-import { supabase } from "@/lib/supabase/client";
+import { ASSETS } from "@/lib/constants/assets";
 import { ArrowLeft, Mail } from "lucide-react";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import {
@@ -18,25 +16,24 @@ import {
   type ForgotPassword as ForgotPasswordType,
 } from "@cozybud/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useWatch } from "react-hook-form";
+import {
+  useForm,
+  useWatch,
+  Controller,
+  type SubmitHandler,
+} from "react-hook-form";
 import isDev from "@/lib/utils/isDev";
 import SideImage from "../SideImage";
 import { motion } from "framer-motion";
 import { FieldError } from "@/pages/checkout/components/FieldError";
-import { useCooldown } from "@/hooks/useCooldown";
+import { useActionCooldown } from "@/hooks/useCooldown";
 import { handleSupabaseAuthError } from "@/lib/utils/format";
+import { AuthAPI } from "@/api";
+import { Turnstile } from "@marsidev/react-turnstile";
+import { useMutation } from "@tanstack/react-query";
+import type { AppError } from "@/api/_error";
 
-const { VITE_APP_URL } = import.meta.env;
-
-const getRedirectUrl = () => {
-  if (isDev) return "http://localhost:5173/auth/forgot-password/reset-password";
-  const baseUrl = VITE_APP_URL.startsWith("http")
-    ? VITE_APP_URL
-    : `https://${VITE_APP_URL}`;
-  return `${baseUrl}/auth/forgot-password/reset-password`;
-};
-
-export const RESET_PASSWORD_REDIRECT_URL = getRedirectUrl();
+const { VITE_CF_TURNSTILE_SITE_KEY } = import.meta.env;
 
 // PHASE 1: Submitting which email account to recover password from
 
@@ -46,10 +43,8 @@ const SubmitEmail = () => {
     "forgot_password_recovery_email",
   );
 
-  const [loading, setLoading] = useState(false);
-  const [sentEmail, setSentEmail] = useState<string>(storedResetEmail || "");
-
   const isLgScreen = useIsLgScreenMin();
+  const navigate = useNavigate();
 
   const {
     register,
@@ -59,56 +54,49 @@ const SubmitEmail = () => {
     control,
     clearErrors,
   } = useForm<ForgotPasswordType>({
-    defaultValues: { email: "" },
+    defaultValues: { email: storedResetEmail || "" },
     resolver: zodResolver(forgotPasswordFormSchema),
   });
 
-  const email = useWatch({
+  const [email, cfTurnstileToken] = useWatch({
     control,
-    name: "email",
+    name: ["email", "cfTurnstileToken"],
   });
   const emailErr = errors.email;
   const rootErr = errors.root;
 
-  const { countdown, isLocked, startCooldown } = useCooldown(
-    180,
-    `email_cooldown_recovery_${sentEmail}`,
+  const { onCooldown, timeRemaining, startCooldown } = useActionCooldown(
+    `cooldown:password_reset:${email}`,
   );
-  const navi = useNavigate();
 
-  const onSubmit = async (data: ForgotPasswordType) => {
+  const { mutateAsync: resetPasswordMutation, isPending: resetLoading } =
+    useMutation({
+      mutationFn: async (payload: ForgotPasswordType) =>
+        AuthAPI.requestResetPassword(payload),
+      onSuccess: (_, variables) => {
+        startCooldown();
+        sessionStorage.setItem(
+          "forgot_password_recovery_email",
+          variables.email,
+        );
+        navigate("/auth/forgot-password/check-email");
+      },
+      onError: (error: AppError) => {
+        if (error) {
+          const message = handleSupabaseAuthError(error);
+          setError("root", {
+            type: "server",
+            message,
+          });
+          throw error;
+        }
+      },
+    });
+
+  const onSubmit: SubmitHandler<ForgotPasswordType> = async (data) => {
     clearErrors();
-    setLoading(true);
-
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
-        redirectTo: RESET_PASSWORD_REDIRECT_URL,
-      });
-
-      if (error) throw error;
-
-      setSentEmail(data.email);
-      sessionStorage.setItem("forgot_password_recovery_email", data.email);
-
-      startCooldown();
-
-      navi("/auth/forgot-password/check-email");
-    } catch (err: unknown) {
-      if (isDev) console.error(err);
-      const message = handleSupabaseAuthError(err);
-
-      setError("root", {
-        type: "server",
-        message,
-      });
-    } finally {
-      setLoading(false);
-    }
+    await resetPasswordMutation(data);
   };
-
-  const minutes = Math.floor(countdown / 60);
-  const seconds = countdown % 60;
-  const timeRemaining = `${minutes}:${seconds.toString().padStart(2, "0")}`;
 
   return (
     <div className="custom-container flex lg:flex lg:gap-15 xl:gap-30 pt-6 justify-center items-center h-screen">
@@ -130,7 +118,7 @@ const SubmitEmail = () => {
           <img
             loading="eager"
             decoding="sync"
-            src={LOGO}
+            src={ASSETS.LOGO_FULL}
             alt="logo"
             className="h-full w-40"
           />
@@ -175,17 +163,40 @@ const SubmitEmail = () => {
                   {emailErr && <FieldError message={emailErr.message} />}
                 </div>
 
+                {/* CF Turnstile */}
+                <div className="flex justify-center mb-2 w-full">
+                  <Controller
+                    control={control}
+                    name="cfTurnstileToken"
+                    render={({ field }) => (
+                      <Turnstile
+                        siteKey={VITE_CF_TURNSTILE_SITE_KEY}
+                        options={{
+                          theme: "dark",
+                          size: "flexible",
+                          appearance: "always",
+                        }}
+                        onSuccess={(token: string) => field.onChange(token)}
+                        onExpire={() => field.onChange("")}
+                        onError={() => field.onChange("")}
+                      />
+                    )}
+                  />
+                </div>
+
                 {/* Send Link */}
                 <div>
                   <Button
                     type="submit"
                     className="border w-full"
-                    disabled={loading || !email || isLocked}
+                    disabled={
+                      resetLoading || !email || !cfTurnstileToken || onCooldown
+                    }
                   >
-                    {loading && <Spinner />}
-                    {loading
-                      ? "Sending Link..."
-                      : isLocked
+                    {resetLoading && <Spinner />}
+                    {resetLoading
+                      ? "Sending Link"
+                      : onCooldown
                         ? `Resend in ${timeRemaining}`
                         : "Send Reset Link"}
                   </Button>

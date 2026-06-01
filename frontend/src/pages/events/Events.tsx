@@ -12,12 +12,7 @@ import {
   Phone,
   CheckCircle,
 } from "lucide-react";
-
-// Event showcase images
-import e1 from "@/assets/thecozybud/event_pic_1.jpg";
-import e2 from "@/assets/thecozybud/event_pic_2.jpg";
-import e3 from "@/assets/thecozybud/event_pic_3.jpg";
-import e4 from "@/assets/thecozybud/event_pic_4.jpg";
+import { ASSETS } from "@/lib/constants/assets";
 
 const eventCategories = [
   {
@@ -43,10 +38,10 @@ const eventCategories = [
 ];
 
 const galleryImages = [
-  { src: e1, alt: "Wedding floral arrangement" },
-  { src: e2, alt: "Event centerpiece design" },
-  { src: e3, alt: "Elegant bouquet display" },
-  { src: e4, alt: "Floral decoration setup" },
+  { src: ASSETS.EVENT_1, alt: "Wedding floral arrangement" },
+  { src: ASSETS.EVENT_2, alt: "Event centerpiece design" },
+  { src: ASSETS.EVENT_3, alt: "Elegant bouquet display" },
+  { src: ASSETS.EVENT_4, alt: "Floral decoration setup" },
 ];
 
 const Events = () => {
@@ -80,7 +75,7 @@ const Events = () => {
       <section className="relative h-[50vh] min-h-[400px] w-full overflow-hidden">
         <div className="absolute inset-0 bg-linear-to-r from-background/80 via-background/40 to-transparent z-10" />
         <img
-          src={e1}
+          src={ASSETS.EVENT_1}
           alt="CozyBud Events"
           className="absolute inset-0 w-full h-full object-cover"
         />

@@ -23,7 +23,7 @@ import PrivacyPolicy from "./pages/privacy-policy/PrivacyPolicy.tsx";
 import Profile from "./pages/profile/Profile.tsx";
 import { Shop, ShopProduct } from "./pages/shop";
 import TermsOfService from "./pages/terms-of-service/TermsOfService.tsx";
-import FAQ from "./pages/FAQ/FAQ.tsx";
+import FAQ from "./pages/frequently-asked-questions/FAQ.tsx";
 import MyPurchases from "./pages/profile/pages/my-purchases/MyPurchases.tsx";
 import OrderDetails from "./pages/profile/pages/my-purchases/OrderDetails.tsx";
 import Settings from "./pages/profile/pages/settings/Settings.tsx";

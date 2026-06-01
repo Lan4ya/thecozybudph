@@ -29,7 +29,7 @@ export const DesktopNavLinks = ({
   const active = hovered ?? location.pathname;
   const user = session?.user;
 
-  const [avatar, setAvatarUrl] = useState<string>("/fallback-avatar.png");
+  const [avatar, setAvatarUrl] = useState<string>("/fallback-avatar.webp");
 
   useEffect(() => {
     if (!user) return;
@@ -90,7 +90,7 @@ export const DesktopNavLinks = ({
               to={href}
               className={cn(
                 "text-foreground text-lg font-medium transition-colors flex items-center justify-center",
-                label === "Profile" && "size-9",
+                label === "Profile" && "size-9.5",
               )}
             >
               {label === "Profile" ? (

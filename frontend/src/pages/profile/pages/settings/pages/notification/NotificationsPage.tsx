@@ -6,10 +6,8 @@ export default function NotificationsPage() {
   const [settings, setSettings] = useState({
     emailOrders: true,
     emailPromos: true,
-    smsOrders: false,
-    smsDelivery: true,
+    smsOrders: true,
     pushEnabled: true,
-    newsletter: true,
   });
 
   const toggle = (key: keyof typeof settings) => {
@@ -38,19 +36,9 @@ export default function NotificationsPage() {
       description: "Get text messages for important order status changes.",
     },
     {
-      key: "smsDelivery",
-      label: "SMS Delivery Updates",
-      description: "Receive SMS when your order is out for delivery.",
-    },
-    {
       key: "pushEnabled",
       label: "Push Notifications",
       description: "Browser push notifications for real-time updates.",
-    },
-    {
-      key: "newsletter",
-      label: "Weekly Newsletter",
-      description: "Our curated newsletter with floral tips and new arrivals.",
     },
   ];
 
@@ -65,7 +53,7 @@ export default function NotificationsPage() {
 
       <Separator />
 
-      <div className="space-y-1">
+      <div className="px-2 space-y-1">
         {rows.map((row) => (
           <SettingsRow
             key={row.key}

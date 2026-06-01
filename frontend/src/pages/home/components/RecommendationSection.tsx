@@ -4,6 +4,7 @@ import { ProductAPI } from "@/api/product";
 import { useAuthStore } from "@/store/useAuthStore";
 import { cn } from "@/lib/utils/cn";
 import { useIsLgScreenMin } from "@/hooks/useMediaQuery";
+import { useAnimateOnView } from "@/hooks/useAnimateOnView";
 
 const Recommendations = () => {
   const { data, error, isFetching } = useSuspenseQuery({
@@ -13,6 +14,7 @@ const Recommendations = () => {
 
   const session = useAuthStore((s) => s.session);
   const isLg = useIsLgScreenMin();
+  const { registerSentinel, visibleMap } = useAnimateOnView();
 
   if (error && !isFetching) throw error;
 
@@ -25,7 +27,15 @@ const Recommendations = () => {
         session && "mb-24",
       )}
     >
-      <div className="space-y-6 lg:text-right">
+      <div
+        ref={registerSentinel}
+        className={cn(
+          "space-y-6 lg:text-right transition-all duration-1000 ease-out",
+          visibleMap[0]
+            ? "translate-y-0 opacity-100"
+            : "translate-y-8 opacity-0",
+        )}
+      >
         {/* Eyebrow */}
         <p className="text-xs font-semibold uppercase tracking-[0.32em] text-accent/70">
           Editor's Picks
@@ -68,19 +78,31 @@ const Recommendations = () => {
           ];
 
           const s = styles[i % styles.length];
+          const isLeftColumn = i % 2 === 0;
+          const cardVisible = visibleMap[i + 1];
 
           return (
             <div
               key={d.id}
+              ref={registerSentinel}
               style={
                 {
                   "--rot": `${s.rot}deg`,
                   "--y": `${isLg ? s.y : 0}px`,
                   "--x": `${isLg ? s.x : 0}px`,
                   transform: `rotate(var(--rot)) translate(var(--x), var(--y))`,
+                  transitionDelay: `${(i % 4) * 50}ms`,
                 } as React.CSSProperties
               }
-              className="relative w-full max-w-[180px] mx-auto group transition-all duration-500 ease-out hover:!transform-none hover:scale-110 hover:z-30"
+              className={cn(
+                "relative w-full max-w-[180px] mx-auto group transition-all duration-1000 ease-out hover:!transform-none hover:scale-110 hover:z-30",
+                cardVisible
+                  ? "translate-x-0 translate-y-0 opacity-100"
+                  : cn(
+                      "translate-y-8 opacity-0",
+                      isLeftColumn ? "-translate-x-8" : "translate-x-8",
+                    ),
+              )}
             >
               {/* Realistic Washi Tape Accent */}
               {s.tape && (

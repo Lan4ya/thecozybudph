@@ -2,6 +2,7 @@ import { seedUsers } from "./seedUsers.ts";
 import { seedAdmin } from "./seedAdmin.ts";
 import { seedProducts } from "./seedProducts.ts";
 import { seedAvatars } from "./seedAvatars.ts";
+import { seedAssets } from "./seedAssets.ts";
 
 // WARN: Execution order matters! Script will break otherwise
 async function main() {
@@ -11,8 +12,11 @@ async function main() {
     console.log("\n--- Seeding Avatars ---");
     await seedAvatars();
 
+    console.log("\n--- Seeding Site Assets ---");
+    await seedAssets();
+
     console.log("\n--- Seeding Users ---");
-    await seedUsers();
+...
 
     console.log("\n--- Seeding Admin ---");
     await seedAdmin();

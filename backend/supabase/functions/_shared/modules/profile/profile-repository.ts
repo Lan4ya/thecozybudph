@@ -26,4 +26,12 @@ export const ProfileRepository = {
       });
     });
   },
+
+  getProfileByEmail: (db: DrizzleClient, email: string) => {
+    return db.rls(async (tx) => {
+      return await tx.query.profiles.findFirst({
+        where: and(eq(profiles.email, email)),
+      });
+    });
+  },
 };

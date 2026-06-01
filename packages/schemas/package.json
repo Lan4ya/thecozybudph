@@ -15,10 +15,12 @@
   },
   "devDependencies": {
     "@lalamove/lalamove-js": "^1.1.0",
+    "@supabase/supabase-js": "^2.106.2",
     "@types/node": "^24.10.1",
     "execa": "^9.6.1",
     "openapi-typescript": "^7.13.0",
     "openapi3-ts": "^4.5.0",
+    "supabase": "npm:@supabase/supabase-js@^2.106.2",
     "typescript": "^5.9.3"
   }
 }

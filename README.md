@@ -263,7 +263,7 @@ http://localhost:54321/functions/v1/order/ui
 ## TODO:
 
 * merge redundant domain types into api types inferred from zod schemas
-* create a script that optimizes images (with sharp maybe) and uploads assets into R2 at build time, and let the app consume it via a manifest
+* create a script that optimizes images with sharp and uploads assets into storage at build time, and let the app consume it via a manifest
 - determine CI strategy for Supabase Edge Function tests (local Supabase Docker startup vs external deployed env vs exclusion from CI due to runtime overhead)
 
 <br>

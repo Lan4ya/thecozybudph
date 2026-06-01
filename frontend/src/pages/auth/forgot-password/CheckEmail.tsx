@@ -1,6 +1,5 @@
-import LOGO from "@/assets/thecozybud/logo_transparent_oneline1.png";
+import { ASSETS } from "@/lib/constants/assets";
 import { useState } from "react";
-import { supabase } from "@/lib/supabase/client";
 import { ArrowLeft, Mail } from "lucide-react";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import {
@@ -9,64 +8,60 @@ import {
   CardHeader,
   CardTitle,
 } from "@/lib/ui/__shadcn__/card";
-import { Link, useLocation, useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import { useIsLgScreenMin } from "@/hooks/useMediaQuery";
-import isDev from "@/lib/utils/isDev";
 import SideImage from "../SideImage";
 import { motion } from "framer-motion";
-import { useCooldown } from "@/hooks/useCooldown";
+import { useActionCooldown } from "@/hooks/useCooldown";
 import { useToast } from "@/providers/ToastProvider";
 import { handleSupabaseAuthError } from "@/lib/utils/format";
-import { RESET_PASSWORD_REDIRECT_URL } from "./SubmitEmail";
+import { AuthAPI } from "@/api/auth";
 
-// PHASE 2: Prompting user to check email and click recovery link.
+import { useMutation } from "@tanstack/react-query";
+import { Turnstile } from "@marsidev/react-turnstile";
+import type { AppError } from "@/api/_error";
+
+const { VITE_CF_TURNSTILE_SITE_KEY } = import.meta.env;
 
 const CheckEmail = () => {
-  const location = useLocation();
-
-  const initialEmail =
-    location.state?.email ||
-    sessionStorage.getItem("forgot_password_recovery_email");
-
-  const [loading, setLoading] = useState(false);
-  const [sentEmail, _setSentEmail] = useState<string>(initialEmail || "");
-
+  const sentEmail =
+    sessionStorage.getItem("forgot_password_recovery_email") || "";
   const isLgScreen = useIsLgScreenMin();
 
-  const { countdown, isLocked, startCooldown } = useCooldown(
-    180,
-    `email_cooldown_recovery_${sentEmail}`,
+  const [cfTurnstileToken, setCfTurnstileToken] = useState("");
+
+  const { onCooldown, timeRemaining, startCooldown } = useActionCooldown(
+    `cooldown:password_reset:${sentEmail}`,
   );
 
   const { addToast } = useToast();
   const navigate = useNavigate();
 
+  const { mutateAsync: resendMutation, isPending: resendLoading } = useMutation(
+    {
+      mutationFn: async () =>
+        AuthAPI.requestResetPassword({
+          email: sentEmail,
+          cfTurnstileToken,
+        }),
+      onSuccess: () => {
+        addToast("Email resent! Please check your inbox.", "success");
+        startCooldown();
+        setCfTurnstileToken("");
+      },
+
+      onError: (error: AppError) => {
+        const message = handleSupabaseAuthError(error);
+        addToast(message, "error");
+      },
+    },
+  );
+
   const handleResend = async () => {
-    if (!sentEmail) return;
-
-    setLoading(true);
-
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(sentEmail, {
-        redirectTo: RESET_PASSWORD_REDIRECT_URL,
-      });
-      if (error) throw error;
-
-      addToast("Email resent! Please check your inbox.", "success");
-      startCooldown();
-    } catch (err: unknown) {
-      if (isDev) console.error(err);
-      const message = handleSupabaseAuthError(err);
-      addToast(message, "error");
-    } finally {
-      setLoading(false);
-    }
+    if (!sentEmail || !cfTurnstileToken) return;
+    await resendMutation();
   };
-
-  const minutes = Math.floor(countdown / 60);
-  const seconds = countdown % 60;
-  const timeRemaining = `${minutes}:${seconds.toString().padStart(2, "0")}`;
 
   return (
     <div className="custom-container flex lg:flex lg:gap-15 xl:gap-30 pt-6 justify-center items-center h-screen">
@@ -88,7 +83,7 @@ const CheckEmail = () => {
           <img
             loading="eager"
             decoding="sync"
-            src={LOGO}
+            src={ASSETS.LOGO_ONELINE}
             alt="logo"
             className="h-full w-40"
           />
@@ -104,6 +99,7 @@ const CheckEmail = () => {
                 Check your email
               </CardTitle>
             </CardHeader>
+
             <CardContent className="text-center space-y-6">
               <div className="space-y-2">
                 <p className="text-muted-foreground">
@@ -119,7 +115,7 @@ const CheckEmail = () => {
                   new password.
                 </p>
 
-                <p className="text-muted-foreground text-sm">
+                <p className="text-muted-foreground/60 text-sm">
                   Wrong email?
                   <Button
                     variant="minimal"
@@ -135,18 +131,28 @@ const CheckEmail = () => {
               </div>
 
               <div className="flex flex-col items-center gap-2">
+                <Turnstile
+                  siteKey={VITE_CF_TURNSTILE_SITE_KEY}
+                  options={{
+                    appearance: "interaction-only",
+                  }}
+                  onSuccess={(token: string) => setCfTurnstileToken(token)}
+                  onExpire={() => setCfTurnstileToken("")}
+                  onError={() => setCfTurnstileToken("")}
+                />
+
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={handleResend}
-                  disabled={loading || isLocked}
+                  disabled={resendLoading || !cfTurnstileToken || onCooldown}
                 >
-                  {isLocked ? (
+                  {onCooldown ? (
                     `Resend in ${timeRemaining}`
                   ) : (
                     <span className="flex items-center gap-2">
-                      {loading && <Spinner />}
-                      {loading ? "Resending Link..." : "Resend Link"}
+                      {resendLoading && <Spinner />}
+                      {resendLoading ? "Resending" : "Resend Link"}
                     </span>
                   )}
                 </Button>

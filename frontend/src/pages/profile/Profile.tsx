@@ -36,7 +36,7 @@ const Row = ({
 }) => (
   <button
     onClick={onClick}
-    className="hover:bg-primary/15 w-full flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors"
+    className="hover:bg-primary/15 w-full flex items-center justify-between px-2 py-3 rounded-md cursor-pointer transition-colors"
   >
     <div className="flex items-center gap-3 text-sm md:text-base">
       {icon}
@@ -81,7 +81,7 @@ const Profile = () => {
   const userName =
     user?.user_metadata?.display_name ?? user?.email?.split("@")[0];
 
-  const [avatarUrl, setAvatarUrl] = useState<string>("/fallback-avatar.png");
+  const [avatarUrl, setAvatarUrl] = useState<string>("/fallback-avatar.webp");
 
   useEffect(() => {
     if (!user) return;

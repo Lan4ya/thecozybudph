@@ -8,8 +8,10 @@ const AdminDashboard = () => {
       <AdminHeader />
       <div className="flex-1 lg:flex">
         <AdminSidebar />
-        <main className="flex-1 custom-container pt-6 lg:pt-0">
-          <Outlet />
+        <main className="flex-1 pt-6 lg:pt-0">
+          <div className="max-w-[1600px] mx-auto w-full custom-container">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import LOGO from "@/assets/thecozybud/logo_transparent_oneline1.png";
+import { ASSETS } from "@/lib/constants/assets";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { ArrowLeft, Eye, EyeOff, Lock } from "lucide-react";
@@ -20,7 +20,7 @@ import { handleError } from "@/lib/utils/format";
 import SideImage from "../SideImage";
 import { motion } from "framer-motion";
 import {
-  resetPasswordSchema,
+  resetPasswordFormSchema,
   type ResetPassword as ResetPasswordType,
 } from "@cozybud/schemas";
 
@@ -41,7 +41,7 @@ const ResetPassword = () => {
     clearErrors,
     setError,
   } = useForm<ResetPasswordType>({
-    resolver: zodResolver(resetPasswordSchema),
+    resolver: zodResolver(resetPasswordFormSchema),
   });
 
   const password = useWatch({ control, name: "password" });
@@ -67,7 +67,7 @@ const ResetPassword = () => {
 
       setTimeout(() => {
         navigate("/auth/login");
-      }, 5000);
+      }, 10000);
 
       setResetComplete(true);
     } catch (err: unknown) {
@@ -99,7 +99,12 @@ const ResetPassword = () => {
         </Link>
 
         <div className="px-4 w-full py-3 mb-6 flex-center">
-          <img loading="eager" src={LOGO} alt="logo" className="h-full w-40" />
+          <img
+            loading="eager"
+            src={ASSETS.LOGO_ONELINE_ALT}
+            alt="logo"
+            className="h-full w-40"
+          />
         </div>
 
         <Card className="shadow-lg border-border/50 backdrop-blur-sm bg-card/70">

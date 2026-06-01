@@ -53,6 +53,7 @@ export const stopWithContactSchema = stopSchema.extend({
     .min(5, "phone number is too short")
     .max(30, "phone number cannot exceed 30 characters"),
 
+  remarks: z.string().trim().optional(),
   POD: z.record(z.string(), z.unknown()).optional(),
 });
 
@@ -184,8 +185,32 @@ export const getShippingCitySchema = z.object({
   cityId: z.string().trim().min(1, "cityId can't be empty"),
 });
 
+// ------------------------ DATA SCHEMAS ------------------------
+
+export const getShippingDriverDataSchema = z.object({
+  id: z.string(),
+  name: z.string().optional(),
+  phone: z.string().optional(),
+  plateNumber: z.string().optional(),
+  photo: z.string().url().optional(),
+  coordinates: coordinatesSchema.optional(),
+});
+
+export const getShippingCityDataSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  status: z.string().optional(),
+});
+
+export const getShippingMarketDataSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  cities: z.array(getShippingCityDataSchema),
+});
+
 export const shipOrderDataSchema = z.object({
   orderId: z.uuid(),
+  shippingOrderId: z.string().optional(),
   status: orderStatusSchema,
 });
 
@@ -195,10 +220,22 @@ export const cancelShipOrderDataSchema = z.object({
   shipmentStatus: z.string(),
 });
 
-// FIX:
-export const getShippingOrderDataSchema = z.record(z.string(), z.unknown());
-
-// ------------------------ DATA SCHEMAS ------------------------
+export const getShippingOrderDataSchema = z.object({
+  id: z.string(),
+  quotationId: z.string(),
+  priceBreakdown: priceBreakdownSchema,
+  driverId: z.string().nullable().optional(),
+  shareLink: z.string().url().optional(),
+  status: z.string(),
+  distance: z
+    .object({
+      value: z.string(),
+      unit: z.string(),
+    })
+    .optional(),
+  stops: z.array(stopWithContactSchema),
+  metadata: z.record(z.string(), z.unknown()).optional(),
+});
 
 // Matches Lalamove.IQuotation
 export const createShippingQuoteDataSchema = z.object({
@@ -239,5 +276,24 @@ export const cancelShipOrderResponseSchema = apiSuccessResponseSchema(
   cancelShipOrderDataSchema,
 );
 export const getShippingOrderResponseSchema = apiSuccessResponseSchema(
+  getShippingOrderDataSchema,
+);
+
+export const getShippingDriverResponseSchema = apiSuccessResponseSchema(
+  getShippingDriverDataSchema,
+);
+
+export const getShippingCityResponseSchema = apiSuccessResponseSchema(
+  getShippingCityDataSchema,
+);
+
+export const getShippingMarketResponseSchema = apiSuccessResponseSchema(
+  getShippingMarketDataSchema,
+);
+
+export const addShippingOrderPriorityFeeResponseSchema =
+  apiSuccessResponseSchema(getShippingOrderDataSchema);
+
+export const editShippingOrderResponseSchema = apiSuccessResponseSchema(
   getShippingOrderDataSchema,
 );

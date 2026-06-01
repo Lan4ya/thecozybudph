@@ -1,6 +1,7 @@
 import { z } from "@hono/zod-openapi";
 import { orderStatusSchema } from "./order.ts";
 import { apiSuccessResponseSchema } from "./_response.ts";
+import { serviceTypeSchema } from "../common.ts";
 
 // ----------------------- REQUEST SCHEMAS -----------------------
 
@@ -36,6 +37,8 @@ export const adminOrderListItemSchema = z.object({
   id: z.uuid(),
   profileId: z.uuid(),
   status: orderStatusSchema,
+  shipmentOrderId: z.string().nullable(),
+  serviceType: serviceTypeSchema,
   subtotalCents: z.number(),
   discountCents: z.number(),
   passOnFee: z.number(),

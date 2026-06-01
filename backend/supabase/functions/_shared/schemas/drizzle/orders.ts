@@ -55,7 +55,7 @@ export const orders = pgTable(
       "orders_status_check",
       sql`${table.status} IN ('to_pay', 'paid', 'to_ship', 'shipped', 'to_receive', 'fulfilled', 'cancelled', 'expired')`,
     ),
-    // index for the cron 'expire-orders-job'
+    // index for cron job 'expire-orders-job'
     index("idx_orders_expiry_cleanup")
       .on(table.status, table.expiresAt)
       .where(sql`${table.status} = 'to_pay'`),

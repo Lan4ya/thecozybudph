@@ -197,32 +197,27 @@ otp_expiry = 3600
 
 # Use a production-ready SMTP server
 [auth.email.smtp]
-enabled = true
-host = "smtp.resend.com"
-port = 587
-user = "resend"
-pass = "env(RESEND_API_KEY)"
-admin_email = "noreply@thecozybudph.qzz.io"
-sender_name = "cozybud"
-# [auth.email.smtp]
-# enabled = true
-# host = "smtp.gmail.com"
+enabled = false
+# host = "smtp.resend.com"
 # port = 587
-# user = "env(GOOGLE_APP_USERNAME)"
-# pass = "env(GOOGLE_APP_PASSWORD)"
-# admin_email = "env(GOOGLE_APP_USERNAME)"
-# sender_name = "cozybud"
+# user = "resend"
+# pass = "env(RESEND_API_KEY)"
+# admin_email = "team@thecozybudph.qzz.io"
+# sender_name = "cozybudph"
 
-# Uncomment to customize email template
-# [auth.email.template.invite]
-# subject = "You have been invited"
-# content_path = "./supabase/templates/invite.html"
+[auth.email.template.recovery]
+subject = "Reset your password - The Cozy Bud PH"
+content_path = "./supabase/templates/recovery.html"
+
+[auth.email.template.confirmation]
+subject = "Confirm your signup - The Cozy Bud PH"
+content_path = "./supabase/templates/confirmation.html"
 
 [auth.sms]
 # Allow/disallow new user signups via SMS to your project.
-enable_signup = false
+enable_signup = true
 # If enabled, users need to confirm their phone number before signing in.
-enable_confirmations = false
+enable_confirmations = true
 # Template for sending OTP to users
 template = "Your code is {{ .Code }}"
 # Controls the minimum amount of time that must pass before sending another sms otp.
@@ -445,3 +440,14 @@ entrypoint = "./functions/shipment/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/shipment/*.html" ]
+
+[functions.auth]
+enabled = true
+verify_jwt = true
+import_map = "./functions/auth/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/auth/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/auth/*.html" ]

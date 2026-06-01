@@ -295,7 +295,7 @@ pn update:latest:sb:tests
 
 ### Schema and docs generation
 ```bash
-pn schemas:gen
+pn schemas:gen # run after eding shemas in packages to copy over the schemas to supabase functions
 pn docs:gen
 ```
 

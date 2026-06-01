@@ -6,6 +6,7 @@ import {
 } from "@cozybud/schemas";
 import createClient, { type Middleware } from "openapi-fetch";
 import { AppError } from "./_error.ts";
+import isDev from "@/lib/utils/isDev.ts";
 
 const middleware: Middleware = {
   async onRequest({ request }) {
@@ -30,6 +31,7 @@ const middleware: Middleware = {
 
       try {
         const body = JSON.parse(text) as ApiErrorResponse;
+        console.log(body);
         if (body?.message) {
           message = body.message ?? message;
           code = body.code ?? code;
@@ -40,6 +42,14 @@ const middleware: Middleware = {
       } catch {
         details = text;
       }
+
+      isDev &&
+        console.error("API Error Response:", {
+          status: response.status,
+          message,
+          code,
+          details,
+        });
 
       throw new AppError({
         message,

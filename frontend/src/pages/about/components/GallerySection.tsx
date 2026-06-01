@@ -5,25 +5,17 @@ import "swiper/swiper.css";
 
 import { cn } from "@/lib/utils/cn";
 import { ProductImage } from "@/components/products/ProductImage";
-
-import TCB_3 from "@/assets/thecozybud/TCB_3.png";
-import TCB_5 from "@/assets/thecozybud/TCB_5.jpg";
-import TCB_6 from "@/assets/thecozybud/TCB_6.jpg";
-import TCB_7 from "@/assets/thecozybud/TCB_7.jpg";
-import eventPic1 from "@/assets/thecozybud/event_pic_1.jpg";
-import eventPic2 from "@/assets/thecozybud/event_pic_2.jpg";
-import eventPic3 from "@/assets/thecozybud/event_pic_3.jpg";
-import eventPic4 from "@/assets/thecozybud/event_pic_4.jpg";
+import { ASSETS } from "@/lib/constants/assets";
 
 const galleryImages = [
-  TCB_5,
-  TCB_6,
-  TCB_7,
-  TCB_3,
-  eventPic1,
-  eventPic2,
-  eventPic3,
-  eventPic4,
+  ASSETS.TCB_5,
+  ASSETS.TCB_6,
+  ASSETS.TCB_7,
+  ASSETS.TCB_3,
+  ASSETS.EVENT_1,
+  ASSETS.EVENT_2,
+  ASSETS.EVENT_3,
+  ASSETS.EVENT_4,
 ];
 
 interface GallerySectionProps {

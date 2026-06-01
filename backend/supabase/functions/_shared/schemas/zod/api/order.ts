@@ -106,6 +106,8 @@ export const payOrderSchema = z.object({
 
 export const getOrderItemDataSchema = z.object({
   id: z.string(),
+  orderId: z.uuid(),
+  shipmentOrderId: z.string().nullable(),
   quantity: z.number().int().nonnegative(),
   cardMessages: z.array(z.string()),
   name: z.string(),
@@ -155,8 +157,15 @@ export const payOrderDataSchema = z.object({
   paymentUrl: z.url().nullable(),
   status: paymentStatusSchema,
 });
+
+export const customerPaymentStatusSchema = z.enum([
+  "pending",
+  "paid",
+  "failed",
+]);
+
 export const getOrderPaymentStatusDataSchema = z.object({
-  status: paymentStatusSchema,
+  status: customerPaymentStatusSchema,
   expiresAt: z.date(),
 });
 

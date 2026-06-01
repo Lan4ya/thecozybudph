@@ -162,6 +162,9 @@ export interface paths {
                                     profileId: string;
                                     /** @enum {string} */
                                     status: "toPay" | "toShip" | "toReceive" | "fulfilled" | "cancelled" | "paid" | "shipped" | "expired";
+                                    shipmentOrderId: string | null;
+                                    /** @enum {string} */
+                                    serviceType: "motorcycle" | "sedan";
                                     subtotalCents: number;
                                     discountCents: number;
                                     passOnFee: number;

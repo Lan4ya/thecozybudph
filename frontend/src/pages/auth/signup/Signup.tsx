@@ -1,11 +1,15 @@
-import LOGO from "@/assets/thecozybud/logo_transparent_oneline1.png";
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase/client";
+import { ASSETS } from "@/lib/constants/assets";
+import { useState } from "react";
 import isDev from "@/lib/utils/isDev";
-
+import { Turnstile } from "@marsidev/react-turnstile";
 import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/lib/ui/__shadcn__/button";
-import { useForm, useWatch, type SubmitHandler } from "react-hook-form";
+import {
+  useForm,
+  useWatch,
+  Controller,
+  type SubmitHandler,
+} from "react-hook-form";
 import {
   Card,
   CardContent,
@@ -16,21 +20,27 @@ import { Link, useNavigate } from "react-router";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import googleIcon from "@/assets/icons/google.svg";
 import { useIsLgScreenMin } from "@/hooks/useMediaQuery";
-import { signUpFormSchema, type SignUp } from "@cozybud/schemas";
+import {
+  signUpFormSchema,
+  type SignUpFormData,
+  type SignupInput,
+} from "@cozybud/schemas";
 import { Input } from "@/lib/ui/__shadcn__/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { handleError } from "@/lib/utils/format";
 import SideImage from "../SideImage";
+import { useMutation } from "@tanstack/react-query";
+import { AuthAPI } from "@/api";
+import type { AppError } from "@/api/_error";
+import { OAuathSignin } from "../OAuathSignin";
+import { useActionCooldown } from "@/hooks/useCooldown";
 
-const { VITE_APP_URL } = import.meta.env;
+const { VITE_CF_TURNSTILE_SITE_KEY } = import.meta.env;
 
 const Signup = () => {
-  const [loading, setLoading] = useState(false);
   const [passVisible, setPassVisible] = useState(false);
-  const [signUpSucess, setSignUpSuccess] = useState(false);
 
   const navigate = useNavigate();
-
   const isLgScreen = useIsLgScreenMin();
 
   const {
@@ -40,117 +50,71 @@ const Signup = () => {
     clearErrors,
     setError,
     control,
-  } = useForm<SignUp>({
+  } = useForm<SignUpFormData>({
     defaultValues: {
-      email: "",
-      password: "",
+      email: "mayadesuu304@gmail.com",
+      password: "password123",
     },
     resolver: zodResolver(signUpFormSchema),
   });
 
-  const [email, password] = useWatch({
+  const [email, password, turnstileToken] = useWatch({
     control,
-    name: ["email", "password"],
+    name: ["email", "password", "cfTurnstileToken"],
   });
-
-  const disabled = !email || !password;
 
   const emailErr = errors.email;
   const passErr = errors.password;
   const rootErr = errors.root;
 
-  const getRedirectUrl = () => {
-    if (isDev) return "http://localhost:5173/";
-    return VITE_APP_URL.startsWith("http")
-      ? VITE_APP_URL
-      : `https://${VITE_APP_URL}`;
-  };
+  const { onCooldown, timeRemaining, startCooldown } = useActionCooldown(
+    `cooldown:email_verification:${email}`,
+  );
 
-  const handleSignInWithOAuth = async () => {
-    clearErrors();
-
-    try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: getRedirectUrl(),
-        },
-      });
-      if (error) throw error;
-
-      sessionStorage.setItem("notifyLogInSuccess", "success");
-      isDev && console.log({ data });
-    } catch (err: unknown) {
-      const message = handleError(err);
-
-      setError("root", {
-        type: "server",
-        message,
-      });
-
-      isDev && console.error(message);
-    }
-  };
-
-  const onSubmit: SubmitHandler<SignUp> = async (data) => {
-    clearErrors();
-    setLoading(true);
-
-    const { email, password } = data;
-
-    try {
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: getRedirectUrl(),
-        },
-      });
-
+  const { mutate: signupMutation, isPending: signupLoading } = useMutation({
+    mutationFn: async (payload: SignupInput) => AuthAPI.signup(payload),
+    onSuccess: (data) => {
+      if (data.user?.identities?.length === 0) {
+        setError("email", {
+          type: "server",
+          message: "email is already registered",
+        });
+        return;
+      }
+      startCooldown();
+      sessionStorage.setItem("signup_attempt", email);
+      navigate("/auth/confirm-email");
+    },
+    onError: (error: AppError) => {
       if (error) {
         setError("root", {
           type: "server",
-          message: "Something went wrong. Please try again later",
+          message: error.message,
         });
-
         throw error;
       }
+    },
+  });
 
-      if (user?.identities?.length === 0) {
-        setError("email", {
-          type: "server",
-          message: "email address already in use",
-        });
-
-        setLoading(false);
-        return;
-      }
-
-      setSignUpSuccess(true);
-      setLoading(false);
+  const handleSignInWithOAuth = async () => {
+    clearErrors();
+    try {
+      const { data } = await OAuathSignin();
+      isDev && console.log({ data });
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : "Unknown error occurred";
-
-      isDev && console.error(message);
-
+      const message = handleError(err);
       setError("root", {
         type: "server",
         message,
       });
-      setLoading(false);
+      isDev && console.error(message);
     }
   };
 
-  useEffect(() => {
-    if (signUpSucess) {
-      sessionStorage.setItem("signup_confirm_email", email);
-      navigate("/auth/confirm-email");
-    }
-  }, [signUpSucess, email, navigate]);
+  const onSubmit: SubmitHandler<SignUpFormData> = async (data) => {
+    clearErrors();
+    signupMutation(data);
+  };
 
   return (
     <div className="custom-container flex lg:flex lg:gap-15 xl:gap-30 pt-6 justify-center items-center h-screen">
@@ -167,7 +131,7 @@ const Signup = () => {
           <img
             loading="eager"
             decoding="sync"
-            src={LOGO}
+            src={ASSETS.LOGO_ONELINE}
             alt="logo"
             className="h-full w-40"
           />
@@ -197,11 +161,8 @@ const Signup = () => {
                   {...register("email")}
                   type="text"
                   placeholder="youremail@email.com"
-                  // value={email}
                   className="bg-popover border-border/60"
                 />
-
-                {/* Email Errs */}
                 {emailErr && (
                   <p className="text-xs text-red-500 mt-1">
                     {emailErr.message}
@@ -214,7 +175,6 @@ const Signup = () => {
                 <label className="block text-sm text-muted-foreground">
                   Password
                 </label>
-
                 <div className="relative">
                   <Input
                     {...register("password")}
@@ -222,7 +182,6 @@ const Signup = () => {
                     placeholder="Enter a strong password"
                     className="pr-10 bg-popover border-border/60"
                   />
-
                   <Button
                     type="button"
                     variant="minimal"
@@ -236,21 +195,53 @@ const Signup = () => {
                     )}
                   </Button>
                 </div>
-
-                {/* Pass Err */}
                 {passErr && (
                   <p className="text-xs text-red-500 mt-1">{passErr.message}</p>
                 )}
               </div>
 
-              {/* Sign Up */}
+              {/* CF Turnstile */}
+              <div className="flex justify-center mb-2 w-full">
+                <Controller
+                  control={control}
+                  name="cfTurnstileToken"
+                  render={({ field }) => (
+                    <Turnstile
+                      siteKey={VITE_CF_TURNSTILE_SITE_KEY}
+                      options={{
+                        theme: "dark",
+                        size: "flexible",
+                        appearance: "always",
+                      }}
+                      onSuccess={(token: string) => field.onChange(token)}
+                      onExpire={() => field.onChange("")}
+                      onError={() => field.onChange("")}
+                    />
+                  )}
+                />
+              </div>
+
               <Button
                 type="submit"
                 className="border w-full flex-center"
-                disabled={loading || disabled}
+                disabled={
+                  signupLoading ||
+                  !email ||
+                  !password ||
+                  !turnstileToken ||
+                  onCooldown
+                }
               >
-                {loading ? <Spinner /> : null}
-                {loading ? "Signing up" : "Sign up"}
+                {
+                  signupLoading ? (
+                    <Spinner />
+                  ) : onCooldown ? null : null /* spacer */
+                }
+                {signupLoading
+                  ? "Signing up"
+                  : onCooldown
+                    ? `Wait ${timeRemaining}`
+                    : "Sign up"}
               </Button>
 
               {/* Root Err */}

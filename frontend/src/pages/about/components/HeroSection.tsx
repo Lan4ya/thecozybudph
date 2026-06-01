@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Skeleton } from "@/lib/ui/__shadcn__/skeleton";
 import { cn } from "@/lib/utils/cn";
-import TCB_1 from "@/assets/thecozybud/TCB_1.png";
+import { ASSETS } from "@/lib/constants/assets";
 
 interface HeroSectionProps {
   registerSentinel: (ref: HTMLElement | null) => void;
@@ -18,7 +18,7 @@ const HeroSection = ({ registerSentinel, visibleMap }: HeroSectionProps) => {
       )}
       <img
         ref={registerSentinel}
-        src={TCB_1}
+        src={ASSETS.TCB_1}
         alt="The Cozy Bud"
         className={cn(
           "pointer-events-none select-none h-full w-full object-cover transition-all duration-900 ease-out",

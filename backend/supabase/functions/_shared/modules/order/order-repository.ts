@@ -94,6 +94,8 @@ export const OrderRepository = {
         .select({
           // item details
           id: orderItemsSnapshots.id,
+          orderId: orders.id,
+          shipmentOrderId: orders.shipmentOrderId,
           quantity: orderItemsSnapshots.quantity,
           cardMessages: orderItemsSnapshots.cardMessages,
           name: orderItemsSnapshots.name,

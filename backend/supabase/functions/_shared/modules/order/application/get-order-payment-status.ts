@@ -13,5 +13,19 @@ export const getOrderPaymentStatus = async (
     throw AppError.notFound({ message: "Payment not found" });
   }
 
-  return data;
+  if (
+    data.status === "paid" ||
+    data.status === "pending" ||
+    data.status === "failed"
+  ) {
+    return {
+      status: data.status,
+      expiresAt: data.expiresAt,
+    };
+  }
+
+  // These status should never happen. If it does it means there's a a logic bug in order/payment flow
+  throw AppError.internal({
+    message: `Invariant violation: Invalid payment status "${data.status}"`,
+  });
 };

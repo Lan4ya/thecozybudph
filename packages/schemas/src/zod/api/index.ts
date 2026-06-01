@@ -5,4 +5,5 @@ export * from "./profile.ts";
 export * from "./order.ts";
 export * from "./admin.ts";
 export * from "./shipment.ts";
+export * from "./auth.ts";
 export * from "./_response.ts";

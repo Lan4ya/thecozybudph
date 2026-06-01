@@ -34,6 +34,35 @@ export type Database = {
   }
   public: {
     Tables: {
+      action_cooldowns: {
+        Row: {
+          action_type: Database["public"]["Enums"]["cooldown_type"]
+          created_at: string
+          ends_at: string
+          profile_id: string
+        }
+        Insert: {
+          action_type: Database["public"]["Enums"]["cooldown_type"]
+          created_at?: string
+          ends_at: string
+          profile_id: string
+        }
+        Update: {
+          action_type?: Database["public"]["Enums"]["cooldown_type"]
+          created_at?: string
+          ends_at?: string
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "action_cooldowns_profile_id_profiles_id_fk"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       addresses: {
         Row: {
           address_line: string
@@ -695,7 +724,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      cooldown_type: "otp_sms" | "email_verification" | "password_reset"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -825,7 +854,9 @@ export const Constants = {
     Enums: {},
   },
   public: {
-    Enums: {},
+    Enums: {
+      cooldown_type: ["otp_sms", "email_verification", "password_reset"],
+    },
   },
 } as const
 

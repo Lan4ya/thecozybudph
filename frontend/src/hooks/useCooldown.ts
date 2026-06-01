@@ -1,56 +1,87 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 
-interface UseCooldownResult {
-  countdown: number;
-  isLocked: boolean;
-  startCooldown: () => void;
+interface UseCooldownOptions {
+  durationSeconds?: number;
 }
 
-export function useCooldown(
-  cooldownSeconds: number,
+interface UseCooldownResult {
+  onCooldown: boolean;
+  timeRemaining: string;
+  countdown: number;
+  startCooldown: (customDuration?: number) => void;
+  resetCooldown: () => void;
+}
+
+/**
+ * A client-side only cooldown hook that persists to localStorage.
+ *
+ * @param storageKey Unique key for localStorage (e.g., 'cooldown:password_reset:user@example.com')
+ * @param options Configuration options
+ */
+export function useActionCooldown(
   storageKey: string,
+  options: UseCooldownOptions = {},
 ): UseCooldownResult {
-  // Extract storage reading into lazy initial state function
-  const [countdown, setCountdown] = useState<number>(() => {
-    if (typeof window === "undefined") return 0;
+  const { durationSeconds = 120 } = options;
 
-    const targetTime = localStorage.getItem(storageKey);
-    if (!targetTime) return 0;
+  // Initialize from localStorage
+  const getInitialEndsAt = (): number | null => {
+    const saved = localStorage.getItem(storageKey);
+    if (!saved) return null;
+    const endsAt = parseInt(saved, 10);
+    return isNaN(endsAt) ? null : endsAt;
+  };
 
-    const remaining = Math.ceil((parseInt(targetTime, 10) - Date.now()) / 1000);
-    if (remaining > 0) return remaining;
+  const [endsAt, setEndsAt] = useState<number | null>(getInitialEndsAt());
+  const [, setTick] = useState(0);
 
-    localStorage.removeItem(storageKey);
-    return 0;
-  });
+  const calculateRemaining = useCallback(() => {
+    if (!endsAt) return 0;
+    const remainingMs = endsAt - Date.now();
+    return Math.max(0, Math.ceil(remainingMs / 1000));
+  }, [endsAt]);
 
-  // Initiate lockout
-  const startCooldown = useCallback(() => {
-    const expiresAt = Date.now() + cooldownSeconds * 1000;
-    localStorage.setItem(storageKey, expiresAt.toString());
-    setCountdown(cooldownSeconds);
-  }, [storageKey, cooldownSeconds]);
+  const countdown = calculateRemaining();
 
-  // Ticker logic
+  // Tick every second
   useEffect(() => {
     if (countdown <= 0) return;
 
     const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          localStorage.removeItem(storageKey);
-          return 0;
-        }
-        return prev - 1;
-      });
+      setTick((prev) => prev + 1);
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [countdown, storageKey]);
+  }, [countdown]);
+
+  const startCooldown = useCallback(
+    (customDuration?: number) => {
+      const duration = (customDuration ?? durationSeconds) * 1000;
+      const newEndsAt = Date.now() + duration;
+      localStorage.setItem(storageKey, newEndsAt.toString());
+      setEndsAt(newEndsAt);
+    },
+    [storageKey, durationSeconds],
+  );
+
+  const resetCooldown = useCallback(() => {
+    localStorage.removeItem(storageKey);
+    setEndsAt(null);
+  }, [storageKey]);
+
+  const timeRemaining = useMemo(() => {
+    if (countdown <= 0) return "0:00";
+    const minutes = Math.floor(countdown / 60);
+    const seconds = countdown % 60;
+    const unit = countdown >= 60 ? "m" : "s";
+    return `${minutes}:${seconds.toString().padStart(2, "0")}${unit}`;
+  }, [countdown]);
 
   return {
+    onCooldown: countdown > 0,
+    timeRemaining,
     countdown,
-    isLocked: countdown > 0,
     startCooldown,
+    resetCooldown,
   };
 }

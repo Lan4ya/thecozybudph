@@ -41,7 +41,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
         if (sameMessageCount >= 3) return prev; // skip duplicates
         const id = crypto.randomUUID();
         const newToasts = [...prev, { id, message, type }];
-        setTimeout(() => removeToast(id), 4000);
+        setTimeout(() => removeToast(id), 7000);
         return newToasts;
       });
     },
@@ -70,7 +70,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
               exit={{ opacity: 0, x: 50, scale: 0.95 }}
               transition={{ type: "spring", damping: 20, stiffness: 300 }}
               className={cn(
-                "flex items-start gap-3 max-w-xs lg:max-w-sm rounded-lg shadow-lg border-l-4 px-4 py-3 font-medium text-sm md:text-base",
+                "flex items-center min-h-14 gap-3 max-w-xs lg:max-w-md rounded-lg shadow-lg border-l-4 px-4 py-3 font-medium text-sm md:text-base",
                 t.type === "success" &&
                   "bg-green-50 text-green-800 border-green-500",
                 t.type === "error" && "bg-red-50 text-red-800 border-red-500",

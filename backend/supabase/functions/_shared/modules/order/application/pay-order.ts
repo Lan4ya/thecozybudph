@@ -1,9 +1,4 @@
-import {
-  PayOrderInput,
-  orders,
-  payments,
-  PayOrderRes,
-} from "@shared/schemas/index.ts";
+import { PayOrderInput, payments, PayOrderRes } from "@shared/schemas/index.ts";
 import { and, eq, isNull, or } from "drizzle-orm";
 import { DrizzleClient } from "@shared/db/client.ts";
 import { AppError } from "@shared/errors/Errors.ts";
@@ -42,7 +37,6 @@ export const payOrder = async (
   }
 
   return db.rls(async (tx) => {
-
     const existingPayment = await tx.query.payments.findFirst({
       where: and(
         eq(payments.isActive, true),

@@ -120,6 +120,7 @@ export interface paths {
                             data: {
                                 /** Format: uuid */
                                 orderId: string;
+                                shippingOrderId?: string;
                                 /** @enum {string} */
                                 status: "toPay" | "toShip" | "toReceive" | "fulfilled" | "cancelled" | "paid" | "shipped" | "expired";
                             };
@@ -182,7 +183,55 @@ export interface paths {
                     content: {
                         "application/json": {
                             data: {
-                                [key: string]: unknown;
+                                id: string;
+                                quotationId: string;
+                                priceBreakdown: {
+                                    base?: string;
+                                    extraMileage?: string;
+                                    surcharge?: string;
+                                    coupon?: string;
+                                    specialRequests?: string;
+                                    priorityFee?: string;
+                                    priorityFeeVat?: string;
+                                    specialVehicle?: string;
+                                    minimumSurcharge?: string;
+                                    discountCap?: string;
+                                    insurance?: string;
+                                    multiStopSurcharge?: string;
+                                    surchargeDiscount?: string;
+                                    vat?: string;
+                                    customerSupportDiscretionary?: string;
+                                    totalBeforeOptimization?: string;
+                                    totalExcludePriorityFee?: string;
+                                    total: string;
+                                    currency: string;
+                                };
+                                driverId?: string | null;
+                                /** Format: uri */
+                                shareLink?: string;
+                                status: string;
+                                distance?: {
+                                    value: string;
+                                    unit: string;
+                                };
+                                stops: {
+                                    /** Format: uuid */
+                                    id?: string;
+                                    coordinates: {
+                                        lat: string;
+                                        lng: string;
+                                    };
+                                    address: string;
+                                    name: string;
+                                    phone: string;
+                                    remarks?: string;
+                                    POD?: {
+                                        [key: string]: unknown;
+                                    };
+                                }[];
+                                metadata?: {
+                                    [key: string]: unknown;
+                                };
                             };
                         };
                     };
@@ -368,7 +417,57 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            data?: unknown;
+                            data: {
+                                id: string;
+                                quotationId: string;
+                                priceBreakdown: {
+                                    base?: string;
+                                    extraMileage?: string;
+                                    surcharge?: string;
+                                    coupon?: string;
+                                    specialRequests?: string;
+                                    priorityFee?: string;
+                                    priorityFeeVat?: string;
+                                    specialVehicle?: string;
+                                    minimumSurcharge?: string;
+                                    discountCap?: string;
+                                    insurance?: string;
+                                    multiStopSurcharge?: string;
+                                    surchargeDiscount?: string;
+                                    vat?: string;
+                                    customerSupportDiscretionary?: string;
+                                    totalBeforeOptimization?: string;
+                                    totalExcludePriorityFee?: string;
+                                    total: string;
+                                    currency: string;
+                                };
+                                driverId?: string | null;
+                                /** Format: uri */
+                                shareLink?: string;
+                                status: string;
+                                distance?: {
+                                    value: string;
+                                    unit: string;
+                                };
+                                stops: {
+                                    /** Format: uuid */
+                                    id?: string;
+                                    coordinates: {
+                                        lat: string;
+                                        lng: string;
+                                    };
+                                    address: string;
+                                    name: string;
+                                    phone: string;
+                                    remarks?: string;
+                                    POD?: {
+                                        [key: string]: unknown;
+                                    };
+                                }[];
+                                metadata?: {
+                                    [key: string]: unknown;
+                                };
+                            };
                         };
                     };
                 };
@@ -419,7 +518,18 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            data?: unknown;
+                            data: {
+                                id: string;
+                                name?: string;
+                                phone?: string;
+                                plateNumber?: string;
+                                /** Format: uri */
+                                photo?: string;
+                                coordinates?: {
+                                    lat: string;
+                                    lng: string;
+                                };
+                            };
                         };
                     };
                 };
@@ -479,7 +589,18 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            data?: unknown;
+                            data: {
+                                id: string;
+                                name?: string;
+                                phone?: string;
+                                plateNumber?: string;
+                                /** Format: uri */
+                                photo?: string;
+                                coordinates?: {
+                                    lat: string;
+                                    lng: string;
+                                };
+                            };
                         };
                     };
                 };
@@ -529,7 +650,11 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            data?: unknown;
+                            data: {
+                                id: string;
+                                name: string;
+                                status?: string;
+                            };
                         };
                     };
                 };
@@ -566,7 +691,15 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            data?: unknown;
+                            data: {
+                                id: string;
+                                name: string;
+                                cities: {
+                                    id: string;
+                                    name: string;
+                                    status?: string;
+                                }[];
+                            };
                         };
                     };
                 };
@@ -625,7 +758,57 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            data?: unknown;
+                            data: {
+                                id: string;
+                                quotationId: string;
+                                priceBreakdown: {
+                                    base?: string;
+                                    extraMileage?: string;
+                                    surcharge?: string;
+                                    coupon?: string;
+                                    specialRequests?: string;
+                                    priorityFee?: string;
+                                    priorityFeeVat?: string;
+                                    specialVehicle?: string;
+                                    minimumSurcharge?: string;
+                                    discountCap?: string;
+                                    insurance?: string;
+                                    multiStopSurcharge?: string;
+                                    surchargeDiscount?: string;
+                                    vat?: string;
+                                    customerSupportDiscretionary?: string;
+                                    totalBeforeOptimization?: string;
+                                    totalExcludePriorityFee?: string;
+                                    total: string;
+                                    currency: string;
+                                };
+                                driverId?: string | null;
+                                /** Format: uri */
+                                shareLink?: string;
+                                status: string;
+                                distance?: {
+                                    value: string;
+                                    unit: string;
+                                };
+                                stops: {
+                                    /** Format: uuid */
+                                    id?: string;
+                                    coordinates: {
+                                        lat: string;
+                                        lng: string;
+                                    };
+                                    address: string;
+                                    name: string;
+                                    phone: string;
+                                    remarks?: string;
+                                    POD?: {
+                                        [key: string]: unknown;
+                                    };
+                                }[];
+                                metadata?: {
+                                    [key: string]: unknown;
+                                };
+                            };
                         };
                     };
                 };

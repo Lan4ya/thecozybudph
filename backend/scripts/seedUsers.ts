@@ -67,7 +67,6 @@ async function createUser() {
     password: DEFAULT_PASSWORD,
     email_confirm: true,
     user_metadata: {
-      name: `User_${random}`,
       avatar_url, // provide default avatar
     },
   });

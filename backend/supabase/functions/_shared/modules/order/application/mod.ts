@@ -3,7 +3,7 @@ import { queryOrders } from "./query-orders.ts";
 import { getOrderItem } from "./get-order-item.ts";
 import { payOrder } from "./pay-order.ts";
 import { handlePaymentWebhook } from "./handle-payment-webhook.ts";
-import { getOrderPaymentStatus } from "./query-order-payment-status.ts";
+import { getOrderPaymentStatus } from "./get-order-payment-status.ts";
 
 export const OrderActions = {
   createOrder,

@@ -1,5 +1,6 @@
 import { DrizzleError, DrizzleQueryError } from "drizzle-orm";
 import { AppError, ValidationError } from "@shared/errors/Errors.ts";
+import { isAuthApiError as isSupabaseAuthApiError } from "supabase";
 
 type PostgresError = {
   code?: string;
@@ -103,6 +104,42 @@ export function normalizeError(error: unknown): AppError | ValidationError {
       default:
         return AppError.internal({
           message: error.message || "Storage error",
+          cause: error,
+        });
+    }
+  }
+
+  // Supabase Auth API Errors
+  // https://supabase.com/docs/guides/auth/debugging/error-codes
+  if (isSupabaseAuthApiError(error)) {
+    switch (error.status) {
+      case 400:
+        return AppError.badRequest({
+          message: error.message,
+          cause: error.cause,
+        });
+
+      case 403:
+        return AppError.unauthorized({
+          message: error.message,
+          cause: error.cause,
+        });
+
+      case 422:
+        return AppError.unprocessable({
+          message: error.message,
+          cause: error.cause,
+        });
+
+      case 429:
+        return AppError.rateLimit({
+          message: error.message,
+          cause: error.cause,
+        });
+
+      default:
+        return AppError.internal({
+          message: error.message,
           cause: error,
         });
     }

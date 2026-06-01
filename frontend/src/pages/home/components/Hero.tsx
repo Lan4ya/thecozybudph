@@ -1,11 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-
-import TCB_1 from "@/assets/thecozybud/TCB_1.png";
-import TCB_3 from "@/assets/thecozybud/TCB_3.png";
-import TCB_5 from "@/assets/thecozybud/TCB_5.jpg";
-import TCB_6 from "@/assets/thecozybud/TCB_6.jpg";
-import TCB_7 from "@/assets/thecozybud/TCB_7.jpg";
+import { ASSETS } from "@/lib/constants/assets";
 import {
   useAnimateOnView,
   type RegisterSentinel,
@@ -14,7 +9,13 @@ import { cn } from "@/lib/utils/cn";
 import { useIsLgScreenMin } from "@/hooks/useMediaQuery";
 import { ProgressiveImage } from "@/components/ProgressiveImage";
 
-const imgSrcs = [TCB_1, TCB_6, TCB_7, TCB_5, TCB_3];
+const imgSrcs = [
+  ASSETS.TCB_1,
+  ASSETS.TCB_6,
+  ASSETS.TCB_7,
+  ASSETS.TCB_5,
+  ASSETS.TCB_3,
+];
 const TRANSITION_MS = 1000;
 
 const Hero = () => {
@@ -236,7 +237,7 @@ const DesktopHeroInner = ({
         <div className="absolute -inset-6 -z-10 rounded-[2.5rem] bg-linear-to-br from-primary/10 via-accent/10 to-transparent blur-2xl" />
         <div className="overflow-hidden rounded-[2.5rem] border border-accent/10 bg-card shadow-2xl">
           <ProgressiveImage
-            src={TCB_1}
+            src={ASSETS.TCB_1}
             alt="CozyBud floral arrangement"
             isEager={true}
             decoding="sync"

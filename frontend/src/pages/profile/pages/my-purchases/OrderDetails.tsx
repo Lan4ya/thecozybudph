@@ -6,6 +6,7 @@ import { Button } from "@/lib/ui/__shadcn__/button";
 import { formatPriceCents } from "@/lib/utils/format";
 import { cn } from "@/lib/utils/cn";
 import { MetaBadge } from "@/components/MetaBadge";
+import ShipmentManagement from "../admin-dashboard/pages/orders/components/ShipmentManagement";
 import {
   ChevronRight,
   MapPin,
@@ -123,7 +124,7 @@ const OrderDetails = () => {
         <div className="lg:col-span-2">
           <div className="rounded-2xl border bg-card overflow-hidden">
             <div className="flex flex-col sm:flex-row gap-5 p-5">
-              {/* Image - Same as OrderCard h-24 w-24 */}
+              {/* Image */}
               <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl border bg-primary/5">
                 <img
                   src={orderItem.primaryImageUrl}
@@ -304,7 +305,7 @@ const OrderDetails = () => {
               className="text-xs px-2 py-1"
             />
             <div className="rounded-lg bg-primary/5 p-3 border border-primary/10 flex items-center gap-2">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-background border border-primary/20">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/5 border border-primary/20">
                 <Truck className="h-3.5 w-3.5 text-primary" />
               </div>
               <div className="text-xs">
@@ -334,6 +335,9 @@ const OrderDetails = () => {
           </div>
         </section>
       </div>
+
+      {/* Admin Shipment Management */}
+      <ShipmentManagement orderItem={orderItem} />
     </div>
   );
 };

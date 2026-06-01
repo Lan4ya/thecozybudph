@@ -62,9 +62,9 @@ export const errorHandler = (
   };
 
   // Add Retry-After for rate limit errors
-  if (normalizedError.code === "RATE_LIMIT_EXCEEDED") {
-    headers["Retry-After"] = "60";
-  }
+  // if (normalizedError.code === "TOO_MANY_REQUEST") {
+  //   headers["Retry-After"] = "60";
+  // }
 
   return Response.json(responseBody, {
     status: normalizedError.status,
