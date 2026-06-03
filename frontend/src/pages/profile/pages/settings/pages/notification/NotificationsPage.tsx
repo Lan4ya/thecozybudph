@@ -53,7 +53,7 @@ export default function NotificationsPage() {
 
       <Separator />
 
-      <div className="px-2 space-y-1">
+      <div className="space-y-1">
         {rows.map((row) => (
           <SettingsRow
             key={row.key}

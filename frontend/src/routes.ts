@@ -108,16 +108,16 @@ const router = createBrowserRouter([
                 path: "account",
                 Component: AccountPage,
               },
-              {
-                path: "addresses",
-                children: [
-                  { index: true, Component: AddressesPage },
-                  { path: "add", Component: AddAddressPage },
-                  { path: ":addressId/edit", Component: EditAddressPage },
-                ],
-              },
               { path: "notifications", Component: NotificationsPage },
               { path: "privacy", Component: PrivacyPage },
+            ],
+          },
+          {
+            path: "addresses",
+            children: [
+              { index: true, Component: AddressesPage },
+              { path: "add", Component: AddAddressPage },
+              { path: ":addressId/edit", Component: EditAddressPage },
             ],
           },
           {

@@ -10,6 +10,7 @@ import {
   ShoppingBag,
   Settings,
   HelpCircle,
+  MapPin,
 } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { handleError } from "@/lib/utils/format";
@@ -250,9 +251,14 @@ const Profile = () => {
           <div className="lg:col-span-2 space-y-6">
             <Section title="Account">
               <Row
-                label="My Purchases"
+                label="Purchases"
                 icon={<ShoppingBag className="size-4 text-primary" />}
                 onClick={() => navigate("/profile/my-purchases")}
+              />
+              <Row
+                label="Addresses"
+                icon={<MapPin className="size-4 text-primary" />}
+                onClick={() => navigate("/profile/addresses")}
               />
               <Row
                 label="Settings"

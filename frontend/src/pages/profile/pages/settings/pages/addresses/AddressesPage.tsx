@@ -1,16 +1,17 @@
 import { Button } from "@/lib/ui/__shadcn__/button";
-import { Separator } from "@/lib/ui/__shadcn__/separator";
 import { Plus } from "lucide-react";
 import { Link } from "react-router";
 import AddressList from "./components/AddressList";
 
 export default function AddressesPage() {
   return (
-    <div className="bg-card rounded-xl border p-5 md:p-6 shadow-sm space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-lg font-semibold">My Addresses</h3>
-          <p className="text-sm text-muted-foreground">
+    <div className="mx-auto w-full max-w-5xl space-y-6 px-4 py-6 md:px-6 lg:px-8">
+      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div className="space-y-1">
+          <h1 className="text-header tracking-tight text-foreground md:text-4xl">
+            My Addresses
+          </h1>
+          <p className="text-muted-foreground font-medium">
             Manage your shipping and billing addresses.
           </p>
         </div>
@@ -21,9 +22,9 @@ export default function AddressesPage() {
         </Link>
       </div>
 
-      <Separator />
-
-      <AddressList />
+      <div className="bg-card rounded-xl border p-5 md:p-6 shadow-sm">
+        <AddressList />
+      </div>
     </div>
   );
 }

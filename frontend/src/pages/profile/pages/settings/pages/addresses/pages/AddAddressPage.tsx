@@ -64,7 +64,7 @@ export default function AddAddressPage() {
         addToast("Address created", "success");
         setAddress(newAddress);
         queryClient.invalidateQueries({ queryKey: [checkoutDefaultAddressQK] });
-        navigate("/profile/settings/addresses");
+        navigate("/profile/addresses");
       },
     });
 
@@ -231,7 +231,7 @@ export default function AddAddressPage() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => navigate("/profile/settings/addresses")}
+                onClick={() => navigate("/profile/addresses")}
               >
                 Cancel
               </Button>

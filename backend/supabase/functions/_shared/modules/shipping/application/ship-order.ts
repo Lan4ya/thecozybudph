@@ -23,7 +23,7 @@ export const shipOrder = async (
   orderId: string,
   payload: ShipOrderInput,
 ) => {
-  // 1. Validation
+  // Validation
   const order = await db.admin.query.orders.findFirst({
     where: eq(orders.id, orderId),
   });

@@ -17,7 +17,6 @@ import {
   shipOrderResponseSchema,
   shipOrderSchema,
   uuidParamSchema,
-  apiSuccessResponseSchema,
   addShippingOrderPriorityFeeResponseSchema,
   getShippingDriverResponseSchema,
   getShippingCityResponseSchema,
@@ -391,7 +390,10 @@ shipment.openapi(shipOrderRoute, shipOrderHandler);
 shipment.openapi(getShippingOrderRoute, getShippingOrderHandler);
 shipment.openapi(cancelShipOrderRoute, cancelShipOrderHandler);
 shipment.openapi(createShippingQuoteRoute, createShippingQuoteHandler);
-shipment.openapi(addShippingOrderPriorityFeeRoute, addShippingOrderPriorityFeeHandler);
+shipment.openapi(
+  addShippingOrderPriorityFeeRoute,
+  addShippingOrderPriorityFeeHandler,
+);
 shipment.openapi(getShippingDriverRoute, getShippingDriverHandler);
 shipment.openapi(changeShippingDriverRoute, changeShippingDriverHandler);
 shipment.openapi(getShippingCityRoute, getShippingCityHandler);
