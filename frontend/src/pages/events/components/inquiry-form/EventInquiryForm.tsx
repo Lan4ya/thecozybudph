@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   eventInquiryFormSchema,
@@ -8,8 +8,16 @@ import { Input } from "@/lib/ui/__shadcn__/input";
 import { Label } from "@/lib/ui/__shadcn__/label";
 import { Textarea } from "@/lib/ui/__shadcn__/textarea";
 import { Button } from "@/lib/ui/__shadcn__/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/lib/ui/__shadcn__/select";
 import { cn } from "@/lib/utils/cn";
-import { EVENT_TYPES, BUDGET_RANGES } from "@/pages/events/constants";
+import { EVENT_TYPES } from "@/pages/events/constants";
+import { DatePicker } from "@/components/DatePicker";
 
 export interface EventInquiryFormProps {
   onSubmit: (data: EventInquiryFormInput) => void;
@@ -23,6 +31,7 @@ export const EventInquiryForm = ({
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<EventInquiryFormInput>({
     resolver: zodResolver(eventInquiryFormSchema),
@@ -34,13 +43,9 @@ export const EventInquiryForm = ({
       eventDate: "",
       guestCount: "" as unknown as undefined,
       venue: "",
-      budget: "",
       message: "",
     },
   });
-
-  const selectClasses =
-    "flex h-10 w-full rounded-md border border-input bg-popover px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50";
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -90,39 +95,59 @@ export const EventInquiryForm = ({
           <Label htmlFor="phone" className="text-foreground/80">
             Phone Number
           </Label>
-          <Input
-            id="phone"
-            type="tel"
-            {...register("phone")}
-            placeholder="+639XXXXXXXXX"
-            className={cn(
-              "bg-popover border-border/60",
-              errors.phone && "border-red-500 focus-visible:ring-red-500",
-            )}
-          />
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground border-r pr-2">
+              +63
+            </span>
+            <Input
+              id="phone"
+              {...register("phone", {
+                setValueAs: (value: string) => {
+                  if (!value) return "";
+                  return `+63${value}`;
+                },
+              })}
+              maxLength={10}
+              placeholder="9XXXXXXXXX"
+              inputMode="numeric"
+              className={cn(
+                "pl-14 bg-popover border-border/60",
+                errors.phone && "border-red-500 focus-visible:ring-red-500",
+              )}
+            />
+          </div>
           {errors.phone && (
             <p className="text-xs text-red-500">{errors.phone.message}</p>
           )}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="eventType" className="text-foreground/80">
+          <Label className="text-foreground/80">
             Event Type <span className="text-red-500">*</span>
           </Label>
-          <select
-            id="eventType"
-            {...register("eventType")}
-            className={cn(
-              selectClasses,
-              errors.eventType && "border-red-500 focus-visible:ring-red-500",
+          <Controller
+            name="eventType"
+            control={control}
+            render={({ field }) => (
+              <Select onValueChange={field.onChange} value={field.value}>
+                <SelectTrigger
+                  className={cn(
+                    "bg-popover border-border/60 w-full",
+                    errors.eventType && "border-red-500 focus:ring-red-500",
+                  )}
+                >
+                  <SelectValue placeholder="Select event type" />
+                </SelectTrigger>
+                <SelectContent position="popper">
+                  {EVENT_TYPES.filter((t) => t.value !== "").map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             )}
-          >
-            {EVENT_TYPES.map((type) => (
-              <option key={type.value} value={type.value}>
-                {type.label}
-              </option>
-            ))}
-          </select>
+          />
           {errors.eventType && (
             <p className="text-xs text-red-500">{errors.eventType.message}</p>
           )}
@@ -132,17 +157,21 @@ export const EventInquiryForm = ({
       {/* Event Date & Guest Count Row */}
       <div className="grid sm:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="eventDate" className="text-foreground/80">
+          <Label className="text-foreground/80">
             Event Date <span className="text-red-500">*</span>
           </Label>
-          <Input
-            id="eventDate"
-            type="date"
-            {...register("eventDate")}
-            min={new Date().toISOString().split("T")[0]}
-            className={cn(
-              "bg-popover border-border/60",
-              errors.eventDate && "border-red-500 focus-visible:ring-red-500",
+          <Controller
+            name="eventDate"
+            control={control}
+            render={({ field }) => (
+              <DatePicker
+                value={field.value}
+                onChange={(date) => field.onChange(date?.toISOString())}
+                placeholder="Select event date"
+                className={cn(
+                  errors.eventDate && "border-red-500 focus:ring-red-500",
+                )}
+              />
             )}
           />
           {errors.eventDate && (
@@ -156,8 +185,7 @@ export const EventInquiryForm = ({
           </Label>
           <Input
             id="guestCount"
-            type="number"
-            {...register("guestCount", { valueAsNumber: true })}
+            {...register("guestCount")}
             placeholder="Approximate number of guests"
             className={cn(
               "bg-popover border-border/60",
@@ -170,7 +198,7 @@ export const EventInquiryForm = ({
         </div>
       </div>
 
-      {/* Venue & Budget Row */}
+      {/* Venue Row */}
       <div className="grid sm:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="venue" className="text-foreground/80">
@@ -188,19 +216,6 @@ export const EventInquiryForm = ({
           {errors.venue && (
             <p className="text-xs text-red-500">{errors.venue.message}</p>
           )}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="budget" className="text-foreground/80">
-            Budget Range
-          </Label>
-          <select id="budget" {...register("budget")} className={selectClasses}>
-            {BUDGET_RANGES.map((range) => (
-              <option key={range.value} value={range.value}>
-                {range.label}
-              </option>
-            ))}
-          </select>
         </div>
       </div>
 

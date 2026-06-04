@@ -1,15 +1,22 @@
 import { Button } from "@/lib/ui/__shadcn__/button";
 import type { Product } from "@cozybud/schemas";
-import { MessageCircle, ShoppingCart, Instagram, Mail } from "lucide-react";
+import {
+  MessageCircle,
+  ShoppingCart,
+  Instagram,
+  ChevronRight,
+} from "lucide-react";
 import { useEffect, useState } from "react";
-import { OptionsDrawer } from "./OptionsDrawer";
-import { useProductSelectionStore } from "@/pages/shop/store/useProductSelectionStore";
+import { ProductOptionsDrawer } from "./ProductOptionsDrawer";
 import { cn } from "@/lib/utils/cn";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/lib/ui/__shadcn__/popover";
+import { useProductSelectionStore } from "@/store/useProductSelectionStore";
+import { useAuthStore } from "@/store/useAuthStore";
+import { AuthRequiredDialog } from "@/components/AuthDialog";
 
 type BottomBarProps = {
   product: Product;
@@ -21,6 +28,9 @@ type BottomBarProps = {
 
 export const BottomBar = (props: BottomBarProps) => {
   const [mode, setMode] = useState<"addToCart" | "buyNow">("addToCart");
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
+
+  const session = useAuthStore((s) => s.session);
 
   const selectedOptions = useProductSelectionStore((s) => s.selectedOptions);
   const setSelectedVariant = useProductSelectionStore(
@@ -40,19 +50,32 @@ export const BottomBar = (props: BottomBarProps) => {
 
   const handleBuyNowMode = () => {
     if (!selectedVariant) return;
+    if (!session) {
+      setAuthDialogOpen(true);
+      return;
+    }
     setMode("buyNow");
     setDrawerOpen(true);
   };
 
   const handleAddToCartMode = () => {
     if (!selectedVariant) return;
+    if (!session) {
+      setAuthDialogOpen(true);
+      return;
+    }
     setMode("addToCart");
     setDrawerOpen(true);
   };
 
   return (
     <>
-      <OptionsDrawer
+      <AuthRequiredDialog
+        open={authDialogOpen}
+        onOpenChange={setAuthDialogOpen}
+      />
+
+      <ProductOptionsDrawer
         onAddToCart={props.onAddToCart}
         onBuyNow={props.onBuyNow}
         productOptions={props.product.options}
@@ -87,7 +110,6 @@ export const BottomBarActions = ({
 }: BottomBarActionsProps) => {
   const messengerLink = `https://m.me/thecozybudph?text=${encodeURIComponent(`Hi! I'm interested in ${product.name}: ${window.location.href}`)}`;
   const instagramLink = `https://ig.me/m/thecozybudph`;
-  const gmailLink = `mailto:thecozybudph@gmail.com?subject=${encodeURIComponent(`Inquiry about ${product.name}`)}&body=${encodeURIComponent(`Hi, I'm interested in ${product.name}: ${window.location.href}`)}`;
 
   return (
     <div
@@ -103,7 +125,7 @@ export const BottomBarActions = ({
             variant="secondary"
           >
             <MessageCircle className="w-5 h-5" />
-            <span className="text-xs font-medium">Chat Now</span>
+            <span className="text-xs font-medium">Message Us</span>
           </Button>
         </PopoverTrigger>
         <PopoverContent
@@ -116,39 +138,32 @@ export const BottomBarActions = ({
             href={messengerLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 p-2 hover:bg-accent rounded-md transition-colors"
+            className="flex items-center justify-between p-2 hover:bg-accent rounded-md transition-colors"
           >
-            <div className="bg-[#0084FF] p-1.5 rounded-lg text-white">
-              <svg viewBox="0 0 24 24" fill="currentColor" className="size-4">
-                <path d="M12 2C6.477 2 2 6.145 2 11.258c0 2.908 1.458 5.488 3.733 7.153V22l3.414-1.874c.905.251 1.865.388 2.853.388 5.523 0 10-4.145 10-9.258C22 6.145 17.523 2 12 2zm1.06 12.012-2.707-2.887-5.286 2.887 5.808-6.17 2.707 2.887 5.286-2.887-5.808 6.17z" />
-              </svg>
+            <div className="flex items-center gap-3">
+              <div className="bg-[#0084FF] p-1.5 rounded-lg text-white">
+                <svg viewBox="0 0 24 24" fill="currentColor" className="size-4">
+                  <path d="M12 2C6.477 2 2 6.145 2 11.258c0 2.908 1.458 5.488 3.733 7.153V22l3.414-1.874c.905.251 1.865.388 2.853.388 5.523 0 10-4.145 10-9.258C22 6.145 17.523 2 12 2zm1.06 12.012-2.707-2.887-5.286 2.887 5.808-6.17 2.707 2.887 5.286-2.887-5.808 6.17z" />
+                </svg>
+              </div>
+              <span className="text-sm font-medium">Messenger</span>
             </div>
-            <span className="text-sm font-medium lg:hidden">Messenger</span>
-            <span className="text-sm font-medium hidden lg:inline">
-              Messenger
-            </span>
+            <ChevronRight className="size-4 text-muted-foreground" />
           </a>
 
           <a
             href={instagramLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 p-2 hover:bg-accent rounded-md transition-colors"
+            className="flex items-center justify-between p-2 hover:bg-accent rounded-md transition-colors"
           >
-            <div className="bg-linear-to-tr from-[#FFB700] via-[#FF0069] to-[#7600E5] p-1.5 rounded-lg text-white">
-              <Instagram className="size-4" />
+            <div className="flex items-center gap-3">
+              <div className="bg-linear-to-tr from-[#FFB700] via-[#FF0069] to-[#7600E5] p-1.5 rounded-lg text-white">
+                <Instagram className="size-4" />
+              </div>
+              <span className="text-sm font-medium">Instagram</span>
             </div>
-            <span className="text-sm font-medium">Instagram</span>
-          </a>
-
-          <a
-            href={gmailLink}
-            className="flex items-center gap-3 p-2 hover:bg-accent rounded-md transition-colors"
-          >
-            <div className="bg-[#EA4335] p-1.5 rounded-lg text-white">
-              <Mail className="size-4" />
-            </div>
-            <span className="text-sm font-medium">Gmail</span>
+            <ChevronRight className="size-4 text-muted-foreground" />
           </a>
         </PopoverContent>
       </Popover>

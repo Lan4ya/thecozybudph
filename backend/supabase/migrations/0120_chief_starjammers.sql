@@ -1,0 +1,1 @@
+ALTER TABLE "orders" DROP COLUMN "shipment_order_id";

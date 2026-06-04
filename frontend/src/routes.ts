@@ -1,57 +1,140 @@
+import { lazy } from "react";
 import { createBrowserRouter, redirect } from "react-router";
-import { RouteLoaderSpinner } from "./components/RouteLoaderSpinner.tsx";
 import { CatchAllErrorPage } from "./pages/ErrorPage.tsx";
 import Root from "./pages/Root.tsx";
 import RootLoader from "./pages/RootLoader.tsx";
-import About from "./pages/about/About.tsx";
 import {
   AuthLoader,
-  Signup,
-  SignupConfirmEmail,
-  Login,
-  ForgotPasswordSubmitEmail,
-  ForgotPasswordCheckEmail,
   ForgotPasswordCheckEmailLoader,
-  ForgotPasswordResetPassword,
   ForgotPasswordResetPasswordLoader,
 } from "./pages/auth";
-import Cart from "./pages/cart/Cart.tsx";
-import Contact from "./pages/contact/Contact.tsx";
-import Events from "./pages/events/Events.tsx";
-import Home from "./pages/home/Home.tsx";
-import PrivacyPolicy from "./pages/privacy-policy/PrivacyPolicy.tsx";
-import Profile from "./pages/profile/Profile.tsx";
-import { Shop, ShopProduct } from "./pages/shop";
-import TermsOfService from "./pages/terms-of-service/TermsOfService.tsx";
-import FAQ from "./pages/frequently-asked-questions/FAQ.tsx";
-import MyPurchases from "./pages/profile/pages/my-purchases/MyPurchases.tsx";
-import OrderDetails from "./pages/profile/pages/my-purchases/OrderDetails.tsx";
-import Settings from "./pages/profile/pages/settings/Settings.tsx";
-import AccountPage from "./pages/profile/pages/settings/pages/account/AccountPage.tsx";
-import AddressesPage from "./pages/profile/pages/settings/pages/addresses/AddressesPage.tsx";
-import AddAddressPage from "./pages/profile/pages/settings/pages/addresses/pages/AddAddressPage.tsx";
-import EditAddressPage from "./pages/profile/pages/settings/pages/addresses/pages/EditAddressPage.tsx";
-import NotificationsPage from "./pages/profile/pages/settings/pages/notification/NotificationsPage.tsx";
-import PrivacyPage from "./pages/profile/pages/settings/pages/privacy/PrivacyPage.tsx";
+import { AdminDashboardLoader } from "@/pages/profile/pages/admin-dashboard/index.ts";
+import { CheckoutLoader } from "@/pages/checkout/index.ts";
 import {
-  AdminDashboardLoader,
-  AdminDashboard,
-  AdminDashboardEvents,
-  AdminDashboardOrders,
-  AdminDashboardAnalytics,
-  AdminDashboardProducts,
-} from "@/pages/profile/pages/admin-dashboard/index.ts";
-import {
-  Checkout,
-  CheckoutLoader,
-  CheckoutAddressSelection,
-  CheckoutPaymentConfirmation,
-  CheckoutPaymentConfirmationLoader,
-} from "@/pages/checkout/index.ts";
-import {
-  CheckoutPaymentStatus,
-  CheckoutPaymentStatusLoader,
-} from "./pages/payment/index.ts";
+  PaymentConfirmationLoader,
+  PaymentStatusLoader,
+} from "@/pages/payment/index.ts";
+import CheckoutEditAddressPage from "./pages/checkout/pages/address-edit/EditAddress.tsx";
+import CheckoutCreateAddressPage from "./pages/checkout/pages/address-create/CreateAddress.tsx";
+import OrderDetailsLoader from "./pages/profile/pages/my-purchases/OrderDetailsLoader.tsx";
+
+const HomePage = lazy(() => import("./pages/home/Home.tsx"));
+const AboutPage = lazy(() => import("./pages/about/About.tsx"));
+const SignupPage = lazy(() =>
+  import("./pages/auth").then((m) => ({ default: m.Signup })),
+);
+const SignupConfirmEmailPage = lazy(() =>
+  import("./pages/auth").then((m) => ({ default: m.SignupConfirmEmail })),
+);
+const LoginPage = lazy(() =>
+  import("./pages/auth").then((m) => ({ default: m.Login })),
+);
+const ForgotPasswordSubmitEmailPage = lazy(() =>
+  import("./pages/auth").then((m) => ({
+    default: m.ForgotPasswordSubmitEmail,
+  })),
+);
+const ForgotPasswordCheckEmailPage = lazy(() =>
+  import("./pages/auth").then((m) => ({ default: m.ForgotPasswordCheckEmail })),
+);
+const ForgotPasswordResetPasswordPage = lazy(() =>
+  import("./pages/auth").then((m) => ({
+    default: m.ForgotPasswordResetPassword,
+  })),
+);
+const CartPage = lazy(() => import("./pages/cart/Cart.tsx"));
+const ContactPage = lazy(() => import("./pages/contact/Contact.tsx"));
+const EventsPage = lazy(() => import("./pages/events/Events.tsx"));
+const PrivacyPolicyPage = lazy(
+  () => import("./pages/privacy-policy/PrivacyPolicy.tsx"),
+);
+const ProfilePage = lazy(() => import("./pages/profile/Profile.tsx"));
+const ShopPage = lazy(() =>
+  import("./pages/shop").then((m) => ({ default: m.Shop })),
+);
+const ShopProductPage = lazy(() =>
+  import("./pages/shop").then((m) => ({ default: m.ShopProduct })),
+);
+const TermsOfServicePage = lazy(
+  () => import("./pages/terms-of-service/TermsOfService.tsx"),
+);
+const FAQPage = lazy(
+  () => import("./pages/frequently-asked-questions/FAQ.tsx"),
+);
+const MyPurchases = lazy(
+  () => import("./pages/profile/pages/my-purchases/MyPurchases.tsx"),
+);
+const MyInquiriesPage = lazy(
+  () => import("./pages/profile/pages/my-inquiries/MyInquiries.tsx"),
+);
+const OrderDetailsPage = lazy(
+  () => import("./pages/profile/pages/my-purchases/OrderDetails.tsx"),
+);
+const SettingsPage = lazy(
+  () => import("./pages/profile/pages/settings/Settings.tsx"),
+);
+const AccountPage = lazy(
+  () => import("./pages/profile/pages/settings/pages/account/AccountPage.tsx"),
+);
+const AddressesPage = lazy(
+  () => import("./pages/profile/pages/addresses/AddressesPage.tsx"),
+);
+const ProfileCreateAddressPage = lazy(
+  () => import("./pages/profile/pages/addresses/pages/CreateAddress.tsx"),
+);
+const ProfileEditAddressPage = lazy(
+  () => import("./pages/profile/pages/addresses/pages/EditAddress.tsx"),
+);
+const NotificationsPage = lazy(
+  () =>
+    import("./pages/profile/pages/settings/pages/notification/NotificationsPage.tsx"),
+);
+const PrivacyPage = lazy(
+  () => import("./pages/profile/pages/settings/pages/privacy/PrivacyPage.tsx"),
+);
+const AdminDashboardPage = lazy(() =>
+  import("@/pages/profile/pages/admin-dashboard/index.ts").then((m) => ({
+    default: m.AdminDashboard,
+  })),
+);
+const AdminDashboardEventsPage = lazy(() =>
+  import("@/pages/profile/pages/admin-dashboard/index.ts").then((m) => ({
+    default: m.AdminDashboardEvents,
+  })),
+);
+const AdminDashboardOrdersPage = lazy(() =>
+  import("@/pages/profile/pages/admin-dashboard/index.ts").then((m) => ({
+    default: m.AdminDashboardOrders,
+  })),
+);
+const AdminDashboardAnalyticsPage = lazy(() =>
+  import("@/pages/profile/pages/admin-dashboard/index.ts").then((m) => ({
+    default: m.AdminDashboardAnalytics,
+  })),
+);
+const AdminDashboardProductsPage = lazy(() =>
+  import("@/pages/profile/pages/admin-dashboard/index.ts").then((m) => ({
+    default: m.AdminDashboardProducts,
+  })),
+);
+const CheckoutPage = lazy(() =>
+  import("@/pages/checkout/index.ts").then((m) => ({ default: m.Checkout })),
+);
+const CheckoutAddressSelectionPage = lazy(() =>
+  import("@/pages/checkout/index.ts").then((m) => ({
+    default: m.CheckoutAddressSelection,
+  })),
+);
+const PaymentConfirmationPage = lazy(() =>
+  import("@/pages/payment/index.ts").then((m) => ({
+    default: m.PaymentConfirmation,
+  })),
+);
+const PaymentStatusPage = lazy(() =>
+  import("./pages/payment/index.ts").then((m) => ({
+    default: m.PaymentStatus,
+  })),
+);
 
 const router = createBrowserRouter([
   {
@@ -60,28 +143,28 @@ const router = createBrowserRouter([
     Component: Root,
     ErrorBoundary: CatchAllErrorPage,
     children: [
-      { index: true, Component: Home },
+      { index: true, Component: HomePage },
 
       {
         path: "auth",
         loader: AuthLoader,
         children: [
-          { path: "signup", Component: Signup },
-          { path: "login", Component: Login },
-          { path: "confirm-email", Component: SignupConfirmEmail },
+          { path: "signup", Component: SignupPage },
+          { path: "login", Component: LoginPage },
+          { path: "confirm-email", Component: SignupConfirmEmailPage },
           {
             path: "forgot-password",
             children: [
-              { index: true, Component: ForgotPasswordSubmitEmail },
+              { index: true, Component: ForgotPasswordSubmitEmailPage },
               {
                 path: "check-email",
                 loader: ForgotPasswordCheckEmailLoader,
-                Component: ForgotPasswordCheckEmail,
+                Component: ForgotPasswordCheckEmailPage,
               },
               {
                 path: "reset-password",
                 loader: ForgotPasswordResetPasswordLoader,
-                Component: ForgotPasswordResetPassword,
+                Component: ForgotPasswordResetPasswordPage,
               },
             ],
           },
@@ -91,17 +174,27 @@ const router = createBrowserRouter([
       {
         path: "profile",
         children: [
-          { index: true, Component: Profile },
+          { index: true, Component: ProfilePage },
           {
             path: "my-purchases",
             children: [
               { index: true, Component: MyPurchases },
-              { path: "item/:itemId", Component: OrderDetails },
+              {
+                path: "order/:orderId",
+                Component: OrderDetailsPage,
+                loader: OrderDetailsLoader,
+              },
             ],
           },
+
+          {
+            path: "my-inquiries",
+            Component: MyInquiriesPage,
+          },
+
           {
             path: "settings",
-            Component: Settings,
+            Component: SettingsPage,
             children: [
               { index: true, loader: () => redirect("account") },
               {
@@ -112,29 +205,30 @@ const router = createBrowserRouter([
               { path: "privacy", Component: PrivacyPage },
             ],
           },
+
           {
             path: "addresses",
             children: [
               { index: true, Component: AddressesPage },
-              { path: "add", Component: AddAddressPage },
-              { path: ":addressId/edit", Component: EditAddressPage },
+              { path: "add", Component: ProfileCreateAddressPage },
+              { path: ":addressId/edit", Component: ProfileEditAddressPage },
             ],
           },
+
           {
             path: "admin",
             loader: AdminDashboardLoader,
-            HydrateFallback: RouteLoaderSpinner,
-            Component: AdminDashboard,
+            Component: AdminDashboardPage,
             children: [
               {
                 index: true,
                 loader: () => redirect("products"),
-                Component: AdminDashboardProducts,
+                Component: AdminDashboardProductsPage,
               },
-              { path: "products", Component: AdminDashboardProducts },
-              { path: "orders", Component: AdminDashboardOrders },
-              { path: "analytics", Component: AdminDashboardAnalytics },
-              { path: "events", Component: AdminDashboardEvents },
+              { path: "products", Component: AdminDashboardProductsPage },
+              { path: "orders", Component: AdminDashboardOrdersPage },
+              { path: "analytics", Component: AdminDashboardAnalyticsPage },
+              { path: "events", Component: AdminDashboardEventsPage },
             ],
           },
         ],
@@ -143,10 +237,10 @@ const router = createBrowserRouter([
       {
         path: "shop",
         children: [
-          { index: true, Component: Shop },
+          { index: true, Component: ShopPage },
           {
             path: "products/:id",
-            Component: ShopProduct,
+            Component: ShopProductPage,
           },
         ],
       },
@@ -154,39 +248,50 @@ const router = createBrowserRouter([
       {
         path: "checkout/:sessionId",
         children: [
-          { index: true, Component: Checkout, loader: CheckoutLoader },
+          { index: true, Component: CheckoutPage, loader: CheckoutLoader },
           {
-            path: "address-selection",
-            Component: CheckoutAddressSelection,
+            path: "address/selection",
+            Component: CheckoutAddressSelectionPage,
             loader: CheckoutLoader,
           },
           {
-            path: "order/:orderId/pay",
-            Component: CheckoutPaymentConfirmation,
-            loader: CheckoutPaymentConfirmationLoader,
+            path: "address/:addressId/edit",
+            Component: CheckoutEditAddressPage,
+            loader: CheckoutLoader,
+          },
+          {
+            path: "address/create",
+            Component: CheckoutCreateAddressPage,
+            loader: CheckoutLoader,
           },
         ],
       },
 
       {
-        path: "payment/:paymentId/status",
-        Component: CheckoutPaymentStatus,
-        loader: CheckoutPaymentStatusLoader,
+        path: "payment/:paymentId/confirm",
+        Component: PaymentConfirmationPage,
+        loader: PaymentConfirmationLoader,
       },
 
-      { path: "events", Component: Events },
+      {
+        path: "payment/:paymentId/status",
+        Component: PaymentStatusPage,
+        loader: PaymentStatusLoader,
+      },
 
-      { path: "cart", Component: Cart },
+      { path: "events", Component: EventsPage },
 
-      { path: "contact", Component: Contact },
+      { path: "cart", Component: CartPage },
 
-      { path: "terms-of-service", Component: TermsOfService },
+      { path: "contact", Component: ContactPage },
 
-      { path: "privacy-policy", Component: PrivacyPolicy },
+      { path: "terms-of-service", Component: TermsOfServicePage },
 
-      { path: "about", Component: About },
+      { path: "privacy-policy", Component: PrivacyPolicyPage },
 
-      { path: "FAQ", Component: FAQ },
+      { path: "about", Component: AboutPage },
+
+      { path: "FAQ", Component: FAQPage },
     ],
   },
 ]);

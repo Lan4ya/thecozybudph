@@ -1,15 +1,16 @@
 import { RouteHandler } from "@hono/zod-openapi";
 import { OrderActions } from "@shared/modules/order/mod.ts";
 import { AppEnv } from "@shared/types.d.ts";
-import { requireBindings, requireVariables } from "@shared/utils/mod.ts";
+import { isDev, requireBindings, requireVariables } from "@shared/utils/mod.ts";
+import { Context } from "hono";
 import {
   createOrderRoute,
+  getOrderWithItemsRoute,
   getOrderPaymentStatusRoute,
-  getOrderItemRoute,
+  getOrderStatusRoute,
   payOrderRoute,
   queryOrdersRoute,
 } from "./order-routes.ts";
-import { Context } from "hono";
 
 export const queryOrderHandler: RouteHandler<
   typeof queryOrdersRoute,
@@ -22,14 +23,25 @@ export const queryOrderHandler: RouteHandler<
   return c.json({ data: data }, 200);
 };
 
-export const getOrderItemHandler: RouteHandler<
-  typeof getOrderItemRoute,
+export const getOrderStatusHandler: RouteHandler<
+  typeof getOrderStatusRoute,
+  AppEnv
+> = async (c) => {
+  const { db } = requireVariables(c, "db");
+  const { id } = c.req.valid("param");
+  const data = await OrderActions.getOrderStatus(db, id);
+  isDev && console.log(data);
+  return c.json({ data }, 200);
+};
+
+export const getOrderWithItemsHandler: RouteHandler<
+  typeof getOrderWithItemsRoute,
   AppEnv
 > = async (c) => {
   const { claims, db } = requireVariables(c, "claims", "db");
   const profileId = claims.sub;
-  const { id: itemId } = c.req.valid("param");
-  const data = await OrderActions.getOrderItem(db, itemId, profileId);
+  const { id: orderId } = c.req.valid("param");
+  const data = await OrderActions.getOrderItem(db, orderId, profileId);
   return c.json({ data }, 200);
 };
 
@@ -51,7 +63,8 @@ export const createOrderHandler: RouteHandler<
     payload,
     idempotencyKey,
   });
-  return c.json({ data }, 200);
+  isDev && console.log({ data });
+  return c.json({ data }, 201);
 };
 
 export const payOrderHandler: RouteHandler<
@@ -78,7 +91,8 @@ export const getOrderPaymentStatusHandler: RouteHandler<
 > = async (c) => {
   const { db } = requireVariables(c, "db");
   const { id: paymentId } = c.req.valid("param");
-  const data = await OrderActions.getOrderPaymentStatus(db, paymentId);
+  const data = await OrderActions.getActivePaymentStatus(db, paymentId);
+  console.log({ data });
   return c.json({ data }, 200);
 };
 

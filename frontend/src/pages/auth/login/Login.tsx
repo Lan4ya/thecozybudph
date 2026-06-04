@@ -20,7 +20,7 @@ import { useForm, useWatch, Controller } from "react-hook-form";
 import isDev from "@/lib/utils/isDev";
 import { handleError } from "@/lib/utils/format";
 import SideImage from "../SideImage";
-import { OAuathSignin } from "../OAuathSignin";
+import { OAuthSignin } from "../OAuthSignin";
 import { Turnstile } from "@marsidev/react-turnstile";
 
 import { useMutation } from "@tanstack/react-query";
@@ -73,7 +73,7 @@ const Login = () => {
   const handleSignInWithOAuth = async () => {
     clearErrors();
     try {
-      const { data } = await OAuathSignin();
+      const { data } = await OAuthSignin();
       isDev && console.log({ data });
     } catch (err: unknown) {
       const message = handleError(err);
@@ -118,12 +118,12 @@ const Login = () => {
       <div className="flex flex-col lg:justify-center h-full max-w-md">
         <Link
           to="/"
-          className="p-2 mb-10 text-sm w-24 flex-center gap-1 border rounded-lg "
+          className="p-2 mb-6 xl:mb-10  text-sm w-24 flex-center gap-1 border rounded-lg "
         >
           <ArrowLeft className="size-4" /> Home
         </Link>
 
-        <div className="px-4 w-full py-3 mb-6 flex-center">
+        <div className="px-4 w-full py-3 mb-2 xl:mb-6 flex-center">
           <img
             loading="eager"
             decoding="sync"
@@ -223,7 +223,7 @@ const Login = () => {
                       options={{
                         theme: "dark",
                         size: "flexible",
-                        appearance: "always",
+                        appearance: "interaction-only",
                       }}
                       onSuccess={(token: string) => field.onChange(token)}
                       onExpire={() => field.onChange("")}

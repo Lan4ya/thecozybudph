@@ -70,7 +70,10 @@ export type Database = {
           city: string
           full_name: string
           id: string
+          is_company_address: boolean
           is_default: boolean
+          latitude: number
+          longitude: number
           phone_number: string
           postal_code: string
           profile_id: string | null
@@ -83,7 +86,10 @@ export type Database = {
           city: string
           full_name: string
           id?: string
+          is_company_address?: boolean
           is_default?: boolean
+          latitude: number
+          longitude: number
           phone_number: string
           postal_code: string
           profile_id?: string | null
@@ -96,7 +102,10 @@ export type Database = {
           city?: string
           full_name?: string
           id?: string
+          is_company_address?: boolean
           is_default?: boolean
+          latitude?: number
+          longitude?: number
           phone_number?: string
           postal_code?: string
           profile_id?: string | null
@@ -191,6 +200,68 @@ export type Database = {
           },
         ]
       }
+      event_inquiries: {
+        Row: {
+          admin_note: string | null
+          budget: string | null
+          created_at: string
+          email: string
+          event_date: string
+          event_type: string
+          guest_count: number | null
+          id: string
+          message: string
+          name: string
+          phone: string
+          profile_id: string | null
+          status: string
+          updated_at: string
+          venue: string | null
+        }
+        Insert: {
+          admin_note?: string | null
+          budget?: string | null
+          created_at?: string
+          email: string
+          event_date: string
+          event_type: string
+          guest_count?: number | null
+          id?: string
+          message: string
+          name: string
+          phone: string
+          profile_id?: string | null
+          status?: string
+          updated_at?: string
+          venue?: string | null
+        }
+        Update: {
+          admin_note?: string | null
+          budget?: string | null
+          created_at?: string
+          email?: string
+          event_date?: string
+          event_type?: string
+          guest_count?: number | null
+          id?: string
+          message?: string
+          name?: string
+          phone?: string
+          profile_id?: string | null
+          status?: string
+          updated_at?: string
+          venue?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_inquiries_profile_id_profiles_id_fk"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       idempotency_keys: {
         Row: {
           created_at: string | null
@@ -258,6 +329,8 @@ export type Database = {
           city: string
           full_name: string
           id: string
+          latitude: number
+          longitude: number
           order_id: string
           phone_number: string
           postal_code: string
@@ -270,6 +343,8 @@ export type Database = {
           city: string
           full_name: string
           id?: string
+          latitude: number
+          longitude: number
           order_id: string
           phone_number: string
           postal_code: string
@@ -282,6 +357,8 @@ export type Database = {
           city?: string
           full_name?: string
           id?: string
+          latitude?: number
+          longitude?: number
           order_id?: string
           phone_number?: string
           postal_code?: string
@@ -300,31 +377,31 @@ export type Database = {
       }
       order_creation_requests: {
         Row: {
-          created_at: string | null
+          created_at: string
           id: string
           idempotency_key: string
           order_id: string | null
           profile_id: string
           status: string
-          updated_at: string | null
+          updated_at: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           id?: string
           idempotency_key: string
           order_id?: string | null
           profile_id: string
           status?: string
-          updated_at?: string | null
+          updated_at?: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           id?: string
           idempotency_key?: string
           order_id?: string | null
           profile_id?: string
           status?: string
-          updated_at?: string | null
+          updated_at?: string
         }
         Relationships: [
           {
@@ -412,52 +489,49 @@ export type Database = {
       }
       orders: {
         Row: {
-          created_at: string | null
+          created_at: string
           discount_cents: number
           expires_at: string
           id: string
           pass_on_fee: number
           profile_id: string
           service_type: string
-          shipment_order_id: string | null
           shipping_cents: number
           source: string
           status: string
           subtotal_cents: number
           total_cents: number
-          updated_at: string | null
+          updated_at: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           discount_cents?: number
           expires_at: string
           id?: string
           pass_on_fee: number
           profile_id: string
           service_type: string
-          shipment_order_id?: string | null
           shipping_cents: number
           source: string
           status?: string
           subtotal_cents: number
           total_cents: number
-          updated_at?: string | null
+          updated_at?: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           discount_cents?: number
           expires_at?: string
           id?: string
           pass_on_fee?: number
           profile_id?: string
           service_type?: string
-          shipment_order_id?: string | null
           shipping_cents?: number
           source?: string
           status?: string
           subtotal_cents?: number
           total_cents?: number
-          updated_at?: string | null
+          updated_at?: string
         }
         Relationships: [
           {
@@ -475,14 +549,13 @@ export type Database = {
           created_at: string | null
           currency: string
           id: string
-          is_active: boolean
           method: string | null
           order_id: string
           paid_at: string | null
           payment_id: string | null
           payment_intent_id: string | null
           profile_id: string
-          status: string
+          status: Database["public"]["Enums"]["payment_status"]
           updated_at: string | null
         }
         Insert: {
@@ -490,14 +563,13 @@ export type Database = {
           created_at?: string | null
           currency?: string
           id?: string
-          is_active?: boolean
           method?: string | null
           order_id: string
           paid_at?: string | null
           payment_id?: string | null
           payment_intent_id?: string | null
           profile_id: string
-          status?: string
+          status?: Database["public"]["Enums"]["payment_status"]
           updated_at?: string | null
         }
         Update: {
@@ -505,14 +577,13 @@ export type Database = {
           created_at?: string | null
           currency?: string
           id?: string
-          is_active?: boolean
           method?: string | null
           order_id?: string
           paid_at?: string | null
           payment_id?: string | null
           payment_intent_id?: string | null
           profile_id?: string
-          status?: string
+          status?: Database["public"]["Enums"]["payment_status"]
           updated_at?: string | null
         }
         Relationships: [
@@ -678,6 +749,99 @@ export type Database = {
         }
         Relationships: []
       }
+      shipments: {
+        Row: {
+          cancel_party: string | null
+          cancel_reason: string | null
+          created_at: string
+          delivered_at: string | null
+          driver_id: string | null
+          driver_image_url: string | null
+          driver_location: string | null
+          driver_name: string | null
+          driver_phone: string | null
+          driver_plate_number: string | null
+          driver_share_link: string | null
+          failed_at: string | null
+          id: string
+          lalamove_order_id: string | null
+          lalamove_quotation_id: string | null
+          order_id: string
+          pod_image_url: string | null
+          pod_status: Database["public"]["Enums"]["pod_status"] | null
+          schedule_at: string | null
+          share_link: string | null
+          shipment_status: Database["public"]["Enums"]["shipment_status"] | null
+          shipment_status_updated_at: string | null
+          total_cents: number | null
+          updated_at: string
+        }
+        Insert: {
+          cancel_party?: string | null
+          cancel_reason?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          driver_id?: string | null
+          driver_image_url?: string | null
+          driver_location?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate_number?: string | null
+          driver_share_link?: string | null
+          failed_at?: string | null
+          id?: string
+          lalamove_order_id?: string | null
+          lalamove_quotation_id?: string | null
+          order_id: string
+          pod_image_url?: string | null
+          pod_status?: Database["public"]["Enums"]["pod_status"] | null
+          schedule_at?: string | null
+          share_link?: string | null
+          shipment_status?:
+            | Database["public"]["Enums"]["shipment_status"]
+            | null
+          shipment_status_updated_at?: string | null
+          total_cents?: number | null
+          updated_at?: string
+        }
+        Update: {
+          cancel_party?: string | null
+          cancel_reason?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          driver_id?: string | null
+          driver_image_url?: string | null
+          driver_location?: string | null
+          driver_name?: string | null
+          driver_phone?: string | null
+          driver_plate_number?: string | null
+          driver_share_link?: string | null
+          failed_at?: string | null
+          id?: string
+          lalamove_order_id?: string | null
+          lalamove_quotation_id?: string | null
+          order_id?: string
+          pod_image_url?: string | null
+          pod_status?: Database["public"]["Enums"]["pod_status"] | null
+          schedule_at?: string | null
+          share_link?: string | null
+          shipment_status?:
+            | Database["public"]["Enums"]["shipment_status"]
+            | null
+          shipment_status_updated_at?: string | null
+          total_cents?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipments_order_id_orders_id_fk"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       webhook_events: {
         Row: {
           created_at: string | null
@@ -725,6 +889,23 @@ export type Database = {
     }
     Enums: {
       cooldown_type: "otp_sms" | "email_verification" | "password_reset"
+      payment_status:
+        | "confirming"
+        | "processing"
+        | "pending"
+        | "paid"
+        | "failed"
+        | "cancelled"
+        | "refunded"
+      pod_status: "FAILED" | "DELIVERED" | "SIGNED"
+      shipment_status:
+        | "ASSIGNING_DRIVER"
+        | "ON_GOING"
+        | "PICKED_UP"
+        | "COMPLETED"
+        | "CANCELLED"
+        | "REJECTED"
+        | "EXPIRED"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -856,6 +1037,25 @@ export const Constants = {
   public: {
     Enums: {
       cooldown_type: ["otp_sms", "email_verification", "password_reset"],
+      payment_status: [
+        "confirming",
+        "processing",
+        "pending",
+        "paid",
+        "failed",
+        "cancelled",
+        "refunded",
+      ],
+      pod_status: ["FAILED", "DELIVERED", "SIGNED"],
+      shipment_status: [
+        "ASSIGNING_DRIVER",
+        "ON_GOING",
+        "PICKED_UP",
+        "COMPLETED",
+        "CANCELLED",
+        "REJECTED",
+        "EXPIRED",
+      ],
     },
   },
 } as const

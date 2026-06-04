@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils/cn";
 import { Flower } from "lucide-react";
 
-export const RouteLoaderSpinner = ({
+export const RouteLoaderFlowerSpinner = ({
   className,
   ...props
 }: React.ComponentProps<"svg">) => {
@@ -20,7 +20,7 @@ export const FlowerSpinner = ({
     <Flower
       role="status"
       aria-label="Loading"
-      className={cn("size-8! lg:size-10! text-primary animate-spin", className)}
+      className={cn("size-9! lg:size-11! text-primary animate-spin", className)}
       {...props}
     />
   );

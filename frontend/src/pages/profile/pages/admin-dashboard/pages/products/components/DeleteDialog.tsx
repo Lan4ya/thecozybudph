@@ -29,7 +29,10 @@ export function DeleteProductDialog({
           variant="destructive"
           size="sm"
           disabled={deleteLoading}
-          className={cn(deleteLoading && "opacity-70 pointer-events-none", className)}
+          className={cn(
+            deleteLoading && "opacity-70 pointer-events-none",
+            className,
+          )}
           aria-label={`Delete product`}
         >
           {deleteLoading && <Spinner />} Delete

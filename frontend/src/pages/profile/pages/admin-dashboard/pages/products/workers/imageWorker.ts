@@ -1,6 +1,4 @@
-// Tells ts compiler that this file is a Web Worker, not a normal
-// window/browser context so it doens't comaplain:
-// <reference lib="webworker" />
+/// <reference lib="webworker" />
 
 interface WorkerInput {
   id: string;
@@ -24,7 +22,9 @@ export type ImageCompressorWorkerOutput =
   | WorkerOutputSuccess
   | WorkerOutputError;
 
-self.onmessage = async (e: MessageEvent<WorkerInput>) => {
+const workerCtx = self as unknown as DedicatedWorkerGlobalScope;
+
+workerCtx.onmessage = async (e: MessageEvent<WorkerInput>) => {
   const { id, buffer, type } = e.data;
 
   try {
@@ -60,13 +60,14 @@ self.onmessage = async (e: MessageEvent<WorkerInput>) => {
       buffer: outBuffer,
     };
 
-    self.postMessage(message, [outBuffer]);
-  } catch (err: any) {
+    workerCtx.postMessage(message, [outBuffer]);
+  } catch (err) {
+    const errorMsg = err instanceof Error ? err.message : "Unknown error";
     const message: WorkerOutputError = {
       id,
       success: false,
-      error: err?.message || "Unknown error",
+      error: errorMsg,
     };
-    self.postMessage(message);
+    workerCtx.postMessage(message);
   }
 };

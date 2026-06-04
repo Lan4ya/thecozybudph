@@ -1,27 +1,38 @@
 import app from "@functions/admin/index.ts";
 import { adminDb } from "@shared/db/client.ts";
-import { products } from "@shared/schemas/index.ts";
+import { CreateProductInput, products } from "@shared/schemas/index.ts";
 import { assert, assertEquals } from "@std/assert";
-import { afterAll, describe, it } from "@std/testing/bdd";
-import { inArray } from "drizzle-orm";
+import { afterAll, beforeAll, describe, it } from "@std/testing/bdd";
+import { inArray, sql } from "drizzle-orm";
 import { getTestToken, getTestAdminToken } from "../helpers/utils.ts";
 import { genCreateProductForm } from "../helpers/inputs.ts";
 
 describe("Admin Products API", () => {
   const createdProductIds: string[] = [];
 
+  const getTestName = (name = "Rose Bouquet") => `${name} (${crypto.randomUUID()})`;
+
+  beforeAll(async () => {
+    // Cleanup any leaked products from previous runs
+    await adminDb.transaction(async (tx) => {
+      await tx.delete(products).where(sql`name LIKE 'Rose Bouquet%'`);
+    });
+  });
+
   afterAll(async () => {
     if (createdProductIds.length > 0) {
-      await adminDb
-        .delete(products)
-        .where(inArray(products.id, createdProductIds));
+      await adminDb.transaction(async (tx) => {
+        await tx
+          .delete(products)
+          .where(inArray(products.id, createdProductIds));
+      });
     }
   });
 
   it("returns 401 Unauthorized when no token is provided", async () => {
     const res = await app.request("/admin/product", {
       method: "POST",
-      // @ts-ignore
+      // @ts-ignore -- Deno and Node type incompatibily
       body: genCreateProductForm(),
     });
 
@@ -50,12 +61,17 @@ describe("Admin Products API", () => {
     };
   };
 
-  const createSeedProduct = async (overrides: any = {}) => {
+  const createSeedProduct = async (
+    overrides: Partial<CreateProductInput> = {},
+  ) => {
     const headers = await authHeaders();
     const res = await app.request("/admin/product", {
       method: "POST",
       // @ts-ignore -- Deno and Node type incompatibily
-      body: genCreateProductForm(overrides),
+      body: genCreateProductForm({
+        name: getTestName(overrides.name),
+        ...overrides,
+      }),
       headers,
     });
 
@@ -138,7 +154,7 @@ describe("Admin Products API", () => {
     const fakeId = crypto.randomUUID();
     const res = await app.request(`/admin/product/${fakeId}`, {
       method: "PATCH",
-      // @ts-ignore
+      // @ts-ignore -- Deno and Node type incompatibily
       body: genCreateProductForm(),
       headers,
     });

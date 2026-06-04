@@ -1,0 +1,1 @@
+ALTER TABLE "shipments" ADD COLUMN "schedule_at" timestamp with time zone;

@@ -1,12 +1,13 @@
 import {
-  type Address,
+  type AddressData,
   type CreateAddressInput,
   type UpdateAddressInput,
 } from "@cozybud/schemas";
 import { client, unwrapData } from "./_client";
+import isDev from "@/lib/utils/isDev";
 
 export const AddressAPI = {
-  createAddress: async (payload: CreateAddressInput): Promise<Address> => {
+  createAddress: async (payload: CreateAddressInput): Promise<AddressData> => {
     const { data } = await client.address.POST("/address", {
       body: payload,
     });
@@ -16,7 +17,7 @@ export const AddressAPI = {
   updateAddress: async (
     payload: UpdateAddressInput,
     addressId: string,
-  ): Promise<Address> => {
+  ): Promise<AddressData> => {
     const { data } = await client.address.PATCH("/address/{id}", {
       params: { path: { id: addressId } },
       body: payload,
@@ -24,12 +25,13 @@ export const AddressAPI = {
     return unwrapData(data, "PATCH /address");
   },
 
-  getAddresses: async (): Promise<Address[]> => {
+  getAddresses: async (): Promise<AddressData[]> => {
     const { data } = await client.address.GET("/address");
+    isDev && console.log("fetching addresses...");
     return unwrapData(data, "GET /address");
   },
 
-  getDefaultAddress: async (): Promise<Address | null> => {
+  getDefaultAddress: async (): Promise<AddressData | null> => {
     const { data } = await client.address.GET("/address/default");
     return unwrapData(data, "GET /address/default");
   },

@@ -52,6 +52,8 @@ export type DrizzleClient = {
   rls: AdminDb["transaction"];
 };
 
+export type DrizzleClientAdminTransaction = (typeof adminDb)["transaction"];
+
 export type DrizzleClientTransactionRLS = Parameters<
   DrizzleClient["rls"]
 >[0] extends (tx: infer T) => unknown
@@ -100,13 +102,9 @@ export function createDrizzle(token?: JwtPayload): DrizzleClient {
           if (token) {
             await tx.execute(sql`
           -- auth.jwt()
-          select set_config('request.jwt.claims', '${sql.raw(
-            JSON.stringify(token),
-          )}', TRUE);
+          select set_config('request.jwt.claims', '${sql.raw(JSON.stringify(token))}', TRUE);
           -- auth.uid()
-          select set_config('request.jwt.claim.sub', '${sql.raw(
-            token.sub ?? "",
-          )}', TRUE);												
+          select set_config('request.jwt.claim.sub', '${sql.raw(token.sub ?? "")}', TRUE);												
           -- set local role
           set local role ${sql.raw(token.role ?? "anon")};
           `);

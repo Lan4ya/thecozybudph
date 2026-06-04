@@ -3,7 +3,7 @@ import { payments } from "../../drizzle/index.ts";
 
 export type InsertPayment = Omit<
   InferInsertModel<typeof payments>,
-  "id" | "paidAt" | "paymentId" | "status" | "isActive"
+  "id" | "paidAt" | "paymentId" | "status"
 >;
 
 export type UpdatePayment = Partial<InferInsertModel<typeof payments>>;

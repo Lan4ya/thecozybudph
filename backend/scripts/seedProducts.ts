@@ -3,9 +3,12 @@ import path from "node:path";
 import pLimit from "p-limit";
 import { z } from "zod";
 import { createProductSchema } from "@cozybud/schemas";
-import { ADMIN_EMAIL, ADMIN_PASSWORD } from "./seedAdmin.ts";
 import { supabase } from "./helpers/supabase.ts";
 import { convertToOptimalWebp } from "./helpers/convertToOptimalWebp.ts";
+import {
+  TEST_ADMIN_EMAIL,
+  TEST_ADMIN_PASSWORD,
+} from "./helpers/createAdminOrGet.ts";
 
 type CreateProductPayload = { id?: string };
 
@@ -351,8 +354,8 @@ export async function seedProducts(
 
   const { data: authData, error: authError } =
     await supabase.auth.signInWithPassword({
-      email: ADMIN_EMAIL,
-      password: ADMIN_PASSWORD,
+      email: TEST_ADMIN_EMAIL,
+      password: TEST_ADMIN_PASSWORD,
     });
 
   if (authError || !authData.session?.access_token) {

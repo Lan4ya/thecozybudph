@@ -2,19 +2,19 @@ import { ShoppingCart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router";
-import { cn } from "@/lib/utils/cn";
 import { ProgressiveImage } from "../ProgressiveImage";
 import isDev from "@/lib/utils/isDev";
 import { supabase } from "@/lib/supabase/client";
 import type { Session } from "@supabase/supabase-js";
+import { cn } from "@/lib/utils/cn";
 
 const navItems = [
   { label: "Shop", href: "/shop" },
   { label: "Events", href: "/events" },
   { label: "About", href: "/about" },
+  { label: "FAQ", href: "/FAQ" },
   { label: "Sign up", href: "/auth/signup" },
   { label: "Log in", href: "/auth/login" },
-  { label: "Profile", href: "/profile" },
 ];
 
 export const DesktopNavLinks = ({
@@ -72,10 +72,6 @@ export const DesktopNavLinks = ({
     >
       {/* Links */}
       {navItems.map(({ label, href }) => {
-        if (label === "Profile" && !session) {
-          return null;
-        }
-
         if ((label === "Sign up" || label === "Log in") && session) {
           return null;
         }
@@ -90,21 +86,13 @@ export const DesktopNavLinks = ({
               to={href}
               className={cn(
                 "text-foreground text-lg font-medium transition-colors flex items-center justify-center",
-                label === "Profile" && "size-9.5",
+                label === "Sign up" &&
+                  "-mr-3 cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-1 rounded-lg",
+                label === "Log in" &&
+                  "cursor-pointer border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 rounded-lg px-4 py-1",
               )}
             >
-              {label === "Profile" ? (
-                <div className="size-full rounded-full overflow-hidden border border-border">
-                  <ProgressiveImage
-                    decoding="sync"
-                    isEager={true}
-                    src={avatar}
-                    alt="Profile"
-                  />
-                </div>
-              ) : (
-                label
-              )}
+              {label}
             </NavLink>
 
             <AnimatePresence>
@@ -161,6 +149,46 @@ export const DesktopNavLinks = ({
           )}
         </AnimatePresence>
       </div>
+
+      {/* Profile */}
+      {session && (
+        <div
+          className="relative flex flex-col items-center justify-center h-full"
+          onMouseEnter={() => setHovered("/profile")}
+        >
+          <NavLink
+            to="/profile"
+            className="text-foreground text-lg font-medium transition-colors flex items-center justify-center size-9.5"
+          >
+            <div className="size-full rounded-full overflow-hidden border border-border">
+              <ProgressiveImage
+                decoding="sync"
+                isEager={true}
+                src={avatar}
+                alt="Profile"
+              />
+            </div>
+          </NavLink>
+
+          <AnimatePresence>
+            {active === "/profile" && (
+              <motion.div
+                layoutId="nav-underline"
+                className="absolute -bottom-2 h-0.5 bg-primary rounded-full w-full"
+                initial={{ opacity: 0, scaleX: 0.8 }}
+                animate={{ opacity: 1, scaleX: 1 }}
+                exit={{ opacity: 0, scaleX: 0.8 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 400,
+                  damping: 26,
+                  mass: 0.3,
+                }}
+              />
+            )}
+          </AnimatePresence>
+        </div>
+      )}
     </div>
   );
 };

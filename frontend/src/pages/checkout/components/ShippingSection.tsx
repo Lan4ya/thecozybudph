@@ -1,14 +1,22 @@
-import { motion } from "framer-motion";
-import { Truck } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { useCheckoutStore } from "../store/useCheckoutStore";
+import { AdminAPI } from "@/api";
 import { CheckoutShippingOptionSkeleton } from "@/lib/ui/skeletons/CheckoutShippingOptionSkeleton";
+import { cn } from "@/lib/utils/cn";
+import { capitalizeFirstLetter } from "@/lib/utils/format";
+import { useQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
+import { Truck, XCircle } from "lucide-react";
 import { useEffect } from "react";
-import { ShipmentAPI } from "@/api";
-import { createShippingQuoteQK } from "../queryKeys";
-import { ShippingOption } from "./ShippingOption";
+import { Link } from "react-router";
 
 const SERVICE_TYPES = ["motorcycle", "sedan"] as const;
+
+import type { AddressData } from "@cozybud/schemas";
+import { useCheckoutStore } from "@/store/useCheckoutStore";
+
+export const createShippingQuoteQK = (address: AddressData | null) => [
+  "shipping-quote",
+  address,
+];
 
 const ShippingSection = () => {
   const addressStore = useCheckoutStore((s) => s.address);
@@ -24,17 +32,8 @@ const ShippingSection = () => {
     queryFn: () => {
       if (!addressStore) throw new Error("Missing address");
 
-      return ShipmentAPI.createShippingQuote({
-        recipientAddress: {
-          addressLine: addressStore.addressLine,
-          postalCode: addressStore.postalCode,
-          region: addressStore.region,
-          city: addressStore.city,
-          province: addressStore.province ?? undefined,
-          barangay: addressStore.barangay.toLowerCase().startsWith("barangay")
-            ? addressStore.barangay
-            : `Barangray ${addressStore.barangay}`,
-        },
+      return AdminAPI.createShipmentQuote({
+        recipientAddressId: addressStore.id,
       });
     },
     meta: { persist: true },
@@ -82,25 +81,37 @@ const ShippingSection = () => {
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="text-sm space-y-3">
+        {isFetching && <CheckoutShippingOptionSkeleton />}
+
         {!isFetching && error && (
-          <div className="text-destructive text-sm">
-            Failed loading shipping options. Make sure the address you're using
-            is serviceable to Lalamove. See full list of{" "}
-            <a
-              href="https://www.lalamove.com/en-ph/serviceable-areas"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-link"
-            >
-              serviceable areas
-            </a>
+          <div className="flex gap-3 border border-destructive/15 bg-destructive/5 rounded-xl p-4 text-sm max-w-xl">
+            <div className="shrink-0 p-1 rounded-full text-destructive">
+              <XCircle className="size-5" />
+            </div>
+
+            <div className="space-y-1">
+              <h5 className="font-semibold text-destructive leading-none">
+                Failed to retrieve shipping prices
+              </h5>
+              <p className="text-muted-foreground leading-relaxed">
+                Make sure the address you're using is serviceable to Lalamove.
+                See the full list of{" "}
+                <Link
+                  to="https://www.lalamove.com/en-ph/serviceable-areas"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-link"
+                >
+                  serviceable areas
+                </Link>
+                .
+              </p>
+            </div>
           </div>
         )}
 
-        {isFetching && <CheckoutShippingOptionSkeleton />}
-
-        {!isFetching && (
+        {!isFetching && !error && (
           <>
             {SERVICE_TYPES.map((type) => {
               const quote = quotations?.find(
@@ -132,6 +143,68 @@ const ShippingSection = () => {
         )}
       </div>
     </motion.div>
+  );
+};
+
+interface ShippingOptionProps {
+  serviceType: string;
+  price?: string | number;
+  isSelected: boolean;
+  onSelect?: () => void;
+  disabled?: boolean;
+}
+
+const ShippingOption = ({
+  serviceType,
+  price,
+  isSelected,
+  onSelect,
+  disabled = false,
+}: ShippingOptionProps) => {
+  const normalizedServiceType = serviceType.toLowerCase();
+
+  return (
+    <label
+      className={cn(
+        "flex items-start justify-between p-3 rounded-lg border transition-all",
+        !disabled
+          ? "cursor-pointer"
+          : "cursor-not-allowed opacity-60 grayscale-[0.5]",
+        isSelected && !disabled
+          ? "border-primary bg-primary/5"
+          : "border-border/40",
+        !disabled && !isSelected && "hover:border-primary/50",
+      )}
+    >
+      <div className="flex items-start gap-3">
+        <input
+          type="radio"
+          name="shippingOption"
+          value={normalizedServiceType}
+          checked={isSelected}
+          onChange={!disabled ? onSelect : undefined}
+          disabled={disabled}
+          className={cn(
+            "mt-1 text-primary focus:ring-primary",
+            disabled && "cursor-not-allowed",
+          )}
+        />
+
+        <div>
+          <p className="font-medium text-foreground">
+            {capitalizeFirstLetter(normalizedServiceType)}
+          </p>
+
+          <p className="pl-px text-xs text-muted-foreground">
+            {normalizedServiceType === "sedan" && "recommended for safety"}
+          </p>
+        </div>
+      </div>
+
+      {price !== undefined && !disabled && (
+        <p className="font-semibold text-sm text-foreground">₱{price}</p>
+      )}
+    </label>
   );
 };
 

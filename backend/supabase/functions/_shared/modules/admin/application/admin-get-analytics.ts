@@ -11,7 +11,7 @@ import { DrizzleClient } from "../../../db/client.ts";
 export const getAnalytics = async (
   db: DrizzleClient,
 ): Promise<AdminAnalyticsRes> => {
-  // 1. Key Metrics
+  // Key Metrics
   const [revenueRes] = await db.admin
     .select({ total: sum(orders.totalCents) })
     .from(orders)
@@ -29,10 +29,13 @@ export const getAnalytics = async (
   // Conversion rate is tricky without a visits table. Mocking it for now.
   const totalRevenue = (Number(revenueRes?.total || 0) / 100).toLocaleString(
     "en-PH",
-    { style: "currency", currency: "PHP" },
+    {
+      style: "currency",
+      currency: "PHP",
+    },
   );
 
-  // 2. Revenue Trend (last 30 days)
+  // Revenue Trend (last 30 days)
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -51,7 +54,7 @@ export const getAnalytics = async (
     )
     .orderBy(sql`TO_CHAR(${orders.createdAt}, 'YYYY-MM-DD')`);
 
-  // 3. Category Sales
+  // Category Sales
   const categorySalesRaw = await db.admin
     .select({
       name: orderItemsSnapshots.category,
@@ -74,7 +77,7 @@ export const getAnalytics = async (
     color: colors[i % colors.length],
   }));
 
-  // 4. Top Products
+  // Top Products
   const topProducts = await db.admin
     .select({
       name: orderItemsSnapshots.name,
@@ -92,7 +95,7 @@ export const getAnalytics = async (
     )
     .limit(5);
 
-  // 5. Daily Orders
+  // Daily Orders
   const dailyOrders = await db.admin
     .select({
       date: sql<string>`TO_CHAR(${orders.createdAt}, 'Dy')`,
@@ -118,7 +121,7 @@ export const getAnalytics = async (
     { month: "June", customers: 92 },
   ];
 
-  // 7. Recent Transactions
+  // Recent Transactions
   const recentTransactionsRaw = await db.admin
     .select({
       id: orders.id,

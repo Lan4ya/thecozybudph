@@ -26,6 +26,11 @@ export interface CreatePaymentIntentResponse {
     attributes: {
       amount: number;
       client_key: string;
+      status:
+        | "awaiting_payment_method"
+        | "awaiting_next_action"
+        | "succeeded"
+        | "processing";
     };
   };
 }

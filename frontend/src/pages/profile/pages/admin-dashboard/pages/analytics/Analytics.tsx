@@ -29,8 +29,8 @@ const Analytics = () => {
 
   return (
     <div className="space-y-6 pt-6 pb-20 relative">
-      <header className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Analytics</h1>
+      <header className="hidden lg:flex items-center justify-between">
+        <h1 className="text-header font-semibold">Analytics</h1>
         <div className="text-sm text-muted-foreground">
           Showing {isLive ? "Live" : "Mockup"} Data
         </div>

@@ -115,12 +115,8 @@
           "name": "addresses_profile_id_profiles_id_fk",
           "tableFrom": "addresses",
           "tableTo": "profiles",
-          "columnsFrom": [
-            "profile_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["profile_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -132,18 +128,14 @@
           "name": "users can select own address",
           "as": "PERMISSIVE",
           "for": "SELECT",
-          "to": [
-            "authenticated"
-          ],
+          "to": ["authenticated"],
           "using": "auth.uid() = profile_id"
         },
         "users can update own address": {
           "name": "users can update own address",
           "as": "PERMISSIVE",
           "for": "UPDATE",
-          "to": [
-            "authenticated"
-          ],
+          "to": ["authenticated"],
           "using": "auth.uid() = profile_id",
           "withCheck": "auth.uid() = profile_id"
         },
@@ -151,18 +143,14 @@
           "name": "users can delete own address",
           "as": "PERMISSIVE",
           "for": "DELETE",
-          "to": [
-            "authenticated"
-          ],
+          "to": ["authenticated"],
           "using": "auth.uid() = profile_id"
         },
         "users can insert own address": {
           "name": "users can insert own address",
           "as": "PERMISSIVE",
           "for": "INSERT",
-          "to": [
-            "authenticated"
-          ],
+          "to": ["authenticated"],
           "withCheck": "auth.uid() = profile_id"
         }
       },
@@ -260,12 +248,8 @@
           "name": "cart_items_cart_id_carts_id_fk",
           "tableFrom": "cart_items",
           "tableTo": "carts",
-          "columnsFrom": [
-            "cart_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["cart_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -273,12 +257,8 @@
           "name": "cart_items_product_id_products_id_fk",
           "tableFrom": "cart_items",
           "tableTo": "products",
-          "columnsFrom": [
-            "product_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["product_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -286,12 +266,8 @@
           "name": "cart_items_product_variant_id_product_variants_id_fk",
           "tableFrom": "cart_items",
           "tableTo": "product_variants",
-          "columnsFrom": [
-            "product_variant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["product_variant_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -351,12 +327,8 @@
           "name": "carts_profile_id_profiles_id_fk",
           "tableFrom": "carts",
           "tableTo": "profiles",
-          "columnsFrom": [
-            "profile_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["profile_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -366,9 +338,7 @@
         "carts_one_per_profile": {
           "name": "carts_one_per_profile",
           "nullsNotDistinct": false,
-          "columns": [
-            "profile_id"
-          ]
+          "columns": ["profile_id"]
         }
       },
       "policies": {},
@@ -447,12 +417,8 @@
           "name": "order_address_snapshots_order_id_orders_id_fk",
           "tableFrom": "order_address_snapshots",
           "tableTo": "orders",
-          "columnsFrom": [
-            "order_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["order_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -464,18 +430,14 @@
           "name": "authenticated can select own order address snapshot",
           "as": "PERMISSIVE",
           "for": "SELECT",
-          "to": [
-            "authenticated"
-          ],
+          "to": ["authenticated"],
           "using": "\n        EXISTS (\n          SELECT 1 FROM orders \n          WHERE orders.id = order_id \n          AND orders.profile_id = auth.uid()\n        )\n      "
         },
         "authenticated can insert own order addres snapshot": {
           "name": "authenticated can insert own order addres snapshot",
           "as": "PERMISSIVE",
           "for": "INSERT",
-          "to": [
-            "authenticated"
-          ],
+          "to": ["authenticated"],
           "withCheck": "\n        EXISTS (\n          SELECT 1 FROM orders \n          WHERE orders.id = order_id \n          AND orders.profile_id = auth.uid()\n        )\n      "
         }
       },
@@ -567,12 +529,8 @@
           "name": "order_items_snapshots_order_id_orders_id_fk",
           "tableFrom": "order_items_snapshots",
           "tableTo": "orders",
-          "columnsFrom": [
-            "order_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["order_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -580,12 +538,8 @@
           "name": "order_items_snapshots_product_id_products_id_fk",
           "tableFrom": "order_items_snapshots",
           "tableTo": "products",
-          "columnsFrom": [
-            "product_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["product_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -593,12 +547,8 @@
           "name": "order_items_snapshots_product_variant_id_product_variants_id_fk",
           "tableFrom": "order_items_snapshots",
           "tableTo": "product_variants",
-          "columnsFrom": [
-            "product_variant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["product_variant_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -610,18 +560,14 @@
           "name": "authenticated can select own order items snapshot",
           "as": "PERMISSIVE",
           "for": "SELECT",
-          "to": [
-            "authenticated"
-          ],
+          "to": ["authenticated"],
           "using": "\n        EXISTS (\n          SELECT 1 FROM orders \n          WHERE orders.id = order_id \n          AND orders.profile_id = auth.uid()\n        )\n      "
         },
         "authenticated can insert own order items snapshot": {
           "name": "authenticated can insert own order items snapshot",
           "as": "PERMISSIVE",
           "for": "INSERT",
-          "to": [
-            "authenticated"
-          ],
+          "to": ["authenticated"],
           "withCheck": "\n        EXISTS (\n          SELECT 1 FROM orders \n          WHERE orders.id = order_id \n          AND orders.profile_id = auth.uid()\n        )\n      "
         }
       },
@@ -754,12 +700,8 @@
           "name": "orders_profile_id_profiles_id_fk",
           "tableFrom": "orders",
           "tableTo": "profiles",
-          "columnsFrom": [
-            "profile_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["profile_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -771,27 +713,21 @@
           "name": "authenticated can select own order",
           "as": "PERMISSIVE",
           "for": "SELECT",
-          "to": [
-            "authenticated"
-          ],
+          "to": ["authenticated"],
           "using": "auth.uid() = profile_id"
         },
         "authenticated can insert own order": {
           "name": "authenticated can insert own order",
           "as": "PERMISSIVE",
           "for": "INSERT",
-          "to": [
-            "authenticated"
-          ],
+          "to": ["authenticated"],
           "withCheck": "auth.uid() = profile_id"
         },
         "authenticated can update own active order": {
           "name": "authenticated can update own active order",
           "as": "PERMISSIVE",
           "for": "UPDATE",
-          "to": [
-            "authenticated"
-          ],
+          "to": ["authenticated"],
           "using": "auth.uid() = profile_id AND expires_at > now()",
           "withCheck": "auth.uid() = profile_id AND expires_at > now()"
         }
@@ -849,9 +785,7 @@
         "product_categories_name_unique": {
           "name": "product_categories_name_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "name"
-          ]
+          "columns": ["name"]
         }
       },
       "policies": {
@@ -859,9 +793,7 @@
           "name": "allow public read",
           "as": "PERMISSIVE",
           "for": "SELECT",
-          "to": [
-            "public"
-          ],
+          "to": ["public"],
           "using": "true"
         }
       },
@@ -893,9 +825,7 @@
         "product_collections_name_unique": {
           "name": "product_collections_name_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "name"
-          ]
+          "columns": ["name"]
         }
       },
       "policies": {
@@ -903,9 +833,7 @@
           "name": "allow public read",
           "as": "PERMISSIVE",
           "for": "SELECT",
-          "to": [
-            "public"
-          ],
+          "to": ["public"],
           "using": "true"
         }
       },
@@ -971,12 +899,8 @@
           "name": "product_variants_product_id_products_id_fk",
           "tableFrom": "product_variants",
           "tableTo": "products",
-          "columnsFrom": [
-            "product_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["product_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -988,9 +912,7 @@
           "name": "allow public read",
           "as": "PERMISSIVE",
           "for": "SELECT",
-          "to": [
-            "public"
-          ],
+          "to": ["public"],
           "using": "true"
         }
       },
@@ -1088,12 +1010,8 @@
           "name": "products_product_collection_id_product_collections_id_fk",
           "tableFrom": "products",
           "tableTo": "product_collections",
-          "columnsFrom": [
-            "product_collection_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["product_collection_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -1101,12 +1019,8 @@
           "name": "products_product_category_id_product_categories_id_fk",
           "tableFrom": "products",
           "tableTo": "product_categories",
-          "columnsFrom": [
-            "product_category_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["product_category_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -1118,9 +1032,7 @@
           "name": "allow public read",
           "as": "PERMISSIVE",
           "for": "SELECT",
-          "to": [
-            "public"
-          ],
+          "to": ["public"],
           "using": "true"
         }
       },
@@ -1261,12 +1173,8 @@
           "name": "payments_order_id_orders_id_fk",
           "tableFrom": "payments",
           "tableTo": "orders",
-          "columnsFrom": [
-            "order_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["order_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -1274,12 +1182,8 @@
           "name": "payments_profile_id_profiles_id_fk",
           "tableFrom": "payments",
           "tableTo": "profiles",
-          "columnsFrom": [
-            "profile_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["profile_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -1291,18 +1195,14 @@
           "name": "authenticated can select own payment",
           "as": "PERMISSIVE",
           "for": "SELECT",
-          "to": [
-            "authenticated"
-          ],
+          "to": ["authenticated"],
           "using": "auth.uid() = profile_id"
         },
         "authenticated can update own payment": {
           "name": "authenticated can update own payment",
           "as": "PERMISSIVE",
           "for": "UPDATE",
-          "to": [
-            "authenticated"
-          ],
+          "to": ["authenticated"],
           "using": "auth.uid() = profile_id",
           "withCheck": "auth.uid() = profile_id"
         },
@@ -1310,9 +1210,7 @@
           "name": "authenticated can initiate payments for active orders",
           "as": "PERMISSIVE",
           "for": "INSERT",
-          "to": [
-            "authenticated"
-          ],
+          "to": ["authenticated"],
           "withCheck": "\n    auth.uid() = profile_id AND \n    EXISTS (\n      SELECT 1 FROM orders \n      WHERE orders.id = order_id \n      AND orders.expires_at > now()\n    )"
         }
       },
@@ -1364,9 +1262,7 @@
         "profiles_email_unique": {
           "name": "profiles_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -1417,9 +1313,7 @@
         "webhook_events_provider_event_id_unique": {
           "name": "webhook_events_provider_event_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "provider_event_id"
-          ]
+          "columns": ["provider_event_id"]
         }
       },
       "policies": {},

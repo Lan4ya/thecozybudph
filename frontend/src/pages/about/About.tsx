@@ -14,7 +14,10 @@ const About = () => {
   return (
     <main className="flex-1 flex flex-col">
       {/* Hero Section - uses visibleMap[0] and [1] */}
-      <HeroSection registerSentinel={registerSentinel} visibleMap={visibleMap} />
+      <HeroSection
+        registerSentinel={registerSentinel}
+        visibleMap={visibleMap}
+      />
 
       {/* About the Shop Section */}
       <AboutSection

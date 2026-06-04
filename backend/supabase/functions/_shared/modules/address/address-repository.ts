@@ -1,7 +1,59 @@
-import { and, eq, ne, sql } from "drizzle-orm";
+import { and, eq, inArray, ne, sql } from "drizzle-orm";
 import { DrizzleClient } from "../../db/client.ts";
 import { AppError } from "../../errors/Errors.ts";
-import { InsertAddress, Address, addresses } from "@shared/schemas/index.ts";
+import {
+  InsertAddress,
+  addresses,
+  orderAddressesSnapshot,
+} from "@shared/schemas/index.ts";
+
+const getMutationSelection = () => ({
+  id: addresses.id,
+  fullName: addresses.fullName,
+  postalCode: addresses.postalCode,
+  region: addresses.region,
+  city: addresses.city,
+  province: addresses.province,
+  barangay: addresses.barangay,
+  addressLine: addresses.addressLine,
+  phoneNumber: addresses.phoneNumber,
+  isDefault: addresses.isDefault,
+});
+
+const baseColumns = {
+  id: true,
+  fullName: true,
+  postalCode: true,
+  region: true,
+  city: true,
+  province: true,
+  barangay: true,
+  addressLine: true,
+  phoneNumber: true,
+  isDefault: true,
+} as const;
+
+async function ensureCompanyAddress(db: DrizzleClient) {
+  try {
+    await db.admin.insert(addresses).values({
+      fullName: "The Cozy Bud",
+      postalCode: "1550",
+      region: "NCR",
+      city: "Mandaluyong",
+      province: "Metro Manila",
+      barangay: "Barangka Ilaya",
+      addressLine: "Edsa Corner Pioneer Street",
+      phoneNumber: "+639170000000",
+      isDefault: true,
+      isCompanyAddress: true,
+      latitude: "14.5739000",
+      longitude: "121.0447000",
+      profileId: null,
+    });
+  } catch (_err) {
+    // Ignore unique constraint violations (race condition)
+  }
+}
 
 export const AddressRepository = {
   insert: async (
@@ -43,14 +95,22 @@ export const AddressRepository = {
           );
       }
 
-      // auto default if there's no any other address yet
+      // If this new address is a company address, unset any existing company address first
+      if (addressInsert.isCompanyAddress) {
+        await tx
+          .update(addresses)
+          .set({ isCompanyAddress: false })
+          .where(eq(addresses.isCompanyAddress, true));
+      }
+
+      // Auto default if there's no any other address yet
       const isDefault = count === 0 || addressInsert.isDefault;
 
       // Insert new address
       const [inserted] = await tx
         .insert(addresses)
         .values({ ...addressInsert, isDefault })
-        .returning();
+        .returning(getMutationSelection());
 
       return inserted;
     });
@@ -76,16 +136,22 @@ export const AddressRepository = {
         throw AppError.notFound({ message: "Address not found" });
       }
 
-      // If we're setting this address as default, unset any existing default first
+      // If updating the address as default, unset any existing default first
       if (addressUpdate.isDefault === true) {
         await tx
           .update(addresses)
-          .set({ isDefault: false })
+          .set({
+            isDefault: false,
+            // For admin address specifically (default address is the company
+            // address) unset also the isCompanyAddress flag to prevent
+            // multiple company addresses
+            isCompanyAddress: false,
+          })
           .where(
             and(
               eq(addresses.profileId, currentAddress.profileId!),
               eq(addresses.isDefault, true),
-              // Don't unset this address if it's already default
+              // If new address is already the default then NOOP
               ne(addresses.id, id),
             ),
           );
@@ -112,30 +178,103 @@ export const AddressRepository = {
         .update(addresses)
         .set(addressUpdate)
         .where(eq(addresses.id, id))
-        .returning();
+        .returning(getMutationSelection());
 
       return updated;
     });
   },
 
   getById: (db: DrizzleClient, id: string) =>
-    db.rls(
-      async (tx) =>
-        await tx.query.addresses.findFirst({
-          where: (addresses, { eq }) => eq(addresses.id, id),
-          columns: {
-            id: true,
-            fullName: true,
-            postalCode: true,
-            region: true,
-            city: true,
-            province: true,
-            barangay: true,
-            addressLine: true,
-            phoneNumber: true,
-          },
-        }),
-    ),
+    db.rls(async (tx) => {
+      return await tx.query.addresses.findFirst({
+        where: (addresses, { eq }) => eq(addresses.id, id),
+        columns: baseColumns,
+      });
+    }),
+
+  getByIdWithCoords: (db: DrizzleClient, id: string) =>
+    db.rls(async (tx) => {
+      return await tx.query.addresses.findFirst({
+        where: (addresses, { eq }) => eq(addresses.id, id),
+        columns: {
+          ...baseColumns,
+          latitude: true,
+          longitude: true,
+        },
+      });
+    }),
+
+  getByIds: (db: DrizzleClient, ids: string[]) =>
+    db.rls(async (tx) => {
+      if (ids.length === 0) return [];
+
+      return await tx.query.addresses.findMany({
+        where: (addresses) => inArray(addresses.id, ids),
+        columns: baseColumns,
+      });
+    }),
+
+  getCompany: async (db: DrizzleClient) => {
+    const existing = await db.rls(async (tx) => {
+      return await tx.query.addresses.findFirst({
+        where: (addresses, { eq, and }) =>
+          and(
+            eq(addresses.isDefault, true),
+            eq(addresses.isCompanyAddress, true),
+          ),
+        columns: baseColumns,
+      });
+    });
+
+    if (existing) return existing;
+
+    // Create company address if it doesn't exist (Lazy Seeding)
+    await ensureCompanyAddress(db);
+
+    return await db.rls(async (tx) => {
+      return await tx.query.addresses.findFirst({
+        where: (addresses, { eq, and }) =>
+          and(
+            eq(addresses.isDefault, true),
+            eq(addresses.isCompanyAddress, true),
+          ),
+        columns: baseColumns,
+      });
+    });
+  },
+
+  getCompanyWithCoords: async (db: DrizzleClient) => {
+    const existing = await db.admin.query.addresses.findFirst({
+      where: (addresses, { eq, and }) =>
+        and(
+          eq(addresses.isDefault, true),
+          eq(addresses.isCompanyAddress, true),
+        ),
+      columns: {
+        ...baseColumns,
+        latitude: true,
+        longitude: true,
+      },
+    });
+
+    if (existing) return existing;
+
+    // Create company address if it doesn't exist (Lazy Seeding)
+    await ensureCompanyAddress(db);
+
+    return await db.admin.query.addresses.findFirst({
+      where: (addresses, { eq, and }) =>
+        and(
+          eq(addresses.isDefault, true),
+          eq(addresses.isCompanyAddress, true),
+        ),
+      columns: {
+        ...baseColumns,
+        latitude: true,
+        longitude: true,
+      },
+    });
+  },
 
   getDefault: (db: DrizzleClient, profileId: string) =>
     db.rls(async (tx) => {
@@ -145,37 +284,33 @@ export const AddressRepository = {
             eq(addresses.isDefault, true),
             eq(addresses.profileId, profileId),
           ),
-        columns: {
-          id: true,
-          fullName: true,
-          postalCode: true,
-          region: true,
-          city: true,
-          province: true,
-          barangay: true,
-          addressLine: true,
-          phoneNumber: true,
-          isDefault: true,
-        },
+        columns: baseColumns,
       });
     }),
 
-  getByProfileId: (db: DrizzleClient, profileId: string): Promise<Address[]> =>
+  getByProfileId: (db: DrizzleClient, profileId: string) =>
     db.rls(async (tx) => {
       return await tx.query.addresses.findMany({
         where: (addresses, { eq }) => eq(addresses.profileId, profileId),
-        columns: {
-          id: true,
-          fullName: true,
-          postalCode: true,
-          region: true,
-          city: true,
-          province: true,
-          barangay: true,
-          addressLine: true,
-          phoneNumber: true,
-          isDefault: true,
-        },
+        columns: baseColumns,
       });
+    }),
+
+  getSnapshotByOrderId: (db: DrizzleClient, orderId: string) =>
+    db.admin.query.orderAddressesSnapshot.findFirst({
+      where: eq(orderAddressesSnapshot.orderId, orderId),
+      columns: {
+        id: true,
+        fullName: true,
+        postalCode: true,
+        region: true,
+        city: true,
+        province: true,
+        barangay: true,
+        addressLine: true,
+        phoneNumber: true,
+        latitude: true,
+        longitude: true,
+      },
     }),
 };

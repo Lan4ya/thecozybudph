@@ -6,7 +6,7 @@ import { adminMiddleware } from "@shared/middlewares/adminMiddleware.ts";
 import { defaultAppMiddlewares } from "@shared/middlewares/defaultMiddleware.ts";
 import { AppEnv } from "@shared/types.d.ts";
 import { isDev } from "@shared/utils/isDev.ts";
-import routes from "./admin-routes.ts";
+import routes from "./admin-routes/mod.ts";
 
 const app = new OpenAPIHono<AppEnv>({
   defaultHook: (result) => {
@@ -14,19 +14,40 @@ const app = new OpenAPIHono<AppEnv>({
       throw new ValidationError(result.error);
     }
   },
-}).basePath("admin");
+}).basePath("/admin");
 
 // Apply default middlewares/configs
 defaultAppMiddlewares(app);
 
 // Serve the OpenAPI document
 app.use("/doc/*", ...(isDev ? [] : [adminMiddleware()]));
-app.doc("/doc", {
-  openapi: "3.0.0",
-  info: {
-    title: "Admin API",
-    version: "1.0.0",
-  },
+app.get("/doc", (c) => {
+  try {
+    const document = app.getOpenAPIDocument({
+      openapi: "3.0.0",
+      info: {
+        title: "Admin API",
+        version: "1.0.0",
+      },
+    });
+
+    return c.json(document);
+  } catch (err: unknown) {
+    // This logs the full stack trace directly into your server console
+    console.error("[OpenAPI Spec Generation Failed]: ", err);
+
+    return c.json(
+      {
+        error: "OPENAPI_GENERATION_FAILED",
+        message:
+          err instanceof Error
+            ? err.message
+            : "Unknown syntax or schema parsing error",
+        stack: err instanceof Error ? err.stack : undefined,
+      },
+      500,
+    );
+  }
 });
 
 // Serve Swagger UI

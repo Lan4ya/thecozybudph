@@ -19,7 +19,7 @@
   /* Typography utils */
 
   .text-header {
-    @apply text-2xl lg:text-[28px] xl:text-3xl font-bold font-ivy-ora-display;
+    @apply text-xl lg:text-2xl font-semibold;
   }
 
   .text-30-bold {

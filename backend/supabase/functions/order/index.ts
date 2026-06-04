@@ -20,17 +20,39 @@ export const app = new OpenAPIHono<AppEnv>({
 defaultAppMiddlewares(app);
 
 // Serve the OpenAPI document
-app.use("/doc/*", ...(isDev ? [] : [adminMiddleware()]));
-app.doc("/doc", {
-  openapi: "3.0.0",
-  info: {
-    title: "Order API",
-    version: "1.0.0",
-  },
+app.use("/order/doc/*", ...(isDev ? [] : [adminMiddleware()]));
+app.get("/doc", (c) => {
+  try {
+    const document = app.getOpenAPIDocument({
+      openapi: "3.0.0",
+      info: {
+        title: "Order API",
+        version: "1.0.0",
+      },
+    });
+
+    return c.json(document);
+  } catch (err: unknown) {
+    // This logs the full stack trace directly into your server console
+    console.error("[OpenAPI Spec Generation Failed]: ", err);
+
+    // Return a verbose payload to your generation script during development
+    return c.json(
+      {
+        error: "OPENAPI_GENERATION_FAILED",
+        message:
+          err instanceof Error
+            ? err.message
+            : "Unknown syntax or schema parsing error",
+        stack: err instanceof Error ? err.stack : undefined,
+      },
+      500,
+    );
+  }
 });
 
 // Serve Swagger UI
-app.get("/ui", swaggerUI({ url: "doc" }));
+app.get("/order/ui", swaggerUI({ url: "doc" }));
 
 // Mount order routes
 app.route("/", order);

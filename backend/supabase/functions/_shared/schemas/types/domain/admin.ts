@@ -1,3 +1,4 @@
+import type { ServiceType } from "../api/admin-shipment.ts";
 import type { OrderStatus } from "./order.ts";
 
 // TODO: derive this zod schemas
@@ -29,6 +30,7 @@ export type AdminOrderListItem = {
   id: string;
   profileId: string;
   status: OrderStatus;
+  serviceType: ServiceType;
 
   subtotalCents: number;
   discountCents: number;

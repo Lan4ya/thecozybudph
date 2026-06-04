@@ -23,8 +23,7 @@ export const handlePaymentWebhook = async (
     throw AppError.badRequest({ message: "Missing signature" });
   }
 
-  // Auth & Integrity: Since this is a public api, this is important to verify
-  // that the payload is really coming from Paymongo and not from someone malicious.
+  // SECURITY: verify if the payload is really coming from Paymongo and not from someone malicious.
   const isValid = verifySignature(rawBody, signatureHeader);
   if (!isValid) throw AppError.forbidden({ message: "Invalid signature" });
 
@@ -54,7 +53,9 @@ export const handlePaymentWebhook = async (
   const paymentIntentId = paymentData.attributes?.payment_intent_id;
 
   if (!paymentIntentId) {
-    throw AppError.badRequest({ message: "missing payment_intent_id in payment data" });
+    throw AppError.badRequest({
+      message: "missing payment_intent_id in payment data",
+    });
   }
 
   console.log({ webhook_pi_id: paymentIntentId });
@@ -90,7 +91,7 @@ export const handlePaymentWebhook = async (
           ? new Date(paymentData.attributes.paid_at * 1000)
           : new Date();
 
-        // Handle payment status: pending -> paid
+        // Handle payment status: processing -> paid
         const [updatedPayment] = await tx
           .update(payments)
           .set({
@@ -100,9 +101,9 @@ export const handlePaymentWebhook = async (
           })
           .where(
             and(
-              eq(payments.isActive, true), // unique per order
+              eq(payments.status, "processing"),
               eq(payments.paymentIntentId, paymentIntentId),
-              ne(payments.status, "paid"), // unique per order
+              ne(payments.status, "paid"),
             ),
           )
           .returning({
@@ -113,10 +114,7 @@ export const handlePaymentWebhook = async (
 
         if (!updatedPayment) {
           const existing = await tx.query.payments.findFirst({
-            where: and(
-              eq(payments.paymentIntentId, paymentIntentId),
-              eq(payments.isActive, true),
-            ),
+            where: and(eq(payments.paymentIntentId, paymentIntentId)),
             columns: { status: true, orderId: true },
           });
 
@@ -129,7 +127,9 @@ export const handlePaymentWebhook = async (
             return { success: true };
           }
 
-          throw AppError.conflict({ message: "Invalid payment state transition" });
+          throw AppError.conflict({
+            message: "Invalid payment state transition",
+          });
         }
 
         isDev && console.log("Payment update result:", updatedPayment);
@@ -166,7 +166,9 @@ export const handlePaymentWebhook = async (
             return { success: true };
           }
 
-          throw AppError.internal({ message: "Invalid order state transition" });
+          throw AppError.internal({
+            message: "Invalid order state transition",
+          });
         }
 
         isDev && console.log("Order update result:", updatedOrder);
@@ -174,7 +176,7 @@ export const handlePaymentWebhook = async (
       }
 
       case "payment.failed": {
-        // Handle orders status: pending -> failed
+        // Handle orders status: processing -> failed
         const [updatedFailedPayment] = await tx
           .update(payments)
           .set({
@@ -182,8 +184,7 @@ export const handlePaymentWebhook = async (
           })
           .where(
             and(
-              eq(payments.isActive, true), // unique per order
-              eq(payments.status, "pending"),
+              eq(payments.status, "processing"),
               eq(payments.paymentIntentId, paymentIntentId),
             ),
           )
@@ -195,10 +196,7 @@ export const handlePaymentWebhook = async (
 
         if (!updatedFailedPayment) {
           const existing = await tx.query.payments.findFirst({
-            where: and(
-              eq(payments.paymentIntentId, paymentIntentId),
-              eq(payments.isActive, true),
-            ),
+            where: eq(payments.paymentIntentId, paymentIntentId),
             columns: { status: true, orderId: true },
           });
 
@@ -211,7 +209,9 @@ export const handlePaymentWebhook = async (
             return { success: true };
           }
 
-          throw AppError.conflict({ message: "Invalid payment state transition" });
+          throw AppError.conflict({
+            message: "Invalid payment state transition",
+          });
         }
 
         isDev &&

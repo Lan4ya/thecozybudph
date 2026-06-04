@@ -90,7 +90,7 @@ export function ProductQueryStateProvider({
     return Object.values(filters).some((v) =>
       Array.isArray(v) ? v.length > 0 : Boolean(v),
     );
-  }, [productQuery.filters]);
+  }, [productQuery]);
 
   const value = useMemo(
     () => ({
@@ -99,7 +99,12 @@ export function ProductQueryStateProvider({
       hasProductQueryFilters,
       clearProductQueryFilters,
     }),
-    [productQuery, setProductQuery, clearProductQueryFilters],
+    [
+      hasProductQueryFilters,
+      productQuery,
+      setProductQuery,
+      clearProductQueryFilters,
+    ],
   );
 
   return (

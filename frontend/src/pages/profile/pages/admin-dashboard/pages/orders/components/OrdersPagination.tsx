@@ -23,7 +23,7 @@ export function OrdersPagination({
   const end = Math.min(offset + currentCount, total);
 
   return (
-    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex gap-2 items-center justify-between">
       <div className="text-sm text-muted-foreground">
         Showing {start}-{end} of {total} orders
       </div>

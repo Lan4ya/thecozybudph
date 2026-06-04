@@ -1,5 +1,4 @@
 import { ProductImage } from "@/components/products/ProductImage";
-import { useCartStore } from "@/pages/cart/store/useCartStore";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Card, CardContent } from "@/lib/ui/__shadcn__/card";
 import { cn } from "@/lib/utils/cn";
@@ -9,6 +8,7 @@ import { Check, Trash2, XIcon, Minus, Plus } from "lucide-react";
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router";
 import { CartItemOptionsDrawer } from "./CartItemOptionsDrawer";
+import { useCartStore } from "@/store/useCartStore";
 
 type CartItemProps = {
   cartItemId: string;
@@ -50,7 +50,7 @@ const CartItem = ({
     if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
     debounceTimeout.current = setTimeout(() => {
       onUpdateCartItem(undefined, newQuantity);
-    }, 750);
+    }, 1000);
   };
 
   const handleIncrement = () => {
@@ -112,7 +112,7 @@ const CartItem = ({
             roundedSize="md"
           />
 
-          <div className="flex-1 min-w-0 flex flex-col">
+          <div className="flex-1 min-w-0 flex flex-col gap-0.5">
             {/* Name & Edit Btn*/}
             <div className="capitalize flex items-center justify-between">
               <h3 className={"font-medium line-clamp-2 "}>{product.name}</h3>
@@ -186,6 +186,8 @@ const CartItem = ({
               onClick={(e) => e.stopPropagation()}
             >
               <CartItemOptionsDrawer
+                onIncrement={handleIncrement}
+                onDecrement={handleDecrement}
                 cartItemId={cartItemId}
                 onUpdateCartItem={onUpdateCartItem}
               />

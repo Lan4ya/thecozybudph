@@ -785,6 +785,111 @@
       "when": 1780144365112,
       "tag": "0111_confused_reavers",
       "breakpoints": true
+    },
+    {
+      "idx": 112,
+      "version": "7",
+      "when": 1780484800903,
+      "tag": "0112_complete_nova",
+      "breakpoints": true
+    },
+    {
+      "idx": 113,
+      "version": "7",
+      "when": 1780765500614,
+      "tag": "0113_brainy_nick_fury",
+      "breakpoints": true
+    },
+    {
+      "idx": 114,
+      "version": "7",
+      "when": 1780831441226,
+      "tag": "0114_uneven_agent_brand",
+      "breakpoints": true
+    },
+    {
+      "idx": 115,
+      "version": "7",
+      "when": 1781028803576,
+      "tag": "0115_workable_grandmaster",
+      "breakpoints": true
+    },
+    {
+      "idx": 116,
+      "version": "7",
+      "when": 1781033021082,
+      "tag": "0116_nostalgic_zaladane",
+      "breakpoints": true
+    },
+    {
+      "idx": 117,
+      "version": "7",
+      "when": 1781033781817,
+      "tag": "0117_neat_thing",
+      "breakpoints": true
+    },
+    {
+      "idx": 118,
+      "version": "7",
+      "when": 1781034395444,
+      "tag": "0118_magenta_hitman",
+      "breakpoints": true
+    },
+    {
+      "idx": 119,
+      "version": "7",
+      "when": 1781116036182,
+      "tag": "0119_green_kate_bishop",
+      "breakpoints": true
+    },
+    {
+      "idx": 120,
+      "version": "7",
+      "when": 1781249640599,
+      "tag": "0120_chief_starjammers",
+      "breakpoints": true
+    },
+    {
+      "idx": 121,
+      "version": "7",
+      "when": 1781294409538,
+      "tag": "0121_magical_zuras",
+      "breakpoints": true
+    },
+    {
+      "idx": 122,
+      "version": "7",
+      "when": 1781294958027,
+      "tag": "0122_smiling_landau",
+      "breakpoints": true
+    },
+    {
+      "idx": 123,
+      "version": "7",
+      "when": 1781336277275,
+      "tag": "0123_regular_obadiah_stane",
+      "breakpoints": true
+    },
+    {
+      "idx": 124,
+      "version": "7",
+      "when": 1781700790993,
+      "tag": "0124_plain_professor_monster",
+      "breakpoints": true
+    },
+    {
+      "idx": 125,
+      "version": "7",
+      "when": 1781869934820,
+      "tag": "0125_military_sandman",
+      "breakpoints": true
+    },
+    {
+      "idx": 126,
+      "version": "7",
+      "when": 1781873400265,
+      "tag": "0126_dry_white_queen",
+      "breakpoints": true
     }
   ]
 }

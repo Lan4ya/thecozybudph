@@ -38,7 +38,7 @@ type FilterDropdownMenuProps = {
   setInputValue?: React.Dispatch<React.SetStateAction<string>>;
 };
 
-// INFO: This is used by all the filter components as base except Search
+// INFO: This component is used as base by all shop filter components except Search
 
 export const FilterDropdown = ({
   children,
@@ -115,32 +115,30 @@ export const FilterDropdown = ({
             {!isInputFocused && hasValue(filterVal) && (
               <DisplaySelectedFilters dropdownType={dropdownType} />
             )}
-            {!isMobile ? (
-              <input
-                ref={inputRef}
-                value={inputValue}
-                onMouseDown={(e) => e.stopPropagation()}
-                onChange={(e) => setInputValue(e.target.value)}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setOpen(true);
-                }}
-                onFocus={() => setInputFocus(true)}
-                onBlur={() => setInputFocus(false)}
-                className="h-full w-full placeholder-muted-foreground focus:outline-none"
-                placeholder={
-                  (hasValue(filterVal) && !isInputFocused) || isInputFocused
-                    ? ""
-                    : "Any"
-                }
-                type="text"
-              />
-            ) : (
-              // Remove input on mobiles
-              <div className="text-muted-foreground text-xs">
-                {hasValue(filterVal) ? null : "Any"}
-              </div>
-            )}
+            {/* {!isMobile ? ( */}
+            <input
+              ref={inputRef}
+              value={inputValue}
+              onMouseDown={(e) => e.stopPropagation()}
+              onChange={(e) => setInputValue(e.target.value)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpen(true);
+              }}
+              onFocus={() => setInputFocus(true)}
+              onBlur={() => setInputFocus(false)}
+              className="h-full w-full placeholder-muted-foreground focus:outline-none"
+              placeholder={
+                (hasValue(filterVal) && !isInputFocused) || isInputFocused
+                  ? ""
+                  : "Any"
+              }
+              type="text"
+            />
+            {/* ) : ( */}
+            {/*   // Remove input on mobiles */}
+            {/*   <div className="text-muted-foreground text-xs">{hasValue(filterVal) ? null : "Any"}</div> */}
+            {/* )} */}
 
             <Button
               variant="minimal"

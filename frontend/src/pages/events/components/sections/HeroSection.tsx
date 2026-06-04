@@ -23,10 +23,11 @@ export const HeroSection = () => {
             <br />
             <span className="text-primary">CozyBud</span>
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-xl">
+
+          <p className="text-lg md:text-xl max-w-xl">
             Transform your special occasions with our bespoke floral designs.
-            From intimate gatherings to grand celebrations, we bring your
-            vision to life.
+            From intimate gatherings to grand celebrations, we bring your vision
+            to life.
           </p>
         </motion.div>
       </div>

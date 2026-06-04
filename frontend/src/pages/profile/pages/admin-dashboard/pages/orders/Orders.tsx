@@ -66,14 +66,8 @@ export default function Orders() {
     useAdminOrdersQuery(query);
 
   const [searchInput, setSearchInput] = useState(query.search ?? "");
-  const [selectedOrder, setSelectedOrder] = useState<AdminOrderListItem | null>(
-    null,
-  );
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-
-  useEffect(() => {
-    setSearchInput(query.search ?? "");
-  }, [query.search]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -95,15 +89,16 @@ export default function Orders() {
     [query.sortBy, query.sortDir],
   );
 
-  const handleOrderRowClick = (order: AdminOrderListItem) => {
-    setSelectedOrder(order);
+  const handleOrderRowClick = (orderId: string) => {
+    setSelectedOrderId(orderId);
     setDrawerOpen(true);
   };
 
   return (
-    <div className="space-y-6 py-6">
-      <header className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Orders</h1>
+    <div className="space-y-6 pb-6 lg:pt-6">
+      {/* Desktop Header */}
+      <header className="hidden lg:flex items-center justify-between">
+        <h1 className="text-header font-semibold">Orders</h1>
       </header>
 
       <OrdersFilters
@@ -129,7 +124,7 @@ export default function Orders() {
         orders={orders}
         isLoading={isLoading}
         hasError={!!error}
-        selectedOrderId={selectedOrder?.id ?? null}
+        selectedOrderId={selectedOrderId ?? null}
         onRowClick={handleOrderRowClick}
       />
 
@@ -146,7 +141,7 @@ export default function Orders() {
       ) : null}
 
       <OrderDetailsDrawer
-        order={selectedOrder}
+        orderId={selectedOrderId}
         open={drawerOpen}
         onOpenChange={setDrawerOpen}
       />

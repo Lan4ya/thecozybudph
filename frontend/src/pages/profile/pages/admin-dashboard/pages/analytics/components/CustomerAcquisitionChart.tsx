@@ -1,11 +1,21 @@
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import { customerData as mockData } from "../data/mock-analytics";
 
 interface CustomerAcquisitionChartProps {
   data?: { month: string; customers: number }[];
 }
 
-export const CustomerAcquisitionChart = ({ data }: CustomerAcquisitionChartProps) => {
+export const CustomerAcquisitionChart = ({
+  data,
+}: CustomerAcquisitionChartProps) => {
   const chartData = data || mockData;
 
   return (
@@ -18,10 +28,19 @@ export const CustomerAcquisitionChart = ({ data }: CustomerAcquisitionChartProps
           <YAxis stroke="#888" />
           <Tooltip
             cursor={{ fill: "var(--accent)", fillOpacity: 0.15 }}
-            contentStyle={{ backgroundColor: "#fff", border: "1px solid #ccc", borderRadius: "8px" }}
+            contentStyle={{
+              backgroundColor: "#fff",
+              border: "1px solid #ccc",
+              borderRadius: "8px",
+            }}
             formatter={(value) => value}
           />
-          <Bar dataKey="customers" fill="#f97316" name="New Customers" radius={[8, 8, 0, 0]} />
+          <Bar
+            dataKey="customers"
+            fill="#f97316"
+            name="New Customers"
+            radius={[8, 8, 0, 0]}
+          />
         </BarChart>
       </ResponsiveContainer>
     </div>

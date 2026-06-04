@@ -107,7 +107,7 @@ const Contact = () => {
       );
       reset();
     } catch (error) {
-      addToast("Failed to send message. Please try again later.", "error");
+      addToast("Something went wrong. Please try again.", "error");
     } finally {
       setIsSubmitting(false);
     }

@@ -1,4 +1,12 @@
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import { ordersData as mockData } from "../data/mock-analytics";
 
 interface OrdersTrendChartProps {
@@ -23,7 +31,11 @@ export const OrdersTrendChart = ({ data }: OrdersTrendChartProps) => {
           <XAxis dataKey="date" stroke="#888" />
           <YAxis stroke="#888" />
           <Tooltip
-            contentStyle={{ backgroundColor: "#fff", border: "1px solid #ccc", borderRadius: "8px" }}
+            contentStyle={{
+              backgroundColor: "#fff",
+              border: "1px solid #ccc",
+              borderRadius: "8px",
+            }}
             formatter={(value) => value}
           />
           <Area

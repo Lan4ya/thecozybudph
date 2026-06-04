@@ -1,7 +1,5 @@
 import { client, unwrapData } from "./_client";
 import type {
-  CheckCooldownInput,
-  CooldownData,
   LoginData,
   LoginInput,
   PasswordResetInput,
@@ -11,19 +9,6 @@ import type {
 } from "@cozybud/schemas";
 
 export const AuthAPI = {
-  /* DEPRECATED: Cooldown is now managed client-side via useActionCooldown and enforced by server directly during actions.
-  checkCooldown: async (input: CheckCooldownInput): Promise<CooldownData> => {
-    const res = await client.auth.POST("/auth/cooldown", {
-      body: input,
-    });
-    const data = unwrapData(res.data, "checkCooldown");
-    return {
-      ...data,
-      endsAt: data.endsAt ? new Date(data.endsAt) : null,
-    };
-  },
-  */
-
   requestResetPassword: async (input: PasswordResetInput) => {
     const res = await client.auth.POST("/auth/password-reset", {
       body: input,

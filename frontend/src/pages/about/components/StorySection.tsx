@@ -65,4 +65,3 @@ const StorySection = ({
 };
 
 export default StorySection;
-

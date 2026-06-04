@@ -1,47 +1,70 @@
-import { getRandomAvatarUrl } from "./helpers/getDefaultAvatarUrl.ts";
+import { createAdminOrGet } from "./helpers/createAdminOrGet.ts";
 import { supabase } from "./helpers/supabase.ts";
 
-export const ADMIN_EMAIL = "admin@local.dev";
-export const ADMIN_PASSWORD = "password123";
+const { SUPABASE_URL } = process.env;
 
 export async function seedAdmin() {
-  const avatar_url = await getRandomAvatarUrl();
+  const { email, password } = await createAdminOrGet();
 
-  const {
-    data: { user },
-    error: error,
-  } = await supabase.auth.admin.createUser({
-    email: ADMIN_EMAIL,
-    password: ADMIN_PASSWORD,
-    email_confirm: true, // auto-confirm so no manual step needed
-    app_metadata: { role: "admin" }, // set as admin
-    user_metadata: { avatar_url }, // set default avatar
-  });
+  const { data: authData, error: authError } =
+    await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-  if (error) {
-    if (
-      "code" in error &&
-      error.code === "email_exists" &&
-      error.status === 422
-    ) {
-      console.log(`DB already has an admin user initialized:`);
-      console.log(`Email: ${ADMIN_EMAIL}`);
-      console.log(`Password: ${ADMIN_PASSWORD}`);
-      return;
-    }
-
-    console.error("Error creating admin:", error);
-    throw error;
+  if (authError || !authData.session?.access_token) {
+    throw new Error(
+      `Admin login failed: ${authError?.message ?? "No access token returned"}`,
+    );
   }
 
-  if (!user) {
-    console.error("Invariant error: createAdmin returned no data");
-    throw new Error("createAdmin returned no data");
+  const token = authData.session.access_token;
+
+  try {
+    await Promise.all([
+      fetch(`${SUPABASE_URL}/functions/v1/address`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullName: "Admin",
+          region: "NCR",
+          city: "Mandaluyong City",
+          postalCode: "1550",
+          barangay: "Barangka Ilaya",
+          addressLine: "Edsa Corner Pioneer Street",
+          phoneNumber: "+639123456789",
+          isDefault: true,
+        }),
+      }),
+      fetch(`${SUPABASE_URL}/functions/v1/address`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullName: "Admin",
+          region: "NCR",
+          city: "Manila",
+          postalCode: "1008",
+          province: "Sampaloc",
+          barangay: "Barangay 411",
+          addressLine: "G Tuazon St.",
+          phoneNumber: "+639123456789",
+          isDefault: false,
+        }),
+      }),
+    ]);
+  } catch (err) {
+    throw new Error(`Network error: ${err}`);
   }
 
-  console.log(`Created admin:`);
-  console.log(`Email: ${ADMIN_EMAIL}`);
-  console.log(`Password: ${ADMIN_PASSWORD}`);
+  console.log(`Created admin creds:`);
+  console.log(`Email: ${email}`);
+  console.log(`Password: ${password}`);
 }
 
 if (process.argv[1] === import.meta.filename) {

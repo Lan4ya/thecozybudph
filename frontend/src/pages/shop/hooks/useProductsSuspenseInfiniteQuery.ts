@@ -4,7 +4,6 @@ import {
   type QueryFunctionContext,
   useSuspenseInfiniteQuery,
 } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo } from "react";
 import { useProductsFilterAndSortState } from "./useProductsFilterAndSortState";
 import { useCollectionsQuery } from "./useCollectionsQuery";
 import { useCategoriesQuery } from "./useCategoriesQuery";
@@ -17,19 +16,13 @@ export const useProductsSuspenseInfiniteQuery = () => {
   const { collections } = useCollectionsQuery();
 
   const collectionMap = new Map<string, string>();
-  const collectionNameToId = collections?.forEach((c) =>
-    collectionMap.set(c.name, c.id),
-  );
+  collections?.forEach((c) => collectionMap.set(c.name, c.id));
 
   const categoryMap = new Map<string, string>();
-  const categoryNameToId = categories?.forEach((c) =>
-    categoryMap.set(c.name, c.id),
-  );
+  categories?.forEach((c) => categoryMap.set(c.name, c.id));
 
-  const hasQueries = useMemo(
-    () => hasProductQueryFilters || productQuery.sort !== "Popularity",
-    [hasProductQueryFilters, productQuery.sort],
-  );
+  const hasQueries =
+    hasProductQueryFilters || productQuery.sort !== "Popularity";
 
   const queryKey = hasQueries
     ? ["products", productQuery]
@@ -37,58 +30,55 @@ export const useProductsSuspenseInfiniteQuery = () => {
 
   const perPage = 12;
 
-  useEffect(() => {
-    console.log({ hasQueries });
-  }, []);
+  const queryFn = async ({ pageParam = 0 }: QueryFunctionContext) => {
+    const filtersDomain = productQuery.filters;
 
-  const queryFn = useCallback(
-    async ({ pageParam = 0 }: QueryFunctionContext) => {
-      const filtersDomain = productQuery.filters;
+    const filtersAPI: ProductFilters = {};
 
-      let filtersAPI: ProductFilters = {};
+    if (filtersDomain?.search) {
+      filtersAPI.search = filtersDomain.search;
+    }
 
-      if (filtersDomain?.search) {
-        filtersAPI.search = filtersDomain.search;
+    if (filtersDomain?.priceRange) {
+      const pr = filtersDomain.priceRange;
+
+      if (pr.endsWith("+")) {
+        filtersAPI.priceRange = { min: Number(pr.slice(0, -1)) };
+      } else {
+        const [min, max] = pr.split("-");
+        filtersAPI.priceRange = { min: Number(min), max: Number(max) };
       }
+    }
 
-      if (filtersDomain?.priceRange) {
-        let pr = filtersDomain.priceRange;
+    if (filtersDomain?.categories) {
+      filtersAPI.categoryIds = filtersDomain.categories
+        .map((c) => categoryMap.get(c))
+        .filter((id): id is string => id !== undefined);
+    }
 
-        if (pr.endsWith("+")) {
-          filtersAPI.priceRange = { min: Number(pr.slice(0, -1)) };
-        } else {
-          const [min, max] = pr.split("-");
-          filtersAPI.priceRange = { min: Number(min), max: Number(max) };
-        }
-      }
+    if (filtersDomain?.collectionNames) {
+      filtersAPI.collectionIds = filtersDomain.collectionNames
+        .map((c) => collectionMap.get(c))
+        .filter((id): id is string => id !== undefined);
+    }
 
-      if (filtersDomain?.categories) {
-        filtersAPI.categoryIds = filtersDomain.categories
-          .map((c) => categoryMap.get(c))
-          .filter((id): id is string => id !== undefined);
-      }
+    return await ProductAPI.queryProducts({
+      page: pageParam as number,
+      perPage,
+      sort: productQuery?.sort ?? "Popularity",
+      filters: filtersAPI,
+    });
+  };
 
-      if (filtersDomain?.collectionNames) {
-        filtersAPI.collectionIds = filtersDomain.collectionNames
-          .map((c) => collectionMap.get(c))
-          .filter((id): id is string => id !== undefined);
-      }
+  const staleTime = 1000 * 60 * 5; // 5 mins
 
-      try {
-        return await ProductAPI.queryProducts({
-          page: pageParam as number,
-          perPage,
-          sort: productQuery?.sort ?? "Popularity",
-          filters: filtersAPI,
-        });
-      } catch (err) {
-        console.error("Products fetch failed:", err);
-        return [];
-      }
-    },
-    [productQuery, categoryNameToId, collectionNameToId],
-  );
-
+  /**
+   * Keep this query in-memory. Do not use a localStorage persister.
+   * The queryKey dynamically changes with every filter/sort permutation.
+   * Because it's an infinite query tracking multiple pages of data, saving every
+   * permutation will quickly exhaust the browser's 5MB storage quota and crash
+   * the app via a QuotaExceededError.
+   */
   const {
     data,
     fetchNextPage,
@@ -102,8 +92,8 @@ export const useProductsSuspenseInfiniteQuery = () => {
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length < perPage ? undefined : allPages.length,
-    staleTime: 0,
-    gcTime: 5 * 60 * 1000,
+    staleTime,
+    gcTime: staleTime * 2,
   });
 
   return {

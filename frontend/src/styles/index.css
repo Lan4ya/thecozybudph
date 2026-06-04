@@ -59,10 +59,12 @@
 
   --destructive: oklch(0.55 0.18 25);
   --destructive-foreground: oklch(0.98 0 0);
-
-  --border: oklch(0.68 0.05 30);
-  --input: oklch(0.68 0.05 30);
-  --ring: oklch(0.68 0.05 30);
+  /* --border: oklch(0.68 0.05 30); */
+  /* --input: oklch(0.68 0.05 30); */
+  /* --ring: oklch(0.68 0.05 30); */
+  --border: color-mix(in srgb, var(--accent) 60%, transparent);
+  --input: color-mix(in srgb, var(--accent) 60%, transparent);
+  --ring: color-mix(in srgb, var(--accent) 60%, transparent);
 
   --skeleton: #dec9bf;
 
@@ -122,8 +124,12 @@
 }
 
 @theme {
+  /* Fonts */
   --font-ivy-ora-display: "IvyOraDisplay", Georgia, sans-serif;
   --font-back-to-black: "BackToBlack", Didot, Georgia, system-ui;
+  --font-apple:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
 
   --animate-shimmer: shimmer 1.6s ease-in-out infinite;
   --animate-rotate: rotate 1s linear infinite;

@@ -53,9 +53,9 @@ async function deleteAllUsers() {
   console.log("Done resetting all users.");
 }
 
-async function createUser() {
+async function createUser(email?: string) {
   const random = randomInt(1000, 100000);
-  const email = `user${random}@local.dev`;
+  const userEmail = email ?? `user${random}@local.dev`;
 
   const avatar_url = await getRandomAvatarUrl();
 
@@ -63,7 +63,7 @@ async function createUser() {
     data: { user },
     error,
   } = await supabase.auth.admin.createUser({
-    email,
+    email: userEmail,
     password: DEFAULT_PASSWORD,
     email_confirm: true,
     user_metadata: {
@@ -75,20 +75,20 @@ async function createUser() {
     if (error.code === "email_exists" && error.status === 422) {
       return {
         status: "duplicate" as const,
-        email,
+        email: userEmail,
       };
     }
 
     return {
       status: "error" as const,
-      email,
+      email: userEmail,
       error,
     };
   }
 
   return {
     status: "created" as const,
-    email,
+    email: userEmail,
     userId: user?.id,
   };
 }
@@ -97,7 +97,9 @@ export async function seedUsers() {
   await deleteAllUsers();
 
   const results = await Promise.all(
-    Array.from({ length: USERS_TO_CREATE }, () => limit(() => createUser())),
+    Array.from({ length: USERS_TO_CREATE }, (_, idx) =>
+      limit(() => (idx === 0 ? createUser("user@local.dev") : createUser())),
+    ),
   );
 
   let created = 0;

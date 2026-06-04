@@ -53,4 +53,3 @@ const HeroSection = ({ registerSentinel, visibleMap }: HeroSectionProps) => {
 };
 
 export default HeroSection;
-

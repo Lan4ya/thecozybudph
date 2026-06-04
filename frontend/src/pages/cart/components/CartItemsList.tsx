@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import "swiper/swiper.css";
-import { useCartStore } from "@/pages/cart/store/useCartStore";
 import { useShallow } from "zustand/react/shallow";
 import { useCartQuery } from "@/pages/cart/hooks/useCartQuery";
 import { DeleteCartItemDialog } from "./CartItemDeleteDialog";
@@ -12,6 +11,9 @@ import { useToast } from "@/providers/ToastProvider";
 import CartItem from "./CartItem";
 import CartItemsListSkeleton from "@/lib/ui/skeletons/CartItemsListSkeleton";
 import type { CartItemUI } from "@/types";
+import { useCartStore } from "@/store/useCartStore";
+import { Button } from "@/lib/ui/__shadcn__/button";
+import { ArrowRight, ShoppingBag } from "lucide-react";
 
 export const CartItemsList = () => {
   const { addToast } = useToast();
@@ -48,7 +50,7 @@ export const CartItemsList = () => {
 
           const existingItem = getCartItem(item.id);
 
-          // Fill the cardMessages array with empty strings so its length always matches the item’s quantity.
+          // Fill the cardMessages with empty strings so its length always matches the item’s quantity.
           // This is needed to render extra empty TextArea's so the user can add more messages if wanted.
           const cardMessages =
             item.cardMessages.length < item.quantity
@@ -98,7 +100,7 @@ export const CartItemsList = () => {
 
     if (!result.success) {
       isDev && console.error(z.flattenError(result.error));
-      addToast("Something wen't wrong. Please try again later.", "error");
+      addToast("Something went wrong. Please try again", "error");
       return;
     }
 
@@ -117,7 +119,7 @@ export const CartItemsList = () => {
 
     if (!result.success) {
       isDev && console.error(z.flattenError(result.error));
-      addToast("Something wen't wrong. Please try again later.", "error");
+      addToast("Something went wrong. Please try again later", "error");
       return;
     }
 
@@ -130,14 +132,27 @@ export const CartItemsList = () => {
 
   if (!cartItems.length && !isFetching)
     return (
-      <div className="mt-40">
-        <p className="text-center text-muted-foreground">No cart items.</p>
+      <div className="rounded-[2.5rem] border-2 border-dashed border-primary/10 bg-primary/2 py-18 lg:py-24 text-center">
+        <div className="mx-auto size-18 lg:size-20 rounded-full bg-primary/5 flex items-center justify-center mb-6">
+          <ShoppingBag className="text-primary/40 size-8 lg:size-10" />
+        </div>
+        <h3 className="text-2xl font-bold mb-2 text-primary">
+          No cart items yet
+        </h3>
+        <p className="text-muted-foreground font-medium mb-8 max-w-xs mx-auto">
+          You haven't added any product to cart yet.
+        </p>
+        <Button asChild className="rounded-full px-6!">
+          <a href="/shop">
+            Explore Products <ArrowRight />
+          </a>
+        </Button>
       </div>
     );
 
   return (
-    <div>
-      <ul className="grid md:grid-cols-2 gap-5">
+    <div className="mx-auto max-w-7xl">
+      <ul className="flex flex-col gap-6 lg:grid lg:grid-cols-2">
         {cartItems.map((item) => (
           <li key={item.id}>
             <CartItem

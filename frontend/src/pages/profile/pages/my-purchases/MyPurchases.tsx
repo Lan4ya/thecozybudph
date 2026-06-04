@@ -6,9 +6,14 @@ import { cn } from "@/lib/utils/cn";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Receipt, ArrowRight, ShoppingBag } from "lucide-react";
 import { OrderCard, statusConfig } from "./components/OrderCard";
-import { FlowerSpinner } from "@/components/RouteLoaderSpinner";
+import {
+  FlowerSpinner,
+  RouteLoaderFlowerSpinner,
+} from "@/components/RouteLoaderSpinner";
 import PersistSuspense from "@/components/PersistSuspense";
 import { ErrorBoundary } from "react-error-boundary";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/swiper.css";
 
 export type OrderStatusUI = keyof typeof statusConfig | "all";
 
@@ -58,13 +63,7 @@ const MyPurchases = () => {
           </div>
         )}
       >
-        <PersistSuspense
-          fallback={
-            <div className="flex-center h-108">
-              <FlowerSpinner />
-            </div>
-          }
-        >
+        <PersistSuspense fallback={<RouteLoaderFlowerSpinner />}>
           <MyPurchasesContent />
         </PersistSuspense>
       </ErrorBoundary>
@@ -136,32 +135,36 @@ const MyPurchasesContent = () => {
 
   return (
     <div className="space-y-8">
-      <div className="sticky top-0 z-10 -mx-4 px-4 bg-background/80 backdrop-blur-md border-b md:relative md:top-auto md:mx-0 md:px-0 md:bg-transparent md:backdrop-blur-none md:border-none">
-        <div className="overflow-x-auto pb-4 pt-2 no-scrollbar">
-          <div
-            className="flex min-w-max gap-2 rounded-xl p-2 md:py-0 md:px-0.5 bg-primary/10 md:bg-transparent md:gap-3"
-            role="tablist"
-            aria-label="Order status tabs"
-          >
-            {ORDER_STATUS_TABS.map(({ status, label }, idx) => (
+      <div className="sticky top-0 z-10 -mx-4 px-4 bg-background/80 backdrop-blur-md md:relative md:top-auto md:mx-0 md:px-0 md:bg-transparent md:backdrop-blur-none md:border-none">
+        <Swiper
+          slidesPerView="auto"
+          spaceBetween={12}
+          className="w-full pb-4 pt-2 md:pb-0"
+          role="tablist"
+          aria-label="Order status tabs"
+        >
+          {ORDER_STATUS_TABS.map(({ status, label }, idx) => (
+            <SwiperSlide
+              key={`status-${idx}`}
+              className="w-auto! px-1 py-1.5 md:py-0.5"
+            >
               <button
-                key={`status-${idx}`}
                 type="button"
                 role="tab"
                 aria-selected={activeTab === status}
                 onClick={() => setActiveTab(status)}
                 className={cn(
-                  "rounded-xl px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition-all",
+                  "rounded-xl px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap",
                   activeTab === status
                     ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105"
-                    : "text-muted-foreground hover:text-foreground hover:bg-primary/20 md:hover:bg-transparent md:hover:underline md:underline-offset-8 md:decoration-2",
+                    : "text-muted-foreground hover:text-foreground hover:bg-primary/20 md:hover:bg-transparent md:hover:underline md:underline-offset-8 md:decoration-2 bg-primary/10 md:bg-transparent",
                 )}
               >
                 {label}
               </button>
-            ))}
-          </div>
-        </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
       </div>
 
       {orders.length === 0 ? (
@@ -169,7 +172,9 @@ const MyPurchasesContent = () => {
           <div className="mx-auto w-20 h-20 rounded-full bg-primary/5 flex items-center justify-center mb-6">
             <ShoppingBag className="text-primary/40 h-10 w-10" />
           </div>
-          <h3 className="text-2xl font-bold mb-2 text-primary">No orders yet</h3>
+          <h3 className="text-2xl font-bold mb-2 text-primary">
+            No orders yet
+          </h3>
           {currentStatus?.label ? (
             <p className="text-muted-foreground font-medium mb-8 max-w-xs mx-auto">
               You don't have any "{currentStatus.label.toLowerCase()}" order
@@ -184,10 +189,31 @@ const MyPurchasesContent = () => {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {orders.map((order) => (
-              <OrderCard key={order.item.id} order={order} />
-            ))}
+          <div className="flex flex-col md:flex-row gap-6 items-start">
+            {/* Mobile View: Single Column */}
+            <div className="flex flex-col space-y-6 w-full md:hidden">
+              {orders.map((order) => (
+                <OrderCard key={order.id} order={order} />
+              ))}
+            </div>
+
+            {/* Desktop View: Left Column (Even indices) */}
+            <div className="hidden md:flex flex-1 flex-col space-y-6 w-full">
+              {orders
+                .filter((_, idx) => idx % 2 === 0)
+                .map((order) => (
+                  <OrderCard key={order.id} order={order} />
+                ))}
+            </div>
+
+            {/* Desktop View: Right Column (Odd indices) */}
+            <div className="hidden md:flex flex-1 flex-col space-y-6 w-full">
+              {orders
+                .filter((_, idx) => idx % 2 !== 0)
+                .map((order) => (
+                  <OrderCard key={order.id} order={order} />
+                ))}
+            </div>
           </div>
 
           {isFetchingNextPage && (

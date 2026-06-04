@@ -1,10 +1,13 @@
 import {
+  AddressData,
   CreateAddressInput,
   CreateOrderInput,
   CreateProductInput,
   CreateShippingQuoteInput,
   PayOrderInput,
+  ShipOrderInput,
 } from "@shared/schemas/index.ts";
+import { CreateLalamoveQuoteInput } from "@shared/integrations/lalamove/create-lalamove-quotation.ts";
 
 export const genCreateProductInput = (): CreateProductInput => ({
   name: "Rose Bouquet",
@@ -101,22 +104,34 @@ export const genCreateAddressInput = (): CreateAddressInput => ({
   isDefault: true,
 });
 
-export const createShippingQuotationInput = (): CreateShippingQuoteInput => ({
-  recipientAddress: {
-    postalCode: "1008",
-    region: "NCR",
-    province: "Sampaloc Manila",
-    city: "Metro Manila",
-    barangay: "411",
-    addressLine: "1462 G Tuazon St.",
-  },
+export const createShippingQuotationInput = (params: {
+  recipientAddressId: string;
+}): CreateShippingQuoteInput => ({
+  recipientAddressId: params.recipientAddressId,
+  serviceType: "motorcycle",
+});
+
+export const genLalamoveQuoteInput = (
+  address: CreateLalamoveQuoteInput["recipientAddress"],
+) => ({
   senderAddress: {
-    postalCode: "1550",
     region: "NCR",
-    province: "Mandaluyong City",
-    city: "Metro Manila",
+    city: "Mandaluyong City",
+    postalCode: "1550",
     barangay: "Barangka Ilaya",
     addressLine: "Edsa Corner Pioneer Street",
+    latitude: "14.5794000",
+    longitude: "121.0359000",
+  },
+  recipientAddress: {
+    region: address.region,
+    city: address.city,
+    postalCode: address.postalCode,
+    barangay: address.barangay,
+    addressLine: address.addressLine,
+    province: address.province,
+    latitude: address.latitude,
+    longitude: address.longitude,
   },
   serviceType: "motorcycle",
 });
@@ -126,6 +141,7 @@ export const genCreateOrderInput = (params: {
   productId: string;
   variantId: string;
   shippingQuoteId: string;
+  primaryImageUrl?: string;
 }): CreateOrderInput => ({
   source: "shop",
   addressId: params.addressId,
@@ -136,7 +152,8 @@ export const genCreateOrderInput = (params: {
       cardMessages: [],
       quantity: 2,
       primaryImageUrl:
-        "http://127.0.0.1:54321/storage/v1/object/public/products/e940a49c-96ca-45d6-b0b4-88aae5bb0440",
+        params.primaryImageUrl ??
+        "http://127.0.0.1:54321/storage/v1/object/public/products/dummy",
     },
   ],
   shippingQuoteId: params.shippingQuoteId,
@@ -154,34 +171,8 @@ export const genPayOrderInput = (params: {
     email: "test@gmail.com",
   },
   type: "gcash",
-  checkoutSessionId: "9ec2e6a5-5482-4961-945f-ec6a9cbda07c",
 });
 
-export const genAdminShipOrderInput = () => ({
-  sender: {
-    address: {
-      fullName: "Sender Name",
-      phoneNumber: "+639170000000",
-      region: "NCR",
-      city: "Mandaluyong",
-      province: "Metro Manila",
-      postalCode: "1550",
-      barangay: "Barangka Ilaya",
-      addressLine: "Edsa Corner Pioneer Street",
-    },
-  },
-  recipient: {
-    address: {
-      fullName: "Recipient Name",
-      phoneNumber: "+639171111111",
-      region: "NCR",
-      city: "Manila",
-      province: "Sampaloc",
-      postalCode: "1008",
-      barangay: "411",
-      addressLine: "1462 G Tuazon St.",
-    },
-    remarks: "Handle with care",
-  },
-  serviceType: "motorcycle",
+export const genAdminShipOrderInput = (p?: ShipOrderInput): ShipOrderInput => ({
+  remarks: p?.remarks ?? "Handle with care",
 });

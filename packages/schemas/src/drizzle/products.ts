@@ -65,7 +65,9 @@ export const products = pgTable(
 
     productCollectionId: uuid("product_collection_id").references(
       () => productCollections.id,
-      { onDelete: "set null" },
+      {
+        onDelete: "set null",
+      },
     ),
     productCategoryId: uuid("product_category_id").references(
       () => productCategories.id,
@@ -86,6 +88,7 @@ export const products = pgTable(
       .notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .defaultNow()
+      .$onUpdate(() => new Date())
       .notNull(),
   },
   (_t) => [

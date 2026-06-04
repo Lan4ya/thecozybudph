@@ -2,6 +2,7 @@ import { Input } from "@/lib/ui/__shadcn__/input";
 import type {
   CreateProductFormInput,
   ProductFormInput,
+  ProductFormOutput,
   UpdateProductFormInput,
 } from "@cozybud/schemas";
 import { useFormContext, useWatch, type FieldErrors } from "react-hook-form";
@@ -32,7 +33,7 @@ export const ProductDetails = ({
     control,
     register,
     formState: { errors },
-  } = useFormContext<ProductFormInput>();
+  } = useFormContext<ProductFormInput, unknown, ProductFormOutput>();
 
   const [mode, description] = useWatch({
     name: ["mode", "description"],
@@ -149,11 +150,7 @@ export const ProductDetails = ({
           )}
 
           <span
-            className={`ml-auto text-xs ${
-              (description?.length ?? 0) > 600
-                ? "text-red-500"
-                : "text-muted-foreground"
-            }`}
+            className={`ml-auto text-xs ${(description?.length ?? 0) > 600 ? "text-red-500" : "text-muted-foreground"}`}
           >
             {description?.length ?? 0}/600
           </span>

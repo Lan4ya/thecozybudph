@@ -3,13 +3,11 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/lib/ui/__shadcn__/dialog";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { useState } from "react";
 
 export function DeleteCartItemDialog({
   open,
@@ -24,8 +22,6 @@ export function DeleteCartItemDialog({
   isDeleting: boolean;
   deletingItemCount: number;
 }) {
-  const [diagOpen, setDiagOpen] = useState(false);
-
   return (
     <Dialog
       open={open}
@@ -33,18 +29,6 @@ export function DeleteCartItemDialog({
         if (!isOpen) onCancel(); // cleanup when dialog closes
       }}
     >
-      {/* @ts-ignore */}
-      {/* <DialogTrigger asChild> */}
-      {/*   <Button */}
-      {/*     variant="destructive" */}
-      {/*     size="sm" */}
-      {/*     disabled={isDeleting} */}
-      {/*     className={cn(isDeleting && "opacity-70 pointer-events-none")} */}
-      {/*     aria-label={`Delete ${product.name}`} */}
-      {/*   > */}
-      {/*     {isDeleting ? <Spinner /> : <Trash2 className="size-4" />} */}
-      {/*   </Button> */}
-      {/* </DialogTrigger> */}
       <DialogContent className="sm:max-w-[420px]">
         <DialogHeader>
           <VisuallyHidden>
@@ -58,17 +42,23 @@ export function DeleteCartItemDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <DialogFooter className="flex">
+        <div className="flex gap-2">
           <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline" className="flex-1">
+              Cancel
+            </Button>
           </DialogClose>
 
           <DialogClose asChild>
-            <Button variant="destructive" onClick={onConfirm}>
+            <Button
+              variant="destructive"
+              className="flex-1"
+              onClick={onConfirm}
+            >
               Delete
             </Button>
           </DialogClose>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );

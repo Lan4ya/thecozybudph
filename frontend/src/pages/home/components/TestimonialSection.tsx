@@ -1,9 +1,7 @@
 import { Card, CardContent } from "@/lib/ui/__shadcn__/card";
 import { ASSETS } from "@/lib/constants/assets";
-import { useAnimationFrame } from "framer-motion";
+import { motion, useAnimationFrame } from "framer-motion";
 import { useRef } from "react";
-import { useAnimateOnView } from "@/hooks/useAnimateOnView";
-import { cn } from "@/lib/utils/cn";
 
 const SPEED = 0.45;
 const REVIEW_LOOP_COPIES = 4;
@@ -48,7 +46,6 @@ const dummyReviews: Review[] = [
 export const ReviewCarousel = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const xRef = useRef(0);
-  const { registerSentinel, visibleMap } = useAnimateOnView();
 
   useAnimationFrame((_, delta) => {
     if (!containerRef.current) return;
@@ -65,14 +62,12 @@ export const ReviewCarousel = () => {
   });
 
   return (
-    <section
-      ref={registerSentinel}
-      className={cn(
-        "custom-container py-18 lg:py-24 mx-auto max-w-[1420px] w-full flex flex-col gap-6 overflow-hidden transition-all duration-1000 ease-out",
-        visibleMap[0]
-          ? "translate-y-0 opacity-100"
-          : "translate-y-8 opacity-0",
-      )}
+    <motion.section
+      initial={{ opacity: 0, y: 32 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+      className="custom-container py-18 lg:py-24 mx-auto max-w-[1420px] w-full flex flex-col gap-6 overflow-hidden"
     >
       <div className="space-y-6 w-full ">
         <p className="text-xs font-semibold uppercase tracking-[0.32em] text-accent/70">
@@ -99,7 +94,7 @@ export const ReviewCarousel = () => {
             <ReviewCard key={i} {...review} />
           ))}
       </div>
-    </section>
+    </motion.section>
   );
 };
 

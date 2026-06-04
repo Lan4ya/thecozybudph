@@ -4,7 +4,7 @@ import { AppError } from "../../errors/Errors.ts";
 
 // Note: If you create a new webhook, make sure to update the webhook secret key in .env
 // since the verifySignature will always fail if the app is using the wrong/outdated key.
-const WEBHOOK_SECRET = Deno.env.get("PAYMONGO_CHECKOUT_WEBHOOK_SECRET");
+const WEBHOOK_SECRET = Deno.env.get("PAYMONGO_WEBHOOK_SECRET");
 
 // Scroll to number 3 Securing a Webhook:
 // https://developers.paymongo.com/docs/creating-webhook
@@ -12,7 +12,8 @@ export function verifySignature(
   rawBody: string,
   signatureHeader: string,
 ): boolean {
-  if (!WEBHOOK_SECRET) throw AppError.badRequest({ message: "Missing Webhook Secret" });
+  if (!WEBHOOK_SECRET)
+    throw AppError.badRequest({ message: "Missing Webhook Secret" });
 
   // signatureHeader format: t=timestamp,te=test_signature,li=live_signature
   const parts = signatureHeader

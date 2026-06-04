@@ -1,6 +1,6 @@
+import { payments } from "@shared/schemas/index.ts";
 import { and, eq } from "drizzle-orm";
 import { DrizzleClient } from "../../db/client.ts";
-import { orders, payments } from "@shared/schemas/index.ts";
 
 export const PaymentRepository = {
   checkExists: (
@@ -8,17 +8,15 @@ export const PaymentRepository = {
     params: {
       paymentId: string;
       profileId: string;
-      isActive?: boolean;
     },
   ): Promise<boolean> => {
-    const { paymentId, profileId, isActive = true } = params;
+    const { paymentId, profileId } = params;
 
     return db.rls(async (tx) => {
       const result = await tx.query.payments.findFirst({
         where: and(
           eq(payments.id, paymentId),
           eq(payments.profileId, profileId),
-          eq(payments.isActive, isActive),
         ),
         columns: {
           id: true,
@@ -31,16 +29,32 @@ export const PaymentRepository = {
 
   getActiveStatusById: (db: DrizzleClient, paymentId: string) => {
     return db.rls(async (tx) => {
-      const [result] = await tx
-        .select({
-          status: payments.status,
-          expiresAt: orders.expiresAt,
-        })
-        .from(payments)
-        .innerJoin(orders, eq(payments.orderId, orders.id))
-        .where(and(eq(payments.isActive, true), eq(payments.id, paymentId)));
+      const result = await tx.query.payments.findFirst({
+        columns: {
+          status: true,
+          orderId: true,
+        },
+        with: {
+          order: {
+            columns: {
+              expiresAt: true,
+            },
+          },
+        },
+        where: (payments, { and, eq, notInArray }) =>
+          and(
+            eq(payments.id, paymentId),
+            notInArray(payments.status, ["refunded", "cancelled"]),
+          ),
+      });
 
-      return result;
+      if (!result) return null;
+
+      return {
+        orderId: result.orderId,
+        status: result.status,
+        expiresAt: result.order?.expiresAt ?? null,
+      };
     });
   },
 };

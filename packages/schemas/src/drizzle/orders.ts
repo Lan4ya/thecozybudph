@@ -10,6 +10,7 @@ import {
   pgPolicy,
   index,
   uniqueIndex,
+  numeric,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { profiles } from "./profiles.ts";
@@ -19,7 +20,7 @@ import type {
   ProductVariant,
   ServiceType,
 } from "../types/index.ts";
-import { authenticatedRole, postgresRole } from "drizzle-orm/supabase/rls";
+import { authenticatedRole } from "drizzle-orm/supabase/rls";
 import type { DBOrderStatus } from "../types/db/order.ts";
 
 export const orders = pgTable(
@@ -29,7 +30,6 @@ export const orders = pgTable(
     profileId: uuid("profile_id")
       .notNull()
       .references(() => profiles.id, { onDelete: "set null" }),
-    shipmentOrderId: text("shipment_order_id"),
     status: text("status").$type<DBOrderStatus>().default("to_pay").notNull(),
     source: text("source").$type<OrderSource>().notNull(),
     serviceType: text("service_type").$type<ServiceType>().notNull(),
@@ -42,8 +42,13 @@ export const orders = pgTable(
     totalCents: integer("total_cents").notNull(),
 
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
   },
   (table) => [
     check("orders_discount_cents_check", sql`${table.discountCents} >= 0`),
@@ -64,23 +69,23 @@ export const orders = pgTable(
       as: "permissive",
       to: authenticatedRole,
       for: "select",
-      using: sql`auth.uid() = profile_id`,
+      using: sql`(select auth.uid()) = profile_id`,
     }),
 
     pgPolicy("authenticated can insert own order", {
       as: "permissive",
       to: authenticatedRole,
       for: "insert",
-      withCheck: sql`auth.uid() = profile_id`,
+      withCheck: sql`(select auth.uid()) = profile_id`,
     }),
 
-    pgPolicy("postgresRole can update active order", {
-      as: "permissive",
-      to: postgresRole,
-      for: "update",
-      using: sql`auth.uid() = profile_id AND expires_at > now()`,
-      withCheck: sql`auth.uid() = profile_id AND expires_at > now()`,
-    }),
+    // pgPolicy("postgresRole can update active order", {
+    //   as: "permissive",
+    //   to: postgres,
+    //   for: "update",
+    //   using: sql`(select auth.uid()) = profile_id AND expires_at > now()`,
+    //   withCheck: sql`(select auth.uid()) = profile_id AND expires_at > now()`,
+    // }),
   ],
 );
 
@@ -99,6 +104,8 @@ export const orderAddressesSnapshot = pgTable(
     barangay: text("barangay").notNull(),
     addressLine: text("address_line").notNull(),
     phoneNumber: varchar("phone_number", { length: 13 }).notNull(), // length is 13 since we will use universal dialing code for PH +63XXXXXXXXXX
+    latitude: numeric("latitude", { precision: 10, scale: 7 }).notNull(),
+    longitude: numeric("longitude", { precision: 10, scale: 7 }).notNull(),
   },
   (_t) => [
     pgPolicy("authenticated can select own order address snapshot", {
@@ -109,7 +116,7 @@ export const orderAddressesSnapshot = pgTable(
         EXISTS (
           SELECT 1 FROM orders 
           WHERE orders.id = order_id 
-          AND orders.profile_id = auth.uid()
+          AND orders.profile_id = (select auth.uid())
         )
       `,
     }),
@@ -122,7 +129,7 @@ export const orderAddressesSnapshot = pgTable(
         EXISTS (
           SELECT 1 FROM orders 
           WHERE orders.id = order_id 
-          AND orders.profile_id = auth.uid()
+          AND (orders.profile_id = auth.uid())
         )
       `,
     }),
@@ -174,7 +181,7 @@ export const orderItemsSnapshots = pgTable(
         EXISTS (
           SELECT 1 FROM orders 
           WHERE orders.id = order_id 
-          AND orders.profile_id = auth.uid()
+          AND (orders.profile_id = auth.uid())
         )
       `,
     }),
@@ -187,7 +194,7 @@ export const orderItemsSnapshots = pgTable(
         EXISTS (
           SELECT 1 FROM orders 
           WHERE orders.id = order_id 
-          AND orders.profile_id = auth.uid()
+          AND (orders.profile_id = auth.uid())
         )
       `,
     }),
@@ -206,8 +213,13 @@ export const orderCreationRequests = pgTable(
     orderId: uuid("order_id").references(() => orders.id, {
       onDelete: "set null",
     }),
-    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
   },
   (table) => [
     uniqueIndex("order_creation_requests_profile_key_unique").on(

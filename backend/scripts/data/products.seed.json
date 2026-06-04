@@ -8,21 +8,18 @@
       "options": [
         {
           "name": "stem count",
-          "values": [
-            "3",
-            "6"
-          ]
+          "values": ["3", "6"]
         }
       ],
       "variants": [
         {
-          "priceCents": 238000,
+          "priceCents": 95000,
           "attributes": {
             "stem count": "3"
           }
         },
         {
-          "priceCents": 428000,
+          "priceCents": 165000,
           "attributes": {
             "stem count": "6"
           }
@@ -43,43 +40,37 @@
       "options": [
         {
           "name": "stem count",
-          "values": [
-            "3",
-            "6"
-          ]
+          "values": ["3", "6"]
         },
         {
           "name": "wrap style",
-          "values": [
-            "linen",
-            "silk"
-          ]
+          "values": ["linen", "silk"]
         }
       ],
       "variants": [
         {
-          "priceCents": 255000,
+          "priceCents": 98000,
           "attributes": {
             "stem count": "3",
             "wrap style": "linen"
           }
         },
         {
-          "priceCents": 265000,
+          "priceCents": 108000,
           "attributes": {
             "stem count": "3",
             "wrap style": "silk"
           }
         },
         {
-          "priceCents": 445000,
+          "priceCents": 168000,
           "attributes": {
             "stem count": "6",
             "wrap style": "linen"
           }
         },
         {
-          "priceCents": 455000,
+          "priceCents": 178000,
           "attributes": {
             "stem count": "6",
             "wrap style": "silk"
@@ -101,21 +92,18 @@
       "options": [
         {
           "name": "stem count",
-          "values": [
-            "3",
-            "6"
-          ]
+          "values": ["3", "6"]
         }
       ],
       "variants": [
         {
-          "priceCents": 249000,
+          "priceCents": 99000,
           "attributes": {
             "stem count": "3"
           }
         },
         {
-          "priceCents": 439000,
+          "priceCents": 169000,
           "attributes": {
             "stem count": "6"
           }
@@ -136,43 +124,37 @@
       "options": [
         {
           "name": "stem count",
-          "values": [
-            "3",
-            "6"
-          ]
+          "values": ["3", "6"]
         },
         {
           "name": "wrap style",
-          "values": [
-            "linen",
-            "silk"
-          ]
+          "values": ["linen", "silk"]
         }
       ],
       "variants": [
         {
-          "priceCents": 257000,
+          "priceCents": 105000,
           "attributes": {
             "stem count": "3",
             "wrap style": "linen"
           }
         },
         {
-          "priceCents": 267000,
+          "priceCents": 115000,
           "attributes": {
             "stem count": "3",
             "wrap style": "silk"
           }
         },
         {
-          "priceCents": 447000,
+          "priceCents": 175000,
           "attributes": {
             "stem count": "6",
             "wrap style": "linen"
           }
         },
         {
-          "priceCents": 457000,
+          "priceCents": 185000,
           "attributes": {
             "stem count": "6",
             "wrap style": "silk"
@@ -180,9 +162,7 @@
         }
       ],
       "primaryImageIndex": 0,
-      "images": [
-        "./images/products/blush-camellia.jpg"
-      ]
+      "images": ["./images/products/blush-camellia.jpg"]
     },
     {
       "name": "opal tulip",
@@ -192,30 +172,25 @@
       "options": [
         {
           "name": "stem count",
-          "values": [
-            "3",
-            "6"
-          ]
+          "values": ["3", "6"]
         }
       ],
       "variants": [
         {
-          "priceCents": 244000,
+          "priceCents": 95000,
           "attributes": {
             "stem count": "3"
           }
         },
         {
-          "priceCents": 434000,
+          "priceCents": 165000,
           "attributes": {
             "stem count": "6"
           }
         }
       ],
       "primaryImageIndex": 0,
-      "images": [
-        "./images/products/opal-tulip.jpg"
-      ]
+      "images": ["./images/products/opal-tulip.jpg"]
     },
     {
       "name": "peony lumiere",
@@ -224,54 +199,86 @@
       "collectionName": "first bloom",
       "options": [
         {
+          "name": "color variation",
+          "values": ["red", "white"]
+        },
+        {
           "name": "stem count",
-          "values": [
-            "3",
-            "6"
-          ]
+          "values": ["3", "6"]
         },
         {
           "name": "wrap style",
-          "values": [
-            "linen",
-            "silk"
-          ]
+          "values": ["linen", "silk"]
         }
       ],
       "variants": [
         {
-          "priceCents": 258000,
+          "priceCents": 110000,
           "attributes": {
+            "color variation": "red",
             "stem count": "3",
             "wrap style": "linen"
           }
         },
         {
-          "priceCents": 268000,
+          "priceCents": 120000,
           "attributes": {
+            "color variation": "red",
             "stem count": "3",
             "wrap style": "silk"
           }
         },
         {
-          "priceCents": 448000,
+          "priceCents": 180000,
           "attributes": {
+            "color variation": "red",
             "stem count": "6",
             "wrap style": "linen"
           }
         },
         {
-          "priceCents": 458000,
+          "priceCents": 190000,
           "attributes": {
+            "color variation": "red",
+            "stem count": "6",
+            "wrap style": "silk"
+          }
+        },
+        {
+          "priceCents": 110000,
+          "attributes": {
+            "color variation": "white",
+            "stem count": "3",
+            "wrap style": "linen"
+          }
+        },
+        {
+          "priceCents": 120000,
+          "attributes": {
+            "color variation": "white",
+            "stem count": "3",
+            "wrap style": "silk"
+          }
+        },
+        {
+          "priceCents": 180000,
+          "attributes": {
+            "color variation": "white",
+            "stem count": "6",
+            "wrap style": "linen"
+          }
+        },
+        {
+          "priceCents": 190000,
+          "attributes": {
+            "color variation": "white",
             "stem count": "6",
             "wrap style": "silk"
           }
         }
       ],
       "primaryImageIndex": 0,
-      "images": [
-        "./images/products/peony-lumiere.jpg"
-      ]
+      "images": ["./images/products/peony-lumiere.jpg"]
     },
     {
       "name": "moonlight sonata",
@@ -281,21 +288,18 @@
       "options": [
         {
           "name": "stem count",
-          "values": [
-            "3",
-            "6"
-          ]
+          "values": ["3", "6"]
         }
       ],
       "variants": [
         {
-          "priceCents": 250000,
+          "priceCents": 115000,
           "attributes": {
             "stem count": "3"
           }
         },
         {
-          "priceCents": 450000,
+          "priceCents": 185000,
           "attributes": {
             "stem count": "6"
           }
@@ -314,21 +318,18 @@
       "options": [
         {
           "name": "stem count",
-          "values": [
-            "1",
-            "3"
-          ]
+          "values": ["1", "3"]
         }
       ],
       "variants": [
         {
-          "priceCents": 50000,
+          "priceCents": 80000,
           "attributes": {
             "stem count": "1"
           }
         },
         {
-          "priceCents": 70000,
+          "priceCents": 130000,
           "attributes": {
             "stem count": "3"
           }
@@ -348,21 +349,18 @@
       "options": [
         {
           "name": "stem count",
-          "values": [
-            "1",
-            "3"
-          ]
+          "values": ["1", "3"]
         }
       ],
       "variants": [
         {
-          "priceCents": 70000,
+          "priceCents": 82000,
           "attributes": {
             "stem count": "1"
           }
         },
         {
-          "priceCents": 90000,
+          "priceCents": 135000,
           "attributes": {
             "stem count": "3"
           }
@@ -382,21 +380,18 @@
       "options": [
         {
           "name": "stem count",
-          "values": [
-            "1",
-            "3"
-          ]
+          "values": ["1", "3"]
         }
       ],
       "variants": [
         {
-          "priceCents": 68000,
+          "priceCents": 85000,
           "attributes": {
             "stem count": "1"
           }
         },
         {
-          "priceCents": 92000,
+          "priceCents": 140000,
           "attributes": {
             "stem count": "3"
           }
@@ -417,21 +412,18 @@
       "options": [
         {
           "name": "stem count",
-          "values": [
-            "3",
-            "6"
-          ]
+          "values": ["3", "6"]
         }
       ],
       "variants": [
         {
-          "priceCents": 110000,
+          "priceCents": 145000,
           "attributes": {
             "stem count": "3"
           }
         },
         {
-          "priceCents": 136000,
+          "priceCents": 220000,
           "attributes": {
             "stem count": "6"
           }
@@ -451,21 +443,18 @@
       "options": [
         {
           "name": "stem count",
-          "values": [
-            "1",
-            "3"
-          ]
+          "values": ["1", "3"]
         }
       ],
       "variants": [
         {
-          "priceCents": 200000,
+          "priceCents": 160000,
           "attributes": {
             "stem count": "1"
           }
         },
         {
-          "priceCents": 300000,
+          "priceCents": 240000,
           "attributes": {
             "stem count": "3"
           }
@@ -485,21 +474,18 @@
       "options": [
         {
           "name": "stem count",
-          "values": [
-            "1",
-            "3"
-          ]
+          "values": ["1", "3"]
         }
       ],
       "variants": [
         {
-          "priceCents": 52000,
+          "priceCents": 88000,
           "attributes": {
             "stem count": "1"
           }
         },
         {
-          "priceCents": 73000,
+          "priceCents": 145000,
           "attributes": {
             "stem count": "3"
           }
@@ -518,21 +504,18 @@
       "options": [
         {
           "name": "stem count",
-          "values": [
-            "1",
-            "3"
-          ]
+          "values": ["1", "3"]
         }
       ],
       "variants": [
         {
-          "priceCents": 56000,
+          "priceCents": 90000,
           "attributes": {
             "stem count": "1"
           }
         },
         {
-          "priceCents": 76000,
+          "priceCents": 150000,
           "attributes": {
             "stem count": "3"
           }
@@ -552,21 +535,18 @@
       "options": [
         {
           "name": "stem count",
-          "values": [
-            "3",
-            "6"
-          ]
+          "values": ["3", "6"]
         }
       ],
       "variants": [
         {
-          "priceCents": 114000,
+          "priceCents": 155000,
           "attributes": {
             "stem count": "3"
           }
         },
         {
-          "priceCents": 142000,
+          "priceCents": 235000,
           "attributes": {
             "stem count": "6"
           }

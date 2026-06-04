@@ -2,7 +2,7 @@
   "workspace": [
     "./admin",
     "./auth",
-    "./shipment",
+    "./event",
     "./address",
     "./cart",
     "./order",
@@ -28,7 +28,6 @@
     "@hono/zod-validator": "npm:@hono/zod-validator@0.8.0",
     "hono-rate-limiter": "npm:hono-rate-limiter@0.5.3",
     "zod": "npm:zod@^4.4.3",
-    "axios": "npm:axios@^1.16.1",
     "drizzle-orm": "npm:drizzle-orm@0.45.2",
     "drizzle-kit": "npm:drizzle-kit@0.31.10",
     "drizzle-zod": "npm:drizzle-zod@0.8.3",

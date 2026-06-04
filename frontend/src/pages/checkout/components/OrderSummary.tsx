@@ -4,11 +4,11 @@ import { ChevronDown, Package } from "lucide-react";
 import { ProductImage } from "@/components/products/ProductImage";
 import { capitalizeFirstLetter, formatPriceCents } from "@/lib/utils/format";
 // import type { OrderItem } from "@cozybud/schemas";
-import { useCheckoutStore, type OrderItemUI } from "../store/useCheckoutStore";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { useState } from "react";
 import { cn } from "@/lib/utils/cn";
 import { MetaBadge } from "@/components/MetaBadge";
+import { useCheckoutStore, type OrderItemUI } from "@/store/useCheckoutStore";
 
 const OrderSummary = () => {
   const orderItemsUI = useCheckoutStore((s) => s.orderItemsUI);

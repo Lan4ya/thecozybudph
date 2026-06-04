@@ -6,14 +6,30 @@ import {
   beginCreateOrderIdempotency,
   completeCreateOrderIdempotency,
   failCreateOrderIdempotency,
-} from "./create-order-idempotency.ts";
-import { prepareCreateOrderData } from "./create-order-prep.ts";
+} from "./_create-order-idempotency.ts";
+import { prepareCreateOrderData } from "./_create-order-prep.ts";
 import {
   createOrderSnapshots,
   rollbackOrderSnapshots,
-} from "./create-order-snapshots.ts";
-import { persistCreateOrderTransaction } from "./create-order-transaction.ts";
+} from "./_create-order-snapshots.ts";
+import { persistCreateOrderTransaction } from "./_create-order-transaction.ts";
 
+/**
+ * Orchestrates the creation of a new order.
+ *
+ * This process is designed to be atomic and idempotent. It coordinates:
+ * 1. Idempotency check: Prevents duplicate orders from network retries or double-clicks.
+ * 2. Data Preparation: Retrieves data (prices, address, etc.) directly from DB for data integrity,
+ * 3. Snapshotting: Creates permanent copies of product images and other details to preserve the order's
+ *    state even if the original product is modified or deleted.
+ * 4. Persistence: Saves the order and related records in a single database transaction.
+ * 5. Cleanup/Rollback: Handles failure by recording errors and cleaning up orphan snapshots.
+ *
+ * @param db - Drizzle database client.
+ * @param supabaseService - Supabase client for storage operations.
+ * @param params - Contains profileId, payload, and the mandatory Idempotency-Key.
+ * @returns orderId and paymentId.
+ */
 export const createOrder = async (
   db: DrizzleClient,
   supabaseService: SupabaseDB,
@@ -29,6 +45,7 @@ export const createOrder = async (
     throw AppError.badRequest({ message: "Missing Idempotency-Key" });
   }
 
+  // Claim or replay idempotency key.
   const idempotencyResult = await beginCreateOrderIdempotency(db, {
     profileId,
     payload,
@@ -39,14 +56,17 @@ export const createOrder = async (
     return idempotencyResult.response;
   }
 
+  // Tracks which snapshot references we incremented so we can decrement them on failure.
   const incrementedSnapshotHashes: string[] = [];
 
   try {
+    // Validate availability and calculate final cents.
     const preparedOrderData = await prepareCreateOrderData(
       db,
       profileId,
       payload,
     );
+
     const snapshotUrlByHash = await createOrderSnapshots(
       db,
       supabaseService,
@@ -62,6 +82,7 @@ export const createOrder = async (
       snapshotUrlByHash,
     });
 
+    // Mark the idempotency key as completed and store the response for future replays.
     await completeCreateOrderIdempotency(db, {
       profileId,
       idempotencyKey,
@@ -71,6 +92,8 @@ export const createOrder = async (
 
     return createdOrder;
   } catch (error) {
+    // Failure Handling:
+    // Mark idempotency as failed so the client can retry with the same key.
     await failCreateOrderIdempotency(db, {
       profileId,
       idempotencyKey,
@@ -78,6 +101,7 @@ export const createOrder = async (
       error,
     });
 
+    // Rollback storage snapshots (decrement ref counts and delete if orphaned).
     await rollbackOrderSnapshots(
       db,
       supabaseService,

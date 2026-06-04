@@ -63,18 +63,69 @@ beforeAll(async () => {
     email: TEST_USER_EMAIL,
     password: TEST_PASSWORD,
   });
+
+  // Create company address if it doesn't exist
+  try {
+    const [existing] = await adminPg`
+      SELECT id FROM addresses WHERE is_company_address = true LIMIT 1
+    `;
+
+    if (!existing) {
+      await adminPg`
+        INSERT INTO addresses (
+          profile_id,
+          full_name,
+          postal_code,
+          region,
+          city,
+          province,
+          barangay,
+          address_line,
+          phone_number,
+          is_default,
+          is_company_address,
+          latitude,
+          longitude
+        ) VALUES (
+          null,
+          'The Cozy Bud',
+          '1550',
+          'NCR',
+          'Mandaluyong',
+          'Metro Manila',
+          'Barangka Ilaya',
+          'Edsa Corner Pioneer Street',
+          '+639170000000',
+          true,
+          true,
+          14.5739000,
+          121.0447000
+        )
+      `.catch((err) => {
+        // Handle race condition where another test might have inserted it
+        // after our SELECT check but before our INSERT.
+        // Postgres error code 23505 is unique_violation.
+        if (err.code === "23505") return;
+        throw err;
+      });
+    }
+  } catch (err) {
+    console.error("Failed to seed company address:", err);
+    throw err;
+  }
 });
 
 afterAll(async () => {
-  // Explicitly stop any auth refresh timers that might have started
-  // despite the config (known issue in some supabase-js versions)
   supabase.auth.stopAutoRefresh();
   supabaseService.auth.stopAutoRefresh();
 
-  // delete users
-  await Promise.all([
-    supabaseService.auth.admin.deleteUser(adminUserId),
-    supabaseService.auth.admin.deleteUser(normalUserId),
-  ]);
+  // Try to delete users, ignore if already gone
+  try {
+    await Promise.all([
+      supabaseService.auth.admin.deleteUser(adminUserId),
+      supabaseService.auth.admin.deleteUser(normalUserId),
+    ]);
+  } catch {}
+
   await adminPg.end();
 });

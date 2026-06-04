@@ -1,0 +1,1 @@
+ALTER POLICY "postgresRole can update active order" ON "orders" TO postgres USING ((select auth.uid()) = profile_id AND expires_at > now()) WITH CHECK ((select auth.uid()) = profile_id AND expires_at > now());

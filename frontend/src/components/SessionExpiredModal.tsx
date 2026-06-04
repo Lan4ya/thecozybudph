@@ -10,12 +10,12 @@ import { Button } from "@/lib/ui/__shadcn__/button";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useEffect, useState } from "react";
 import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
-import { useCartStore } from "@/pages/cart/store/useCartStore";
-import { useProductSelectionStore } from "@/pages/shop/store/useProductSelectionStore";
 import { supabase } from "@/lib/supabase/client";
 import { handleError } from "@/lib/utils/format";
 import isDev from "@/lib/utils/isDev";
 import { useQueryClient } from "@tanstack/react-query";
+import { useCartStore } from "@/store/useCartStore";
+import { useProductSelectionStore } from "@/store/useProductSelectionStore";
 
 export default function SessionExpiredModal() {
   const [showModal, setShowModal] = useState(false);

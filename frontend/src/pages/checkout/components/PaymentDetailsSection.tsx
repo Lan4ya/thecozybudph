@@ -1,15 +1,23 @@
 import { motion } from "framer-motion";
 import { formatPriceCents } from "@/lib/utils/format";
 import { Separator } from "@/lib/ui/__shadcn__/separator"; // if you have one, else use border
-import { useCheckoutStore } from "../store/useCheckoutStore";
 import { calculatePassOnFee } from "../calculatePassOnFee";
 import { useEffect } from "react";
+import { HelpCircle } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/lib/ui/__shadcn__/popover";
+import { useCheckoutStore } from "@/store/useCheckoutStore";
 
 const PaymentDetailsSection = () => {
   const orderItems = useCheckoutStore((s) => s.orderItemsUI);
   const shipping = useCheckoutStore((s) => s.shipping);
   const payment = useCheckoutStore((s) => s.payment);
   const setPayment = useCheckoutStore((s) => s.setPayment);
+  const shippingQuoteId = useCheckoutStore((s) => s.shipping?.quotationId);
+  const addressId = useCheckoutStore((s) => s.address?.id);
 
   const shippingCents = Math.round((shipping?.fee ?? 0) * 100);
   const subtotalCents = orderItems.reduce(
@@ -27,6 +35,8 @@ const PaymentDetailsSection = () => {
   const total = baseTotalCents + passOnFeeCents;
 
   useEffect(() => setPayment({ total }), [total, setPayment]);
+
+  if (!payment?.type || !shippingQuoteId || !addressId) return null;
 
   return (
     <motion.div
@@ -48,7 +58,23 @@ const PaymentDetailsSection = () => {
         </div>
 
         <div className="flex justify-between">
-          <span className="text-muted-foreground">Admin fee</span>
+          <div className="flex items-center gap-1 text-muted-foreground">
+            <span>Admin fee</span>
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className="hover:text-foreground transition-colors cursor-help">
+                  <HelpCircle className="size-3.5" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-64 p-4 text-xs">
+                <h4 className="font-semibold mb-1">Admin Fee</h4>
+                <p className="text-muted-foreground">
+                  This fee is charged by PayMongo, our payment service provider,
+                  calculated based on your chosen payment method.
+                </p>
+              </PopoverContent>
+            </Popover>
+          </div>
           <span>{formatPriceCents(passOnFeeCents)}</span>
         </div>
 
@@ -58,9 +84,6 @@ const PaymentDetailsSection = () => {
           <span>Total Payment</span>
           <span className="text-primary">{formatPriceCents(total)}</span>
         </div>
-      </div>
-      <div className="mt-4 text-xs text-muted-foreground text-center lg:text-left">
-        Taxes included. Shipping and discounts calculated at checkout.
       </div>
     </motion.div>
   );

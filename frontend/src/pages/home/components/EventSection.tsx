@@ -5,8 +5,8 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/swiper.css";
 import { ProductImage } from "@/components/products/ProductImage";
 import { cn } from "@/lib/utils/cn";
-import { useAnimateOnView } from "@/hooks/useAnimateOnView";
 import { useNavigate } from "react-router";
+import { motion } from "framer-motion";
 
 const imgSrcs = [
   ASSETS.EVENT_1,
@@ -17,7 +17,6 @@ const imgSrcs = [
 
 const EventSection = () => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const { registerSentinel, visibleMap } = useAnimateOnView();
   const navigate = useNavigate();
 
   const isFirstSlide = activeIndex === 0;
@@ -31,14 +30,12 @@ const EventSection = () => {
   return (
     <section className="bg-primary/5">
       <div className="space-y-12 w-full py-18 lg:py-24 custom-container justify-between gap-5 md:gap-10 lg:grid lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:items-center lg:[grid-template-areas:'carousel_text'] max-w-[1420px] mx-auto">
-        <div
-          ref={registerSentinel}
-          className={cn(
-            "space-y-6 lg:text-right transition-all duration-1000 ease-out",
-            visibleMap[0]
-              ? "translate-y-0 opacity-100"
-              : "translate-y-8 opacity-0",
-          )}
+        <motion.div
+          initial={{ opacity: 0, y: 32 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+          className="space-y-6 lg:text-right"
         >
           {/* Eyebrow */}
           <p className="text-xs font-semibold uppercase tracking-[0.32em] text-accent/70">
@@ -56,17 +53,15 @@ const EventSection = () => {
             arrangement is composed with intention—designed to elevate the
             atmosphere and leave a lasting impression.
           </p>
-        </div>
+        </motion.div>
 
         {/* Main Carousel */}
-        <div
-          ref={registerSentinel}
-          className={cn(
-            "lg:[grid-area:carousel] group relative w-full overflow-hidden active:cursor-grabbing transition-all duration-1000 ease-out",
-            visibleMap[1]
-              ? "translate-y-0 opacity-100"
-              : "translate-y-8 opacity-0",
-          )}
+        <motion.div
+          initial={{ opacity: 0, y: 32 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+          className="lg:[grid-area:carousel] group relative w-full overflow-hidden active:cursor-grabbing"
         >
           <Swiper
             modules={[Navigation, A11y]}
@@ -137,7 +132,7 @@ const EventSection = () => {
               />
             ))}
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

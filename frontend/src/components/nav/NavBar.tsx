@@ -7,8 +7,8 @@ import { NavLink } from "react-router";
 import { useAnimateOnView } from "@/hooks/useAnimateOnView";
 import { MobileDrawer } from "./MobileDrawer";
 import { DesktopNavLinks } from "./DesktopNavLinks";
-import { useCartQuery } from "@/pages/cart/hooks/useCartQuery";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useCartQuery } from "@/pages/cart/hooks/useCartQuery";
 
 const NavBar = () => {
   const isMediumScreenAndBelow = useMediaQuery("(max-width: 1023px)");

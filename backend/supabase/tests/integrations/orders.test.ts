@@ -1,8 +1,7 @@
-// FIX: move out shipping test into it's own test
 import app from "@functions/order/index.ts";
 import { createDrizzle, supabaseService } from "@shared/db/client.ts";
 import { AppError } from "@shared/errors/Errors.ts";
-import { createShippingQuotation } from "@shared/integrations/lalamove/create-shipping-quotation.ts";
+import { ShipmentActions } from "@shared/modules/admin/application/shipment/mod.ts";
 import { createAddress } from "@shared/modules/address/application/create-address.ts";
 import { createProduct } from "@shared/modules/product/application/create-product.ts";
 import {
@@ -18,7 +17,6 @@ import { afterAll, beforeAll, describe, it } from "@std/testing/bdd";
 import { eq } from "drizzle-orm";
 import { getTestToken } from "../helpers/utils.ts";
 import {
-  createShippingQuotationInput,
   genCreateAddressInput,
   genCreateOrderInput,
   genCreateProductInput,
@@ -89,24 +87,26 @@ describe("Orders API", () => {
 
     const address = await createAddress(
       userDb,
-      genCreateAddressInput(),
       profileId,
+      false,
+      genCreateAddressInput(),
     );
     createdAddressIds.push(address.id);
     assert(address.id);
 
-    const [quotation] = await createShippingQuotation(
-      createShippingQuotationInput(),
-    );
+    const [quotation] = await ShipmentActions.createShipmentQuotation(userDb, {
+      recipientAddressId: address.id,
+      serviceType: "motorcycle",
+    });
     const quotationId = quotation.id;
     assert(quotationId);
 
-    // Context for tests
     (globalThis as any).testContext = {
       productId: product.id,
       variantId,
       addressId: address.id,
       quotationId,
+      primaryImageUrl: product.imageUrls?.[0],
     };
   });
 
@@ -138,8 +138,9 @@ describe("Orders API", () => {
   });
 
   it("queries user orders", async () => {
-    const { addressId, productId, variantId, quotationId } = (globalThis as any)
-      .testContext;
+    const { addressId, productId, variantId, quotationId, primaryImageUrl } = (
+      globalThis as any
+    ).testContext;
 
     const createOrderRes = await apiRequest("/order", {
       method: "POST",
@@ -148,13 +149,12 @@ describe("Orders API", () => {
         productId,
         variantId,
         shippingQuoteId: quotationId,
+        primaryImageUrl,
       }),
-      headers: {
-        "Idempotency-Key": crypto.randomUUID(),
-      },
+      headers: { "Idempotency-Key": crypto.randomUUID() },
     });
 
-    assertEquals(createOrderRes.status, 200);
+    assertEquals(createOrderRes.status, 201);
 
     const { data: createOrderData } = (await createOrderRes.json()) as {
       data: { orderId: string; paymentId: string };
@@ -179,8 +179,9 @@ describe("Orders API", () => {
   });
 
   it("gets a single order item", async () => {
-    const { addressId, productId, variantId, quotationId } = (globalThis as any)
-      .testContext;
+    const { addressId, productId, variantId, quotationId, primaryImageUrl } = (
+      globalThis as any
+    ).testContext;
 
     const createOrderRes = await apiRequest("/order", {
       method: "POST",
@@ -189,10 +190,9 @@ describe("Orders API", () => {
         productId,
         variantId,
         shippingQuoteId: quotationId,
+        primaryImageUrl,
       }),
-      headers: {
-        "Idempotency-Key": crypto.randomUUID(),
-      },
+      headers: { "Idempotency-Key": crypto.randomUUID() },
     });
 
     const { data: createOrderData } = (await createOrderRes.json()) as {
@@ -208,20 +208,20 @@ describe("Orders API", () => {
     const order = queryBody.data.find(
       (o: any) => o.id === createOrderData.orderId,
     );
-    const itemId = order.item.id;
 
-    const getRes = await apiRequest(`/order/item/${itemId}`);
+    const getRes = await apiRequest(`/order/${order.id}`);
 
     assertEquals(getRes.status, 200);
 
     const getBody = await getRes.json();
-    assertEquals(getBody.data.id, itemId);
-    assertEquals(getBody.data.name, "Rose Bouquet");
+    assertEquals(getBody.data.id, order.id);
+    assertEquals(getBody.data.items[0].name, "Rose Bouquet");
   });
 
   it("creates and pay an order", async () => {
-    const { addressId, productId, variantId, quotationId } = (globalThis as any)
-      .testContext;
+    const { addressId, productId, variantId, quotationId, primaryImageUrl } = (
+      globalThis as any
+    ).testContext;
 
     const createOrderRes = await apiRequest("/order", {
       method: "POST",
@@ -230,13 +230,12 @@ describe("Orders API", () => {
         productId,
         variantId,
         shippingQuoteId: quotationId,
+        primaryImageUrl,
       }),
-      headers: {
-        "Idempotency-Key": crypto.randomUUID(),
-      },
+      headers: { "Idempotency-Key": crypto.randomUUID() },
     });
 
-    assertEquals(createOrderRes.status, 200);
+    assertEquals(createOrderRes.status, 201);
 
     const order = (await createOrderRes.json()).data as CreateOrderRes;
     assertEquals(!!order.orderId, true);
@@ -263,9 +262,8 @@ describe("Orders API", () => {
 
   describe("Idempotency", () => {
     it("replays the same response for the same idempotency key", async () => {
-      const { addressId, productId, variantId, quotationId } = (
-        globalThis as any
-      ).testContext;
+      const { addressId, productId, variantId, quotationId, primaryImageUrl } =
+        (globalThis as any).testContext;
 
       const idempotencyKey = crypto.randomUUID();
       const payload = genCreateOrderInput({
@@ -273,6 +271,7 @@ describe("Orders API", () => {
         productId,
         variantId,
         shippingQuoteId: quotationId,
+        primaryImageUrl,
       });
 
       // First request
@@ -281,7 +280,7 @@ describe("Orders API", () => {
         body: payload,
         headers: { "Idempotency-Key": idempotencyKey },
       });
-      assertEquals(res1.status, 200);
+      assertEquals(res1.status, 201);
       const data1 = (await res1.json()).data as CreateOrderRes;
       createdOrderIds.push(data1.orderId);
       createdPaymentIds.push(data1.paymentId);
@@ -292,7 +291,7 @@ describe("Orders API", () => {
         body: payload,
         headers: { "Idempotency-Key": idempotencyKey },
       });
-      assertEquals(res2.status, 200);
+      assertEquals(res2.status, 201);
       const data2 = (await res2.json()).data as CreateOrderRes;
 
       assertEquals(data1.orderId, data2.orderId);
@@ -300,9 +299,8 @@ describe("Orders API", () => {
     });
 
     it("returns 409 Conflict when the same key is used with a different payload", async () => {
-      const { addressId, productId, variantId, quotationId } = (
-        globalThis as any
-      ).testContext;
+      const { addressId, productId, variantId, quotationId, primaryImageUrl } =
+        (globalThis as any).testContext;
 
       const idempotencyKey = crypto.randomUUID();
       const payload = genCreateOrderInput({
@@ -310,6 +308,7 @@ describe("Orders API", () => {
         productId,
         variantId,
         shippingQuoteId: quotationId,
+        primaryImageUrl,
       });
 
       // First request
@@ -318,7 +317,7 @@ describe("Orders API", () => {
         body: payload,
         headers: { "Idempotency-Key": idempotencyKey },
       });
-      assertEquals(res1.status, 200);
+      assertEquals(res1.status, 201);
       const data1 = (await res1.json()).data as CreateOrderRes;
       createdOrderIds.push(data1.orderId);
       createdPaymentIds.push(data1.paymentId);
@@ -338,9 +337,8 @@ describe("Orders API", () => {
 
   describe("Race Conditions & Integrity", () => {
     it("prevents double payment via concurrent requests", async () => {
-      const { addressId, productId, variantId, quotationId } = (
-        globalThis as any
-      ).testContext;
+      const { addressId, productId, variantId, quotationId, primaryImageUrl } =
+        (globalThis as any).testContext;
 
       // Create an order first
       const createRes = await apiRequest("/order", {
@@ -350,6 +348,7 @@ describe("Orders API", () => {
           productId,
           variantId,
           shippingQuoteId: quotationId,
+          primaryImageUrl,
         }),
         headers: { "Idempotency-Key": crypto.randomUUID() },
       });
@@ -382,9 +381,8 @@ describe("Orders API", () => {
     });
 
     it("fails payment for expired orders", async () => {
-      const { addressId, productId, variantId, quotationId } = (
-        globalThis as any
-      ).testContext;
+      const { addressId, productId, variantId, quotationId, primaryImageUrl } =
+        (globalThis as any).testContext;
 
       // Create an order
       const createRes = await apiRequest("/order", {
@@ -394,6 +392,7 @@ describe("Orders API", () => {
           productId,
           variantId,
           shippingQuoteId: quotationId,
+          primaryImageUrl,
         }),
         headers: { "Idempotency-Key": crypto.randomUUID() },
       });

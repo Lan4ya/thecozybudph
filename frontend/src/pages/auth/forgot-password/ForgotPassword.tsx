@@ -118,7 +118,7 @@ const SubmitEmail = () => {
           <img
             loading="eager"
             decoding="sync"
-            src={ASSETS.LOGO_FULL}
+            src={ASSETS.LOGO_ONELINE}
             alt="logo"
             className="h-full w-40"
           />
@@ -174,7 +174,7 @@ const SubmitEmail = () => {
                         options={{
                           theme: "dark",
                           size: "flexible",
-                          appearance: "always",
+                          appearance: "interaction-only",
                         }}
                         onSuccess={(token: string) => field.onChange(token)}
                         onExpire={() => field.onChange("")}
@@ -195,7 +195,7 @@ const SubmitEmail = () => {
                   >
                     {resetLoading && <Spinner />}
                     {resetLoading
-                      ? "Sending Link"
+                      ? "Sending Link..."
                       : onCooldown
                         ? `Resend in ${timeRemaining}`
                         : "Send Reset Link"}

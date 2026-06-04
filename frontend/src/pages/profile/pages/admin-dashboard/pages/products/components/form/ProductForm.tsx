@@ -9,7 +9,11 @@ import {
 import { motion } from "framer-motion";
 import { useForm, FormProvider, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type ProductFormOutput, productFormSchema } from "@cozybud/schemas";
+import {
+  type ProductFormOutput,
+  type ProductFormInput,
+  productFormSchema,
+} from "@cozybud/schemas";
 import {
   Card,
   CardHeader,
@@ -19,7 +23,6 @@ import {
 import { Button } from "@/lib/ui/__shadcn__/button";
 import { Spinner } from "@/lib/ui/__shadcn__/spinner";
 import { Plus, X } from "lucide-react";
-import z from "zod";
 import { formHasChanges } from "./helpers/formHasChanges";
 import { useProductMutations } from "@/pages/profile/pages/admin-dashboard/pages/products/hooks/useProductsMutations";
 import { useImageCompressor } from "@/pages/profile/pages/admin-dashboard/pages/products/hooks/useImageConverter";
@@ -54,11 +57,7 @@ export default function ProductForm() {
 
   const fileFieldName = updatingProduct ? "newProductImages" : "productImages";
 
-  const form = useForm<
-    z.input<typeof productFormSchema>,
-    unknown,
-    z.output<typeof productFormSchema>
-  >({
+  const form = useForm<ProductFormInput, unknown, ProductFormOutput>({
     resolver: zodResolver(productFormSchema),
     defaultValues: updatingProduct
       ? { ...getUpdateFormDefaultValues(updatingProduct) }
@@ -181,7 +180,7 @@ export default function ProductForm() {
     void nextStep();
   };
 
-  // Derive image display: (existing minus deletions plus selected)
+  // Derive image display: existing minus deletions plus selected
   const displayImages = useMemo(() => {
     const existing = updatingProduct?.imageUrls ?? [];
     const filteredExisting = existing.filter(
@@ -216,7 +215,7 @@ export default function ProductForm() {
     } else {
       setPrimaryImageIndex(0);
     }
-  }, [isFormOpen, updatingProduct, form.reset]);
+  }, [form, isFormOpen, updatingProduct, form.reset]);
 
   // Cleanup blobs on unmount
   useEffect(() => {
@@ -281,14 +280,11 @@ export default function ProductForm() {
     },
     [
       fileFieldName,
+      form,
       imageUrlsToDelete,
-      MAX_IMAGES,
       primaryImageIndex,
       newSelectedFiles.length,
-      form.setError,
-      form.setValue,
       updatingProduct,
-      form.clearErrors,
     ],
   );
 
@@ -368,6 +364,8 @@ export default function ProductForm() {
     },
     [
       fileFieldName,
+      form,
+      form.setValue,
       imageUrlsToDelete,
       primaryImageIndex,
       newSelectedFiles,
@@ -377,7 +375,6 @@ export default function ProductForm() {
   );
 
   const onSubmit = async (fieldData: ProductFormOutput) => {
-    // setSubmitting(true);
     setFormOpen(false); // close form immediately
 
     const files = newSelectedFiles.map((s) => s.file);
@@ -429,7 +426,7 @@ export default function ProductForm() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-1000 flex items-center justify-center bg-black/50 p-4"
+      className="fixed inset-0 z-500 flex items-center justify-center bg-black/50 p-4"
     >
       <Card className="w-full max-w-2xl relative ">
         <button

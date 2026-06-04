@@ -1,10 +1,10 @@
-import type { paths as ShipmentPaths } from "./openapi/shipment.ts";
 import type { paths as AddressPaths } from "./openapi/address.ts";
 import type { paths as AdminPaths } from "./openapi/admin.ts";
 import type { paths as ProfilePaths } from "./openapi/profile.ts";
 import type { paths as CartPaths } from "./openapi/cart.ts";
 import type { paths as OrderPaths } from "./openapi/order.ts";
 import type { paths as AuthPaths } from "./openapi/auth.ts";
+import type { paths as EventPaths } from "./openapi/event.ts";
 import {
   apiErrorResponseSchema,
   apiSuccessResponseSchema,
@@ -17,8 +17,8 @@ export const EDGE_FUNCTIONS = [
   "cart",
   "profile",
   "address",
-  "shipment",
   "auth",
+  "event",
 ] as const;
 
 export type OpenApiPaths = {
@@ -27,8 +27,8 @@ export type OpenApiPaths = {
   cart: CartPaths;
   profile: ProfilePaths;
   address: AddressPaths;
-  shipment: ShipmentPaths;
   auth: AuthPaths;
+  event: EventPaths;
 };
 
 export type ApiErrorResponse = z.infer<typeof apiErrorResponseSchema>;

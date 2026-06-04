@@ -32,7 +32,7 @@ import SideImage from "../SideImage";
 import { useMutation } from "@tanstack/react-query";
 import { AuthAPI } from "@/api";
 import type { AppError } from "@/api/_error";
-import { OAuathSignin } from "../OAuathSignin";
+import { OAuthSignin } from "../OAuthSignin";
 import { useActionCooldown } from "@/hooks/useCooldown";
 
 const { VITE_CF_TURNSTILE_SITE_KEY } = import.meta.env;
@@ -99,7 +99,7 @@ const Signup = () => {
   const handleSignInWithOAuth = async () => {
     clearErrors();
     try {
-      const { data } = await OAuathSignin();
+      const { data } = await OAuthSignin();
       isDev && console.log({ data });
     } catch (err: unknown) {
       const message = handleError(err);
@@ -121,13 +121,13 @@ const Signup = () => {
       <div className="flex flex-col lg:justify-center h-full max-w-md">
         <Link
           to="/"
-          className="p-2 mb-10 text-sm w-24 flex-center gap-1 border rounded-lg "
+          className="p-2 mb-6 xl:mb-10 text-sm w-24 flex-center gap-1 border rounded-lg "
         >
           <ArrowLeft className="size-4" /> Home
         </Link>
 
         {/* LOGO */}
-        <div className="px-4 w-full py-3 mb-6 flex-center">
+        <div className="px-4 w-full py-3 mb-2 xl:mb-6  flex-center">
           <img
             loading="eager"
             decoding="sync"
@@ -211,7 +211,7 @@ const Signup = () => {
                       options={{
                         theme: "dark",
                         size: "flexible",
-                        appearance: "always",
+                        appearance: "interaction-only",
                       }}
                       onSuccess={(token: string) => field.onChange(token)}
                       onExpire={() => field.onChange("")}

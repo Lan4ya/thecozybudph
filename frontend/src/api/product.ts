@@ -57,7 +57,6 @@ export const ProductAPI = {
       const minPrice = priceRange.min * 100;
       const maxPrice =
         priceRange.max !== undefined ? priceRange.max * 100 : undefined;
-      console.log("Price Range in cents: ", { min: minPrice, max: maxPrice });
 
       if (maxPrice !== undefined) {
         query = query
@@ -102,7 +101,7 @@ export const ProductAPI = {
     }
 
     const { data, error } = await query;
-    console.log("Fetching products...");
+    isDev && console.log("Fetching products...");
 
     if (error) throw error;
 
@@ -128,7 +127,7 @@ export const ProductAPI = {
       .eq("id", productId)
       .maybeSingle();
 
-    // isDev && console.log("product: ", data);
+    isDev && console.log("fetching product by id...");
     if (error) throw error;
     if (!data) return null;
 

@@ -8,16 +8,8 @@
     "verbatimModuleSyntax": true,
     "noEmitOnError": true,
     "allowImportingTsExtensions": true,
-    "lib": [
-      "ES2023",
-      "DOM"
-    ],
-    "types": [
-      "node"
-    ]
+    "lib": ["ES2023", "DOM"],
+    "types": ["node"]
   },
-  "include": [
-    "src/",
-    "genOpenApiDocs.ts"
-  ]
+  "include": ["src/", "genOpenApiDocs.ts"]
 }

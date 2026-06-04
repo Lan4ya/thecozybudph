@@ -9,8 +9,8 @@ import {
   Shield,
   ShoppingBag,
   Settings,
-  HelpCircle,
   MapPin,
+  Calendar,
 } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { handleError } from "@/lib/utils/format";
@@ -145,7 +145,7 @@ const Profile = () => {
       });
       if (error) throw error;
 
-      addToast("Avatar updated successfully!", "success");
+      addToast("Avatar updated", "success");
       setIsAvatarDialogOpen(false);
     } catch (err) {
       const message = handleError(err);
@@ -256,6 +256,11 @@ const Profile = () => {
                 onClick={() => navigate("/profile/my-purchases")}
               />
               <Row
+                label="Event Inquiries"
+                icon={<Calendar className="size-4 text-primary" />}
+                onClick={() => navigate("/profile/my-inquiries")}
+              />
+              <Row
                 label="Addresses"
                 icon={<MapPin className="size-4 text-primary" />}
                 onClick={() => navigate("/profile/addresses")}
@@ -264,11 +269,6 @@ const Profile = () => {
                 label="Settings"
                 icon={<Settings className="size-4 text-primary" />}
                 onClick={() => navigate("/profile/settings")}
-              />
-              <Row
-                label="FAQ"
-                icon={<HelpCircle className="size-4 text-primary" />}
-                onClick={() => navigate("/FAQ")}
               />
             </Section>
 

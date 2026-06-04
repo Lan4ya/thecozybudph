@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
 import { MapPin, ChevronRight } from "lucide-react";
-import { useDefaultAddressQuery } from "../hooks/useAddressQuery";
+import { useDefaultAddressQuery } from "../../../hooks/useAddressQuery";
 import { NavLink, useParams } from "react-router";
-import { useCheckoutStore } from "../store/useCheckoutStore";
 import { Skeleton } from "@/lib/ui/__shadcn__/skeleton";
 import { useEffect } from "react";
 import ErrorDialogue from "@/components/ErrorDialogue";
+import { useCheckoutStore } from "@/store/useCheckoutStore";
 
 const AddressSection = () => {
   const addressStore = useCheckoutStore((s) => s.address);
@@ -20,6 +20,7 @@ const AddressSection = () => {
   } = useDefaultAddressQuery({ enabled: !addressStore });
 
   useEffect(() => {
+    // Use default address as checkout order address
     if (defaultAddress && !addressStore) setAddress(defaultAddress);
   }, [defaultAddress, addressStore, setAddress]);
 
@@ -79,7 +80,7 @@ const AddressSection = () => {
         {addressStore && (
           <NavLink
             className="flex-center text-primary hover:text-primary/90"
-            to={`/checkout/${sessionId}/address-selection`}
+            to={`/checkout/${sessionId}/address/selection`}
             state={"editing"}
           >
             Edit <ChevronRight />
@@ -89,13 +90,13 @@ const AddressSection = () => {
 
       {!addressStore ? (
         <div className="text-sm text-muted-foreground">
-          No address yet. Please{" "}
+          No address yet. Please create one{" "}
           <NavLink
             className="text-link"
-            to={`/checkout/${sessionId}/address-selection`}
+            to={`/checkout/${sessionId}/address/selection`}
             state={"selecting"}
           >
-            create one
+            here
           </NavLink>
         </div>
       ) : (

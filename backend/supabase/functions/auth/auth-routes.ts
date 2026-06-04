@@ -1,25 +1,22 @@
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
+import { ValidationError } from "@shared/errors/Errors.ts";
 import {
   drizzleMiddleware,
   supabaseMiddleware,
 } from "@shared/middlewares/mod.ts";
-import { ValidationError } from "@shared/errors/Errors.ts";
 import {
   apiErrorResponseSchema,
-  checkCooldownSchema,
-  cooldownResponseSchema,
+  loginResponseSchema,
   loginSchema,
   passwordResetResponseSchema,
   passwordResetSchema,
   resendEmailVerificationResponseSchema,
   resendEmailVerificationSchema,
-  signupSchema,
   signupResponseSchema,
-  loginResponseSchema,
+  signupSchema,
 } from "@shared/schemas/index.ts";
 import { AppEnv } from "@shared/types.d.ts";
 import {
-  checkCooldownHandler,
   loginHanndler,
   passwordResetHandler,
   resendEmailVerificationHandler,
@@ -96,41 +93,6 @@ export const loginRoute = createRoute({
   tags: ["Auth", "Login"],
 });
 
-export const checkCooldownRoute = createRoute({
-  method: "post",
-  path: "/cooldown",
-  request: {
-    body: {
-      content: {
-        "application/json": {
-          schema: checkCooldownSchema,
-        },
-      },
-      required: true,
-    },
-  },
-  middleware: [supabaseMiddleware(), drizzleMiddleware()] as const,
-  responses: {
-    200: {
-      description: "Check action cooldown",
-      content: {
-        "application/json": {
-          schema: cooldownResponseSchema,
-        },
-      },
-    },
-    401: {
-      description: "Unauthorized",
-      content: {
-        "application/json": {
-          schema: apiErrorResponseSchema,
-        },
-      },
-    },
-  },
-  tags: ["Auth"],
-});
-
 export const requestPasswordResetRoute = createRoute({
   method: "post",
   path: "/password-reset",
@@ -195,7 +157,6 @@ const auth = new OpenAPIHono<AppEnv>({
 
 auth.openapi(signupRoute, signupHandler);
 auth.openapi(loginRoute, loginHanndler);
-auth.openapi(checkCooldownRoute, checkCooldownHandler);
 auth.openapi(requestPasswordResetRoute, passwordResetHandler);
 auth.openapi(resendVerificationRoute, resendEmailVerificationHandler);
 

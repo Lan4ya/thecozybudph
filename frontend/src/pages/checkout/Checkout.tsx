@@ -1,4 +1,4 @@
-import TopBar from "./components/TopBar";
+import Header from "./components/TopBar";
 import AddressSection from "./components/AddressSection";
 import ShippingSection from "./components/ShippingSection";
 import PaymentMethodsSection from "./components/PaymentMethodsSection";
@@ -10,7 +10,7 @@ const Checkout = () => {
   return (
     <div className="pb-28">
       <div className="custom-container max-w-7xl mx-auto pt-6 space-y-6">
-        <TopBar />
+        <Header />
         <AddressSection />
         <OrderSummary />
         <ShippingSection />

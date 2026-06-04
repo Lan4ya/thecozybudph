@@ -15,15 +15,6 @@ type ProductOptionsProps = {
 };
 
 export const ProductOptions = ({ fields, remove }: ProductOptionsProps) => {
-  const { watch } = useFormContext<ProductFormInput>();
-
-  // useEffect(() => {
-  //   const subscription = watch((value) => {
-  //     console.log("options changed:", value.options);
-  //   });
-  //   return () => subscription.unsubscribe();
-  // }, [watch]);
-
   return (
     <div>
       {fields.map((field, index) => (

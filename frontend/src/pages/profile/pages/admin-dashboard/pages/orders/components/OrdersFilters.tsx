@@ -52,6 +52,7 @@ export function OrdersFilters({
 }: OrdersFiltersProps) {
   return (
     <div className="flex flex-wrap gap-3 items-end">
+      {/* Search */}
       <div className="relative w-full sm:w-auto sm:max-w-80">
         <Search className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
@@ -76,6 +77,7 @@ export function OrdersFilters({
         </div>
       </div>
 
+      {/* Filter Status */}
       <Select
         value={status ?? "all"}
         onValueChange={(value) => {
@@ -99,6 +101,7 @@ export function OrdersFilters({
         </SelectContent>
       </Select>
 
+      {/* Sort By */}
       <Select value={sortValue} onValueChange={onSortChange}>
         <SelectTrigger className="w-40 grow-1 md:ml-auto md:grow-0">
           <SelectValue placeholder="" />

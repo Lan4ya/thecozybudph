@@ -9,11 +9,9 @@ const ALLOWED_EXTENSIONS = [".png", ".jpg", ".jpeg", ".tiff"];
 
 export async function seedAvatars() {
   try {
-    const assetsDir = path.join(
+    const assetsDir = path.resolve(
       import.meta.dirname,
-      "data",
-      "images",
-      "avatars",
+      "./data/images/avatars/",
     );
 
     if (!existsSync(assetsDir)) {

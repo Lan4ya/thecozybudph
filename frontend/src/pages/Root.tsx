@@ -3,12 +3,13 @@ import NavBar from "@/components/nav/NavBar";
 import Footer from "@/components/Footer";
 import { cn } from "@/lib/utils/cn";
 import { ProductQueryStateProvider } from "@/providers/ProductQueryProvider";
-import { useInitAuthStore } from "@/hooks/useInitAuthStore";
+import { useInitAuthStore } from "@/store/useInitAuthStore";
 import { TanstackQueryDevtoolsToggle } from "@/components/TanstackQueryDevToolsToggle";
 import SessionExpiredModal from "@/components/SessionExpiredModal";
 import { ScrollToTop } from "@/components/ScrollToTop";
 
-export const NAV_HIDDEN_PATHS = ["/auth"];
+export const NAV_HIDDEN_PATHS = ["/auth", "/payment"];
+
 export const FOOTER_HIDDEN_PATHS = [
   ...NAV_HIDDEN_PATHS,
   "/cart",
@@ -16,6 +17,7 @@ export const FOOTER_HIDDEN_PATHS = [
   "/checkout",
   "/profile/admin",
   "/payment",
+  "/order",
 ];
 export const PROTECTED_ROUTES = ["/profile", "/checkout"];
 

@@ -16,15 +16,18 @@ import {
   queryOrdersResponseSchema,
   queryOrdersSchema,
   uuidParamSchema,
+  getOrderStatusResponseSchema,
+  successSchema,
 } from "@shared/schemas/index.ts";
 import { AppEnv } from "@shared/types.d.ts";
 import {
   createOrderHandler,
-  getOrderItemHandler,
+  getOrderWithItemsHandler,
   getOrderPaymentStatusHandler,
   orderPaymentWebhookHandler,
   payOrderHandler,
   queryOrderHandler,
+  getOrderStatusHandler,
 } from "./order-handlers.ts";
 
 export const orderPaymentWebhookRoute = createRoute({
@@ -35,9 +38,7 @@ export const orderPaymentWebhookRoute = createRoute({
       description: "Handle payment webhook",
       content: {
         "application/json": {
-          schema: getOrderItemResponseSchema.omit({ data: true }).extend({
-            success: z.boolean(),
-          }),
+          schema: successSchema,
         },
       },
     },
@@ -78,9 +79,49 @@ export const queryOrdersRoute = createRoute({
   tags: ["Order"],
 });
 
-export const getOrderItemRoute = createRoute({
+export const getOrderStatusRoute = createRoute({
   method: "get",
-  path: "/item/{id}",
+  path: "/{id}/status",
+  request: {
+    params: uuidParamSchema("id"),
+  },
+  middleware: [
+    supabaseMiddleware(),
+    authMiddleware(),
+    drizzleMiddleware(),
+  ] as const,
+  responses: {
+    200: {
+      description: "Get order status",
+      content: {
+        "application/json": {
+          schema: getOrderStatusResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: apiErrorResponseSchema,
+        },
+      },
+    },
+    404: {
+      description: "Order not found",
+      content: {
+        "application/json": {
+          schema: apiErrorResponseSchema,
+        },
+      },
+    },
+  },
+  tags: ["Order"],
+});
+
+export const getOrderWithItemsRoute = createRoute({
+  method: "get",
+  path: "/{id}",
   request: {
     params: uuidParamSchema("id"),
   },
@@ -138,7 +179,7 @@ export const createOrderRoute = createRoute({
     drizzleMiddleware(),
   ] as const,
   responses: {
-    200: {
+    201: {
       description: "Create new order",
       content: {
         "application/json": {
@@ -265,8 +306,9 @@ export const getOrderPaymentStatusRoute = createRoute({
 
 const order = new OpenAPIHono<AppEnv>();
 
+order.openapi(getOrderStatusRoute, getOrderStatusHandler);
 order.openapi(queryOrdersRoute, queryOrderHandler);
-order.openapi(getOrderItemRoute, getOrderItemHandler);
+order.openapi(getOrderWithItemsRoute, getOrderWithItemsHandler);
 order.openapi(createOrderRoute, createOrderHandler);
 order.openapi(payOrderRoute, payOrderHandler);
 order.openapi(getOrderPaymentStatusRoute, getOrderPaymentStatusHandler);

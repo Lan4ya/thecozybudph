@@ -146,28 +146,28 @@ const Footer = () => {
           </div>
 
           {/* Newsletter */}
-          <div className="sm:col-span-2 lg:col-span-3">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-secondary-foreground/60 mb-4">
-              Stay in Bloom
-            </h3>
-            <p className="text-sm text-secondary-foreground/80 mb-4">
-              Subscribe for seasonal updates, new arrivals, and exclusive
-              offers.
-            </p>
-            <form className="flex gap-2" onSubmit={(e) => e.preventDefault()}>
-              <input
-                type="email"
-                placeholder="Your email"
-                className="flex-1 min-w-0 rounded-lg bg-secondary-foreground/10 border border-secondary-foreground/10 px-3.5 py-2.5 text-sm text-secondary-foreground placeholder:text-secondary-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent"
-              />
-              <button
-                type="submit"
-                className="shrink-0 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-              >
-                Subscribe
-              </button>
-            </form>
-          </div>
+          {/*   <div className="sm:col-span-2 lg:col-span-3"> */}
+          {/*     <h3 className="text-xs font-semibold uppercase tracking-wider text-secondary-foreground/60 mb-4"> */}
+          {/*       Stay in Bloom */}
+          {/*     </h3> */}
+          {/*     <p className="text-sm text-secondary-foreground/80 mb-4"> */}
+          {/*       Subscribe for seasonal updates, new arrivals, and exclusive */}
+          {/*       offers. */}
+          {/*     </p> */}
+          {/*     <form className="flex gap-2" onSubmit={(e) => e.preventDefault()}> */}
+          {/*       <input */}
+          {/*         type="email" */}
+          {/*         placeholder="Your email" */}
+          {/*         className="flex-1 min-w-0 rounded-lg bg-secondary-foreground/10 border border-secondary-foreground/10 px-3.5 py-2.5 text-sm text-secondary-foreground placeholder:text-secondary-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent" */}
+          {/*       /> */}
+          {/*       <button */}
+          {/*         type="submit" */}
+          {/*         className="shrink-0 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors" */}
+          {/*       > */}
+          {/*         Subscribe */}
+          {/*       </button> */}
+          {/*     </form> */}
+          {/*   </div> */}
         </div>
       </div>
 

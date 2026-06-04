@@ -88,8 +88,7 @@ export const defaultAppMiddlewares = (app: OpenAPIHono<AppEnv>) => {
       console.log(`[Rate Limit] Global limit hit: ${getClientIp(c)}`);
       return c.json(
         {
-          message:
-            "Too many requests, please wait a moment before trying again",
+          message: "Too many requests, wait a moment before trying again",
           code: "RATE_LIMIT",
         },
         429,
@@ -108,7 +107,7 @@ export const defaultAppMiddlewares = (app: OpenAPIHono<AppEnv>) => {
       return c.json(
         {
           message:
-            "Too many login attempts, please wait a moment before trying again.",
+            "Too many login attempts, wait a moment before trying again.",
           code: "RATE_LIMIT",
         },
         429,
@@ -127,7 +126,7 @@ export const defaultAppMiddlewares = (app: OpenAPIHono<AppEnv>) => {
       return c.json(
         {
           message:
-            "Too many signup attempts, please wait a moment before trying again.",
+            "Too many signup attempts, wait a moment before trying again.",
           code: "RATE_LIMIT",
         },
         429,
@@ -147,8 +146,7 @@ export const defaultAppMiddlewares = (app: OpenAPIHono<AppEnv>) => {
       );
       return c.json(
         {
-          message:
-            "Too many requests, please wait a moment before trying again.",
+          message: "Too many requests, wait a moment before trying again.",
           code: "RATE_LIMIT",
         },
         429,

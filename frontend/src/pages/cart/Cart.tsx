@@ -1,14 +1,14 @@
 import { CartItemsList } from "./components/CartItemsList";
-import { ArrowLeft, Check } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/lib/ui/__shadcn__/button";
-import { formatPriceCents } from "@/lib/utils/format";
 import { useNavigate } from "react-router";
-import { useCartStore } from "@/pages/cart/store/useCartStore";
 import { useToast } from "@/providers/ToastProvider";
 import { useShallow } from "zustand/react/shallow";
-import { CustomErrorBoundary } from "@/components/CustomErrorBoundary";
-import { useCheckoutStore } from "../checkout/store/useCheckoutStore";
+import { ErrorBoundary } from "react-error-boundary";
+import { EmptyOrErrorState } from "@/components/EmptyOrErrorState";
+import { useCartStore } from "@/store/useCartStore";
+import { useCheckoutStore } from "@/store/useCheckoutStore";
+import { CartBottomBar } from "./components/CartBottomBar";
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -46,7 +46,7 @@ const Cart = () => {
 
   const handleDeleteItems = () => {
     if (selectedItems.length === 0) {
-      addToast("Please select item(s).", "info");
+      addToast("Please select item(s) first.", "info");
       return;
     }
 
@@ -83,23 +83,26 @@ const Cart = () => {
     const sessionId = crypto.randomUUID();
 
     useCheckoutStore.getState().reset();
-    useCheckoutStore.getState().setCheckoutIds({ session: sessionId });
     useCheckoutStore.getState().setSource("cart");
     useCheckoutStore.getState().setOrderItemsUI(orderItems);
+    // Since sessionId only is stored client side only (sessionStorage), we're gonna use this
+    // to verify the user really created the checkout sessionId properly and not
+    // just typed some random uuid in the url by comparing if param uuid === sessionId store
+    useCheckoutStore.getState().setCheckout({ sessionId, status: "active" });
     navigate(`/checkout/${sessionId}`);
   };
 
   return (
     <>
-      <div className="custom-container space-y-8 pb-25 pt-6 max-w-7xl mx-auto">
-        <header className="py-2 border-b border-border/40  grid grid-cols-3 items-center">
-          <div>
-            <Button variant="minimal" size="auto" onClick={() => navigate(-1)}>
-              <ArrowLeft />
-            </Button>
-          </div>
+      <div className="custom-container space-y-22 pb-25 pt-6 max-w-7xl mx-auto">
+        <header className="py-2 border-b border-border/40 grid grid-cols-3 items-center">
+          {/* <Button variant="minimal" size="auto" onClick={() => navigate(-1)}> */}
+          {/*   <ArrowLeft /> */}
+          {/* </Button> */}
 
-          <h1 className="text-header text-center">Your Cart</h1>
+          <h1 className="text-nowrap col-start-2 text-header justify-self-center">
+            Your Cart Items
+          </h1>
 
           <div className="flex justify-end ">
             {!hasNoItems && (
@@ -124,58 +127,31 @@ const Cart = () => {
 
         {/* Cart Items List */}
         <main>
-          <CustomErrorBoundary uiMessage="Failed to load cart items.">
+          <ErrorBoundary
+            FallbackComponent={(props) => (
+              <EmptyOrErrorState
+                title="Failed to load your cart"
+                description="Please check your connection and try again."
+                {...props}
+              />
+            )}
+          >
             <CartItemsList />
-          </CustomErrorBoundary>
+          </ErrorBoundary>
         </main>
       </div>
 
-      {/* Bottom Bar */}
-      <div className="fixed left-0 bottom-0 w-full z-10 bg-card border">
-        <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-3 p-4">
-          <div className="flex gap-2">
-            <div
-              onClick={toggleAllSelection}
-              className={cn(
-                "flex items-center justify-center w-5 h-5 border-2 rounded cursor-pointer transition-all",
-                allItemsSelected
-                  ? "bg-primary border-primary text-primary-foreground"
-                  : "border-muted-foreground hover:border-primary",
-              )}
-            >
-              {allItemsSelected && <Check className="size-3" />}
-            </div>
-            <span
-              className="text-sm font-medium cursor-pointer select-none"
-              onClick={toggleAllSelection}
-            >
-              Select all ({selectedItems.length}/{cartItems.length})
-            </span>
-          </div>
-
-          {isEditingCart ? (
-            <Button
-              variant={"destructive"}
-              className=""
-              onClick={handleDeleteItems}
-            >
-              Delete
-            </Button>
-          ) : (
-            <div className="flex gap-2 items-center">
-              <span className="text-sm">{formatPriceCents(subtotal)}</span>
-
-              <Button
-                disabled={hasNoItems}
-                onClick={handleCheckout}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
-              >
-                Check Out
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
+      <CartBottomBar
+        allItemsSelected={allItemsSelected}
+        toggleAllSelection={toggleAllSelection}
+        selectedCount={selectedItems.length}
+        totalCount={cartItems.length}
+        isEditingCart={isEditingCart}
+        onDelete={handleDeleteItems}
+        subtotalCents={subtotal}
+        hasNoItems={hasNoItems}
+        onCheckout={handleCheckout}
+      />
     </>
   );
 };

@@ -23,7 +23,7 @@ export const useProductMutations = () => {
     },
     onError: function handleCreateProductError(err: Error) {
       isDev && console.error(err.message);
-      addToast("Something wen't wrong. Please try again later.", "error");
+      addToast("Something went wrong. Please try again.", "error");
     },
     onSuccess: (product) => {
       queryClient.setQueriesData<ProductsQueryData>(
@@ -43,7 +43,7 @@ export const useProductMutations = () => {
         },
       );
 
-      addToast("Product added successfully", "success");
+      addToast("Product added", "success");
     },
   });
 
@@ -60,7 +60,7 @@ export const useProductMutations = () => {
     },
     onError: (err: Error) => {
       isDev && console.error(err.message);
-      addToast("Something wen't wrong. Please try again later.", "error");
+      addToast("Something went wrong. Please try again later.", "error");
     },
     onSuccess: (updatedProduct) => {
       queryClient.setQueriesData<ProductsQueryData>(
@@ -99,7 +99,7 @@ export const useProductMutations = () => {
         },
       );
 
-      addToast("Product updated successfully", "success");
+      addToast("Product updated", "success");
     },
   });
 
@@ -113,7 +113,7 @@ export const useProductMutations = () => {
     },
     onError: (err: Error) => {
       isDev && console.error(err.message);
-      addToast("Something wen't wrong. Please try again later.", "error");
+      addToast("Something went wrong. Please try again later.", "error");
     },
     onSuccess: ({ deletedProductIds }) => {
       queryClient.setQueriesData<ProductsQueryData>(
@@ -134,7 +134,7 @@ export const useProductMutations = () => {
         },
       );
 
-      addToast("Product deleted successfully", "success");
+      addToast("Product deleted", "success");
     },
   });
 

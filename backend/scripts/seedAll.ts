@@ -3,30 +3,38 @@ import { seedAdmin } from "./seedAdmin.ts";
 import { seedProducts } from "./seedProducts.ts";
 import { seedAvatars } from "./seedAvatars.ts";
 import { seedAssets } from "./seedAssets.ts";
+import { initBuckets } from "./initBuckets.ts";
+import { seedOrders } from "./seedOrders.ts";
 
-// WARN: Execution order matters! Script will break otherwise
+// Execution order matters! Script will break otherwise
 async function main() {
-  console.log("Starting seeding pipeline...");
-
   try {
-    console.log("\n--- Seeding Avatars ---");
+    console.log("\n--- 🚀 Initializing Buckets ---");
+    await initBuckets();
+
+    console.log("\n--- 🚀 Seeding Avatars ---");
     await seedAvatars();
 
-    console.log("\n--- Seeding Site Assets ---");
+    console.log("\n--- 🚀 Seeding Site Assets ---");
     await seedAssets();
 
-    console.log("\n--- Seeding Users ---");
-...
+    console.log("\n--- 🚀 Seeding Users ---");
+    await seedUsers();
 
-    console.log("\n--- Seeding Admin ---");
+    console.log("\n--- 🚀 Seeding Admin ---");
     await seedAdmin();
 
-    console.log("\n--- Seeding Products ---");
+    console.log("\n--- 🚀 Seeding Products ---");
     await seedProducts();
 
-    console.log("\nSeeding pipeline finished successfully.");
+    console.log("\n--- 🚀 Seeding Orders ---");
+    await seedOrders();
+
+    console.log("\n✅ DB Seeding finished.");
+
+    process.exit(0);
   } catch (err) {
-    console.error("\nSeeding pipeline failed:");
+    console.error("\n❌ Seeding pipeline failed:");
     console.error(err);
     process.exit(1);
   }

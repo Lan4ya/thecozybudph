@@ -19,7 +19,6 @@ dev.use(logger());
 dev.post("/auth/user/update", async (c: Context) => {
   if (!isDev) throw new Error("Dev ednpoint only");
 
-  // const s = c.get("supabaseService");
   const s = c.get("supabase");
   const { email, password, name } = await c.req.json();
   const { data, error } = await s.auth.updateUser({

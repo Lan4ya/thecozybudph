@@ -99,52 +99,58 @@ export const payOrderSchema = z.object({
     email: z.email().trim().min(1, "email is required"),
   }),
   type: paymentMethodTypesSchema,
-  checkoutSessionId: z.uuid("checkoutSessionId is not a valid UUID"),
+  // checkoutSessionId: z.uuid("checkoutSessionId is not a valid UUID"),
 });
 
 // ----------------------- DATA SCHEMAS -----------------------
 
-export const getOrderItemDataSchema = z.object({
-  id: z.string(),
-  orderId: z.uuid(),
+export const getOrderWithItemsDataSchema = z.object({
+  id: z.uuid(),
+  paymentId: z.uuid(),
   shipmentOrderId: z.string().nullable(),
-  quantity: z.number().int().nonnegative(),
-  cardMessages: z.array(z.string()),
-  name: z.string(),
-  collection: z.string().nullable(),
-  category: z.string(),
-  primaryImageUrl: z.url(),
-  variantAttributes: z.record(z.string(), z.string()),
-  priceCents: z.number().int().nonnegative(),
-
-  createdAt: z.date().nullable(),
-
+  createdAt: z.date(),
+  expiresAt: z.date(),
   status: customerOrderStatusSchema,
   serviceType: serviceTypeSchema,
-
   subtotalCents: z.number().int().nonnegative(),
   discountCents: z.number().int().nonnegative(),
   shippingCents: z.number().int().nonnegative(),
   passOnFee: z.number().int().nonnegative(),
   totalCents: z.number().int().nonnegative(),
-
   address: createAddressSchema.omit({ isDefault: true }),
+  items: z.array(
+    z.object({
+      orderId: z.uuid(),
+      quantity: z.number().int().nonnegative(),
+      cardMessages: z.array(z.string()),
+      name: z.string(),
+      collection: z.string().nullable(),
+      category: z.string(),
+      primaryImageUrl: z.url(),
+      variantAttributes: z.record(z.string(), z.string()),
+      priceCents: z.number().int().nonnegative(),
+    }),
+  ),
 });
 
 export const queryOrderDataSchema = z.object({
   id: z.uuid(),
+  paymentId: z.uuid(),
   status: customerOrderStatusSchema,
-  totalCents: z.number(),
+  totalCents: z.number().int().nonnegative(),
   expiresAt: z.date(),
-  item: z.object({
-    id: z.uuid(),
-    quantity: z.number(),
-    name: z.string(),
-    category: z.string(),
-    primaryImageUrl: z.url(),
-    variantAttributes: z.record(z.string(), z.string()),
-    priceCents: z.number(),
-  }),
+  createdAt: z.date(),
+  items: z.array(
+    z.object({
+      id: z.uuid(),
+      quantity: z.number().int().nonnegative(),
+      name: z.string(),
+      category: z.string(),
+      primaryImageUrl: z.url(),
+      variantAttributes: z.record(z.string(), z.string()),
+      priceCents: z.number().int().nonnegative(),
+    }),
+  ),
 });
 
 export const createOrderDataSchema = z.object({
@@ -158,13 +164,14 @@ export const payOrderDataSchema = z.object({
   status: paymentStatusSchema,
 });
 
-export const customerPaymentStatusSchema = z.enum([
-  "pending",
-  "paid",
-  "failed",
-]);
+export const customerPaymentStatusSchema = z.enum(["pending", "paid"]);
+
+export const getOrderStatusDataSchema = z.object({
+  status: customerOrderStatusSchema,
+});
 
 export const getOrderPaymentStatusDataSchema = z.object({
+  orderId: z.uuid(),
   status: customerPaymentStatusSchema,
   expiresAt: z.date(),
 });
@@ -172,7 +179,7 @@ export const getOrderPaymentStatusDataSchema = z.object({
 // ----------------------- RESPONSE SCHEMAS -----------------------
 
 export const getOrderItemResponseSchema = apiSuccessResponseSchema(
-  getOrderItemDataSchema,
+  getOrderWithItemsDataSchema,
 );
 
 export const queryOrdersResponseSchema = apiSuccessResponseSchema(
@@ -188,6 +195,10 @@ export const createOrderResponseSchema = apiSuccessResponseSchema(
 
 export const payOrderResponseSchema =
   apiSuccessResponseSchema(payOrderDataSchema);
+
+export const getOrderStatusResponseSchema = apiSuccessResponseSchema(
+  getOrderStatusDataSchema,
+);
 
 export const getOrderPaymentStatusResponseSchema = apiSuccessResponseSchema(
   getOrderPaymentStatusDataSchema,

@@ -6,7 +6,9 @@ export const getProfile = async (db: DrizzleClient, profileId: string) => {
   const profile = await ProfileRepository.getProfileById(db, profileId);
 
   if (!profile) {
-    throw AppError.notFound({ message: `Profile with id ${profileId} not found` });
+    throw AppError.notFound({
+      message: `Profile with id ${profileId} not found`,
+    });
   }
 
   return profile;

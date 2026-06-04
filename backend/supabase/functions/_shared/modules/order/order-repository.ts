@@ -1,3 +1,4 @@
+import { shipments } from "@shared/schemas/drizzle/shipments.ts";
 import {
   cartItems,
   DBOrderStatus,
@@ -5,6 +6,7 @@ import {
   orderAddressesSnapshot,
   orderItemsSnapshots,
   orders,
+  payments,
   productCategories,
   productCollections,
   products,
@@ -69,14 +71,14 @@ export const OrderRepository = {
     });
   },
 
-  checkExists: (db: DrizzleClient, id: string) =>
+  getOrderStatus: (db: DrizzleClient, id: string) =>
     db.rls(async (tx) => {
       const row = await tx.query.orders.findFirst({
-        columns: { id: true },
+        columns: { status: true },
         where: eq(orders.id, id),
       });
 
-      return !!row;
+      return row;
     }),
 
   getById: (db: DrizzleClient, id: string) => {
@@ -88,25 +90,26 @@ export const OrderRepository = {
     });
   },
 
-  getOrderItem: (db: DrizzleClient, itemId: string, profileId: string) => {
-    return db.rls(async (tx) => {
-      const [orderItem] = await tx
-        .select({
-          // item details
-          id: orderItemsSnapshots.id,
-          orderId: orders.id,
-          shipmentOrderId: orders.shipmentOrderId,
-          quantity: orderItemsSnapshots.quantity,
-          cardMessages: orderItemsSnapshots.cardMessages,
-          name: orderItemsSnapshots.name,
-          collection: orderItemsSnapshots.collection,
-          category: orderItemsSnapshots.category,
-          primaryImageUrl: orderItemsSnapshots.primaryImageUrl,
-          variantAttributes: orderItemsSnapshots.variantAttributes,
-          priceCents: orderItemsSnapshots.priceCents,
+  getByIdAdmin: (db: DrizzleClient, id: string) => {
+    return db.admin.query.orders.findFirst({
+      where: and(eq(orders.id, id)),
+    });
+  },
 
-          // order details
+  getOrderWithItems: (
+    db: DrizzleClient,
+    orderId: string,
+    profileId: string,
+  ) => {
+    return db.rls(async (tx) => {
+      const [orderWithAddress] = await tx
+        .select({
+          // Order details
+          id: orders.id,
+          paymentId: payments.id,
+          shipmentOrderId: shipments.lalamoveOrderId,
           createdAt: orders.createdAt,
+          expiresAt: orders.expiresAt,
           status: orders.status,
           serviceType: orders.serviceType,
           subtotalCents: orders.subtotalCents,
@@ -115,6 +118,7 @@ export const OrderRepository = {
           passOnFee: orders.passOnFee,
           totalCents: orders.totalCents,
 
+          // Address snapshot
           address: {
             fullName: orderAddressesSnapshot.fullName,
             postalCode: orderAddressesSnapshot.postalCode,
@@ -126,24 +130,52 @@ export const OrderRepository = {
             phoneNumber: orderAddressesSnapshot.phoneNumber,
           },
         })
-        .from(orderItemsSnapshots)
-        .innerJoin(orders, eq(orders.id, orderItemsSnapshots.orderId))
+        .from(orders)
+        .leftJoin(shipments, eq(shipments.orderId, orders.id))
+        .innerJoin(payments, and(eq(payments.orderId, orders.id)))
         .innerJoin(
           orderAddressesSnapshot,
-          eq(orderAddressesSnapshot.orderId, orderItemsSnapshots.orderId),
+          eq(orderAddressesSnapshot.orderId, orders.id),
         )
-        .where(
-          and(
-            eq(orderItemsSnapshots.id, itemId),
-            eq(orders.profileId, profileId),
-          ),
-        )
+        .where(and(eq(orders.id, orderId), eq(orders.profileId, profileId)))
         .limit(1);
 
-      if (!orderItem) {
-        return null;
-      }
-      return orderItem;
+      if (!orderWithAddress) return null;
+
+      const allItems = await tx
+        .select({
+          orderId: orderItemsSnapshots.orderId,
+          quantity: orderItemsSnapshots.quantity,
+          cardMessages: orderItemsSnapshots.cardMessages,
+          name: orderItemsSnapshots.name,
+          collection: orderItemsSnapshots.collection,
+          category: orderItemsSnapshots.category,
+          primaryImageUrl: orderItemsSnapshots.primaryImageUrl,
+          variantAttributes: orderItemsSnapshots.variantAttributes,
+          priceCents: orderItemsSnapshots.priceCents,
+        })
+        .from(orderItemsSnapshots)
+        .where(eq(orderItemsSnapshots.orderId, orderId));
+
+      const grouped = Object.groupBy(allItems, (item) => item.orderId);
+      const itemsForOrder = grouped[orderId] ?? [];
+
+      return {
+        id: orderWithAddress.id,
+        paymentId: orderWithAddress.paymentId,
+        shipmentOrderId: orderWithAddress.shipmentOrderId,
+        createdAt: orderWithAddress.createdAt,
+        expiresAt: orderWithAddress.expiresAt,
+        status: orderWithAddress.status,
+        serviceType: orderWithAddress.serviceType,
+        subtotalCents: orderWithAddress.subtotalCents,
+        discountCents: orderWithAddress.discountCents,
+        shippingCents: orderWithAddress.shippingCents,
+        passOnFee: orderWithAddress.passOnFee,
+        totalCents: orderWithAddress.totalCents,
+        address: orderWithAddress.address,
+        items: itemsForOrder,
+      };
     });
   },
 
@@ -166,25 +198,17 @@ export const OrderRepository = {
             ? inArray(orders.status, ["to_ship", "shipped", "paid"])
             : eq(orders.status, status);
 
-      return await tx
+      const ordersData = await tx
         .select({
           id: orders.id,
+          paymentId: payments.id,
           status: orders.status,
           totalCents: orders.totalCents,
           expiresAt: orders.expiresAt,
-
-          item: {
-            id: orderItemsSnapshots.id,
-            quantity: orderItemsSnapshots.quantity,
-            name: orderItemsSnapshots.name,
-            category: orderItemsSnapshots.category,
-            primaryImageUrl: orderItemsSnapshots.primaryImageUrl,
-            variantAttributes: orderItemsSnapshots.variantAttributes,
-            priceCents: orderItemsSnapshots.priceCents,
-          },
+          createdAt: orders.createdAt,
         })
-        .from(orderItemsSnapshots)
-        .innerJoin(orders, eq(orders.id, orderItemsSnapshots.orderId))
+        .from(orders)
+        .innerJoin(payments, and(eq(payments.orderId, orders.id)))
         .where(
           and(
             eq(orders.profileId, profileId),
@@ -195,6 +219,38 @@ export const OrderRepository = {
         .orderBy(desc(orders.createdAt))
         .limit(limit)
         .offset(offset);
+
+      if (ordersData.length === 0) {
+        return [];
+      }
+
+      const orderIds = ordersData.map((o) => o.id);
+
+      const allItems = await tx
+        .select({
+          orderId: orderItemsSnapshots.orderId,
+          id: orderItemsSnapshots.id,
+          quantity: orderItemsSnapshots.quantity,
+          name: orderItemsSnapshots.name,
+          category: orderItemsSnapshots.category,
+          primaryImageUrl: orderItemsSnapshots.primaryImageUrl,
+          variantAttributes: orderItemsSnapshots.variantAttributes,
+          priceCents: orderItemsSnapshots.priceCents,
+        })
+        .from(orderItemsSnapshots)
+        .where(inArray(orderItemsSnapshots.orderId, orderIds));
+
+      const itemsByOrderId = Object.groupBy(allItems, (item) => item.orderId);
+
+      return ordersData.map((order) => ({
+        id: order.id,
+        paymentId: order.paymentId,
+        status: order.status,
+        totalCents: order.totalCents,
+        expiresAt: order.expiresAt,
+        createdAt: order.createdAt,
+        items: itemsByOrderId[order.id] ?? [],
+      }));
     });
   },
 
@@ -234,20 +290,21 @@ export const OrderRepository = {
     params: {
       orderId: string;
       status: DBOrderStatus;
-      shippingOrderId?: string | null;
     },
   ) => {
-    const { orderId, status, shippingOrderId } = params;
+    const { orderId, status } = params;
     const [row] = await db.admin
       .update(orders)
       .set({
         status,
-        ...(shippingOrderId !== undefined
-          ? { shipmentOrderId: shippingOrderId }
-          : {}),
       })
       .where(eq(orders.id, orderId))
-      .returning({ status: orders.status });
+      .returning({ id: orders.id, status: orders.status });
+
+    if (!row) {
+      throw new Error(`Order not found: ${orderId}`);
+    }
+
     return row.status as DBOrderStatus;
   },
 };

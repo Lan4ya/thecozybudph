@@ -27,14 +27,14 @@ const Carousel = ({ urls }: CarouselProps) => {
     <div className="flex flex-col w-full -mt-0.5 lg:mt-0 min-[522px]:pt-10 max-w-[500px] gap-4 lg:pt-0">
       {/* Carousel */}
       <div className=" overflow-hidden relative w-full  bg-background group active:cursor-grabbing">
-        {!isLgScreen && (
-          <Link
-            to="/shop"
-            className="z-10 absolute left-3 top-5 rounded-xl bg-black/50  text-white px-3 py-3"
-          >
-            <ArrowLeft className="size-5" />
-          </Link>
-        )}
+        {/* {!isLgScreen && ( */}
+        {/*   <Link */}
+        {/*     to="/shop" */}
+        {/*     className="z-10 absolute left-3 top-5 rounded-xl bg-black/50  text-white px-3 py-3" */}
+        {/*   > */}
+        {/*     <ArrowLeft className="size-5" /> */}
+        {/*   </Link> */}
+        {/* )} */}
 
         <Swiper
           modules={[Navigation, A11y]}

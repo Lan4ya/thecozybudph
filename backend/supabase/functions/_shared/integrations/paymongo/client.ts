@@ -1,12 +1,11 @@
-import axios from "axios";
 import { AppError } from "../../errors/Errors.ts";
 
 // TODO: read this again after creating checkout UI in client for the full workflow:
-// https://developers.paymongo.com/docs/accepting-a-paymenT
+// https://developers.paymongo.com/docs/accepting-a-payment
 
 // TODO: activate gcash payment method in paymongo dashboard (needs beneficiary
 // documents) to properly create live mode payment methods:
-// https:dashboard.paymongo.com/payment-methods
+// https:dshboard.paymongo.com/payment-methods
 
 // TODO:
 // GCash Deep Links: Important Note for App-Based Merchants
@@ -16,31 +15,77 @@ import { AppError } from "../../errors/Errors.ts";
 //    Without proper handling, the “Open in GCash” button will not work (e.g., it may do nothing or show an error).
 //    Customers can still scan the QR code, but the in-app redirection flow will not function as intended.
 
-export const paymongoClient = axios.create({
-  baseURL: "https://api.paymongo.com/v1",
-  headers: {
-    // btoa (Binary to ASCII) is a built-in fn that converts a string to Base64-encoded string.
-    // HTTP Basic Authentication requires this format: Authorization: Basic base64(username:password)
+const BASE_URL = "https://api.paymongo.com/v1";
 
-    // https://developers.paymongo.com/docs/authentication#authenticate-using-your-api-keys
-    Authorization: `Basic ${btoa(Deno.env.get("PAYMONGO_SECRET_KEY") + ":")}`,
-    "Content-Type": "application/json",
-  },
-});
+const defaultHeaders = {
+  Authorization: `Basic ${btoa(Deno.env.get("PAYMONGO_SECRET_KEY") + ":")}`,
+  "Content-Type": "application/json",
+};
 
-paymongoClient.interceptors.response.use(
-  (res) => res.data.data,
-  (err: unknown) => {
-    if (axios.isAxiosError(err)) {
-      const status = err.response?.status ?? 500;
-      const message = err.response?.data || err.message;
+type RequestOptions = Omit<RequestInit, "body"> & {
+  body?: unknown;
+};
 
-      return Promise.reject(
-        new AppError({ status, message: "Paymongo request failed", cause: message }),
-      );
-    }
+async function request<T>(
+  path: string,
+  options: RequestOptions = {},
+): Promise<T> {
+  const res = await fetch(`${BASE_URL}${path}`, {
+    ...options,
+    headers: {
+      ...defaultHeaders,
+      ...options.headers,
+    },
+    body: options.body ? JSON.stringify(options.body) : undefined,
+  });
 
-    // else throw it to global error handler
-    throw err;
-  },
-);
+  let json: unknown;
+
+  try {
+    json = await res.json();
+  } catch {
+    json = null;
+  }
+
+  if (!res.ok) {
+    throw new AppError({
+      status: res.status,
+      message: "Paymongo request failed",
+      cause: json,
+    });
+  }
+
+  return (json as { data: T }).data;
+}
+
+export const paymongoClient = {
+  get: <T>(path: string, init?: RequestInit) =>
+    request<T>(path, { ...init, method: "GET" }),
+
+  post: <T>(path: string, body?: unknown, init?: RequestInit) =>
+    request<T>(path, {
+      ...init,
+      method: "POST",
+      body,
+    }),
+
+  put: <T>(path: string, body?: unknown, init?: RequestInit) =>
+    request<T>(path, {
+      ...init,
+      method: "PUT",
+      body,
+    }),
+
+  patch: <T>(path: string, body?: unknown, init?: RequestInit) =>
+    request<T>(path, {
+      ...init,
+      method: "PATCH",
+      body,
+    }),
+
+  delete: <T>(path: string, init?: RequestInit) =>
+    request<T>(path, {
+      ...init,
+      method: "DELETE",
+    }),
+};

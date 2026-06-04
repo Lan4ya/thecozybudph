@@ -67,9 +67,7 @@ export const KeyMetricsCards = ({ data }: KeyMetricsCardsProps) => {
             <p className="text-sm text-muted-foreground mb-1">{metric.label}</p>
             <p className="text-2xl font-bold mb-2">{metric.value}</p>
             <p
-              className={`text-xs font-medium ${
-                metric.positive ? "text-green-600" : "text-red-600"
-              }`}
+              className={`text-xs font-medium ${metric.positive ? "text-green-600" : "text-red-600"}`}
             >
               {metric.change} from last month
             </p>

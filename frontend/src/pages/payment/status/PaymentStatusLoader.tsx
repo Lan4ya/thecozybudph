@@ -7,18 +7,17 @@ export type PaymentLoaderData = {
 
 const uuidSchema = z.uuid();
 
-const CheckoutPaymentStatusLoader: LoaderFunction = async ({ params }) => {
+const PaymentStatusLoader: LoaderFunction = ({ params }) => {
   const { paymentId } = params;
+  const parsed = uuidSchema.safeParse(paymentId);
 
-  const orderIdResult = uuidSchema.safeParse(paymentId);
-
-  if (!orderIdResult.success) {
+  if (!parsed.success) {
     throw new Response("Not Found", { status: 404 });
   }
 
   return {
-    paymentId: orderIdResult.data,
+    paymentId: parsed.data,
   } satisfies PaymentLoaderData;
 };
 
-export default CheckoutPaymentStatusLoader;
+export default PaymentStatusLoader;

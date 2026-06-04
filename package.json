@@ -5,21 +5,26 @@
   "scripts": {
     "dev:sb": "cd backend && pn exec supabase start && pn exec supabase functions serve --no-verify-jwt",
     "dev:fe": "pn -F frontend dev",
+    "dev:tunnel": "ngrok http 54321",
     "dev": "concurrently \"pn dev:sb\" \"pn dev:fe\"",
     "dev:restart": "cd backend && pn exec supabase stop && cd - && pn dev",
     "build:fe": "pn -F frontend build",
     "type:sb": "pn -F backend type:sb",
-    "type:fe": "tsgo --noEmit -p ./frontend/tsconfig.json",
-    "type:schemas": "tsgo --noEmit -p ./packages/schemas/tsconfig.json",
+    "type:fe": "pn -F frontend type",
+    "type:schemas": "pn -F schemas type",
     "type": "pn type:fe && pn type:schemas && pn type:sb",
+    "dev:webhook": "pn -F backend dev:webhook",
     "db:migrate": "pn -F backend db:migrate",
     "db:seed": "pn -F backend db:seed",
+    "db:reset": "cd backend && pn exec supabase db reset && pn db:seed",
     "test:sb": "pn -F backend test:sb",
     "test:fe": "pn -F frontend test",
     "add:sb": "pn -F backend add:sb",
+    "remove:sb": "pn -F backend remove:sb",
     "update:sb": "pn -F backend update:sb",
     "update:latest:sb": "pn -F backend update:latest:sb",
     "add:sb:tests": "pn -F backend add:sb:tests",
+    "remove:sb:tests": "pn -F backend remove:sb:tests",
     "update:sb:tests": "pn -F backend update:sb:tests",
     "update:latest:sb:tests": "pn -F backend update:latest:sb:tests",
     "schemas:gen": "pn -F backend schemas:gen",
@@ -28,6 +33,7 @@
   "devDependencies": {
     "@typescript/native-preview": "7.0.0-dev.20260521.1",
     "concurrently": "^9.2.1",
-    "supabase": "^2.98.2"
+    "supabase": "^2.98.2",
+    "tsx": "^4.21.0"
   }
 }

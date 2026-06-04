@@ -3,17 +3,26 @@ import {
   type ProductWithRelations,
   type DeleteProductsInput,
   type AdminQueryOrdersInput,
-  type AdminQueryOrdersRes,
+  type AdminQueryOrdersData,
   type CreateProductFormOutput,
   type UpdateProductFormOutput,
   type AdminAnalyticsRes,
+  type CreateShippingQuoteData,
+  type CreateShippingQuoteInput,
+  type GetShippingOrderData,
+  type ShipOrderData,
+  type ShipOrderInput,
+  type AdminGetOrderData,
 } from "@cozybud/schemas";
 import { supabase } from "@/lib/supabase/client";
 import { toProductWithRelationsDomain } from "@/lib/utils/mappers";
 import { client, unwrapData } from "./_client";
 import type { ProductQueryListItemsAPI } from "@/types";
+import isDev from "@/lib/utils/isDev";
 
 export const AdminAPI = {
+  // ------------------------- Products -------------------------
+
   queryProducts: async ({
     page = 0,
     perPage = 12,
@@ -54,9 +63,7 @@ export const AdminAPI = {
         priceRange.max !== undefined ? priceRange.max * 100 : undefined;
 
       if (max !== undefined) {
-        query = query
-          .gte("min_price_cents", min)
-          .lte("min_price_cents", max);
+        query = query.gte("min_price_cents", min).lte("min_price_cents", max);
       } else {
         query = query.gte("min_price_cents", min);
       }
@@ -203,9 +210,26 @@ export const AdminAPI = {
     return unwrapData(raw, "DELETE /admin/product");
   },
 
-  getOrders: async (
+  // Orders
+
+  getOrder: async (orderId: string): Promise<AdminGetOrderData> => {
+    const { data: raw } = await client.admin.GET("/admin/order/{id}", {
+      params: { path: { id: orderId } },
+    });
+    const data = unwrapData(raw, `GET /admin/order/${orderId}`);
+    if (!data) return null;
+
+    return {
+      ...data,
+      createdAt: new Date(data.createdAt),
+      updatedAt: new Date(data.updatedAt),
+      expiresAt: new Date(data.expiresAt),
+    };
+  },
+
+  queryOrders: async (
     query: AdminQueryOrdersInput,
-  ): Promise<AdminQueryOrdersRes> => {
+  ): Promise<AdminQueryOrdersData> => {
     const { data: raw } = await client.admin.GET("/admin/order", {
       params: { query },
     });
@@ -222,8 +246,141 @@ export const AdminAPI = {
     };
   },
 
+  // ------------------------- Analytics -------------------------
+
   getAnalytics: async (): Promise<AdminAnalyticsRes> => {
     const { data: raw } = await client.admin.GET("/admin/analytics");
     return unwrapData(raw, "GET /admin/analytics");
   },
+
+  // ------------------------- Shipment -------------------------
+
+  createShipmentQuote: async (
+    payload: CreateShippingQuoteInput,
+  ): Promise<CreateShippingQuoteData[]> => {
+    isDev && console.log("creating shipping quotes...", payload);
+    const { data: raw } = await client.admin.POST("/admin/shipment/quotes", {
+      body: payload,
+    });
+    const data = unwrapData(raw, "POST /admin/shipment/quotes");
+
+    return data.map((quote) => ({
+      ...quote,
+      scheduleAt: new Date(quote.scheduleAt),
+      expiresAt: new Date(quote.expiresAt),
+    }));
+  },
+
+  createShipmentOrder: async (
+    payload: ShipOrderInput,
+    orderId: string,
+  ): Promise<ShipOrderData> => {
+    const { data: raw } = await client.admin.PATCH("/admin/order/{id}/ship", {
+      params: { path: { id: orderId } },
+      body: payload,
+    });
+    const data = unwrapData(raw, `PATCH /admin/order/${orderId}/ship`);
+    return {
+      ...data,
+      updatedAt: new Date(data.updatedAt),
+      createdAt: new Date(data.createdAt),
+      scheduleAt: data?.scheduleAt ? new Date(data.scheduleAt) : null,
+      PODFailedAt: data?.PODFailedAt ? new Date(data.PODFailedAt) : null,
+      PODDeliveredAt: data?.PODDeliveredAt
+        ? new Date(data.PODDeliveredAt)
+        : null,
+    };
+  },
+
+  getShipmentOrder: async (
+    orderId: string,
+  ): Promise<GetShippingOrderData | null> => {
+    const { data: raw } = await client.admin.GET("/admin/order/{id}/ship", {
+      params: { path: { id: orderId } },
+    });
+    const data = unwrapData(raw, `GET /admin/order/${orderId}/ship`);
+    if (!data) return null;
+
+    return {
+      ...data,
+      updatedAt: new Date(data.updatedAt),
+      createdAt: new Date(data.createdAt),
+      scheduleAt: data?.scheduleAt ? new Date(data.scheduleAt) : null,
+      PODFailedAt: data?.PODFailedAt ? new Date(data.PODFailedAt) : null,
+      PODDeliveredAt: data?.PODDeliveredAt
+        ? new Date(data.PODDeliveredAt)
+        : null,
+    };
+  },
+
+  cancelShipmentOrder: async (
+    orderId: string,
+  ): Promise<{ success: boolean }> => {
+    const { data: raw } = await client.admin.DELETE("/admin/order/{id}/ship", {
+      params: { path: { id: orderId } },
+    });
+    return unwrapData(raw, `DELETE /admin/order/${orderId}/ship/cancel`);
+  },
+
+  // addPriorityFee: async (
+  //   payload: AddShippingOrderPriorityFeeInput,
+  // ): Promise<GetShippingOrderData> => {
+  //   const { data: raw } = await client.admin.POST(
+  //     "/admin/shipment/priority-fee",
+  //     {
+  //       body: payload,
+  //     },
+  //   );
+  //   return unwrapData(raw, "POST /admin/shipment/priority-fee");
+  // },
+  //
+  // getDriver: async (
+  //   query: GetShippingDriverInput,
+  // ): Promise<GetShippingDriverData> => {
+  //   const { data: raw } = await client.admin.GET("/admin/shipment/driver", {
+  //     params: { query },
+  //   });
+  //   return unwrapData(raw, "GET /admin/shipment/driver");
+  // },
+  //
+  // changeDriver: async (
+  //   payload: ChangeShippingDriverInput,
+  // ): Promise<GetShippingDriverData> => {
+  //   const { data: raw } = await client.admin.POST(
+  //     "/admin/shipment/driver/change",
+  //     {
+  //       body: payload,
+  //     },
+  //   );
+  //   return unwrapData(raw, "POST /admin/shipment/driver/change");
+  // },
+  //
+  // getCity: async (cityId: string): Promise<GetShippingCityData> => {
+  //   const { data: raw } = await client.admin.GET(
+  //     "/admin/shipment/city/{cityId}",
+  //     {
+  //       params: { path: { cityId } },
+  //     },
+  //   );
+  //   return unwrapData(raw, `GET /admin/shipment/city/${cityId}`);
+  // },
+  //
+  // getMarket: async (): Promise<GetShippingMarketData> => {
+  //   const { data: raw } = await client.admin.GET("/admin/shipment/market");
+  //   return unwrapData(raw, "GET /admin/shipment/market");
+  // },
+  //
+  // editShippingOrder: async (
+  //   orderId: string,
+  //   payload: EditShippingOrderInput,
+  // ): Promise<GetShippingOrderData> => {
+  //   const { data: raw } = await client.admin.PATCH(
+  //     "/admin/order/{id}/ship/edit",
+  //     {
+  //       params: { path: { id: orderId } },
+  //       body: payload,
+  //     },
+  //   );
+  //   return unwrapData(raw, `PATCH /admin/order/${orderId}/ship/edit`);
+  // },
 };

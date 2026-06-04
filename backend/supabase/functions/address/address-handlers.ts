@@ -14,9 +14,19 @@ export const createAddressHandler: RouteHandler<
   AppEnv
 > = async (c) => {
   const payload = c.req.valid("json");
-  const { db, claims } = requireVariables(c, "db", "claims");
+  const { db, claims, isAdmin } = requireVariables(
+    c,
+    "db",
+    "claims",
+    "isAdmin",
+  );
   const profileId = claims.sub;
-  const res = await AddressActions.createAddress(db, payload, profileId);
+  const res = await AddressActions.createAddress(
+    db,
+    profileId,
+    isAdmin,
+    payload,
+  );
   return c.json({ data: res }, 200);
 };
 
@@ -24,10 +34,10 @@ export const updateAddressHandler: RouteHandler<
   typeof updateAddressRoute,
   AppEnv
 > = async (c) => {
-  const { db } = requireVariables(c, "db");
+  const { db, isAdmin } = requireVariables(c, "db", "isAdmin");
   const payload = c.req.valid("json");
   const { id } = c.req.valid("param");
-  const res = await AddressActions.updateAddress(db, id, payload);
+  const res = await AddressActions.updateAddress(db, id, isAdmin, payload);
   return c.json({ data: res }, 200);
 };
 

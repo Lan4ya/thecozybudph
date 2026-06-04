@@ -8,11 +8,14 @@ import type {
   CreateOrderRes,
   GetPaymentStatusRes,
   QueryOrderRes,
-  GetOrderItemRes,
+  GetOrderWithItemsRes as GetOrderWithItemsRes,
+  GetOrderStatusRes,
 } from "@cozybud/schemas";
 
 export const OrderAPI = {
   queryOrders: async (params: QueryOrdersInput): Promise<QueryOrderRes[]> => {
+    isDev && console.log("querying orders...");
+
     const { status, limit, offset } = params;
     const { data: raw } = await client.order.GET("/order", {
       params: { query: { status, limit, offset } },
@@ -21,17 +24,21 @@ export const OrderAPI = {
     return data.map((r) => ({
       ...r,
       expiresAt: new Date(r.expiresAt),
+      createdAt: new Date(r.createdAt),
     }));
   },
 
-  getOrderItem: async (id: string): Promise<GetOrderItemRes> => {
-    const { data: raw } = await client.order.GET("/order/item/{id}", {
-      params: { path: { id } },
+  getOrderWithItems: async (orderId: string): Promise<GetOrderWithItemsRes> => {
+    isDev && console.log("fetching order item", orderId);
+
+    const { data: raw } = await client.order.GET("/order/{id}", {
+      params: { path: { id: orderId } },
     });
-    const data = unwrapData(raw, "GET /order/item/{id}");
+    const data = unwrapData(raw, "GET /order/{id}");
     return {
       ...data,
-      createdAt: data.createdAt ? new Date(data.createdAt) : null,
+      createdAt: new Date(data.createdAt),
+      expiresAt: new Date(data.expiresAt),
     };
   },
 
@@ -63,6 +70,13 @@ export const OrderAPI = {
       },
     });
     return unwrapData(raw, "PATCH /order/{id}/pay");
+  },
+
+  getOrderStatus: async (orderId: string): Promise<GetOrderStatusRes> => {
+    const { data: raw } = await client.order.GET("/order/{id}/status", {
+      params: { path: { id: orderId } },
+    });
+    return unwrapData(raw, "GET /order/{id}/status");
   },
 
   getOrderPaymentStatus: async (

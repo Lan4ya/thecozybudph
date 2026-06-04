@@ -7,9 +7,7 @@ import {
   addCartItemSchema,
   orderItemSchema,
 } from "@cozybud/schemas";
-import PersistSuspense from "@/components/PersistSuspense";
-import { RouteLoaderSpinner } from "@/components/RouteLoaderSpinner";
-import { ArrowLeft } from "lucide-react";
+import { AlertCircle, ArrowLeft, ArrowRight } from "lucide-react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useEffect, useMemo, useState } from "react";
 import { Star, Heart, Shield } from "lucide-react";
@@ -18,18 +16,19 @@ import { cn } from "@/lib/utils/cn";
 import { BottomBar } from "./components/BottomBar.tsx";
 import { formatPriceCents } from "@/lib/utils/format";
 import z from "zod";
-import { useProductSelectionStore } from "@/pages/shop/store/useProductSelectionStore.tsx";
 import isDev from "@/lib/utils/isDev";
 import { useCartItemMutations } from "@/pages/cart/hooks/useCartMutations.ts";
-import { useAuthStore } from "@/store/useAuthStore.tsx";
-import { useCheckoutStore } from "@/pages/checkout/store/useCheckoutStore.ts";
+import { useAuthStore } from "@/store/useAuthStore.ts";
+import { useCheckoutStore } from "@/store/useCheckoutStore.ts";
+import { useProductSelectionStore } from "@/store/useProductSelectionStore.ts";
+import { Button } from "@/lib/ui/__shadcn__/button.tsx";
 
 const Product = () => {
   return (
-    <div className="max-w-7xl flex flex-col items-center gap-8 mb-25 lg:grid lg:grid-cols-2 lg:gap-12 lg:items-start lg:mt-8 justify-center lg:mx-auto lg:px-6">
-      <PersistSuspense fallback={<RouteLoaderSpinner />}>
-        <ProductInner />
-      </PersistSuspense>
+    <div className="max-w-7xl flex flex-col items-center gap-8 mb-25 lg:grid lg:grid-cols-2 lg:gap-12 lg:items-center lg:mt-8 justify-center lg:mx-auto lg:px-6">
+      {/* <PersistSuspense fallback={<RouteLoaderFlowerSpinner />}> */}
+      <ProductInner />
+      {/* </PersistSuspense> */}
     </div>
   );
 };
@@ -45,6 +44,8 @@ const ProductInner = () => {
     return true;
   }, [id]);
 
+  const staleTime = 1000 * 60 * 5; // 5 mins
+
   const {
     data: product,
     isLoading: getProductLoading,
@@ -55,14 +56,14 @@ const ProductInner = () => {
       if (!id || !isValidUUID) return Promise.resolve(null);
       return ProductAPI.getById(id);
     },
-    staleTime: 1 * 60 * 60 * 1000,
-    gcTime: 1 * 60 * 60 * 1000,
+    staleTime,
+    gcTime: staleTime * 2,
+    meta: { persist: true },
   });
 
   const isSmScreenMax = useMediaQuery("(max-width: 518px)");
 
   const { addToast } = useToast();
-  const session = useAuthStore((s) => s.session);
 
   const [hearted, setHearted] = useState(false);
 
@@ -72,7 +73,6 @@ const ProductInner = () => {
 
   const resetProductSelectionStore = useProductSelectionStore((s) => s.reset);
 
-  const setCheckoutIds = useCheckoutStore((s) => s.setCheckoutIds);
   const setCheckoutSource = useCheckoutStore((s) => s.setSource);
   const setCheckoutOrderItems = useCheckoutStore((s) => s.setOrderItemsUI);
 
@@ -96,11 +96,6 @@ const ProductInner = () => {
   const handleAddToCart = async () => {
     if (!product) return;
 
-    if (!session) {
-      addToast("Please log in first to continue.", "error");
-      return;
-    }
-
     const { quantity, selectedVariant, cardMessages } =
       useProductSelectionStore.getState();
 
@@ -123,11 +118,6 @@ const ProductInner = () => {
 
   const handleBuyNow = async () => {
     if (!product) return;
-
-    if (!session) {
-      addToast("Please log in first to continue.", "error");
-      return;
-    }
 
     const { quantity, selectedVariant, cardMessages } =
       useProductSelectionStore.getState();
@@ -156,11 +146,15 @@ const ProductInner = () => {
     const sessionId = crypto.randomUUID();
 
     useCheckoutStore.getState().reset();
-    setCheckoutIds({ session: sessionId });
     setCheckoutSource("shop");
     setCheckoutOrderItems([orderItem]);
+    // Since sessionId only is stored client side only (sessionStorage), we're gonna use this
+    // to verify the user really created the checkout sessionId properly and not
+    // just typed some random uuid in the url by comparing if param uuid === sessionId store
+    useCheckoutStore.getState().setCheckout({ sessionId, status: "active" });
     navigate(`/checkout/${sessionId}`);
 
+    // Reset selection configs
     resetProductSelectionStore(product.options);
   };
 
@@ -170,8 +164,21 @@ const ProductInner = () => {
 
   if (!product || !isValidUUID)
     return (
-      <div className="absolute inset-0 z-10 flex-center mb-70 text-lg lg:text-xl text-muted-foreground">
-        Product Not Found
+      <div className="w-full grid-cols-2 rounded-[2.5rem] border-2 border-dashed border-primary/10 bg-primary/2 py-18 lg:py-24 text-center">
+        <div className="mx-auto size-18 lg:size-20 rounded-full bg-primary/5 flex items-center justify-center mb-6">
+          <AlertCircle className="text-primary/40 size-8 lg:size-10" />
+        </div>
+        <h3 className="text-2xl font-bold mb-2 text-primary">
+          Product not found
+        </h3>
+        <p className="text-muted-foreground font-medium mb-8 max-w-xs mx-auto">
+          We coudn't find the product you're looking for
+        </p>
+        <Button asChild className="rounded-full px-6!">
+          <a href="/shop">
+            Go to Shop <ArrowRight />
+          </a>
+        </Button>
       </div>
     );
 
@@ -190,8 +197,8 @@ const ProductInner = () => {
 
       <Carousel urls={product.imageUrls} />
 
-      <div className="max-[380px]:px-2! px-4 lg:px-0 max-w-2xl w-full">
-        <div className="space-y-2 border-b pb-6">
+      <div className="space-y-6 max-[380px]:px-2! px-4 lg:px-0 max-w-2xl w-full">
+        <div className="space-y-2 lg:space-y-8 border-b pb-6">
           {/* Product Header */}
           <div className="flex items-center justify-between">
             <div className="flex-center gap-4">
@@ -210,7 +217,7 @@ const ProductInner = () => {
             >
               <Heart
                 className={cn(
-                  "w-6 h-6 text-muted-foreground hover:text-red-600 transition-colors",
+                  "size-7 lg:size-7 text-muted-foreground hover:text-red-600 transition-colors",
                   hearted && "fill-red-600 text-red-400",
                 )}
               />
@@ -233,7 +240,7 @@ const ProductInner = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 py-6 border-b">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-red-200 rounded-full">
-              <Heart className="w-5 h-5 text-red-600" />
+              <Heart className="size-5 text-red-600" />
             </div>
             <div>
               <div className="font-medium text-sm">Made With Love</div>

@@ -3,6 +3,7 @@ import { createContext, useCallback, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
 import type { ProductQueryUI } from "@/types";
 import { parseProductQueryParams } from "@/pages/shop/utils/parseProductQueryParams";
+import { ProductQueryStateContext } from "@/providers/ProductQueryProvider";
 
 type AdminProductsContextType = {
   isFormOpen: boolean;
@@ -96,6 +97,24 @@ const AdminProductsProvider = ({ children }: { children: React.ReactNode }) => {
     });
   }, []);
 
+  const hasProductQueryFilters = useMemo(() => {
+    const { filters } = productQuery;
+    if (!filters) return false;
+    return Object.values(filters).some((v) =>
+      Array.isArray(v) ? v.length > 0 : Boolean(v),
+    );
+  }, [productQuery]);
+
+  const clearProductQueryFilters = useCallback(() => {
+    const qp = parseProductQueryParams(searchParams);
+    if (qp.filters) {
+      Object.keys(qp.filters).forEach((key) => {
+        searchParams.delete(key);
+      });
+    }
+    setSearchParams(searchParams, { replace: true });
+  }, [searchParams, setSearchParams]);
+
   const value = useMemo(
     () => ({
       isFormOpen,
@@ -120,9 +139,26 @@ const AdminProductsProvider = ({ children }: { children: React.ReactNode }) => {
     ],
   );
 
+  const shopProviderValue = useMemo(
+    () => ({
+      productQuery,
+      setProductQuery,
+      hasProductQueryFilters,
+      clearProductQueryFilters,
+    }),
+    [
+      productQuery,
+      setProductQuery,
+      hasProductQueryFilters,
+      clearProductQueryFilters,
+    ],
+  );
+
   return (
     <AdminProductsContext.Provider value={value}>
-      {children}
+      <ProductQueryStateContext.Provider value={shopProviderValue}>
+        {children}
+      </ProductQueryStateContext.Provider>
     </AdminProductsContext.Provider>
   );
 };

@@ -12,7 +12,7 @@ export const useCartItemMutations = () => {
     mutationFn: CartAPI.addItems,
     onError: (err: Error) => {
       isDev && console.error(err.message);
-      addToast("Something wen't wrong. Please try again later.", "error");
+      addToast("Something went wrong. Please try again.", "error");
     },
     onSuccess: (cartItem) => {
       queryClient.setQueryData<CartItem[]>(["cart"], (old = []) => {
@@ -52,7 +52,7 @@ export const useCartItemMutations = () => {
     },
     onError: (err: Error) => {
       isDev && console.error(err.message);
-      addToast("Something went wrong. Please try again later.", "error");
+      addToast("Something went wrong. Please try again.", "error");
     },
   });
 
@@ -97,7 +97,7 @@ export const useCartItemMutations = () => {
     },
     onError: (err: Error) => {
       isDev && console.error(err.message);
-      addToast("Something wen't wrong. Please try again later.", "error");
+      addToast("Something went wrong. Please try again.", "error");
     },
   });
 

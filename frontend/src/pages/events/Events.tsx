@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { EventInquiryForm } from "./components";
-import type { EventInquiryInput } from "@cozybud/schemas";
+import type { CreateEventInquiryInput } from "@cozybud/schemas";
 import { useToast } from "@/providers/ToastProvider";
+import { useEventInquiryMutations } from "@/hooks/useEventInquiries";
 import { Button } from "@/lib/ui/__shadcn__/button";
 import {
   Heart,
@@ -45,18 +46,14 @@ const galleryImages = [
 ];
 
 const Events = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { addToast } = useToast();
+  const { createInquiry } = useEventInquiryMutations();
 
-  const handleInquirySubmit = async (data: EventInquiryInput) => {
-    setIsSubmitting(true);
-
+  const handleInquirySubmit = async (data: CreateEventInquiryInput) => {
     try {
-      // Simulate API call - replace with actual endpoint when ready
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await createInquiry.mutateAsync(data);
 
-      console.log("Event inquiry submitted:", data);
       setIsSubmitted(true);
       addToast(
         "Thank you for your inquiry! We'll be in touch soon.",
@@ -64,8 +61,6 @@ const Events = () => {
       );
     } catch (error) {
       addToast("Something went wrong. Please try again.", "error");
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -183,7 +178,10 @@ const Events = () => {
       </section>
 
       {/* Inquiry Form Section */}
-      <section className="py-16 lg:py-24 bg-linear-to-b from-primary/5 to-background">
+      <section
+        id="inquiry-form"
+        className="py-16 lg:py-24 bg-linear-to-b from-primary/5 to-background"
+      >
         <div className="custom-container">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start max-w-6xl mx-auto">
             {/* Left Side - Info */}
@@ -306,7 +304,7 @@ const Events = () => {
                   </div>
                   <EventInquiryForm
                     onSubmit={handleInquirySubmit}
-                    isSubmitting={isSubmitting}
+                    isSubmitting={createInquiry.isPending}
                   />
                 </>
               )}

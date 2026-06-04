@@ -1,11 +1,11 @@
 import { Outlet } from "react-router";
 import { AdminSidebar } from "./components/AdminSidebar";
-import AdminHeader from "./components/AdminHeader";
+import AdminMobileHeader from "./components/AdminMobileHeader";
 
 const AdminDashboard = () => {
   return (
     <div className="min-h-screen flex flex-col">
-      <AdminHeader />
+      <AdminMobileHeader />
       <div className="flex-1 lg:flex">
         <AdminSidebar />
         <main className="flex-1 pt-6 lg:pt-0">

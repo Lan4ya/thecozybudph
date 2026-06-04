@@ -1,13 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { ASSETS } from "@/lib/constants/assets";
-import {
-  useAnimateOnView,
-  type RegisterSentinel,
-} from "@/hooks/useAnimateOnView";
 import { cn } from "@/lib/utils/cn";
 import { useIsLgScreenMin } from "@/hooks/useMediaQuery";
 import { ProgressiveImage } from "@/components/ProgressiveImage";
+import { motion } from "framer-motion";
 
 const imgSrcs = [
   ASSETS.TCB_1,
@@ -19,33 +16,16 @@ const imgSrcs = [
 const TRANSITION_MS = 1000;
 
 const Hero = () => {
-  const { registerSentinel, visibleMap } = useAnimateOnView();
   const isLgScreenMin = useIsLgScreenMin();
 
   return (
     <section aria-label="Hero" className="custom-container w-full">
-      {isLgScreenMin ? (
-        <DesktopHeroInner
-          registerSentinel={registerSentinel}
-          visibleMap={visibleMap}
-        />
-      ) : (
-        <MobileHeroInner
-          registerSentinel={registerSentinel}
-          visibleMap={visibleMap}
-        />
-      )}
+      {isLgScreenMin ? <DesktopHeroInner /> : <MobileHeroInner />}
     </section>
   );
 };
 
-const MobileHeroInner = ({
-  registerSentinel,
-  visibleMap,
-}: {
-  registerSentinel: RegisterSentinel;
-  visibleMap: boolean[];
-}) => {
+const MobileHeroInner = () => {
   const slides = [imgSrcs[imgSrcs.length - 1], ...imgSrcs, imgSrcs[0]];
   const [index, setIndex] = useState(1);
   const [transition, setTransition] = useState(true);
@@ -79,14 +59,12 @@ const MobileHeroInner = ({
 
   return (
     <div className="mx-auto flex w-full max-w-[560px] flex-col gap-8 pt-8 pb-18">
-      <div
-        ref={registerSentinel}
-        className={cn(
-          "rounded-3xl border border-accent/10 bg-accent/5 px-5 py-6 text-center transition-all duration-900 ease-out",
-          visibleMap[0]
-            ? "translate-y-0 opacity-100"
-            : "translate-y-8 opacity-0",
-        )}
+      <motion.div
+        initial={{ opacity: 0, y: 32 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+        className="rounded-3xl border border-accent/10 bg-accent/5 px-5 py-6 text-center"
       >
         <p className="mb-2 text-xs font-semibold uppercase tracking-[0.25em] text-accent/70">
           The Cozy Bud
@@ -112,16 +90,14 @@ const MobileHeroInner = ({
             Our story
           </Link>
         </div>
-      </div>
+      </motion.div>
 
-      <div
-        ref={registerSentinel}
-        className={cn(
-          "overflow-hidden rounded-3xl border border-accent/10 shadow-xl bg-card transition-all duration-900 ease-out",
-          visibleMap[1]
-            ? "translate-y-0 opacity-100"
-            : "translate-y-8 opacity-0",
-        )}
+      <motion.div
+        initial={{ opacity: 0, y: 32 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+        className="overflow-hidden rounded-3xl border border-accent/10 shadow-xl bg-card"
       >
         <div
           className="flex h-full transition-transform"
@@ -143,28 +119,20 @@ const MobileHeroInner = ({
             </div>
           ))}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
 
-const DesktopHeroInner = ({
-  registerSentinel,
-  visibleMap,
-}: {
-  registerSentinel: RegisterSentinel;
-  visibleMap: boolean[];
-}) => {
+const DesktopHeroInner = () => {
   return (
     <div className="mx-auto grid w-full max-w-[1420px] items-center gap-10 py-30 pb-32 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] xl:gap-14">
-      <div
-        ref={registerSentinel}
-        className={cn(
-          "space-y-6 transition-all duration-900 ease-out",
-          visibleMap[0]
-            ? "translate-y-0 opacity-100"
-            : "translate-y-8 opacity-0",
-        )}
+      <motion.div
+        initial={{ opacity: 0, y: 32 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+        className="space-y-6"
       >
         <p className="text-xs font-semibold uppercase tracking-[0.32em] text-accent/70">
           The Cozy Bud
@@ -223,16 +191,14 @@ const DesktopHeroInner = ({
             </p>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      <div
-        ref={registerSentinel}
-        className={cn(
-          "relative transition-all duration-900 ease-out",
-          visibleMap[1]
-            ? "translate-y-0 opacity-100"
-            : "translate-y-8 opacity-0",
-        )}
+      <motion.div
+        initial={{ opacity: 0, y: 32 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+        className="relative"
       >
         <div className="absolute -inset-6 -z-10 rounded-[2.5rem] bg-linear-to-br from-primary/10 via-accent/10 to-transparent blur-2xl" />
         <div className="overflow-hidden rounded-[2.5rem] border border-accent/10 bg-card shadow-2xl">
@@ -244,7 +210,7 @@ const DesktopHeroInner = ({
             className="pointer-events-none h-[620px] select-none"
           />
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

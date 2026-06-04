@@ -58,11 +58,6 @@ export const CartRepository = {
     });
   },
 
-  /**
-   * Adds a new cart item or updates an existing one with the same product variant.
-   * If the item already exists in the cart, it increments the quantity and
-   * appends any new card messages.
-   */
   upsertCartItem: (
     db: DrizzleClient,
     cartId: string,
@@ -126,12 +121,11 @@ export const CartRepository = {
           id: variant.productId,
           name: variant.productName,
           primaryImageUrl: variant.primaryImageUrl,
-          options: variant.productOptions as unknown as ProductOption[],
+          options: variant.productOptions ?? [],
           variant: {
             id: variant.id,
             priceCents: variant.priceCents,
-            attributes:
-              variant.attributes as unknown as ProductVariant["attributes"],
+            attributes: variant.attributes,
           },
         },
       };
@@ -161,7 +155,9 @@ export const CartRepository = {
         .limit(1);
 
       if (!currentItem || !currentItem.cartId || !currentItem.productId) {
-        throw AppError.notFound({ message: "Cart item not found or incomplete" });
+        throw AppError.notFound({
+          message: "Cart item not found or incomplete",
+        });
       }
 
       // CASE A: No variant change (or no new variant provided)

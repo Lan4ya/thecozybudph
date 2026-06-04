@@ -2,11 +2,11 @@ packages:
   - frontend
   - backend/**
   - packages/**
-  - '!**/node_modules/**' # Do not scan nested node_modules
+  - "!**/node_modules/**" # Do not scan nested node_modules
 
 allowBuilds:
-  '@prisma/engines': true
-  '@snaplet/seed': true
+  "@prisma/engines": true
+  "@snaplet/seed": true
   esbuild: true
   sharp: true
   supabase: true
@@ -15,6 +15,6 @@ ignoredBuiltDependencies:
   - supabase
 
 onlyBuiltDependencies:
-  - '@prisma/engines'
-  - '@snaplet/seed'
+  - "@prisma/engines"
+  - "@snaplet/seed"
   - esbuild

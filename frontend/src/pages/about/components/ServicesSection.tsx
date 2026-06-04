@@ -1,16 +1,5 @@
 import { cn } from "@/lib/utils/cn";
-import {
-
-
-
-  
-  Flower,
-  Leaf,
-  Heart,
-  Truck,
-  Sparkles,
-  Gift,
-} from "lucide-react";
+import { Flower, Leaf, Heart, Truck, Sparkles, Gift } from "lucide-react";
 
 const services = [
   {
@@ -67,7 +56,7 @@ const ServicesSection = ({
             "text-center mb-12 transition-all duration-900 ease-out",
             visibleMap[titleIndex]
               ? "opacity-100 translate-y-0"
-              : "opacity-0 translate-y-8"
+              : "opacity-0 translate-y-8",
           )}
         >
           <h2 className="font-ivy-ora-display text-3xl lg:text-4xl font-semibold mb-4">
@@ -87,7 +76,7 @@ const ServicesSection = ({
                 "bg-card rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300",
                 visibleMap[startIndex + index]
                   ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-8"
+                  : "opacity-0 translate-y-8",
               )}
               style={{ transitionDelay: `${index * 100}ms` }}
             >

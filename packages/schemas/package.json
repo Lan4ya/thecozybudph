@@ -4,7 +4,8 @@
   "main": "src/index.ts",
   "type": "module",
   "scripts": {
-    "docs:gen": "pnpm tsx ./genOpenApiDocs.ts"
+    "docs:gen": "pnpm tsx ./genOpenApiDocs.ts",
+    "type": "tsgo --noEmit --ignoreConfig src/**/*.{ts}"
   },
   "dependencies": {
     "@hono/zod-openapi": "^0.19.10",

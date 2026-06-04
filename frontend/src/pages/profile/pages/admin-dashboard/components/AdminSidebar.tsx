@@ -4,7 +4,7 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { BarChart3, CalendarDays, Package, ShoppingCart } from "lucide-react";
 import { Drawer, DrawerContent } from "@/lib/ui/__shadcn__/drawer";
 import { cn } from "@/lib/utils/cn";
-import { useAdminDashboardStore } from "../hooks/useAdminDashboardStore";
+import { useAdminDashboardStore } from "@/store/useAdminDashboardStore";
 
 export const adminNavLinks = [
   { label: "Products", to: "/profile/admin/products", icon: Package },

@@ -21,6 +21,8 @@ export const useIsLgScreenMin = () => !!useMediaQuery("(min-width: 1024px)");
 
 export const useIsXlScreenMin = () => !!useMediaQuery("(min-width: 1280px)");
 
+export const useIs2xlScreenMin = () => !!useMediaQuery("(min-width: 1536px)");
+
 // Use the base function instead if you want a customized breakpoint
 export function useMediaQuery(
   query: string,

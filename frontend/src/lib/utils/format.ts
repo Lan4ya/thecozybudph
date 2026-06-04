@@ -40,7 +40,7 @@ export const handleError = (error: unknown): string => {
 };
 
 export const handleSupabaseAuthError = (err: unknown): string => {
-  const fallbackMessage = "Something went wrong. Please try again";
+  const fallbackMessage = "Something went wrong. Please try again.";
   let message = fallbackMessage;
 
   if (isAuthApiError(err)) {

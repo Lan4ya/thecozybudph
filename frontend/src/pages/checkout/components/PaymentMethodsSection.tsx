@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { CreditCard } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
-import { useCheckoutStore } from "../store/useCheckoutStore";
 import type { PaymentMethodTypes } from "@cozybud/schemas";
+import { useCheckoutStore } from "@/store/useCheckoutStore";
 
 type PaymentMethod = {
   type: PaymentMethodTypes;
@@ -94,6 +94,7 @@ const PaymentMethodsSection = () => {
                     </span>
                   )}
                 </div>
+
                 {method.description && (
                   <p className="text-xs text-muted-foreground mt-0.5">
                     {method.description}

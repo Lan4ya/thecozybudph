@@ -1,4 +1,72 @@
 export interface paths {
+    "/order/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Get order status */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: {
+                                /** @enum {string} */
+                                status: "toPay" | "toShip" | "toReceive" | "fulfilled" | "cancelled";
+                            };
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                            code: string;
+                            details?: unknown;
+                        };
+                    };
+                };
+                /** @description Order not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                            code: string;
+                            details?: unknown;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/order": {
         parameters: {
             query?: never;
@@ -29,12 +97,16 @@ export interface paths {
                             data: {
                                 /** Format: uuid */
                                 id: string;
+                                /** Format: uuid */
+                                paymentId: string;
                                 /** @enum {string} */
                                 status: "toPay" | "toShip" | "toReceive" | "fulfilled" | "cancelled";
                                 totalCents: number;
                                 /** Format: date-time */
                                 expiresAt: string;
-                                item: {
+                                /** Format: date-time */
+                                createdAt: string;
+                                items: {
                                     /** Format: uuid */
                                     id: string;
                                     quantity: number;
@@ -46,7 +118,7 @@ export interface paths {
                                         [key: string]: string;
                                     };
                                     priceCents: number;
-                                };
+                                }[];
                             }[];
                         };
                     };
@@ -101,7 +173,7 @@ export interface paths {
             };
             responses: {
                 /** @description Create new order */
-                200: {
+                201: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -150,7 +222,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/order/item/{id}": {
+    "/order/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -176,23 +248,15 @@ export interface paths {
                     content: {
                         "application/json": {
                             data: {
+                                /** Format: uuid */
                                 id: string;
                                 /** Format: uuid */
-                                orderId: string;
+                                paymentId: string;
                                 shipmentOrderId: string | null;
-                                quantity: number;
-                                cardMessages: string[];
-                                name: string;
-                                collection: string | null;
-                                category: string;
-                                /** Format: uri */
-                                primaryImageUrl: string;
-                                variantAttributes: {
-                                    [key: string]: string;
-                                };
-                                priceCents: number;
                                 /** Format: date-time */
-                                createdAt: string | null;
+                                createdAt: string;
+                                /** Format: date-time */
+                                expiresAt: string;
                                 /** @enum {string} */
                                 status: "toPay" | "toShip" | "toReceive" | "fulfilled" | "cancelled";
                                 /** @enum {string} */
@@ -212,6 +276,21 @@ export interface paths {
                                     addressLine: string;
                                     phoneNumber: string;
                                 };
+                                items: {
+                                    /** Format: uuid */
+                                    orderId: string;
+                                    quantity: number;
+                                    cardMessages: string[];
+                                    name: string;
+                                    collection: string | null;
+                                    category: string;
+                                    /** Format: uri */
+                                    primaryImageUrl: string;
+                                    variantAttributes: {
+                                        [key: string]: string;
+                                    };
+                                    priceCents: number;
+                                }[];
                             };
                         };
                     };
@@ -282,8 +361,6 @@ export interface paths {
                         };
                         /** @enum {string} */
                         type: "gcash" | "brankas";
-                        /** Format: uuid */
-                        checkoutSessionId: string;
                     };
                 };
             };
@@ -301,7 +378,7 @@ export interface paths {
                                 /** Format: uri */
                                 paymentUrl: string | null;
                                 /** @enum {string} */
-                                status: "processing" | "pending" | "paid" | "failed" | "cancelled" | "refunded";
+                                status: "confirming" | "processing" | "pending" | "paid" | "failed" | "cancelled" | "refunded";
                             };
                         };
                     };
@@ -379,8 +456,10 @@ export interface paths {
                     content: {
                         "application/json": {
                             data: {
+                                /** Format: uuid */
+                                orderId: string;
                                 /** @enum {string} */
-                                status: "pending" | "paid" | "failed";
+                                status: "confirming" | "pending" | "paid" | "failed";
                                 /** Format: date-time */
                                 expiresAt: string;
                             };

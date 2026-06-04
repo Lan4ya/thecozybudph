@@ -17,17 +17,7 @@ export const cooldownTypeSchema = z.enum([
   "password_reset",
 ]);
 
-export const checkCooldownSchema = z.object({
-  actionType: cooldownTypeSchema,
-  email: z.email("invalid email").optional(),
-});
-
 // DATA
-
-export const cooldownDataSchema = z.object({
-  actionType: cooldownTypeSchema,
-  endsAt: z.date().nullable(),
-});
 
 export const supabaseUserSchema = z
   .object({
@@ -75,9 +65,6 @@ export const loginDataSchema = z.object({
 export const signupResponseSchema = apiSuccessResponseSchema(signupDataSchema);
 
 export const loginResponseSchema = apiSuccessResponseSchema(loginDataSchema);
-
-export const cooldownResponseSchema =
-  apiSuccessResponseSchema(cooldownDataSchema);
 
 export const resendEmailVerificationResponseSchema = apiSuccessResponseSchema(
   z.object({ success: z.boolean() }),

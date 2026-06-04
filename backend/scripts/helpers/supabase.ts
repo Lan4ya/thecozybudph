@@ -15,3 +15,15 @@ export const supabase = createClient<Database>(
   SUPABASE_URL,
   SUPABASE_SERVICE_ROLE_KEY,
 );
+
+// NOTE: Do not use this for auth ops that saves session so rls bypass always work
+export const supabaseService = createClient<Database>(
+  SUPABASE_URL,
+  SUPABASE_SERVICE_ROLE_KEY,
+  {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  },
+);

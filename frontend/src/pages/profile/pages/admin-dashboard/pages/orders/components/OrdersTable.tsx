@@ -8,7 +8,7 @@ type OrdersTableProps = {
   isLoading: boolean;
   hasError: boolean;
   selectedOrderId: string | null;
-  onRowClick: (order: AdminOrderListItem) => void;
+  onRowClick: (orderId: string) => void;
 };
 
 function formatDate(date: Date) {
@@ -96,9 +96,9 @@ export function OrdersTable({
               orders.map((order) => (
                 <tr
                   key={order.id}
-                  onClick={() => onRowClick(order)}
+                  onClick={() => onRowClick(order.id)}
                   className={`cursor-pointer border-t transition-colors hover:bg-accent/15 ${
-                    selectedOrderId === order.id ? "bg-accent/30" : ""
+                    selectedOrderId === order.id ? "bg-accent/25" : ""
                   }`}
                 >
                   <td className="pr-4 pl-8 py-3 text-left">

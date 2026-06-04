@@ -1,4 +1,13 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 import { revenueData as mockData } from "../data/mock-analytics";
 
 interface RevenueChartProps {
@@ -17,7 +26,11 @@ export const RevenueChart = ({ data }: RevenueChartProps) => {
           <XAxis dataKey="date" stroke="#888" />
           <YAxis stroke="#888" />
           <Tooltip
-            contentStyle={{ backgroundColor: "#fff", border: "1px solid #ccc", borderRadius: "8px" }}
+            contentStyle={{
+              backgroundColor: "#fff",
+              border: "1px solid #ccc",
+              borderRadius: "8px",
+            }}
             formatter={(value) => `₱${value}`}
           />
           <Legend />

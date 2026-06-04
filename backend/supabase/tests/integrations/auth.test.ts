@@ -13,7 +13,11 @@ type JsonRequestInit = {
 };
 
 describe("Auth API", () => {
-  const apiRequest = async (path: string, init: JsonRequestInit = {}, token?: string) => {
+  const apiRequest = async (
+    path: string,
+    init: JsonRequestInit = {},
+    token?: string,
+  ) => {
     const headers = new Headers(init.headers);
     const authToken = token;
     if (authToken) {
@@ -33,49 +37,6 @@ describe("Auth API", () => {
     });
   };
 
-  describe("POST /auth/cooldown", () => {
-    it("returns 200 and null endsAt when no Authorization header and no email provided", async () => {
-      const res = await apiRequest("/auth/cooldown", {
-        method: "POST",
-        body: {
-          actionType: "password_reset",
-        },
-      });
-
-      assertEquals(res.status, 200); 
-      const body = await res.json();
-      assertEquals(body.data.endsAt, null);
-    });
-
-    it("checks cooldown for an authenticated user", async () => {
-      const token = await getTestToken();
-      const res = await apiRequest("/auth/cooldown", {
-        method: "POST",
-        body: {
-          actionType: "password_reset",
-        },
-      }, token);
-
-      assertEquals(res.status, 200);
-      const body = await res.json();
-      assert("endsAt" in body.data);
-    });
-
-    it("checks cooldown for a specific email", async () => {
-      const res = await apiRequest("/auth/cooldown", {
-        method: "POST",
-        body: {
-          actionType: "password_reset",
-          email: TEST_USER_EMAIL,
-        },
-      });
-
-      assertEquals(res.status, 200);
-      const body = await res.json();
-      assert("endsAt" in body.data);
-    });
-  });
-
   describe("POST /auth/password-reset", () => {
     it("requests a password reset", async () => {
       const requestPasswordResetStub = stub(
@@ -89,6 +50,7 @@ describe("Auth API", () => {
           method: "POST",
           body: {
             email: TEST_USER_EMAIL,
+            cfTurnstileToken: "dummy-token",
           },
         });
 
@@ -100,15 +62,16 @@ describe("Auth API", () => {
       }
     });
 
-    it("returns 400 on invalid email", async () => {
+    it("returns 422 on invalid email", async () => {
       const res = await apiRequest("/auth/password-reset", {
         method: "POST",
         body: {
           email: "invalid-email",
+          cfTurnstileToken: "dummy-token",
         },
       });
 
-      assertEquals(res.status, 400);
+      assertEquals(res.status, 422);
     });
   });
 
@@ -136,7 +99,7 @@ describe("Auth API", () => {
       }
     });
 
-    it("returns 400 on invalid email", async () => {
+    it("returns 422 on invalid email", async () => {
       const res = await apiRequest("/auth/resend-verification", {
         method: "POST",
         body: {
@@ -144,7 +107,7 @@ describe("Auth API", () => {
         },
       });
 
-      assertEquals(res.status, 400);
+      assertEquals(res.status, 422);
     });
   });
 });

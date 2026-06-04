@@ -15,7 +15,9 @@ export const authMiddleware =
     const authHeader = c.req.header("Authorization");
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      throw AppError.unauthorized({ message: "Missing or malformed Authorization header" });
+      throw AppError.unauthorized({
+        message: "Missing or malformed Authorization header",
+      });
     }
 
     const token = authHeader?.split(" ")[1];

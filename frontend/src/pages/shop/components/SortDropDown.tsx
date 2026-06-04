@@ -43,12 +43,16 @@ export function SortDropdownMenu({ className }: { className?: string }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="minimal" size="lg" className={cn("w-40 border", className)}>
+        <Button
+          variant="minimal"
+          size="lg"
+          className={cn("w-40 border", className)}
+        >
           <ArrowUpDown className="size-3.5 text-muted-foreground" /> {sortOpt}
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent className="w-40">
+      <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-40">
         <DropdownMenuGroup>
           <DropdownMenuLabel className="text-xs text-muted-foreground">
             Sort by

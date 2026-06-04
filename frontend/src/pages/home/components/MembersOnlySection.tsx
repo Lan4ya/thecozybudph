@@ -1,13 +1,12 @@
 import { useAuthStore } from "@/store/useAuthStore";
 import { Link } from "react-router";
-import { useAnimateOnView } from "@/hooks/useAnimateOnView";
 import { cn } from "@/lib/utils/cn";
+import { motion } from "framer-motion";
 
 export const MembersOnlySection = () => {
   const session = useAuthStore((s) => s.session);
-  const { registerSentinel, visibleMap } = useAnimateOnView();
 
-  if (!!session) return null;
+  if (session) return null;
 
   return (
     <section className="">
@@ -18,14 +17,12 @@ export const MembersOnlySection = () => {
 
         <div className="relative mx-auto grid w-full max-w-5xl items-end gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
           {/* Left content */}
-          <div
-            ref={registerSentinel}
-            className={cn(
-              "space-y-6 text-center lg:text-left transition-all duration-1000 ease-out",
-              visibleMap[0]
-                ? "translate-y-0 opacity-100"
-                : "translate-y-8 opacity-0",
-            )}
+          <motion.div
+            initial={{ opacity: 0, y: 32 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+            className="space-y-6 text-center lg:text-left"
           >
             {/* Eyebrow */}
             <p className="text-xs font-semibold uppercase tracking-[0.32em] text-accent/70">
@@ -47,17 +44,15 @@ export const MembersOnlySection = () => {
             <div className="inline-flex items-center gap-2 rounded-xl bg-accent/10 px-3 py-2 text-sm font-medium text-accent">
               <span>✨</span> Welcome vouchers for new members
             </div>
-          </div>
+          </motion.div>
 
           {/* Right CTA */}
-          <div
-            ref={registerSentinel}
-            className={cn(
-              "flex flex-col gap-4 px-8 backdrop-blur-sm transition-all duration-1000 ease-out",
-              visibleMap[1]
-                ? "translate-y-0 opacity-100"
-                : "translate-y-8 opacity-0",
-            )}
+          <motion.div
+            initial={{ opacity: 0, y: 32 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+            className="flex flex-col gap-4 px-8 backdrop-blur-sm"
           >
             <Link
               to="/auth/signup"
@@ -69,14 +64,14 @@ export const MembersOnlySection = () => {
             <p className="text-center text-xs text-muted-foreground lg:text-left">
               Already a member?{" "}
               <Link
-                to="/auth/signin"
+                to="/auth/login"
                 className="font-medium text-accent underline-offset-4 hover:underline"
               >
-                Sign in
+                Log in
               </Link>{" "}
               to view your rewards.
             </p>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

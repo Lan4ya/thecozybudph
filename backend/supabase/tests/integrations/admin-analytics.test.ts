@@ -1,5 +1,4 @@
 import adminApp from "@functions/admin/index.ts";
-import { supabaseService } from "@shared/db/client.ts";
 import { assertEquals, assert } from "@std/assert";
 import { describe, it, beforeAll } from "@std/testing/bdd";
 import { getTestToken, getTestAdminToken } from "../helpers/utils.ts";
@@ -55,9 +54,9 @@ describe("Admin Analytics API", () => {
   describe("Data Retrieval", () => {
     it("successfully retrieves live analytics data", async () => {
       const res = await adminRequest("/admin/analytics", { method: "GET" });
-      
+
       assertEquals(res.status, 200);
-      
+
       const body = await res.json();
       const data = body.data;
 
@@ -67,7 +66,7 @@ describe("Admin Analytics API", () => {
       assert(data.keyMetrics.totalOrders);
       assert(data.keyMetrics.totalCustomers);
       assert(data.keyMetrics.conversionRate);
-      
+
       assert(Array.isArray(data.revenueTrend));
       assert(Array.isArray(data.categorySales));
       assert(Array.isArray(data.topProducts));

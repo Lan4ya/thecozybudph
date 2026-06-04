@@ -8,4 +8,4 @@ import {
 export type CreateAddressInput = z.infer<typeof createAddressSchema>;
 export type UpdateAddressInput = z.infer<typeof updateAddressSchema>;
 
-export type Address = z.infer<typeof addressDataSchema>;
+export type AddressData = z.infer<typeof addressDataSchema>;

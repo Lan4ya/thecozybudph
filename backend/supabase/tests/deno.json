@@ -14,6 +14,7 @@
     "test:profiles": "deno test --preload=./helpers/setup.ts --no-check --allow-all ./integrations/profiles.test.ts",
     "test:admin-products": "deno test --preload=./helpers/setup.ts --no-check --allow-all ./integrations/admin-products.test.ts",
     "test:admin-orders": "deno test --preload=./helpers/setup.ts --no-check --allow-all ./integrations/admin-orders.test.ts",
+    "test:admin-shipment": "deno test --preload=./helpers/setup.ts --no-check --allow-all ./integrations/admin-shipment.test.ts",
     "test:admin-analytics": "deno test --preload=./helpers/setup.ts --no-check --allow-all ./integrations/admin-analytics.test.ts",
     "test-all": "deno test --preload=./helpers/setup.ts --no-check --allow-all --parallel ./**/*test.ts"
   },

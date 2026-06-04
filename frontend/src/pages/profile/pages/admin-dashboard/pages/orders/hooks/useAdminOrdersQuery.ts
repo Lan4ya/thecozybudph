@@ -7,9 +7,9 @@ export const useAdminOrdersQuery = (query: AdminQueryOrdersInput) => {
 
   const { data, isLoading, error, isFetching } = useQuery({
     queryKey,
-    queryFn: () => AdminAPI.getOrders(query),
+    queryFn: () => AdminAPI.queryOrders(query),
     staleTime: 30 * 1000,
-    gcTime: 5 * 60 * 1000,
+    gcTime: 60 * 1000,
   });
 
   return {

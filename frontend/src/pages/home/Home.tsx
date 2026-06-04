@@ -11,7 +11,6 @@ const Home = () => {
   return (
     <main className="overflow-x-hidden flex-1">
       <Hero />
-
       <EventSection />
       <ReviewCarousel />
 

@@ -152,7 +152,7 @@ const CheckEmail = () => {
                   ) : (
                     <span className="flex items-center gap-2">
                       {resendLoading && <Spinner />}
-                      {resendLoading ? "Resending" : "Resend Link"}
+                      {resendLoading ? "Resending..." : "Resend Link"}
                     </span>
                   )}
                 </Button>

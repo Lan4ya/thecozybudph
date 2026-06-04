@@ -1,6 +1,7 @@
 import { DrizzleError, DrizzleQueryError } from "drizzle-orm";
 import { AppError, ValidationError } from "@shared/errors/Errors.ts";
 import { isAuthApiError as isSupabaseAuthApiError } from "supabase";
+import { ZodError } from "zod";
 
 type PostgresError = {
   code?: string;
@@ -32,6 +33,7 @@ export function isSupabaseStorageError(
 export function normalizeError(error: unknown): AppError | ValidationError {
   if (error instanceof ValidationError) return error;
   if (error instanceof AppError) return error;
+  if (error instanceof ZodError) return new ValidationError(error);
 
   //  Drizzle errors (Postgres)
   if (error instanceof DrizzleError || error instanceof DrizzleQueryError) {

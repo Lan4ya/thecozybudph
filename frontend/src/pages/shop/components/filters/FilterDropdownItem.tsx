@@ -7,7 +7,7 @@ import {
   type ArrayFilterKeys,
   type ProductFiltersUI,
   type NonArrayFilterKeys,
-  type ProductPriceRangeOptionsUIsUI,
+  type ProductPriceRangeOptionsUI,
 } from "../../../../types";
 import { arrayFiltersKeys } from "../../../../types";
 import { formatPriceRange } from "./PriceRange";
@@ -78,7 +78,7 @@ export const FilterDropdownItem = ({
       onMouseDown={(e) => e.preventDefault()} // Keep input focused; prevents "Any" flicker
     >
       {filterKey === "priceRange"
-        ? formatPriceRange(filterVal as ProductPriceRangeOptionsUIsUI)
+        ? formatPriceRange(filterVal as ProductPriceRangeOptionsUI)
         : filterVal}
       {isItemActive && <Check className="size-4" />}
     </DropdownMenuItem>

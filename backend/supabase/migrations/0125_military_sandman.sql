@@ -1,0 +1,2 @@
+CREATE TYPE "public"."pod_status" AS ENUM('FAILED', 'DELIVERED', 'SIGNED');--> statement-breakpoint
+ALTER TABLE "shipments" ALTER COLUMN "pod_status" SET DATA TYPE "public"."pod_status" USING "pod_status"::text::"public"."pod_status";

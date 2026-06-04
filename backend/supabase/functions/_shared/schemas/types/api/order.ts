@@ -1,7 +1,8 @@
 import { z } from "zod";
 import type {
   createOrderSchema,
-  getOrderItemDataSchema,
+  getOrderWithItemsDataSchema,
+  getOrderStatusDataSchema,
   payOrderSchema,
   queryOrderDataSchema,
   queryOrdersSchema,
@@ -22,7 +23,9 @@ export type CreatePaymentRes = {
   status: string;
 };
 
-export type GetOrderItemRes = z.infer<typeof getOrderItemDataSchema>;
+export type GetOrderWithItemsRes = z.infer<typeof getOrderWithItemsDataSchema>;
+
+export type GetOrderStatusRes = z.infer<typeof getOrderStatusDataSchema>;
 
 export type QueryOrderRes = z.infer<typeof queryOrderDataSchema>;
 

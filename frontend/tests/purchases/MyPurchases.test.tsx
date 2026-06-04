@@ -11,7 +11,8 @@ vi.mock("react-router", () => {
   const React = require("react");
   return {
     useNavigate: () => mockNavigate,
-    Link: (props: any) => React.createElement("a", { href: props.to, ...props }, props.children),
+    Link: (props: any) =>
+      React.createElement("a", { href: props.to, ...props }, props.children),
   };
 });
 
@@ -25,7 +26,8 @@ vi.mock("@/api", () => ({
 
 // Mock FlowerSpinner and PersistSuspense to avoid heavy rendering
 vi.mock("@/components/RouteLoaderSpinner", () => ({
-  FlowerSpinner: () => React.createElement("div", { "data-testid": "loading" }, "Loading..."),
+  FlowerSpinner: () =>
+    React.createElement("div", { "data-testid": "loading" }, "Loading..."),
 }));
 
 vi.mock("@/components/PersistSuspense", () => ({
@@ -51,7 +53,7 @@ describe("MyPurchases Component", () => {
     return render(
       <QueryClientProvider client={queryClient}>
         <ToastProvider>{ui}</ToastProvider>
-      </QueryClientProvider>
+      </QueryClientProvider>,
     );
   };
 
@@ -80,7 +82,7 @@ describe("MyPurchases Component", () => {
 
     expect(await screen.findByText("My Purchases")).toBeInTheDocument();
     expect(await screen.findByText("Red Roses")).toBeInTheDocument();
-    
+
     // Use getAllByText or find specific status badge
     const statusBadges = await screen.findAllByText("To Ship");
     expect(statusBadges.length).toBeGreaterThan(0);
@@ -96,7 +98,7 @@ describe("MyPurchases Component", () => {
 
     await waitFor(() => {
       expect(mockQueryOrders).toHaveBeenCalledWith(
-        expect.objectContaining({ status: "toShip" })
+        expect.objectContaining({ status: "toShip" }),
       );
     });
   });

@@ -15,14 +15,17 @@ The repo is designed around shared contracts first: define schemas once, then co
 ## Core rules to follow
 
 1. **Edit shared schemas in `packages/schemas/src/` first.**
+
    - Do not hand-edit copied/generated schema files in the backend shared folder.
    - Regenerate/sync after schema changes.
 
 2. **Use the established request flow.**
+
    - Frontend API modules call the generated client wrapper and unwrap `{ data: ... }`.
    - Edge functions validate with OpenAPI/Zod schemas, run middleware, then delegate to application logic.
 
 3. **Keep feature work end-to-end.**
+
    - When you add a feature, update the schema, backend route, backend use case, frontend API method, query/mutation hook, and UI together.
 
 4. **Prefer existing patterns over inventing new ones.**
@@ -33,7 +36,9 @@ The repo is designed around shared contracts first: define schemas once, then co
 ## High-level architecture
 
 ### Frontend
+
 The frontend is a React application with:
+
 - React Router data-mode loaders
 - TanStack Query for server state
 - Supabase auth/client usage
@@ -45,7 +50,9 @@ Common frontend flow:
 `page/component` → `hook` → `frontend/src/api/*` → Supabase Edge Function endpoint → response mapping → TanStack Query cache update
 
 ### Backend
+
 Backend logic is split into domain-based edge functions:
+
 - `address`
 - `cart`
 - `order`
@@ -59,7 +66,9 @@ Common backend flow:
 `<domain>/index.ts` → `<domain>-routes.ts` → `<domain>-handlers.ts` → `_shared/modules/<domain>/application/*` → repository → Drizzle/Postgres or external service
 
 ### Shared contracts
+
 `packages/schemas/src/` holds:
+
 - Zod request/response schemas
 - Drizzle table definitions
 - Type helpers for API/domain/database/form data
@@ -72,32 +81,39 @@ Common backend flow:
 Use this flow as the default mental model.
 
 1. **User interacts with the UI**
+
    - A page component or child component triggers a fetch or mutation.
 
 2. **React Query or a loader calls a feature hook**
+
    - Query hooks usually live near the feature page.
    - Mutation hooks wrap API calls and handle optimistic/cache updates when needed.
 
 3. **Frontend API module calls the backend**
+
    - API modules live in `frontend/src/api/`.
    - They use the shared client wrapper and pass path/query/body values.
    - Responses are unwrapped from `{ data: ... }`.
 
 4. **Edge function middleware runs**
+
    - Auth middleware validates the Supabase token.
    - Supabase client middleware creates the correct client for RLS.
    - Drizzle middleware injects the DB client.
    - Admin middleware gates admin-only routes.
 
 5. **Route handler validates input**
+
    - Route-level Zod/OpenAPI schemas validate path/query/body input.
    - Invalid input returns the shared error shape.
 
 6. **Application use case runs**
+
    - Domain application code contains the business logic.
    - This is where orchestration, cross-table writes, idempotency, or external integrations belong.
 
 7. **Repository and DB layer execute**
+
    - Repositories perform actual persistence work.
    - Use transactions when the operation touches multiple tables or needs consistent state.
 
@@ -106,6 +122,7 @@ Use this flow as the default mental model.
    - The frontend maps dates/shape differences, then updates query caches or store state.
 
 ### What this looks like in practice
+
 A create-order flow typically follows this path:
 `UI` → `OrderAPI.createOrder()` → `/order` edge function → auth/drizzle/supabase service middleware → `createOrderHandler()` → `OrderActions.createOrder()` → repository/transaction work → response → UI/cache updates
 
@@ -114,9 +131,11 @@ A create-order flow typically follows this path:
 ## How to create a feature end to end
 
 ### 1. Define the contract first
+
 Add or update the shared schema in `packages/schemas/src/`.
 
 Typical places:
+
 - `packages/schemas/src/zod/api/*` for request/response schemas
 - `packages/schemas/src/drizzle/*` for database tables
 - `packages/schemas/src/types/*` for inferred domain/API/form types
@@ -124,17 +143,22 @@ Typical places:
 Keep request and response shapes explicit. If the frontend needs a type, derive it from the shared schema instead of redefining it locally.
 
 ### 2. Regenerate shared artifacts
+
 After schema changes, sync them into the backend shared schema area using the repo’s generation workflow.
 
 ### 3. Add or update the backend route
+
 For the relevant domain:
+
 - define the route in `<domain>-routes.ts`
 - attach the correct middleware
 - wire the route to the handler
 - expose the route from `<domain>/index.ts`
 
 ### 4. Implement the handler
+
 The handler should:
+
 - extract validated input from `c.req.valid(...)`
 - access required context with `requireVariables(...)`
 - call the domain application function
@@ -143,9 +167,11 @@ The handler should:
 Keep handlers thin.
 
 ### 5. Implement the application logic
+
 Put business rules in `_shared/modules/<domain>/application/`.
 
 Use this layer for:
+
 - orchestration across repositories
 - transactional writes
 - external integrations
@@ -154,19 +180,24 @@ Use this layer for:
 - state transitions
 
 ### 6. Update the repository layer
+
 If persistence changes, update the relevant repository methods and Drizzle schema references.
 
 ### 7. Add the frontend API method
+
 Update or create the API function in `frontend/src/api/`.
 
 Typical responsibilities:
+
 - call the right endpoint
 - include headers like `Authorization` or `Idempotency-Key` when needed
 - unwrap the `{ data: ... }` response
 - normalize date fields into `Date` objects when the UI expects them
 
 ### 8. Add the UI hook or store usage
+
 Use TanStack Query for server state:
+
 - `useQuery` for fetches
 - `useMutation` for writes
 - update query cache on success instead of forcing full refetches when practical
@@ -174,12 +205,16 @@ Use TanStack Query for server state:
 For local UI state, keep using the existing store pattern already used by the feature.
 
 ### 9. Update tests
+
 Add or update:
+
 - backend integration tests in `backend/supabase/tests/integrations/`
 - frontend tests if the feature has UI behavior worth covering
 
 ### 10. Update docs if the feature changes behavior
+
 Update relevant docs, API docs, or setup notes when the feature affects:
+
 - environment variables
 - commands
 - auth/admin behavior
@@ -191,7 +226,9 @@ Update relevant docs, API docs, or setup notes when the feature affects:
 ## Backend patterns to preserve
 
 ### Middleware order matters
+
 A common pattern is:
+
 1. `supabaseMiddleware()`
 2. `authMiddleware()`
 3. `adminMiddleware()` when needed
@@ -199,20 +236,26 @@ A common pattern is:
 5. `supabaseServiceMiddleware()` only where elevated service access is required
 
 ### Use the right DB client
+
 - `rls` for user-scoped operations that should respect row-level security
 - `admin` for privileged operations that must bypass RLS
 
 ### Keep responses consistent
+
 Most routes return:
+
 ```ts
 return c.json({ data }, 200);
 ```
 
 ### Use idempotency for write-heavy flows
+
 Order creation and payment flows already use idempotency keys. Reuse that approach for similar operations that should not double-submit.
 
 ### Validate everything at the edge
+
 Do not trust frontend validation alone. Validate:
+
 - query params
 - route params
 - request body
@@ -223,16 +266,21 @@ Do not trust frontend validation alone. Validate:
 ## Frontend patterns to preserve
 
 ### Data fetching
+
 Use the existing API layer instead of calling Supabase directly from pages when the feature belongs behind an edge function.
 
 ### Query keys
+
 Keep query keys stable and feature-scoped. Update cache surgically in mutation success handlers when possible.
 
 ### Date handling
+
 When the API returns serialized dates, convert them near the API boundary rather than throughout the UI.
 
 ### UI composition
+
 Prefer small focused components under each feature page:
+
 - page shell
 - section components
 - hooks
@@ -241,7 +289,9 @@ Prefer small focused components under each feature page:
 - presentational subcomponents
 
 ### Forms
+
 Use:
+
 - `react-hook-form`
 - `zodResolver`
 - shared form schemas from `@cozybud/schemas`
@@ -251,6 +301,7 @@ Use:
 ## Shared schema workflow
 
 When changing schemas:
+
 1. Edit files in `packages/schemas/src/`
 2. Regenerate the synced backend shared artifacts
 3. Update backend imports if types or paths changed
@@ -263,6 +314,7 @@ This repo treats shared schemas as the source of truth.
 ## Commands
 
 ### Local development
+
 ```bash
 pn dev
 pn dev:sb
@@ -270,6 +322,7 @@ pn dev:fe
 ```
 
 ### Type-check
+
 ```bash
 pn type
 pn type:fe
@@ -278,12 +331,14 @@ pn type:sb
 ```
 
 ### Database and seeding
+
 ```bash
 pn db:migrate
 pn db:seed
 ```
 
 ### Supabase function dependency management
+
 ```bash
 pn add:sb <registry-name>:<package-name>
 pn update:sb
@@ -294,6 +349,7 @@ pn update:latest:sb:tests
 ```
 
 ### Schema and docs generation
+
 ```bash
 pn schemas:gen # run after eding shemas in packages to copy over the schemas to supabase functions
 pn docs:gen
@@ -304,19 +360,23 @@ pn docs:gen
 ## Local setup
 
 ### Required tools
+
 - Node.js 24.12.0+
 - Deno
 - pnpm 11.0.1+
 - Docker
 
 ### Environment variables
+
 Frontend:
+
 ```bash
 VITE_SUPABASE_URL=
 VITE_SUPABASE_ANON_KEY=
 ```
 
 Backend:
+
 ```bash
 SUPABASE_URL=
 SUPABASE_ANON_KEY=
@@ -325,6 +385,7 @@ SUPABASE_DB_URL=
 ```
 
 Supabase function env:
+
 ```bash
 DB_TX_POOLER_URL=
 PAYMONGO_PUBLIC_KEY=
@@ -338,7 +399,9 @@ APP_URL=
 ```
 
 ### Seeded admin login
+
 The seed pipeline creates an admin account:
+
 - `admin@local.dev`
 - `password123`
 
@@ -357,6 +420,7 @@ The seed pipeline creates an admin account:
 ## Writing style for AI changes
 
 When generating or editing code:
+
 - match the existing file’s style and structure
 - keep changes minimal and focused
 - prefer type-safe shared contracts over ad hoc shapes

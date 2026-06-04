@@ -19,8 +19,9 @@ export const queryOrders = async (
     ...rest,
   });
 
-  return orders.map((order) => ({
-    ...order,
-    status: toCustomerStatus(order.status),
+  return orders.map((o) => ({
+    ...o,
+    status: toCustomerStatus(o.status),
+    items: o.items,
   }));
 };

@@ -1,10 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import {
-  Heart,
-  Sparkles,
-  Calendar,
-  Palette,
-} from "lucide-react";
+import { Heart, Sparkles, Calendar, Palette } from "lucide-react";
 import { ASSETS } from "@/lib/constants/assets";
 
 export interface EventCategory {
@@ -60,11 +55,11 @@ export const EVENT_TYPES = [
   { value: "other", label: "Other" },
 ] as const;
 
-export const BUDGET_RANGES = [
-  { value: "", label: "Select budget range (optional)" },
-  { value: "under-5k", label: "Under ₱5,000" },
-  { value: "5k-10k", label: "₱5,000 - ₱10,000" },
-  { value: "10k-20k", label: "₱10,000 - ₱20,000" },
-  { value: "20k-50k", label: "₱20,000 - ₱50,000" },
-  { value: "50k+", label: "₱50,000+" },
-] as const;
+// export const BUDGET_RANGES = [
+//   { value: "", label: "Select budget range (optional)" },
+//   { value: "under-5k", label: "Under ₱5,000" },
+//   { value: "5k-10k", label: "₱5,000 - ₱10,000" },
+//   { value: "10k-20k", label: "₱10,000 - ₱20,000" },
+//   { value: "20k-50k", label: "₱20,000 - ₱50,000" },
+//   { value: "50k+", label: "₱50,000+" },
+// ] as const;

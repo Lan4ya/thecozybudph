@@ -33,7 +33,9 @@ export const idempotencyKeys = pgTable(
     responsePayload: jsonb("response_payload"),
     errorPayload: jsonb("error_payload"),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .$onUpdate(() => new Date()),
     expiresAt: timestamp("expires_at", { withTimezone: true }),
   },
   (table) => [

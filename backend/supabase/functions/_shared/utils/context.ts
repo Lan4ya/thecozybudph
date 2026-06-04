@@ -52,9 +52,7 @@ export function requireBindings<T extends keyof Bindings>(
   if (missing.length) {
     const isPlural = missing.length > 1;
 
-    const cause = `Missing required env ${
-      isPlural ? "variables" : "variable"
-    }: ${missing.join(", ")}`;
+    const cause = `Missing required env ${isPlural ? "variables" : "variable"}: ${missing.join(", ")}`;
 
     throw AppError.internal({ message: "Internal server error", cause });
   }

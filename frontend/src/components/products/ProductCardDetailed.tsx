@@ -29,7 +29,7 @@ const ProductCardDetailed = ({ product }: Props) => {
       onClick={handleClick}
     >
       {/* Image */}
-      <div className="h-62 overflow-hidden">
+      <div className="h-53 md:h-62 overflow-hidden shrink-0">
         <ProductImage
           loading="lazy"
           src={primaryImageUrl}
@@ -38,11 +38,11 @@ const ProductCardDetailed = ({ product }: Props) => {
       </div>
 
       {/* Details */}
-      <div className="flex flex-col p-4 min-w-0">
+      <div className="flex flex-col p-4 md:p-5 min-w-0">
         <div className="space-y-2">
           {/* Title + Category */}
           <div className="flex items-start justify-between gap-3">
-            <h3 className="capitalize line-clamp-2 text-base lg:text-lg font-semibold leading-snug">
+            <h3 className="whitespace-nowrap capitalize line-clamp-2 text-base lg:text-lg font-semibold leading-snug">
               {name}
             </h3>
 
