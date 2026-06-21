@@ -5,9 +5,7 @@
 import { load } from "@std/dotenv";
 import { fileURLToPath } from "node:url";
 
-const envPath = fileURLToPath(
-  new URL("../../../../backend/.env", import.meta.url),
-);
+const envPath = fileURLToPath(new URL("../../.env", import.meta.url));
 
 await load({
   envPath,

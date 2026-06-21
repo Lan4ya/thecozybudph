@@ -190,12 +190,9 @@ describe("Admin Shipping Workflow", () => {
     assertEquals(order?.status, "to_ship");
 
     // Cancel the shipment
-    const cancelRes = await adminRequest(
-      `/admin/order/${seed.orderId}/ship/cancel`,
-      {
-        method: "DELETE",
-      },
-    );
+    const cancelRes = await adminRequest(`/admin/order/${seed.orderId}/ship`, {
+      method: "DELETE",
+    });
     assertEquals(cancelRes.status, 200);
     const cancelBody = await cancelRes.json();
     assertEquals(cancelBody.data.success, true);

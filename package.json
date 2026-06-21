@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "dev:sb": "cd backend && pn exec supabase start && pn exec supabase functions serve --no-verify-jwt",
+    "dev:sb": "cd backend && pn exec supabase start && pn exec supabase functions serve --no-verify-jwt --env-file ./supabase/.env",
     "dev:fe": "pn -F frontend dev",
     "dev:tunnel": "ngrok http 54321",
     "dev": "concurrently \"pn dev:sb\" \"pn dev:fe\"",

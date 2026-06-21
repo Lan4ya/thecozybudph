@@ -236,7 +236,7 @@ describe("Admin Orders API", () => {
 
       // 4. Cancel the shipment
       const cancelRes = await adminRequest(
-        `/admin/order/${seed.orderId}/ship/cancel`,
+        `/admin/order/${seed.orderId}/ship`,
         {
           method: "DELETE",
         },
