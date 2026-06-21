@@ -44,15 +44,19 @@ pn i
 
 ### 3. Set env vars for all listed directories
 
-./frontend/.env.local
 ```bash
+# ./frontend/.env.local
+
 VITE_SUPABASE_URL=
 VITE_SUPABASE_ANON_KEY=
 VITE_CF_TURNSTILE_SITE_KEY=
 VITE_APP_URL=http://localhost:5173
 ```
-/backend/.env
+
 ```bash
+# /backend/.env
+# Used by Node scripts
+
 SUPABASE_URL=
 SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
@@ -67,21 +71,22 @@ LALAMOVE_PUBLIC_KEY=
 LALAMOVE_SECRET_KEY=
 LALAMOVE_WEBHOOK_SERCRET=
 
-GEOAPIFY_API_KEY=
 ENV=development
 APP_URL=http://localhost:5173
 ```
-./backend/supabase/.env
-```bash
-# Google OAuth
-GOOGLE_CLIENT_ID=
-GOOGLE_SECRET=
 
-# SMTP
-RESEND_API_KEY=
-```
-./backend/supabase/functions/.env
 ```bash
+# ./backend/supabase/.env
+# Used by Supabase functions, Supabase config.toml, and Supabase tests
+
+# Supabase functions doesn't need these SUPABASE vars since it injects them
+# automatically when running locally, this is used solely by tests. We can
+# safely ignore supabase's warning 'Env name cannot start with SUPABASE_'
+SUPABASE_URL=
+SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+SUPABASE_DB_URL=
+
 PAYMONGO_PUBLIC_KEY=
 PAYMONGO_SECRET_KEY=
 PAYMONGO_CHECKOUT_WEBHOOK_SECRET=
@@ -91,16 +96,23 @@ LALAMOVE_SECRET_KEY=
 
 GEOAPIFY_API_KEY=
 
+# Cloudflare turnstile
 CF_TURNSTILE_SECRET_KEY=
 
 ENV=development
 APP_URL=http://localhost:5173
+
+# Google OAuth
+GOOGLE_CLIENT_ID=
+GOOGLE_SECRET=
+
+# SMTP
+RESEND_API_KEY=
 ```
 
 ### 4. Run dev server
 
 Make sure docker in running first, then run:
-
 ```bash
 pn dev
 ```
@@ -111,14 +123,12 @@ pn db:seed
 ```
 
 Part of seed script creates an admin account. Use it on login to access admin dashboard.
-
 ```bash
 email: admin@local.dev
 password: password123
 ```
 
 ### 5. Open Website
-
 ```bash
 http://localhost:5173
 ```
@@ -129,7 +139,7 @@ http://localhost:5173
 
 ### PNPM Workspace Packages
 
-This project uses a pn monorepo.
+This project uses a pnpm monorepo.
 Workspace definitions are located in:
 
 ```txt
@@ -216,18 +226,9 @@ pn update:latest:sb
 
 ---
 
-## 🧪 Supabase Edge Function Tests
+## 🧪 Supabase Function Tests
 
-Integration tests intentionally use a separate Deno workspace.
-
-This avoids coupling:
-
-- test execution
-- runtime module resolution
-- dependency graphs
-- environment initialization
-
-with the production Supabase Functions runtime.
+Tests intentionally use a separate Deno workspace for isolation.
 
 ### Running all integration tests
 
