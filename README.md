@@ -5,7 +5,7 @@
 - [Typescript](https://www.typescriptlang.org/)
 - [React](https://react.dev/)
 - [TailwindCSS](https://tailwindcss.com/)
-- [React Router (Data Mode)](https://reactrouter.com/start/data/installation/)
+- [React Router (data mode)](https://reactrouter.com/start/data/installation/)
 - [Lucide](https://lucide.dev/)
 - [ShadCN](https://ui.shadcn.com/)
 - [Motion](https://motion.dev/)
@@ -14,11 +14,12 @@
 
 ### Backend:
 
-- [Supabase (Deno & PostgreSQL)](https://supabase.com/)
+- [Supabase](https://supabase.com/)
 - [Hono](https://hono.dev/)
-- [Node (scripting & cli only)](https://nodejs.org/en)
-- [PayMongo](https://www.paymongo.com/)
+- [Node (scripting only)](https://nodejs.org/en)
 - [Drizzle](https://orm.drizzle.team/docs/get-started)
+- [PayMongo (payment gateway)](https://www.paymongo.com/)
+- [Lalamove API (product shipment booking)](https://developers.lalamove.com/#introduction-change-log)
 
 ---
 
@@ -41,16 +42,17 @@ cd thecozybudph
 pn i
 ```
 
-### 3. Set env vars per directory
+### 3. Set env vars for all listed directories
 
+./frontend/.env.local
 ```bash
-# ./frontend/.env.local
 VITE_SUPABASE_URL=
 VITE_SUPABASE_ANON_KEY=
+VITE_CF_TURNSTILE_SITE_KEY=
+VITE_APP_URL=http://localhost:5173
 ```
-
+/backend/.env
 ```bash
-# ./backend/.env
 SUPABASE_URL=
 SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
@@ -59,29 +61,27 @@ SUPABASE_DB_URL=
 PAYMONGO_PUBLIC_KEY=
 PAYMONGO_SECRET_KEY=
 
-PAYMONGO_CHECKOUT_WEBHOOK_SECRET=
+PAYMONGO_WEBHOOK_SECRET=
 
 LALAMOVE_PUBLIC_KEY=
 LALAMOVE_SECRET_KEY=
+LALAMOVE_WEBHOOK_SERCRET=
 
 GEOAPIFY_API_KEY=
 ENV=development
 APP_URL=http://localhost:5173
 ```
-
+./backend/supabase/.env
 ```bash
-# ./backend/supabase/.env
-# Google OAuth:
+# Google OAuth
 GOOGLE_CLIENT_ID=
 GOOGLE_SECRET=
 
-# Google SMTP:
-GOOGLE_APP_USERNAME=
-GOOGLE_APP_PASSWORD=
+# SMTP
+RESEND_API_KEY=
 ```
-
+./backend/supabase/functions/.env
 ```bash
-# ./backend/supabase/functions/.env
 PAYMONGO_PUBLIC_KEY=
 PAYMONGO_SECRET_KEY=
 PAYMONGO_CHECKOUT_WEBHOOK_SECRET=
@@ -91,8 +91,10 @@ LALAMOVE_SECRET_KEY=
 
 GEOAPIFY_API_KEY=
 
+CF_TURNSTILE_SECRET_KEY=
+
 ENV=development
-APP_URL=https://thecozybudph.com
+APP_URL=http://localhost:5173
 ```
 
 ### 4. Run dev server
@@ -104,14 +106,11 @@ pn dev
 ```
 
 ### 4.5. Seed DB
-
-Note: Do NOT spam this script since you'll get hit with rate limit and the script will not work for a while
-
 ```bash
 pn db:seed
 ```
 
-Part of seed script creates an admin account. Use it for login to access admin dashboard.
+Part of seed script creates an admin account. Use it on login to access admin dashboard.
 
 ```bash
 email: admin@local.dev
@@ -199,6 +198,12 @@ pn add:sb npm:@hono/zod-openapi
 pn add:sb jsr:@std/testing/mock
 ```
 
+### Removing dependency
+
+```bash
+pn remove:sb <registry-name>:<package-name>
+```
+
 ### Updating dependencies
 
 ```bash
@@ -230,13 +235,18 @@ with the production Supabase Functions runtime.
 pn test:sb
 ```
 
-### Add a test dependency
+### Adding test dependency
 
 ```bash
 pn add:sb:tests <registry-name>:<package-name>
 ```
+### Removing test dependency
 
-### Update test dependencies
+```bash
+pn remove:sb:tests <registry-name>:<package-name>
+```
+
+### Updating test dependencies
 
 ```bash
 pn update:sb:tests
@@ -272,26 +282,23 @@ http://localhost:54321/functions/v1/order/doc
 ```bash
 http://localhost:54321/functions/v1/order/ui
 ```
-
 ---
 
 <br>
 
----
-
-## LOC as of 06/11/26
+## LOC as of 06/22/26
 
 ```bash
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- Language              Files        Lines         Code     Comments       Blanks
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- CSS                       3          258          204           15           39
- HTML                      3          292          280            8            4
- JavaScript                2           59           52            1            6
- SQL                     108         1329         1044           58          227
- TSX                     192        22536        19950          538         2048
- TypeScript              393        33977        29238         1885         2854
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- Total                   701        58451        50768         2505         5178
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ Language              Files        Lines 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ CSS                       3          258 
+ HTML                      3          299 
+ JavaScript                2           80 
+ SQL                     114         1358 
+ TSX                     186        21942 
+ TypeScript              418        36290 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ Total                   726        60227 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
