@@ -34,6 +34,10 @@ export const addressDataSchema = createAddressSchema.extend({
   id: z.uuid(),
 });
 
+export const deleteAddressDataSchema = z.object({
+  id: z.uuid(),
+});
+
 // ----------------------- RESPONSE SCHEMAS -----------------------
 
 export const getAddressesResponseSchema = apiSuccessResponseSchema(
@@ -42,6 +46,10 @@ export const getAddressesResponseSchema = apiSuccessResponseSchema(
 
 export const getAddressResponseSchema = apiSuccessResponseSchema(
   addressDataSchema.nullable(),
+);
+
+export const deleteAddressResponseSchema = apiSuccessResponseSchema(
+  deleteAddressDataSchema,
 );
 
 export const createAddressResponseSchema =

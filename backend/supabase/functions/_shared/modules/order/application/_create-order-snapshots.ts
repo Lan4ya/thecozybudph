@@ -5,7 +5,6 @@ import { imageSnapshots } from "@shared/schemas/index.ts";
 import { and, eq, sql } from "drizzle-orm";
 import pLimit from "p-limit";
 import { formatSupabasePublicUrl } from "../../../utils/mod.ts";
-import { isDev } from "../../../utils/isDev.ts";
 import { parseSupabaseUrls } from "../parse-supabase-urls.ts";
 import { PreparedOrderItem } from "./_create-order-prep.ts";
 import { SupabaseDB } from "@shared/types.d.ts";
@@ -16,7 +15,7 @@ export const createOrderSnapshots = async (
   orderItems: PreparedOrderItem[],
   incrementedSnapshotHashes: string[],
 ): Promise<Map<string, string>> => {
-  const limit = pLimit(10);
+  const limit = pLimit(5);
 
   const uniqueHashes = Array.from(
     new Map(orderItems.map((item) => [item.primaryImageHash, item])).values(),
@@ -38,6 +37,7 @@ export const createOrderSnapshots = async (
 
         incrementedSnapshotHashes.push(hash);
 
+        // Download the image from products bucket and upload it to image_snapshots bucket (copying it over)
         if (snapshotRecord.refCount === 1) {
           const { images, invalids } = parseSupabaseUrls([img.primaryImageUrl]);
 
@@ -83,7 +83,7 @@ export const createOrderSnapshots = async (
 
         return {
           sourceHash: hash,
-          snapshotUrl: formatSupabasePublicUrl(publicUrl, isDev),
+          snapshotUrl: formatSupabasePublicUrl(publicUrl),
         };
       }),
     ),
@@ -105,18 +105,16 @@ export const rollbackOrderSnapshots = async (
   supabaseService: SupabaseDB,
   incrementedSnapshotHashes: string[],
 ) => {
-  if (!incrementedSnapshotHashes.length) {
-    return;
-  }
+  if (!incrementedSnapshotHashes.length) return;
+
+  const hashesToDelete: string[] = [];
 
   await db.admin
     .transaction(async (tx) => {
       for (const hash of incrementedSnapshotHashes) {
         const [updated] = await tx
           .update(imageSnapshots)
-          .set({
-            refCount: sql`GREATEST(0, ${imageSnapshots.refCount} - 1)`,
-          })
+          .set({ refCount: sql`GREATEST(0, ${imageSnapshots.refCount} - 1)` })
           .where(eq(imageSnapshots.hash, hash))
           .returning({ refCount: imageSnapshots.refCount });
 
@@ -132,13 +130,7 @@ export const rollbackOrderSnapshots = async (
             .returning({ hash: imageSnapshots.hash });
 
           if (deleted) {
-            await ProductStorage.deleteImages(
-              supabaseService,
-              "image_snapshots",
-              [hash],
-            ).catch((err) =>
-              console.error(`Failed to delete orphaned snapshot ${hash}:`, err),
-            );
+            hashesToDelete.push(hash);
           }
         }
       }
@@ -146,4 +138,18 @@ export const rollbackOrderSnapshots = async (
     .catch((err) => {
       console.error("Failed to rollback reference counts after error", err);
     });
+
+  // Perform external storage cleanup safely outside tx
+  if (hashesToDelete.length > 0) {
+    await ProductStorage.deleteImages(
+      supabaseService,
+      "image_snapshots",
+      hashesToDelete,
+    ).catch((err) =>
+      console.error(
+        `Failed to delete orphaned snapshots ${hashesToDelete.join(", ")}:`,
+        err,
+      ),
+    );
+  }
 };

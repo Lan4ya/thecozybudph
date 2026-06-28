@@ -17,13 +17,8 @@ export default function AddressesPage() {
 
   return (
     <div className="mx-auto w-full max-w-5xl space-y-6 px-4 py-6 md:px-6 lg:px-8">
-      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div className="space-y-1">
-          <h1 className="text-header">My Addresses</h1>
-          <p className="text-muted-foreground font-medium">
-            Manage your shipping and billing addresses.
-          </p>
-        </div>
+      <div className="flex gap-4 justify-between">
+        <h1 className="text-header">My Addresses</h1>
 
         <Link to="add">
           <Button className="rounded-xl">

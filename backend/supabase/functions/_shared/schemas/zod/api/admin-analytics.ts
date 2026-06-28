@@ -1,7 +1,7 @@
 import z from "zod";
 import { apiSuccessResponseSchema } from "./_response.ts";
 
-export const adminAnalyticsSchema = z.object({
+export const adminAnalyticsDataSchema = z.object({
   keyMetrics: z.object({
     totalRevenue: z.object({
       value: z.string(),
@@ -77,5 +77,6 @@ export const adminAnalyticsSchema = z.object({
   ),
 });
 
-export const adminAnalyticsResponseSchema =
-  apiSuccessResponseSchema(adminAnalyticsSchema);
+export const adminAnalyticsResponseSchema = apiSuccessResponseSchema(
+  adminAnalyticsDataSchema,
+);

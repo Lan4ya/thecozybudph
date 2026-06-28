@@ -31,7 +31,7 @@ export const orders = pgTable(
       .notNull()
       .references(() => profiles.id, { onDelete: "set null" }),
     status: text("status").$type<DBOrderStatus>().default("to_pay").notNull(),
-    source: text("source").$type<OrderSource>().notNull(),
+    source: text("source").$type<OrderSource>().notNull().default("shop"),
     serviceType: text("service_type").$type<ServiceType>().notNull(),
 
     // Payment Details
@@ -55,7 +55,10 @@ export const orders = pgTable(
     check("orders_shipping_cents_check", sql`${table.shippingCents} >= 0`),
     check("orders_subtotal_cents_check", sql`${table.subtotalCents} >= 0`),
     check("orders_total_cents_check", sql`${table.totalCents} >= 0`),
-    check("orders_source_check", sql`${table.source} IN ('shop', 'cart')`),
+    check(
+      "orders_source_check",
+      sql`${table.source} IN ('shop', 'instagram,', 'facebook', 'others')`,
+    ),
     check(
       "orders_status_check",
       sql`${table.status} IN ('to_pay', 'paid', 'to_ship', 'shipped', 'to_receive', 'fulfilled', 'cancelled', 'expired')`,
@@ -198,41 +201,5 @@ export const orderItemsSnapshots = pgTable(
         )
       `,
     }),
-  ],
-);
-
-export const orderCreationRequests = pgTable(
-  "order_creation_requests",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    profileId: uuid("profile_id")
-      .notNull()
-      .references(() => profiles.id, { onDelete: "cascade" }),
-    idempotencyKey: text("idempotency_key").notNull(),
-    status: text("status").default("processing").notNull(),
-    orderId: uuid("order_id").references(() => orders.id, {
-      onDelete: "set null",
-    }),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .defaultNow()
-      .$onUpdate(() => new Date())
-      .notNull(),
-  },
-  (table) => [
-    uniqueIndex("order_creation_requests_profile_key_unique").on(
-      table.profileId,
-      table.idempotencyKey,
-    ),
-    index("idx_order_creation_requests_profile_status").on(
-      table.profileId,
-      table.status,
-    ),
-    check(
-      "order_creation_requests_status_check",
-      sql`${table.status} IN ('processing', 'completed', 'failed')`,
-    ),
   ],
 );

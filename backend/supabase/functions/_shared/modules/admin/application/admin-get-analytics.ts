@@ -1,5 +1,5 @@
 import {
-  AdminAnalyticsRes,
+  AdminAnalyticsData,
   orderAddressesSnapshot,
   orderItemsSnapshots,
   orders,
@@ -10,8 +10,8 @@ import { DrizzleClient } from "../../../db/client.ts";
 
 export const getAnalytics = async (
   db: DrizzleClient,
-): Promise<AdminAnalyticsRes> => {
-  // Key Metrics
+): Promise<AdminAnalyticsData> => {
+  // key metrics
   const [revenueRes] = await db.admin
     .select({ total: sum(orders.totalCents) })
     .from(orders)
@@ -26,7 +26,7 @@ export const getAnalytics = async (
     .select({ count: count() })
     .from(profiles);
 
-  // Conversion rate is tricky without a visits table. Mocking it for now.
+  // conversion rate is tricky without a visits table. Mocking it for now.
   const totalRevenue = (Number(revenueRes?.total || 0) / 100).toLocaleString(
     "en-PH",
     {
@@ -35,7 +35,7 @@ export const getAnalytics = async (
     },
   );
 
-  // Revenue Trend (last 30 days)
+  // revenue trend (last 30 days)
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 

@@ -890,6 +890,20 @@
       "when": 1781873400265,
       "tag": "0126_dry_white_queen",
       "breakpoints": true
+    },
+    {
+      "idx": 127,
+      "version": "7",
+      "when": 1782308332314,
+      "tag": "0127_lame_scarecrow",
+      "breakpoints": true
+    },
+    {
+      "idx": 128,
+      "version": "7",
+      "when": 1782627633984,
+      "tag": "0128_many_energizer",
+      "breakpoints": true
     }
   ]
 }

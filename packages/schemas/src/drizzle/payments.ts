@@ -54,18 +54,6 @@ export const payments = pgTable(
 
     uniqueIndex("payments_unique_per_order").on(t.orderId),
 
-    uniqueIndex("payments_unique_refunded_per_order")
-      .on(t.orderId)
-      .where(sql`${t.status} = 'refunded'`),
-
-    uniqueIndex("payments_unique_pending_per_order")
-      .on(t.orderId)
-      .where(sql`${t.status} = 'pending'`),
-
-    uniqueIndex("payments_unique_paid_per_order")
-      .on(t.orderId)
-      .where(sql`${t.status} = 'paid'`),
-
     pgPolicy("authenticated can select own payment", {
       as: "permissive",
       to: authenticatedRole,

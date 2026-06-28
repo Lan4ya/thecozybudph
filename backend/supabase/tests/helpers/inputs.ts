@@ -1,5 +1,4 @@
 import {
-  AddressData,
   CreateAddressInput,
   CreateOrderInput,
   CreateProductInput,
@@ -144,6 +143,7 @@ export const genCreateOrderInput = (params: {
   primaryImageUrl?: string;
 }): CreateOrderInput => ({
   source: "shop",
+  fromCart: false,
   addressId: params.addressId,
   items: [
     {

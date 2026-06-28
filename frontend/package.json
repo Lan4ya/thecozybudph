@@ -11,6 +11,7 @@
     "test": "vitest --environment happy-dom"
   },
   "dependencies": {
+    "@aivangogh/ph-address": "^2025.4.4",
     "@cozybud/schemas": "workspace:*",
     "@floating-ui/dom": "^1.7.4",
     "@floating-ui/react": "^0.27.16",

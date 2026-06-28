@@ -18,7 +18,7 @@ import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { useCallback } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { useParams, useNavigate } from "react-router";
+import { useParams } from "react-router";
 import { z } from "zod";
 import { FieldError } from "../../components/FieldError";
 
@@ -64,13 +64,47 @@ export const EditAddressForm = ({
 
   const { addToast } = useToast();
   const queryClient = useQueryClient();
-  const navi = useNavigate();
 
   const [isDefault, phoneNumber] = useWatch({
     control,
     name: ["isDefault", "phoneNumber"],
   });
   const displayPhoneNumber = phoneNumber?.replace(/^\+63/, "") ?? "";
+
+  const { mutate: deleteAddressMutation, isPending: deleteLoading } =
+    useMutation({
+      mutationFn: (addressId: string) => AddressAPI.deleteAddress(addressId),
+      onError: (err: AppError) => {
+        isDev && console.error(err.message);
+        if (
+          err.status === 404 &&
+          err.message === "No geocoding results found"
+        ) {
+          addToast(
+            "We couldn't find this address on the map. Please double-check your address details",
+            "error",
+          );
+          return;
+        }
+        addToast("Something went wrong. Please try again later.", "error");
+      },
+      onSuccess: (data) => {
+        queryClient.setQueryData<AddressData[]>([addressesQK], (old) => {
+          if (!old) return old;
+          const next = [...old];
+          const idx = next.findIndex((n) => n.id === data.id);
+          const exists = idx !== -1;
+          if (exists) next.splice(idx, 1);
+          return next;
+        });
+
+        addToast("Deleted address", "success");
+
+        if (onSuccessSideEffect) {
+          onGoBack();
+        }
+      },
+    });
 
   const { mutate: updateAddressMutation, isPending: updateLoading } =
     useMutation({
@@ -137,6 +171,20 @@ export const EditAddressForm = ({
     });
   }, [isDefault, setValue, addToast, updatingAddress?.isDefault]);
 
+  const handleDelete = () => {
+    if (!addressId) return;
+
+    if (updatingAddress?.isDefault) {
+      addToast(
+        "Cannot delete default address. Set another address as default first.",
+        "error",
+      );
+      return;
+    }
+
+    deleteAddressMutation(addressId);
+  };
+
   const onSubmit = (address: EditAddressFormValues) => {
     if (!updatingAddress?.id) return;
     isDev && console.log("submit address payload", address);
@@ -175,7 +223,7 @@ export const EditAddressForm = ({
 
         <div className="mb-10 flex gap-2  max-w-140">
           <div className="h-auto w-2 bg-yellow-500" />
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm lg:text-base text-muted-foreground">
             NOTE: As we use Lalamove's services, we only currently deliver to
             North, Central, South Luzon, and Cebu Islandwide. See Lalamove's{" "}
             <a
@@ -297,9 +345,9 @@ export const EditAddressForm = ({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="space-y-4 mt-4"
+            className="space-y-4 mt-4 lg:sticky lg:top-20 lg:h-fit"
           >
-            <div className="rounded-3xl border border-border/60 bg-card p-4 shadow-sm sm:p-6 lg:sticky lg:top-20 lg:h-fit">
+            <div className="rounded-3xl border border-border/60 bg-card p-4 shadow-sm sm:p-6">
               <div className="mb-2 text-sm font-medium text-foreground/90">
                 Set as default address
               </div>
@@ -309,7 +357,7 @@ export const EditAddressForm = ({
                 onClick={toggleDefault}
                 className={cn(
                   "flex w-full items-center justify-between rounded-2xl border border-border/60 bg-background px-4 py-3 text-left shadow-sm transition-colors hover:border-primary/40",
-                  updatingAddress?.isDefault && "opacity-60",
+                  updatingAddress?.isDefault && "cursor-not-allowed",
                 )}
               >
                 <div>
@@ -339,8 +387,14 @@ export const EditAddressForm = ({
             {/*  CTA */}
             <div className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-center gap-2 border-t border-border/60 bg-background/90 p-4 backdrop-blur md:px-6 lg:static lg:justify-end lg:border-none lg:bg-transparent lg:p-0 lg:backdrop-none">
               <Button
-                className="h-10 flex-1 rounded-2xl lg:w-34 lg:flex-none lg:rounded-xl"
+                type="button"
+                className={cn(
+                  "h-10 flex-1 rounded-2xl lg:w-34 lg:flex-none lg:rounded-xl",
+                  updatingAddress?.isDefault && "cursor-not-allowed",
+                )}
                 variant="destructive"
+                disabled={deleteLoading}
+                onClick={handleDelete}
               >
                 Delete
               </Button>

@@ -21,7 +21,7 @@ export type InsertOrderAddressSnapshot = InferInsertModel<
 >;
 
 export type InsertPendingOrder = {
-  order: Omit<InsertOrder, "id">;
+  order: Omit<InsertOrder & { fromCart: boolean }, "id">;
   items: Omit<InsertOrderItemSnapshot, "id" | "orderId">[];
   address: Omit<InsertOrderAddressSnapshot, "id" | "orderId">;
 };

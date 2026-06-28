@@ -4,6 +4,7 @@ import {
   cartItems,
   carts,
   CreateOrderRes,
+  idempotencyKeys,
   InsertOrder,
   orderAddressesSnapshot,
   orderItemsSnapshots,
@@ -16,6 +17,8 @@ import {
   PreparedOrderItem,
 } from "./_create-order-prep.ts";
 import { Geoapify } from "@shared/integrations/geoapify/mod.ts";
+
+export const CREATE_ORDER_IDEMPOTENCY_OPERATION = "create_order";
 
 /**
  * Persists the prepared order data to the database within a single transaction.
@@ -33,19 +36,30 @@ export const persistCreateOrderTransaction = async (
   db: DrizzleClient,
   params: {
     profileId: string;
+    fromCart: boolean;
     order: InsertOrder;
     orderAddress: PreparedOrderAddress;
     orderItems: PreparedOrderItem[];
     snapshotUrlByHash: Map<string, string>;
+    idempotencyKey: string;
+    requestHash: string;
   },
 ): Promise<CreateOrderRes> => {
-  const { order, orderAddress, orderItems, profileId, snapshotUrlByHash } =
-    params;
+  const {
+    order,
+    orderAddress,
+    orderItems,
+    profileId,
+    snapshotUrlByHash,
+    idempotencyKey,
+    requestHash,
+    fromCart,
+  } = params;
 
   const { lat: latitude, lng: longitude } =
     await Geoapify.getCoordsByAddress(orderAddress);
 
-  return db.rls(async (tx) => {
+  return db.admin.transaction(async (tx) => {
     const [pendingOrder] = await tx
       .insert(orders)
       .values(order)
@@ -80,23 +94,25 @@ export const persistCreateOrderTransaction = async (
       orderId: pendingOrder.id,
     });
 
-    if (order.source === "cart") {
+    // Rm items from user's cart if the order came from cart
+    if (fromCart === true) {
       const [cart] = await tx
         .select({ id: carts.id })
         .from(carts)
         .where(eq(carts.profileId, profileId))
         .limit(1);
 
-      const variantIds = orderItems.map((item) => item.variantId);
-
-      await tx
-        .delete(cartItems)
-        .where(
-          and(
-            eq(cartItems.cartId, cart.id),
-            inArray(cartItems.productVariantId, variantIds),
-          ),
-        );
+      if (cart) {
+        const variantIds = orderItems.map((item) => item.variantId);
+        await tx
+          .delete(cartItems)
+          .where(
+            and(
+              eq(cartItems.cartId, cart.id),
+              inArray(cartItems.productVariantId, variantIds),
+            ),
+          );
+      }
     }
 
     const [payment] = await tx
@@ -109,9 +125,37 @@ export const persistCreateOrderTransaction = async (
       })
       .returning({ id: payments.id });
 
-    return {
+    const response = {
       orderId: pendingOrder.id,
       paymentId: payment.id,
     };
+
+    // Complete create-order idempotency
+    const [completedIdempotencyKey] = await tx
+      .update(idempotencyKeys)
+      .set({
+        status: "completed",
+        responsePayload: response,
+        errorPayload: null,
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(idempotencyKeys.profileId, profileId),
+          eq(idempotencyKeys.operation, CREATE_ORDER_IDEMPOTENCY_OPERATION),
+          eq(idempotencyKeys.idempotencyKey, idempotencyKey),
+          eq(idempotencyKeys.requestHash, requestHash),
+          eq(idempotencyKeys.status, "processing"),
+        ),
+      )
+      .returning({ id: idempotencyKeys.id });
+
+    if (!completedIdempotencyKey) {
+      throw AppError.conflict({
+        message: "Failed to finalize idempotent create-order request",
+      });
+    }
+
+    return response;
   });
 };

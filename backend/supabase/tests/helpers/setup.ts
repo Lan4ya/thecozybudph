@@ -1,5 +1,5 @@
 /*
- * This file is preloaded when running tests
+ * NOTE: This file is preloaded when running tests
  */
 
 import { load } from "@std/dotenv";

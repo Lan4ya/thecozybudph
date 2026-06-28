@@ -13,7 +13,7 @@ import { StatusBadge } from "./StatusBadge";
 import { getOrderItemCount } from "./OrdersTable";
 import { useToast } from "@/providers/ToastProvider";
 import { AdminAPI } from "@/api";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQueries } from "@tanstack/react-query";
 import { queryClient } from "@/providers/TanstackQueryProvider";
 import {
   AlertCircle,
@@ -144,23 +144,27 @@ export function OrderDetailsDrawer({
     };
   }, [open]);
 
-  const { data: order, isLoading: isLoadingOrder } = useQuery({
-    queryKey: ["order", orderId],
-    queryFn: () => AdminAPI.getOrder(orderId!),
-    enabled: open && !!orderId && animationCompleted,
-    meta: { persist: true },
-  });
-
-  const {
-    data: shipment,
-    isLoading: isLoadingShipment,
-    refetch: refetchShipment,
-    isFetching: isFetchingShipment,
-  } = useQuery({
-    queryKey: ["shipment", order?.id],
-    queryFn: () => AdminAPI.getShipmentOrder(order!.id),
-    enabled: open && !!order?.id && animationCompleted,
-    meta: { persist: true },
+  const [
+    { data: order, isLoading: isLoadingOrder },
+    {
+      data: shipment,
+      isLoading: isLoadingShipment,
+      refetch: refetchShipment,
+      isFetching: isFetchingShipment,
+    },
+  ] = useQueries({
+    queries: [
+      {
+        queryKey: ["order", orderId],
+        queryFn: () => AdminAPI.getOrder(orderId!),
+        enabled: open && !!orderId && animationCompleted,
+      },
+      {
+        queryKey: ["shipment", orderId],
+        queryFn: () => AdminAPI.getShipmentOrder(orderId!),
+        enabled: open && !!orderId && animationCompleted,
+      },
+    ],
   });
 
   const { mutate: shipOrder, isPending: isShipping } = useMutation({
@@ -176,15 +180,13 @@ export function OrderDetailsDrawer({
       );
     },
     onSuccess: (_shipment) => {
-      console.log({ adminOrdersQK });
-
       addToast("Shipment booked!", "success");
 
       queryClient.invalidateQueries({
         queryKey: ["order", orderId],
       });
       queryClient.invalidateQueries({
-        queryKey: ["shipment", order?.id],
+        queryKey: ["shipment", orderId],
       });
       queryClient.invalidateQueries({ queryKey: adminOrdersQK });
     },
@@ -203,7 +205,7 @@ export function OrderDetailsDrawer({
     onSuccess: () => {
       addToast("Cancellation request sent, please wait a moment", "info");
 
-      queryClient.invalidateQueries({ queryKey: ["shipment", order?.id] });
+      queryClient.invalidateQueries({ queryKey: ["shipment", orderId] });
       setIsPollingCancellation(true);
 
       // Poll 5 times, 5sec interval
@@ -430,7 +432,7 @@ export function OrderDetailsDrawer({
               </section>
 
               {/* Shipment Section */}
-              <section className="space-y-4 pt-4 border-t">
+              <section className="space-y-4 pt-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-sm font-semibold flex items-center gap-2">
                     <Truck className="size-4" />

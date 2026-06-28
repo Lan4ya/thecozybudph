@@ -18,7 +18,6 @@ import { formatPriceCents } from "@/lib/utils/format";
 import z from "zod";
 import isDev from "@/lib/utils/isDev";
 import { useCartItemMutations } from "@/pages/cart/hooks/useCartMutations.ts";
-import { useAuthStore } from "@/store/useAuthStore.ts";
 import { useCheckoutStore } from "@/store/useCheckoutStore.ts";
 import { useProductSelectionStore } from "@/store/useProductSelectionStore.ts";
 import { Button } from "@/lib/ui/__shadcn__/button.tsx";
@@ -73,7 +72,7 @@ const ProductInner = () => {
 
   const resetProductSelectionStore = useProductSelectionStore((s) => s.reset);
 
-  const setCheckoutSource = useCheckoutStore((s) => s.setSource);
+  const setCheckoutFromCart = useCheckoutStore((s) => s.setFromCart);
   const setCheckoutOrderItems = useCheckoutStore((s) => s.setOrderItemsUI);
 
   useEffect(() => {
@@ -146,7 +145,7 @@ const ProductInner = () => {
     const sessionId = crypto.randomUUID();
 
     useCheckoutStore.getState().reset();
-    setCheckoutSource("shop");
+    setCheckoutFromCart(false);
     setCheckoutOrderItems([orderItem]);
     // Since sessionId only is stored client side only (sessionStorage), we're gonna use this
     // to verify the user really created the checkout sessionId properly and not

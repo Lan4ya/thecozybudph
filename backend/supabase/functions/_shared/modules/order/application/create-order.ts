@@ -4,7 +4,6 @@ import { CreateOrderInput, CreateOrderRes } from "@shared/schemas/index.ts";
 import { SupabaseDB } from "../../../types.d.ts";
 import {
   beginCreateOrderIdempotency,
-  completeCreateOrderIdempotency,
   failCreateOrderIdempotency,
 } from "./_create-order-idempotency.ts";
 import { prepareCreateOrderData } from "./_create-order-prep.ts";
@@ -40,6 +39,7 @@ export const createOrder = async (
   },
 ): Promise<CreateOrderRes> => {
   const { profileId, payload, idempotencyKey } = params;
+  const { fromCart, ...orderInput } = payload;
 
   if (!idempotencyKey) {
     throw AppError.badRequest({ message: "Missing Idempotency-Key" });
@@ -48,7 +48,7 @@ export const createOrder = async (
   // Claim or replay idempotency key.
   const idempotencyResult = await beginCreateOrderIdempotency(db, {
     profileId,
-    payload,
+    orderInput,
     idempotencyKey,
   });
 
@@ -60,11 +60,10 @@ export const createOrder = async (
   const incrementedSnapshotHashes: string[] = [];
 
   try {
-    // Validate availability and calculate final cents.
     const preparedOrderData = await prepareCreateOrderData(
       db,
       profileId,
-      payload,
+      orderInput,
     );
 
     const snapshotUrlByHash = await createOrderSnapshots(
@@ -76,18 +75,13 @@ export const createOrder = async (
 
     const createdOrder = await persistCreateOrderTransaction(db, {
       profileId,
+      fromCart,
       order: preparedOrderData.order,
       orderAddress: preparedOrderData.orderAddress,
       orderItems: preparedOrderData.orderItems,
       snapshotUrlByHash,
-    });
-
-    // Mark the idempotency key as completed and store the response for future replays.
-    await completeCreateOrderIdempotency(db, {
-      profileId,
       idempotencyKey,
       requestHash: idempotencyResult.requestHash,
-      response: createdOrder,
     });
 
     return createdOrder;
@@ -101,7 +95,6 @@ export const createOrder = async (
       error,
     });
 
-    // Rollback storage snapshots (decrement ref counts and delete if orphaned).
     await rollbackOrderSnapshots(
       db,
       supabaseService,

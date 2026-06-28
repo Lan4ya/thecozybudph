@@ -119,7 +119,7 @@ const CreateAddressForm = ({ onSuccessSideEffect }: CreateAddressFormProps) => {
 
         <div className="mb-10 flex gap-2  max-w-140">
           <div className="h-auto w-2 bg-yellow-500" />
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm lg:text-base text-muted-foreground">
             Note: As we use Lalamove's services, we only currently deliver to
             North, Central, South Luzon, and Cebu Islandwide. See Lalamove's{" "}
             <a
@@ -246,9 +246,9 @@ const CreateAddressForm = ({ onSuccessSideEffect }: CreateAddressFormProps) => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="space-y-4 mt-4"
+            className="space-y-4 mt-4 lg:sticky lg:top-20 lg:h-fit"
           >
-            <div className="rounded-3xl border border-border/60 bg-card p-4 shadow-sm sm:p-6 lg:sticky lg:top-20 lg:h-fit">
+            <div className="rounded-3xl border border-border/60 bg-card p-4 shadow-sm sm:p-6">
               <div className="mb-2 text-sm font-medium text-foreground/90">
                 Set as default address
               </div>

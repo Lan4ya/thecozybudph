@@ -1,5 +1,5 @@
 import { EditAddressForm } from "@/pages/checkout/pages/address-edit/EditAddressForm";
-import { useCheckoutStore } from "@/pages/checkout/store/useCheckoutStore";
+import { useCheckoutStore } from "@/store/useCheckoutStore";
 import type { AddressData } from "@cozybud/schemas";
 import { useNavigate } from "react-router";
 

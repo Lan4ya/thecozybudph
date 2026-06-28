@@ -13,8 +13,6 @@ type Payment = {
   total?: number;
 } | null;
 
-type Source = "shop" | "cart" | null;
-
 const CHECKOUT_SESSION_NAME = "checkout-details";
 
 export type OrderItemUI = {
@@ -46,8 +44,8 @@ type CheckoutState = {
   checkout: Checkout;
   setCheckout: (ck: Checkout) => void;
 
-  source: Source;
-  setSource: (s: Source) => void;
+  fromCart: boolean;
+  setFromCart: (s: boolean) => void;
 
   orderItemsUI: OrderItemUI[];
   setOrderItemsUI: (oi: OrderItemUI[]) => void;
@@ -66,7 +64,7 @@ export const useCheckoutStore = create<CheckoutState>()(
   persist(
     (set, _get, api) => ({
       checkout: null,
-      source: null,
+      fromCart: false,
       orderItemsUI: [],
       address: null,
       shipping: null,
@@ -79,7 +77,7 @@ export const useCheckoutStore = create<CheckoutState>()(
         api.persist.clearStorage();
         set({
           checkout: null,
-          source: null,
+          fromCart: false,
           orderItemsUI: [],
           address: null,
           shipping: null,
@@ -93,7 +91,7 @@ export const useCheckoutStore = create<CheckoutState>()(
           return { checkout: { ...prev, ...patch } };
         }),
 
-      setSource: (source) => set({ source }),
+      setFromCart: (fromCart) => set({ fromCart }),
 
       setAddress: (address) => set({ address }),
 
@@ -123,7 +121,7 @@ export const useCheckoutStore = create<CheckoutState>()(
       partialize: (state) => ({
         // only persist specific fields
         orderItemsUI: state.orderItemsUI,
-        source: state.source,
+        fromCart: state.fromCart,
         checkout: state.checkout,
         address: state.address,
         payment: state.payment,

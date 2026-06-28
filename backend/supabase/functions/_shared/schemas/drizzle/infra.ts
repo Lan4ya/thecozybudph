@@ -7,8 +7,12 @@ import {
   uniqueIndex,
   pgEnum,
   primaryKey,
+  integer,
+  bigint,
+  check,
 } from "drizzle-orm/pg-core";
 import { profiles } from "./profiles.ts";
+import { sql } from "drizzle-orm";
 
 export const webhookEvents = pgTable("webhook_events", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -68,5 +72,31 @@ export const actionCooldowns = pgTable(
   (table) => [
     // Creates a composite Primary Key from both columns
     primaryKey({ columns: [table.profileId, table.actionType] }),
+  ],
+);
+
+// NOTE: this table is altered in migrations as an UNLOGGED Table
+export const rateLimits = pgTable("rate_limits", {
+  key: text("key").primaryKey(),
+  count: integer("count").notNull().default(0),
+  resetAt: bigint("reset_at", { mode: "number" }).notNull(),
+});
+
+export const imageSnapshots = pgTable(
+  "image_snapshots",
+  {
+    hash: text("hash").primaryKey(),
+    refCount: integer("ref_count").notNull().default(0),
+    createdAt: timestamp("created_at", {
+      withTimezone: true,
+    })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    check(
+      "image_snapshots_ref_count_non_negative",
+      sql`${table.refCount} >= 0`,
+    ),
   ],
 );

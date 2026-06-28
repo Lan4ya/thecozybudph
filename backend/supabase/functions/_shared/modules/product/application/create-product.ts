@@ -19,7 +19,6 @@ export const createProduct = async (
   let uploadCleanup: (() => Promise<void>) | undefined;
 
   try {
-    // Upload images
     const { urls, hashes, cleanup } = await ProductStorage.uploadImages(
       supabaseService,
       "products",

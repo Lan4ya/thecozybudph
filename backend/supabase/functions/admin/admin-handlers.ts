@@ -80,6 +80,7 @@ export const getOrderHandler: RouteHandler<
   const { db } = requireVariables(c, "db");
   const { id: orderId } = c.req.valid("param");
   const data = await AdminActions.getOrder(db, orderId);
+  console.log({ data });
   return c.json({ data }, 200);
 };
 

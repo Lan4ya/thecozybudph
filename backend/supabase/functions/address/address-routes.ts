@@ -5,9 +5,10 @@ import {
   supabaseMiddleware,
 } from "@shared/middlewares/mod.ts";
 import {
+  apiErrorResponseSchema,
   createAddressResponseSchema,
   createAddressSchema,
-  apiErrorResponseSchema,
+  deleteAddressResponseSchema,
   getAddressesResponseSchema,
   getAddressResponseSchema,
   updateAddressResponseSchema,
@@ -17,10 +18,43 @@ import {
 import { AppEnv } from "@shared/types.d.ts";
 import {
   createAddressHandler,
+  deleteAddressHandler,
   getAddressesHandler,
   getDefaultAddressesHandler,
   updateAddressHandler,
 } from "./address-handlers.ts";
+
+export const deleteAddressRoute = createRoute({
+  method: "delete",
+  path: "/{id}",
+  middleware: [
+    supabaseMiddleware(),
+    authMiddleware(),
+    drizzleMiddleware(),
+  ] as const,
+  request: {
+    params: uuidParamSchema("id"),
+  },
+  responses: {
+    200: {
+      description: "Delete user's address",
+      content: {
+        "application/json": {
+          schema: deleteAddressResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: apiErrorResponseSchema,
+        },
+      },
+    },
+  },
+  tags: ["Address"],
+});
 
 export const getAddressesRoute = createRoute({
   method: "get",
@@ -187,5 +221,6 @@ address.openapi(getAddressesRoute, getAddressesHandler);
 address.openapi(getDefaultAddressRoute, getDefaultAddressesHandler);
 address.openapi(createAddressRoute, createAddressHandler);
 address.openapi(updateAddressRoute, updateAddressHandler);
+address.openapi(deleteAddressRoute, deleteAddressHandler);
 
 export default address;

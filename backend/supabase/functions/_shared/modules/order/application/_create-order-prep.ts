@@ -9,6 +9,7 @@ import { Lalamove } from "@shared/integrations/lalamove/mod.ts";
 type VariantDetails = Awaited<
   ReturnType<typeof OrderRepository.getDetailsByVariantIds>
 >[number];
+
 type AddressRow = NonNullable<
   Awaited<ReturnType<typeof AddressRepository.getById>>
 >;
@@ -43,7 +44,7 @@ export type PreparedCreateOrderData = {
 export const prepareCreateOrderData = async (
   db: DrizzleClient,
   profileId: string,
-  payload: CreateOrderInput,
+  payload: Omit<CreateOrderInput, "fromCart">,
 ): Promise<PreparedCreateOrderData> => {
   const address = await AddressRepository.getById(db, payload.addressId);
   if (!address) throw AppError.notFound({ message: "Address not found" });

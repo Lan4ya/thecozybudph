@@ -1,7 +1,8 @@
-import {
-  type AddressData,
-  type CreateAddressInput,
-  type UpdateAddressInput,
+import type {
+  AddressData,
+  CreateAddressInput,
+  DeleteAddressData,
+  UpdateAddressInput,
 } from "@cozybud/schemas";
 import { client, unwrapData } from "./_client";
 import isDev from "@/lib/utils/isDev";
@@ -23,6 +24,13 @@ export const AddressAPI = {
       body: payload,
     });
     return unwrapData(data, "PATCH /address");
+  },
+
+  deleteAddress: async (id: string): Promise<DeleteAddressData> => {
+    const { data } = await client.address.DELETE("/address/{id}", {
+      params: { path: { id } },
+    });
+    return unwrapData(data, "GET /address/default");
   },
 
   getAddresses: async (): Promise<AddressData[]> => {

@@ -4,6 +4,7 @@ import { AppEnv } from "@shared/types.d.ts";
 import { requireVariables } from "@shared/utils/mod.ts";
 import {
   createAddressRoute,
+  deleteAddressRoute,
   getAddressesRoute,
   getDefaultAddressRoute,
   updateAddressRoute,
@@ -59,4 +60,15 @@ export const getAddressesHandler: RouteHandler<
   const profileId = claims.sub;
   const res = await AddressActions.getAddresses(db, profileId);
   return c.json({ data: res }, 200);
+};
+
+export const deleteAddressHandler: RouteHandler<
+  typeof deleteAddressRoute,
+  AppEnv
+> = async (c) => {
+  const { db, claims } = requireVariables(c, "db", "claims");
+  const profileId = claims.sub;
+  const { id: addressId } = c.req.valid("param");
+  const data = await AddressActions.deleteAddress(db, addressId, profileId);
+  return c.json({ data }, 200);
 };

@@ -1,4 +1,5 @@
 import { SnakeToCamel, CamelToSnake } from "@shared/schemas/index.ts";
+import { isDev } from "@shared/utils/isDev.ts";
 
 export const formatPrice = (price = 0) => {
   const hasCentavos = !Number.isInteger(price);
@@ -11,11 +12,11 @@ export const formatPrice = (price = 0) => {
   });
 };
 
-export const formatSupabasePublicUrl = (url: string, isDev: boolean) => {
+export const formatSupabasePublicUrl = (url: string) => {
   if (!url) return url;
 
   return isDev
-    ? // replace internal docker host + port with localhost mapped port so the browser can access it
+    ? // replace supabase's internal docker host + port with localhost mapped port so the browser can access it
       url.replace("kong:8000", "127.0.0.1:54321")
     : url;
 };

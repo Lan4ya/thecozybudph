@@ -3,7 +3,7 @@ import AddressSection from "./components/AddressSection";
 import ShippingSection from "./components/ShippingSection";
 import PaymentMethodsSection from "./components/PaymentMethodsSection";
 import PaymentDetailsSection from "./components/PaymentDetailsSection";
-import BottomBar from "./components/BottomBar";
+import CheckoutBottomBar from "./components/CheckoutBottomBar";
 import OrderSummary from "./components/OrderSummary";
 
 const Checkout = () => {
@@ -18,7 +18,7 @@ const Checkout = () => {
         <PaymentDetailsSection />
       </div>
 
-      <BottomBar />
+      <CheckoutBottomBar />
     </div>
   );
 };

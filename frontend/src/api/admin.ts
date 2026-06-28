@@ -6,7 +6,7 @@ import {
   type AdminQueryOrdersData,
   type CreateProductFormOutput,
   type UpdateProductFormOutput,
-  type AdminAnalyticsRes,
+  type AdminAnalyticsData,
   type CreateShippingQuoteData,
   type CreateShippingQuoteInput,
   type GetShippingOrderData,
@@ -248,7 +248,7 @@ export const AdminAPI = {
 
   // ------------------------- Analytics -------------------------
 
-  getAnalytics: async (): Promise<AdminAnalyticsRes> => {
+  getAnalytics: async (): Promise<AdminAnalyticsData> => {
     const { data: raw } = await client.admin.GET("/admin/analytics");
     return unwrapData(raw, "GET /admin/analytics");
   },

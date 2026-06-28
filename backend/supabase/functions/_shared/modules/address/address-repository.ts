@@ -184,6 +184,17 @@ export const AddressRepository = {
     });
   },
 
+  delete: (db: DrizzleClient, id: string, profileId: string) =>
+    db.rls(async (tx) => {
+      return await tx
+        .delete(addresses)
+        .where(and(eq(addresses.id, id), eq(addresses.profileId, profileId)))
+        .returning({
+          id: addresses.id,
+        })
+        .then((r) => r[0]);
+    }),
+
   getById: (db: DrizzleClient, id: string) =>
     db.rls(async (tx) => {
       return await tx.query.addresses.findFirst({

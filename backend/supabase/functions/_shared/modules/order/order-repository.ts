@@ -45,7 +45,7 @@ export const OrderRepository = {
         .returning();
 
       // Delete the item(s) from user cart if the order came from cart and not directly from shop
-      if (order.source === "cart") {
+      if (order.fromCart === true) {
         const cart = await CartRepository.getCartByProfileId(
           db,
           order.profileId,

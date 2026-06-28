@@ -149,8 +149,12 @@ export interface paths {
             requestBody?: {
                 content: {
                     "application/json": {
-                        /** @enum {string} */
-                        source: "shop" | "cart";
+                        /**
+                         * @default shop
+                         * @enum {string}
+                         */
+                        source?: "shop" | "instagram" | "facebook" | "others";
+                        fromCart: boolean;
                         items: {
                             quantity: number;
                             /** Format: uuid */
@@ -378,7 +382,7 @@ export interface paths {
                                 /** Format: uri */
                                 paymentUrl: string | null;
                                 /** @enum {string} */
-                                status: "confirming" | "processing" | "pending" | "paid" | "failed" | "cancelled" | "refunded";
+                                status: "processing" | "pending" | "paid" | "failed" | "cancelled" | "refunded";
                             };
                         };
                     };
@@ -459,7 +463,7 @@ export interface paths {
                                 /** Format: uuid */
                                 orderId: string;
                                 /** @enum {string} */
-                                status: "confirming" | "pending" | "paid" | "failed";
+                                status: "pending" | "paid";
                                 /** Format: date-time */
                                 expiresAt: string;
                             };

@@ -23,7 +23,7 @@ type BeginIdempotencyResult =
  * Converts a value to a deterministic JSON string.
  *
  * Standard JSON.stringify does not guarantee key order for objects.
- * We need consistent output so that the same payload always produces the same hash,
+ * We need consistent output so that the same orderInput always produces the same hash,
  * preventing false mismatches due to property ordering differences in the client.
  */
 const toStableJson = (value: unknown): string => {
@@ -47,13 +47,13 @@ const toStableJson = (value: unknown): string => {
 };
 
 /**
- * Generates a SHA-256 hash of the payload.
+ * Generates a SHA-256 hash of the orderInput.
  *
  * This hash is used to verify that the same Idempotency-Key isn't reused
  * for a different set of order data (which would be an invalid client request).
  */
-const hashPayload = async (payload: unknown): Promise<string> => {
-  const data = new TextEncoder().encode(toStableJson(payload));
+const hashPayload = async (orderInput: unknown): Promise<string> => {
+  const data = new TextEncoder().encode(toStableJson(orderInput));
   const digest = await crypto.subtle.digest("SHA-256", data);
   return Array.from(new Uint8Array(digest))
     .map((byte) => byte.toString(16).padStart(2, "0"))
@@ -83,12 +83,12 @@ export const beginCreateOrderIdempotency = async (
   db: DrizzleClient,
   params: {
     profileId: string;
-    payload: CreateOrderInput;
+    orderInput: Omit<CreateOrderInput, "fromCart">;
     idempotencyKey: string;
   },
 ): Promise<BeginIdempotencyResult> => {
-  const { idempotencyKey, payload, profileId } = params;
-  const requestHash = await hashPayload(payload);
+  const { idempotencyKey, orderInput, profileId } = params;
+  const requestHash = await hashPayload(orderInput);
 
   const [claimedIdempotencyKey] = await db.admin
     .insert(idempotencyKeys)
@@ -132,7 +132,8 @@ export const beginCreateOrderIdempotency = async (
 
   if (existingIdempotencyKey.requestHash !== requestHash) {
     throw AppError.conflict({
-      message: "This Idempotency-Key was already used with a different payload",
+      message:
+        "This Idempotency-Key was already used with a different orderInput",
     });
   }
 
@@ -140,7 +141,7 @@ export const beginCreateOrderIdempotency = async (
     if (!isCreateOrderRes(existingIdempotencyKey.responsePayload)) {
       throw AppError.internal({
         message:
-          "Completed idempotent create-order request has invalid response payload",
+          "Completed idempotent create-order request has invalid response orderInput",
       });
     }
 
@@ -156,6 +157,7 @@ export const beginCreateOrderIdempotency = async (
     });
   }
 
+  // Reclaims failed requests
   const [reclaimedIdempotencyKey] = await db.admin
     .update(idempotencyKeys)
     .set({
@@ -185,43 +187,6 @@ export const beginCreateOrderIdempotency = async (
     kind: "claimed",
     requestHash,
   };
-};
-
-export const completeCreateOrderIdempotency = async (
-  db: DrizzleClient,
-  params: {
-    profileId: string;
-    idempotencyKey: string;
-    requestHash: string;
-    response: CreateOrderRes;
-  },
-) => {
-  const { idempotencyKey, profileId, requestHash, response } = params;
-
-  const [completedIdempotencyKey] = await db.admin
-    .update(idempotencyKeys)
-    .set({
-      status: "completed",
-      responsePayload: response,
-      errorPayload: null,
-      updatedAt: new Date(),
-    })
-    .where(
-      and(
-        eq(idempotencyKeys.profileId, profileId),
-        eq(idempotencyKeys.operation, CREATE_ORDER_IDEMPOTENCY_OPERATION),
-        eq(idempotencyKeys.idempotencyKey, idempotencyKey),
-        eq(idempotencyKeys.requestHash, requestHash),
-        eq(idempotencyKeys.status, "processing"),
-      ),
-    )
-    .returning({ id: idempotencyKeys.id });
-
-  if (!completedIdempotencyKey) {
-    throw AppError.conflict({
-      message: "Failed to finalize idempotent create-order request",
-    });
-  }
 };
 
 export const failCreateOrderIdempotency = async (

@@ -83,7 +83,7 @@ const Cart = () => {
     const sessionId = crypto.randomUUID();
 
     useCheckoutStore.getState().reset();
-    useCheckoutStore.getState().setSource("cart");
+    useCheckoutStore.getState().setFromCart(true);
     useCheckoutStore.getState().setOrderItemsUI(orderItems);
     // Since sessionId only is stored client side only (sessionStorage), we're gonna use this
     // to verify the user really created the checkout sessionId properly and not
@@ -96,10 +96,6 @@ const Cart = () => {
     <>
       <div className="custom-container space-y-22 pb-25 pt-6 max-w-7xl mx-auto">
         <header className="py-2 border-b border-border/40 grid grid-cols-3 items-center">
-          {/* <Button variant="minimal" size="auto" onClick={() => navigate(-1)}> */}
-          {/*   <ArrowLeft /> */}
-          {/* </Button> */}
-
           <h1 className="text-nowrap col-start-2 text-header justify-self-center">
             Your Cart Items
           </h1>

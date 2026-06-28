@@ -1,6 +1,6 @@
 import type { SupabaseDB } from "@shared/types.d.ts";
 import pLimit from "p-limit";
-import { formatSupabasePublicUrl, isDev } from "@shared/utils/mod.ts";
+import { formatSupabasePublicUrl } from "@shared/utils/mod.ts";
 
 export const ProductStorage = {
   deleteImages: async (
@@ -64,7 +64,7 @@ export const ProductStorage = {
 
         return {
           path,
-          url: formatSupabasePublicUrl(publicUrl, isDev),
+          url: formatSupabasePublicUrl(publicUrl),
           hash,
         };
       }),

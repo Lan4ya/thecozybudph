@@ -20,20 +20,20 @@ import { createShippingQuoteQK } from "./ShippingSection";
 import { useCheckoutStore } from "@/store/useCheckoutStore";
 import { usePaymentStore } from "@/store/usePaymentStore";
 
-const BottomBar = () => {
+const CheckoutBottomBar = () => {
   const navigate = useNavigate();
   const {
     shippingQuoteId,
     serviceType,
     total,
-    source,
+    fromCart,
     address,
     orderItemsUI,
     paymentMethodType,
   } = useCheckoutStore(
     useShallow((s) => ({
       total: s.payment?.total,
-      source: s.source,
+      fromCart: s.fromCart,
       address: s.address,
       orderItemsUI: s.orderItemsUI,
       shippingQuoteId: s.shipping?.quotationId,
@@ -92,7 +92,7 @@ const BottomBar = () => {
     }
 
     const payload = {
-      source,
+      fromCart,
       items: orderItems,
       addressId: address?.id,
       shippingQuoteId,
@@ -156,4 +156,4 @@ const BottomBar = () => {
   );
 };
 
-export default BottomBar;
+export default CheckoutBottomBar;

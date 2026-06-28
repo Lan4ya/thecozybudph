@@ -210,20 +210,21 @@ describe("Admin Orders API", () => {
 
   describe("Shipping Workflow", () => {
     it("ships a paid order and then cancels it", async () => {
-      // 1. Create a PAID order
+      // Create a PAID order
       const seed = await createSeedOrder(true);
 
-      // 2. Ship the order (book Lalamove)
+      // Ship the order (book Lalamove)
       const shipRes = await adminRequest(`/admin/order/${seed.orderId}/ship`, {
         method: "PATCH",
         body: genAdminShipOrderInput(),
       });
+      console.log({ shipRes });
 
       assertEquals(shipRes.status, 200);
       const shipBody = await shipRes.json();
       assertEquals(shipBody.data.shipmentStatus, "ASSIGNING_DRIVER");
 
-      // 3. Verify status in DB
+      // Verify status in DB
       const order = await userDb.admin.query.orders.findFirst({
         where: eq(orders.id, seed.orderId),
       });
@@ -234,7 +235,7 @@ describe("Admin Orders API", () => {
       });
       assert(shipment?.lalamoveOrderId);
 
-      // 4. Cancel the shipment
+      // Cancel the shipment
       const cancelRes = await adminRequest(
         `/admin/order/${seed.orderId}/ship`,
         {
@@ -251,7 +252,7 @@ describe("Admin Orders API", () => {
         status: "paid",
       });
 
-      // 5. Verify status reverted in DB
+      // Verify status reverted in DB
       const revertedOrder = await userDb.admin.query.orders.findFirst({
         where: eq(orders.id, seed.orderId),
       });

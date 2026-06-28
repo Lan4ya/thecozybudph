@@ -512,7 +512,7 @@ export type Database = {
           profile_id: string
           service_type: string
           shipping_cents: number
-          source: string
+          source?: string
           status?: string
           subtotal_cents: number
           total_cents: number
@@ -749,6 +749,24 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limits: {
+        Row: {
+          count: number
+          key: string
+          reset_at: number
+        }
+        Insert: {
+          count?: number
+          key: string
+          reset_at: number
+        }
+        Update: {
+          count?: number
+          key?: string
+          reset_at?: number
+        }
+        Relationships: []
+      }
       shipments: {
         Row: {
           cancel_party: string | null
@@ -890,9 +908,8 @@ export type Database = {
     Enums: {
       cooldown_type: "otp_sms" | "email_verification" | "password_reset"
       payment_status:
-        | "confirming"
-        | "processing"
         | "pending"
+        | "processing"
         | "paid"
         | "failed"
         | "cancelled"
@@ -1038,9 +1055,8 @@ export const Constants = {
     Enums: {
       cooldown_type: ["otp_sms", "email_verification", "password_reset"],
       payment_status: [
-        "confirming",
-        "processing",
         "pending",
+        "processing",
         "paid",
         "failed",
         "cancelled",

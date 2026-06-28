@@ -149,8 +149,12 @@ export interface paths {
             requestBody?: {
                 content: {
                     "application/json": {
-                        /** @enum {string} */
-                        source: "shop" | "cart";
+                        /**
+                         * @default shop
+                         * @enum {string}
+                         */
+                        source?: "shop" | "instagram" | "facebook" | "others";
+                        fromCart: boolean;
                         items: {
                             quantity: number;
                             /** Format: uuid */

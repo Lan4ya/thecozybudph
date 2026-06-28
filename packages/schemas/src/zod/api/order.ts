@@ -23,7 +23,12 @@ export const ORDER_STATUS = [
 ] as const;
 
 export const orderStatusSchema = z.enum(ORDER_STATUS);
-export const orderSourceSchema = z.enum(["shop", "cart"]);
+export const orderSourceSchema = z.enum([
+  "shop",
+  "instagram",
+  "facebook",
+  "others",
+]);
 export const customerOrderStatusSchema = z.enum(CUSTOMER_ORDER_STATUS);
 
 export const queryOrdersSchema = z.object({
@@ -78,7 +83,8 @@ export const orderItemSchema = addCartItemSchema;
 export const orderAddressSchema = createAddressSchema;
 
 export const createOrderSchema = z.object({
-  source: orderSourceSchema,
+  source: orderSourceSchema.optional().default("shop"),
+  fromCart: z.boolean(),
   items: z
     .array(
       orderItemSchema.extend({

@@ -65,6 +65,9 @@ importers:
 
   frontend:
     dependencies:
+      '@aivangogh/ph-address':
+        specifier: ^2025.4.4
+        version: 2025.4.4
       '@cozybud/schemas':
         specifier: workspace:*
         version: link:../packages/schemas
@@ -324,6 +327,9 @@ packages:
 
   '@adobe/css-tools@4.5.0':
     resolution: {integrity: sha512-6OzddxPio9UiWTCemp4N8cYLV2ZN1ncRnV1cVGtve7dhPOtRkleRyx32GQCYSwDYgaHU3USMm84tNsvKzRCa1Q==}
+
+  '@aivangogh/ph-address@2025.4.4':
+    resolution: {integrity: sha512-25r9QXqRFTrM5XpqTdTihs9XU9WGaMViUpCB7nkLZNOyHL5tLQY4kzpKVzk3PUN9+Ckgrg5VgKbChgYvZ4z5Sw==}
 
   '@asteasolutions/zod-to-openapi@7.3.4':
     resolution: {integrity: sha512-/2rThQ5zPi9OzVwes6U7lK1+Yvug0iXu25olp7S0XsYmOqnyMfxH7gdSQjn/+DSOHRg7wnotwGJSyL+fBKdnEA==}
@@ -3911,6 +3917,9 @@ packages:
     resolution: {integrity: sha512-LaNjtRWUBY++zB5nE/NwcaoMylSPk+S+ZHNB1TzdbMJMny6dynpAGt7X/tl/QYq3TIeE6nxHppbo2LGymrG5Pw==}
     engines: {node: '>=10'}
 
+  pako@2.2.0:
+    resolution: {integrity: sha512-zJq6RP/5q+TO2OpFV3FHzlPnFjmkb7Nc99a5SNjJE+uu/PkpChs+NIZSSzbBoD+6kjiISXjfYdwj1ZRQ81dz/w==}
+
   parent-module@1.0.1:
     resolution: {integrity: sha512-GQ2EWRpQV8/o+Aw8YqtfZZPfNRWZYkbidE9k5rpl/hC3vtHHBfGm2Ifi6qWV+coDGkrUKZAxE3Lot5kcsRlh+g==}
     engines: {node: '>=6'}
@@ -4720,6 +4729,10 @@ packages:
 snapshots:
 
   '@adobe/css-tools@4.5.0': {}
+
+  '@aivangogh/ph-address@2025.4.4':
+    dependencies:
+      pako: 2.2.0
 
   '@asteasolutions/zod-to-openapi@7.3.4(zod@4.3.6)':
     dependencies:
@@ -7996,6 +8009,8 @@ snapshots:
   p-locate@5.0.0:
     dependencies:
       p-limit: 3.1.0
+
+  pako@2.2.0: {}
 
   parent-module@1.0.1:
     dependencies:

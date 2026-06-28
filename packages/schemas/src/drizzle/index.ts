@@ -6,7 +6,6 @@ import * as products from "./products.ts";
 import * as payments from "./payments.ts";
 import * as profiles from "./profiles.ts";
 import * as infra from "./infra.ts";
-import * as imageSnapshots from "./image_snapshots.ts";
 import * as eventInquiries from "./event-inquiries.ts";
 
 export const drizzleSchemas = {
@@ -18,7 +17,6 @@ export const drizzleSchemas = {
   ...payments,
   ...profiles,
   ...infra,
-  ...imageSnapshots,
   ...eventInquiries,
 };
 
@@ -30,5 +28,4 @@ export * from "./products.ts";
 export * from "./payments.ts";
 export * from "./profiles.ts";
 export * from "./infra.ts";
-export * from "./image_snapshots.ts";
 export * from "./event-inquiries.ts";
